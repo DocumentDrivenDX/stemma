@@ -39,4 +39,4 @@ if [ ! -x "$dest/bun" ]; then
 fi
 
 ln -sfn "bun-$version/bun" "$root/.tools/bun"
-"$root/.tools/bun" --version
+BUN_RUNTIME_TRANSPILER_CACHE_PATH="$root/.tools/transpiler-cache" "$root/.tools/bun" --version

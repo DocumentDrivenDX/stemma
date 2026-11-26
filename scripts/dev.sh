@@ -11,6 +11,7 @@ cd "$root"
 "$root/scripts/setup-bun.sh" >/dev/null
 export BUN_INSTALL="$root/.tools/bun-home"
 export BUN_INSTALL_CACHE_DIR="$root/.tools/bun-cache"
+export BUN_RUNTIME_TRANSPILER_CACHE_PATH="$root/.tools/transpiler-cache"
 bun="$root/.tools/bun"
 # --no-install: no run-time package download. The other two stop Bun loading a
 # working directory's .env and bunfig.toml (SEC-014).
