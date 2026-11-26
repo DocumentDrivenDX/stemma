@@ -1,0 +1,140 @@
+Stemma demo. All names and sources are invented.
+DEMO is a fresh temporary directory
+"stemma" below means: cd <plugin root> && bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js
+Plugin root: <plugin root>
+
+=============== 1. Create a project and record two sources
+
+$ stemma init --project $DEMO/book
+Created a Stemma project in $DEMO/book
+  wrote rules.md
+  wrote .gitattributes
+  wrote .gitignore
+  wrote stemma.json
+[exit 0]
+
+$ stemma record add source --input $DEMO/harbour.json --actor person:demo-author --project $DEMO/book
+Added src-demo0harbour01
+  records/sources/src-demo0harbour01.json
+No record problems found.
+[exit 0]
+
+$ stemma record add source --input $DEMO/orphan.json --actor person:demo-author --project $DEMO/book
+Added src-demo0orphan001
+  records/sources/src-demo0orphan001.json
+No record problems found.
+[exit 0]
+
+=============== 2. Add two citations: one with a mistyped key
+
+$ stemma record add citation --input $DEMO/cite-1.json --actor person:demo-author --project $DEMO/book
+Added cit-demo0toll00001
+  records/citations/cit-demo0toll00001.json
+No record problems found.
+[exit 0]
+
+$ stemma record add citation --input $DEMO/cite-2.json --actor person:demo-author --project $DEMO/book
+Added cit-demo0toll00002
+  records/citations/cit-demo0toll00002.json
+No record problems found.
+[exit 0]
+
+By hand: list both sources for the bibliography in stemma.json (orphan1990 is never cited).
+
+=============== 3. Check: the seeded errors are reported and explained
+
+$ stemma check --project $DEMO/book
+OPEN FINDINGS: 3 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 13 result(s) passed.
+
+1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
+   Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
+   What to do: Cite it, remove it from bibliography_include in stemma.json, or keep it on purpose and record why.
+   - src-demo0orphan001
+       source file: records/sources/src-demo0orphan001.json
+       key: orphan1990
+
+2. PROBLEM: A citation uses a key that no source record holds.  [cite.key]
+   Why it matters: A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.
+   What to do: Correct the key in the citation, or add a source record with that key (or add it to the right source's key_aliases).
+   - cit-demo0toll00002
+       citation file: records/citations/cit-demo0toll00002.json
+       key: hartwel1998
+       sentence: The toll was doubled in the following century.
+
+3. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
+   Why it matters: Digests, review marks and diffs depend on one exact form. No value is wrong because of this alone.
+   What to do: Run `fmt` on the file. It rewrites the layout and changes no value.
+   - stemma.json
+       file: stemma.json
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - whether cited figures appear in the stored source text  [number.present]
+   - whether you hold a copy of each cited source, with its text extracted  [source.held]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0harbour01 (not admitted)
+
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/book/.stemma/reports/check.json
+[exit 1]
+
+=============== 4. Fix them: correct the key, drop the uncited listing, reformat
+
+$ stemma fmt --project $DEMO/book
+Rewrote 1 file(s) in canonical form.
+  stemma.json
+No record problems found.
+[exit 0]
+
+$ stemma check --project $DEMO/book
+OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 15 result(s) passed.
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - whether cited figures appear in the stored source text  [number.present]
+   - whether you hold a copy of each cited source, with its text extracted  [source.held]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0harbour01 (not admitted)
+
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/book/.stemma/reports/check.json
+[exit 1]
+
+The seeded errors are gone. The project is still NOT called checked clean, on purpose:
+it cites a source, and this version cannot yet check some things about cited sources
+(listed under NOT CHECKED). Those count as open.
+
+=============== 5. What checked clean looks like today: sources recorded, nothing cited yet
+
+$ stemma init --project $DEMO/reading-list
+Created a Stemma project in $DEMO/reading-list
+  wrote rules.md
+  wrote .gitattributes
+  wrote .gitignore
+  wrote stemma.json
+[exit 0]
+
+$ stemma record add source --input $DEMO/harbour.json --actor person:demo-author --project $DEMO/reading-list
+Added src-demo0harbour01
+  records/sources/src-demo0harbour01.json
+No record problems found.
+[exit 0]
+
+$ stemma check --project $DEMO/reading-list
+CHECKED CLEAN: the checks found nothing open.
+This does not mean that the book is correct. It covers only what is in these project files.
+Checked the whole project: 6 result(s) passed.
+
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/reading-list/.stemma/reports/check.json
+[exit 0]
+
+Note: this label says nothing about citations, because this project has none.
+
+Demo finished as expected. The files are in $DEMO

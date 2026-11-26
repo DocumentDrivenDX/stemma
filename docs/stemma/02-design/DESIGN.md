@@ -18,9 +18,39 @@ ddx:
 
 Stemma has two interfaces: turns in an agent chat (M1 on) and the offline browser
 explorer (M3). A terminal user sees the command line's own output (CONTRACT-002).
-Nothing here is built. Screen readers, host chat rendering, and every browser are
-untested for these designs. Flows: [[UF-007]], [[UF-012]], [[UF-013]],
+Neither is built. The one thing built from this document is the documentation
+microsite (`website/`, see Microsite), which is not a product interface. Screen
+readers and host chat rendering are untested; for the microsite only headless
+Chromium has been used. Flows: [[UF-007]], [[UF-012]], [[UF-013]],
 [[UF-015]].
+
+## Identity and Voice
+
+- **Name**: Stemma; `stemma` for the command. A *stemma codicum* is the family
+  tree of a text's manuscripts. The idea it carries is a visible line of descent.
+- **Mark** (`website/src/mark.svg`, drawn for Stemma): one filled node for the
+  earliest witness and lines of descent to three open nodes, one through an
+  intermediate branch. It depicts no real tradition. It follows light and dark,
+  keeps clear space of a quarter of its width, and is not used below 16 pixels.
+- **Character**: a careful report. No mascot, seal, check mark, shadow, gradient,
+  or animation. Identity comes from the mark, serif headings, and the wording.
+  Stemma sets no brand color.
+- **Voice**: plain, specific, and short. Say what is wrong, show the evidence,
+  say why it matters, suggest what to do. Say what was not checked. Mark planned
+  work "not built", never "coming soon". Never praise the author's text or
+  present a model judgment as verification.
+
+### Family reuse
+
+Reviewed on 2026-11-26 with read-only access.
+
+| Source | Reused | Not reused, and why |
+|---|---|---|
+| arras (MIT OR Apache-2.0) | Color and radius role token defaults of `@documentdrivendx/arras-ui` 0.8.1, copied as values with attribution; its Playwright 1.63.0 and axe-core 4.13.0 pins | The package itself on the microsite, which has no record views and would need React |
+| HELIX | The practice of a written site design language; JetBrains Mono and Inter as faces | No files: the repository has no licence file. Hugo with the hextra theme needs Hugo and Go modules |
+| DocumentDrivenDX home page | Layout habits: static HTML, serif headings, a skip link | No files or colors: no licence file |
+| ux-builder (MIT OR Apache-2.0) | The rule that the contrast a page shows and the contrast a test enforces come from one function | Its token engine and widgets, which are larger than eight static pages need |
+| innsigle | Nothing | No licence file found |
 
 ## Modalities, Size Classes and App Frame
 
@@ -192,9 +222,12 @@ Computed from these literals with the WCAG contrast formula: text, muted text,
 and accent are at least 5.8:1, and the three status colors at least 4.7:1, on all
 three backgrounds. On accent is at least 6.6:1. The strong line is at least 3.3:1.
 The arras border color is 1.2:1 to 1.5:1, so it MUST NOT carry meaning or mark a
-control's edge. These are computed values only: contrast as rendered on screen,
-including Tailwind opacity modifiers, tints, and arras's own widgets, is
-unverified.
+control's edge. A local test computes these pairs from `website/src/tokens.css`,
+enforces floors of 4.5:1 for text and 3:1 for the strong line, and requires the
+stylesheet's color values to appear in this document. A browser test reads the rendered
+colors of a sample of each pair on the microsite, in light and dark, and axe-core
+checks each page. Contrast under Tailwind opacity modifiers or tints, and in
+arras's own widgets, is unverified.
 
 ### Spacing, shape, and type
 
@@ -211,6 +244,26 @@ arras 0.8.1 sets 13 px root text and uses pixel sizes in places; whether its
 views meet text resize at 200% is unverified. Typeset pages use the book's
 vendored fonts, not these tokens. Fonts for non-Latin interface text are
 untested. Quoted right-to-left text carries `lang` and `dir`.
+
+### Bundled fonts for published pages
+
+The product interfaces keep the arras system stacks above. The microsite and the
+captured command-line pages bundle their fonts, so that they look alike across
+machines and request nothing from another host: Source Serif 4 (headings), Inter
+(text), and JetBrains Mono (output and IDs), from pinned `@fontsource-variable`
+5.3.0 packages under the SIL Open Font License 1.1, with licence texts published
+beside the files. Only the Latin and extended Latin upright files are bundled;
+italics are synthesized by the browser.
+
+### Report components
+
+| Component | Convention |
+|---|---|
+| Status label | The script's exact word in a bordered label in the matching status color. Never a check mark or an icon alone |
+| Report excerpt | A figure whose caption says what the text is (commands to type, or a transcript of a real run) and what was replaced. Monospace, no ligatures, long lines wrap, reachable by keyboard. Color only repeats the report's own words |
+| Finding | Outcome, check ID and reason code; what is wrong; why it matters; what to do; evidence. Filled from a JSON report. A drawing of a report entry is labeled as such and is not presented as a Stemma screen |
+| Figure | A screenshot has alternative text, a caption saying how it was made, and the same content available as text. A captured page of command output says "Rendered page, not a terminal window" in the image and in its caption |
+| Planned work | Listed apart from what works, with the words "not built". It gets no screenshot or sample output |
 
 ### Styling: Tailwind with arras styles
 
@@ -239,6 +292,25 @@ Unverified: that the scoped reset and arras's stylesheet coexist without
 collisions; that Stemma views placed beside `GraphBrowser`, sharing its client
 and location, work without an arras extension (CONTRACT-005 G); and that the
 single offline page's content security policy accepts the bundled stylesheet.
+
+## Microsite
+
+`website/` is static HTML with one Tailwind stylesheet and no JavaScript, built by
+a Bun script (`./scripts/dev.sh site`). That is lighter than the family's Hugo
+sites, which add Hugo, Go modules, and a theme, while the one-page family home
+page has no generator to reuse. It follows the tokens, voice, and components
+above. Its navigation is a list of page links that wraps on narrow screens; the
+Menu button rule applies to the explorer only. Dark follows the system setting or
+`data-appearance`; the site has no switch of its own.
+
+Command transcripts, JSON reports, the check list, and screenshots under
+`website/generated/` come from real runs (`./scripts/dev.sh docs`) of the demo and
+the test fixtures. The local test run fails when they are stale or when a website
+file holds a local path. A screenshot counts as current when the page it was
+captured from is unchanged; its pixels are not compared between machines.
+Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,
+off-site requests, links, light and dark, 320 and 375 pixel widths, keyboard
+focus, and axe-core. The site is not deployed.
 
 ## Non-Goals
 

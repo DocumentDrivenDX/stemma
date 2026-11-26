@@ -1,0 +1,767 @@
+{
+  "body": {
+    "changed": [],
+    "inputs": {
+      "blobs": [],
+      "corpus_sha256": "498ddb1e428b0489a309ab94dd4a434b40657d4b55c69a28d600745afdef5804",
+      "manuscript": [],
+      "profiles": []
+    },
+    "label": "open_findings",
+    "mode": "work",
+    "not_run": [
+      {
+        "check": "build.uncommitted",
+        "reason": "input_absent"
+      },
+      {
+        "check": "changelog.missing",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.format",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.unlinked",
+        "reason": "input_absent"
+      },
+      {
+        "check": "claim.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "claim.inactive",
+        "reason": "input_absent"
+      },
+      {
+        "check": "construct.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "construct.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "draft.marked",
+        "reason": "input_absent"
+      },
+      {
+        "check": "id.resolves",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.alt",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.font",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.metadata",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.permission",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.placement",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.resolution",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.vector",
+        "reason": "input_absent"
+      },
+      {
+        "check": "locator.extent",
+        "reason": "input_absent"
+      },
+      {
+        "check": "meta.resolver",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "meta.source",
+        "reason": "input_absent"
+      },
+      {
+        "check": "number.present",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "package.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "quote.present",
+        "reason": "input_absent"
+      },
+      {
+        "check": "quote.self",
+        "reason": "input_absent"
+      },
+      {
+        "check": "restricted.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.changed",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.held",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "support.current",
+        "reason": "input_absent"
+      },
+      {
+        "check": "takeover.removal",
+        "reason": "input_absent"
+      }
+    ],
+    "redaction": "none",
+    "results": [
+      {
+        "annotations": [],
+        "check": "bib.uncited",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          }
+        ],
+        "finding_key": "27bb033a1d98e31531bfbdbdae5cc6eaf00c58b2dd260301c423c269ede53eb9",
+        "fixes": [],
+        "item": {
+          "content_sha256": "87f2475ea978d46c83c1f52596b70887f50c62904e039a6f72c5a063aae34d92",
+          "record": "src-fixture0harbour01"
+        },
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "source": "src-fixture0harbour01",
+        "subject": "src-fixture0harbour01",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "bib.uncited",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0orphan001.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "orphan1990"
+          }
+        ],
+        "finding_key": "1b0edc57b5b72598b3bf5d6f4acae43b93a1fee76758bc83f2e3e67098a9ea70",
+        "fixes": [
+          "add_citation",
+          "remove_from_bibliography"
+        ],
+        "item": {
+          "content_sha256": "df554a7e22ed0cd0a4cd68464e0c2bf19ae62b3d8f156dfa87eafb55e20924a7",
+          "record": "src-fixture0orphan001"
+        },
+        "message": "A source is listed for the built bibliography but cited nowhere.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "not_cited",
+        "rules": [],
+        "source": "src-fixture0orphan001",
+        "subject": "src-fixture0orphan001",
+        "suggestions": [
+          "Cite it, remove it from bibliography_include in stemma.json, or keep it on purpose and record why."
+        ],
+        "why": "The bibliography would list a work the book never cites, or a citation you meant to make is missing."
+      },
+      {
+        "annotations": [],
+        "check": "cite.key",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "citation_file",
+            "value": "records/citations/cit-fixture0ghost0001.json"
+          },
+          {
+            "class": "manuscript",
+            "name": "key",
+            "value": "ghost2020"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "A second invented harbour kept no toll books."
+          }
+        ],
+        "finding_key": "6ffcfbfbc14510d7981aa4bd653a05d3482fb9ebc360c7c8489db3669325fae8",
+        "fixes": [
+          "repoint",
+          "add_source",
+          "remove_citation"
+        ],
+        "item": {
+          "content_sha256": "55709641ed00c504b75b006b4a9c61366b281792bcb2eae26752457b2bf67dd4",
+          "record": "cit-fixture0ghost0001"
+        },
+        "message": "A citation uses a key that no source record holds.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "key_unknown",
+        "rules": [],
+        "sentence": {
+          "sha256": "10c73d03ea7a173dcc0b1f5cf7e82a9f3dc979a55381d7871220ff3e5f7e1c6f",
+          "text": "A second invented harbour kept no toll books."
+        },
+        "subject": "cit-fixture0ghost0001",
+        "suggestions": [
+          "Correct the key in the citation, or add a source record with that key (or add it to the right source's key_aliases)."
+        ],
+        "why": "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography."
+      },
+      {
+        "annotations": [],
+        "check": "cite.key",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "citation_file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          },
+          {
+            "class": "manuscript",
+            "name": "key",
+            "value": "hartwell1998"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "The invented town charged a toll at its harbour."
+          }
+        ],
+        "finding_key": "2888a66f099173405b8a92897e8b79bf44ee7bd16c52bf1c03c1ae4c97c58f5c",
+        "fixes": [],
+        "item": {
+          "content_sha256": "ef727f0a8ba832a8b68e81893791d02f2ce8e755393c0bfd54ce0dfb4ab3fcab",
+          "record": "cit-fixture0good00001"
+        },
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "sentence": {
+          "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
+          "text": "The invented town charged a toll at its harbour."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "cit-fixture0good00001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/agents/agt-fixture0broken001.json"
+          }
+        ],
+        "finding_key": "25715641dcc973752a609f098437b6015956b099d52703161f4ca7acb90728c3",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/agents/agt-fixture0broken001.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0ghost0001.json"
+          }
+        ],
+        "finding_key": "66e45b54dadf886043a460d834b40963ab7348687e1039c636e4d6a1aa82cabf",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/citations/cit-fixture0ghost0001.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          }
+        ],
+        "finding_key": "066f02d34a569a50cc1c43cb3f3c3a9f7b0fa215ead3121b1447c45ba82884fe",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/citations/cit-fixture0good00001.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0compact01.json"
+          }
+        ],
+        "finding_key": "980af35b1bff0ed4265aa303bccf63bd1cc1dcbaa6e2c1678472b0e4f7dd9aaa",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0compact01.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "84440d57951be3b327f6fa6ef4f4024481aa99e229f77439070a18a98179b21f",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0harbour01.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0invalid01.json"
+          }
+        ],
+        "finding_key": "b117fb6de9698756952bd0486bb62f10b4fd83705aa4662c36a95b6e69a68a90",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0invalid01.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0orphan001.json"
+          }
+        ],
+        "finding_key": "a03cf4c865cbf093f8cb6acd224b4e5c763890fc2e431484e7f0170ad9813d1d",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0orphan001.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          },
+          {
+            "class": "location",
+            "name": "position",
+            "value": "line 5, column 27"
+          }
+        ],
+        "finding_key": "be63402528afa7f362da8b3b7379a77d9d8c0fba41a15dcd5e7505a678164743",
+        "fixes": [],
+        "message": "Text in a project file looks like a map coordinate. The value is not repeated here.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "coordinate_text",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [
+          "Look at the position in the evidence. If it is a sensitive site, remove the value from the file (git history may still hold it). If it is public or not a coordinate, you need do nothing."
+        ],
+        "why": "This output can disclose a restricted site's position. The scan cannot tell whether a site is restricted, so it warns about every coordinate it recognizes."
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          }
+        ],
+        "finding_key": "8746b02fa87edc21e1660a3e6e360035dc292831faa40176bd63fbf0c6b09263",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0ghost0001.json"
+          }
+        ],
+        "finding_key": "dfce06ff97228264420401c3cfdc4957131034ca45895963de1f05cc9f9382e0",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "cit-fixture0ghost0001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          }
+        ],
+        "finding_key": "ce1ddc8726d6a0227efebcc51de65060337e3ba8af911a375728383111b62abc",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "cit-fixture0good00001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/agents/agt-fixture0broken001.json"
+          },
+          {
+            "class": "metadata",
+            "name": "problem",
+            "value": "duplicate_key"
+          }
+        ],
+        "finding_key": "79a798d9b26cf0f6a74a0ac6f3a4528cbec56abe5e330abdcf71670b2ed79394",
+        "fixes": [],
+        "message": "A file cannot be read as a record, so nothing in it was checked.",
+        "open": true,
+        "outcome": "unverifiable",
+        "reason_code": "record_unreadable",
+        "rules": [],
+        "subject": "records/agents/agt-fixture0broken001.json",
+        "suggestions": [
+          "Open the named file and repair it (look for merge-conflict markers, a repeated key or a missing bracket), or restore it from git. Stemma does not guess its content."
+        ],
+        "why": "Every other check reads these files. A broken record can hide a citation problem or create a false one."
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          },
+          {
+            "class": "location",
+            "name": "line",
+            "value": "7"
+          }
+        ],
+        "finding_key": "4fea38cd28b1b21a7ca293d718618761c000089d6705061b846233d97a6632ac",
+        "fixes": [],
+        "message": "A rule ID in rules.md is used twice.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "rule_id_duplicate",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [
+          "Give the later rule a number that has never been used."
+        ],
+        "why": "A report or record citing this ID could mean either rule."
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0compact01.json"
+          }
+        ],
+        "finding_key": "47d61b374d86c5c24f5661fe6c37cbb81a942f3d9737292417e23d7284f5d419",
+        "fixes": [
+          "format"
+        ],
+        "message": "A file is not written in the canonical form (key order, indentation or line endings differ).",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "record_noncanonical",
+        "rules": [],
+        "subject": "src-fixture0compact01",
+        "suggestions": [
+          "Run `fmt` on the file. It rewrites the layout and changes no value."
+        ],
+        "why": "Digests, review marks and diffs depend on one exact form. No value is wrong because of this alone."
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "ab71455c1972be52386fa91c36231dc1b37a8174556dd2349cbc6ccf9bc3019a",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "src-fixture0harbour01",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0invalid01.json"
+          },
+          {
+            "class": "location",
+            "name": "field",
+            "value": "/admission"
+          },
+          {
+            "class": "metadata",
+            "name": "problem",
+            "value": "the value is not one of the allowed values"
+          }
+        ],
+        "finding_key": "28fa65c61b204007cbeecb4fe5c018a42d1363388837e9d52d91607162d892eb",
+        "fixes": [],
+        "message": "A record breaks a rule of the record format.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "record_invalid",
+        "rules": [],
+        "subject": "src-fixture0invalid01",
+        "suggestions": [
+          "Correct the field named in the evidence, then run `check` again."
+        ],
+        "why": "Every other check reads these files. A broken record can hide a citation problem or create a false one."
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0invalid01.json"
+          },
+          {
+            "class": "location",
+            "name": "field",
+            "value": "/tittle"
+          },
+          {
+            "class": "metadata",
+            "name": "problem",
+            "value": "the field is not part of the record format"
+          }
+        ],
+        "finding_key": "dc58a7562613f6840c5b4f682b1e86848d26a844e6095b3f023d37c74ddb73d3",
+        "fixes": [],
+        "message": "A record has a field the record format does not define. The field is kept as it is.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "unknown_field",
+        "rules": [],
+        "subject": "src-fixture0invalid01",
+        "suggestions": [
+          "Check the spelling. Put a field of your own under `x` with a namespaced name such as `myname.note`."
+        ],
+        "why": "A misspelled field name means the value you meant to record is not read."
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0orphan001.json"
+          }
+        ],
+        "finding_key": "b015a69d90525f93e601a89eb52260e561f1e594aebe5e87bc518e1a02f1ac6a",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "src-fixture0orphan001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          },
+          {
+            "class": "location",
+            "name": "field",
+            "value": "/bibliography_include/2"
+          },
+          {
+            "class": "metadata",
+            "name": "problem",
+            "value": "no record has this ID"
+          },
+          {
+            "class": "location",
+            "name": "points_at",
+            "value": "src-fixture0missing01"
+          }
+        ],
+        "finding_key": "569006add7721884c2155515902dba5266cf9f7df118b7a5bc322e286dd4fbc4",
+        "fixes": [
+          "repoint"
+        ],
+        "message": "A record points at a record that is missing or is of the wrong kind.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "reference_dangling",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [
+          "Point the reference at the right record, or remove it."
+        ],
+        "why": "The link between your evidence and its source is broken, so anything relying on it cannot be traced."
+      }
+    ],
+    "scope": "all",
+    "summary": {
+      "confirmed": 0,
+      "could_not_check": 1,
+      "dismissed": 0,
+      "fail": 8,
+      "not_implemented": 3,
+      "open": 9,
+      "pass": 14,
+      "unreviewed": 0,
+      "unverifiable": 1
+    },
+    "tools": {
+      "bun": "1.4.5",
+      "sqlite": "(removed)",
+      "stemma": "0.0.1"
+    },
+    "unreviewed": []
+  },
+  "run": {
+    "started": "(removed)",
+    "duration_ms": 0,
+    "platform": "(removed)"
+  },
+  "schema": "stemma.check-report/0"
+}

@@ -47,14 +47,17 @@ export function label(results: Result[], skipped: NotRun[]): ReportBody["label"]
   return results.some((r) => r.open) || skipped.some((n) => n.reason === "not_implemented") ? "open_findings" : "checked_clean";
 }
 
+/** The checks this version runs. The check reference on the website is generated from this. */
+export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus) => Result[]> = {
+  "record.valid": recordResults,
+  "cite.key": citeKeyResults,
+  "bib.uncited": uncitedResults,
+  "coordinate.stray": coordinateResults,
+};
+
 export function runChecks(corpus: Corpus, tools: Record<string, string>): { body: ReportBody; errors: string[] } {
   const errors: string[] = [];
-  const results = sortResults([
-    ...guarded("record.valid", corpus, recordResults, errors),
-    ...guarded("cite.key", corpus, citeKeyResults, errors),
-    ...guarded("bib.uncited", corpus, uncitedResults, errors),
-    ...guarded("coordinate.stray", corpus, coordinateResults, errors),
-  ]);
+  const results = sortResults(Object.entries(IMPLEMENTED_CHECKS).flatMap(([check, run]) => guarded(check, corpus, run, errors)));
   const skipped = notRun(corpus);
   const unreviewed = unreviewedItems(corpus);
   const count = (test: (r: Result) => boolean) => results.filter(test).length;

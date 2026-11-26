@@ -46,12 +46,13 @@ Plugin root: ${plugin}`);
 
 heading("1. Create a project and record two sources");
 stemma(0, book, "init");
-const harbour = add("source", "harbour", { citation_key: "hartwell1998", type: "book", title: { value: "Harbour tolls of an invented town" }, issued: { edtf: "1998" } });
-const orphan = add("source", "orphan", { citation_key: "orphan1990", type: "book", title: { value: "An invented work nobody cites" }, issued: { edtf: "1990" } });
+// Fixed IDs keep the transcript the same on every run (website/generate.ts).
+const harbour = add("source", "harbour", { id: "src-demo0harbour01", citation_key: "hartwell1998", type: "book", title: { value: "Harbour tolls of an invented town" }, issued: { edtf: "1998" } });
+const orphan = add("source", "orphan", { id: "src-demo0orphan001", citation_key: "orphan1990", type: "book", title: { value: "An invented work nobody cites" }, issued: { edtf: "1990" } });
 
 heading("2. Add two citations: one with a mistyped key");
-add("citation", "cite-1", { key: "hartwell1998", sentence: { text: "The invented town charged a toll at its harbour." } });
-const typo = add("citation", "cite-2", { key: "hartwel1998", sentence: { text: "The toll was doubled in the following century." } });
+add("citation", "cite-1", { id: "cit-demo0toll00001", key: "hartwell1998", sentence: { text: "The invented town charged a toll at its harbour." } });
+const typo = add("citation", "cite-2", { id: "cit-demo0toll00002", key: "hartwel1998", sentence: { text: "The toll was doubled in the following century." } });
 console.log("\nBy hand: list both sources for the bibliography in stemma.json (orphan1990 is never cited).");
 const settingsPath = join(book, "stemma.json");
 const settings = JSON.parse(readFileSync(settingsPath, "utf8"));

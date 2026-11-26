@@ -1,0 +1,348 @@
+{
+  "body": {
+    "changed": [],
+    "inputs": {
+      "blobs": [],
+      "corpus_sha256": "ea6ce7a0f02adc503fa1d091a2bebd1fa753edf13007420606db93f2555598d0",
+      "manuscript": [
+        {
+          "path": "manuscript/chp-fixture0chapter1.md",
+          "sha256": "ab5b9ae682ae957b5e743b0eb38de9d628fdb949338dcbad6a1ca048dc4c6865"
+        }
+      ],
+      "profiles": []
+    },
+    "label": "open_findings",
+    "mode": "work",
+    "not_run": [
+      {
+        "check": "bib.uncited",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "build.uncommitted",
+        "reason": "input_absent"
+      },
+      {
+        "check": "changelog.missing",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.format",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.key",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "cite.unlinked",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "claim.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "claim.inactive",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "construct.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "construct.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "draft.marked",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "id.resolves",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "image.alt",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.font",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.metadata",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.permission",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.placement",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.resolution",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.vector",
+        "reason": "input_absent"
+      },
+      {
+        "check": "locator.extent",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "meta.resolver",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "meta.source",
+        "reason": "input_absent"
+      },
+      {
+        "check": "number.present",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "package.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "quote.present",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "quote.self",
+        "reason": "input_absent"
+      },
+      {
+        "check": "restricted.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.changed",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.held",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "support.current",
+        "reason": "input_absent"
+      },
+      {
+        "check": "takeover.removal",
+        "reason": "input_absent"
+      }
+    ],
+    "redaction": "none",
+    "results": [
+      {
+        "annotations": [],
+        "check": "bib.uncited",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          }
+        ],
+        "finding_key": "27bb033a1d98e31531bfbdbdae5cc6eaf00c58b2dd260301c423c269ede53eb9",
+        "fixes": [],
+        "item": {
+          "content_sha256": "87f2475ea978d46c83c1f52596b70887f50c62904e039a6f72c5a063aae34d92",
+          "record": "src-fixture0harbour01"
+        },
+        "message": "Whether a listed source is cited could not be checked: this version cannot yet read the files in manuscript/.",
+        "open": true,
+        "outcome": "unverifiable",
+        "reason_code": "manuscript_not_read",
+        "rules": [],
+        "source": "src-fixture0harbour01",
+        "subject": "src-fixture0harbour01",
+        "suggestions": [
+          "Nothing to fix in your files. Check this entry by hand until Stemma reads manuscripts."
+        ],
+        "why": "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way."
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "manuscript/chp-fixture0chapter1.md"
+          }
+        ],
+        "finding_key": "6091537efe76bda791403f0e80ca758d9a8c34ec4aaf2a8fde284ba4c5ccd004",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "manuscript/chp-fixture0chapter1.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "84440d57951be3b327f6fa6ef4f4024481aa99e229f77439070a18a98179b21f",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0harbour01.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          }
+        ],
+        "finding_key": "ec4bec4b7e31262dccd8f487e876da298a09064fd8da238012b55bfc109d5104",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          }
+        ],
+        "finding_key": "8746b02fa87edc21e1660a3e6e360035dc292831faa40176bd63fbf0c6b09263",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          }
+        ],
+        "finding_key": "d52222def6a8d9a9cbf35d36ca26052a1bd340858189f36db5ce143d274c6803",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "ab71455c1972be52386fa91c36231dc1b37a8174556dd2349cbc6ccf9bc3019a",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "src-fixture0harbour01",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          }
+        ],
+        "finding_key": "7465519b749afb75a536a5e1360d62cb793eb639042b7dacddfcefed33f63fc0",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [],
+        "why": ""
+      }
+    ],
+    "scope": "all",
+    "summary": {
+      "confirmed": 0,
+      "could_not_check": 1,
+      "dismissed": 0,
+      "fail": 0,
+      "not_implemented": 11,
+      "open": 1,
+      "pass": 7,
+      "unreviewed": 0,
+      "unverifiable": 1
+    },
+    "tools": {
+      "bun": "1.4.5",
+      "sqlite": "(removed)",
+      "stemma": "0.0.1"
+    },
+    "unreviewed": []
+  },
+  "run": {
+    "started": "(removed)",
+    "duration_ms": 0,
+    "platform": "(removed)"
+  },
+  "schema": "stemma.check-report/0"
+}

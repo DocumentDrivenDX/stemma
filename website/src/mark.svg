@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>path,circle{stroke:#151a23}circle{fill:#151a23}.leaf{fill:#ffffff}rect{fill:#ffffff}@media (prefers-color-scheme:dark){path,circle{stroke:#e8ebf1}circle{fill:#e8ebf1}.leaf{fill:#161b24}rect{fill:#161b24}}</style>
+  <rect width="32" height="32" rx="6"/>
+  <path fill="none" stroke-width="2" d="M16 7v4M9 17v-6h14v6M23 17v3M18 26v-6h9v6M9 17v9"/>
+  <circle cx="16" cy="6" r="3" stroke-width="1.5"/>
+  <circle class="leaf" cx="9" cy="26" r="2.6" stroke-width="1.8"/>
+  <circle class="leaf" cx="18" cy="26" r="2.6" stroke-width="1.8"/>
+  <circle class="leaf" cx="27" cy="26" r="2.6" stroke-width="1.8"/>
+</svg>

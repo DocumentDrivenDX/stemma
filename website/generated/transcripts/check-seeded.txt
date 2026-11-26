@@ -1,0 +1,79 @@
+$ stemma check --all --project $PROJECTS/seeded
+OPEN FINDINGS: 8 problem(s), 1 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 14 result(s) passed.
+
+1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
+   Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
+   What to do: Cite it, remove it from bibliography_include in stemma.json, or keep it on purpose and record why.
+   - src-fixture0orphan001
+       source file: records/sources/src-fixture0orphan001.json
+       key: orphan1990
+
+2. PROBLEM: A citation uses a key that no source record holds.  [cite.key]
+   Why it matters: A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.
+   What to do: Correct the key in the citation, or add a source record with that key (or add it to the right source's key_aliases).
+   - cit-fixture0ghost0001
+       citation file: records/citations/cit-fixture0ghost0001.json
+       key: ghost2020
+       sentence: A second invented harbour kept no toll books.
+
+3. PROBLEM: Text in a project file looks like a map coordinate. The value is not repeated here.  [coordinate.stray]
+   Why it matters: This output can disclose a restricted site's position. The scan cannot tell whether a site is restricted, so it warns about every coordinate it recognizes.
+   What to do: Look at the position in the evidence. If it is a sensitive site, remove the value from the file (git history may still hold it). If it is public or not a coordinate, you need do nothing.
+   - rules.md
+       file: rules.md
+       position: line 5, column 27
+
+4. COULD NOT CHECK: A file cannot be read as a record, so nothing in it was checked.  [record.valid]
+   Why it matters: Every other check reads these files. A broken record can hide a citation problem or create a false one.
+   What to do: Open the named file and repair it (look for merge-conflict markers, a repeated key or a missing bracket), or restore it from git. Stemma does not guess its content.
+   - records/agents/agt-fixture0broken001.json
+       file: records/agents/agt-fixture0broken001.json
+       problem: duplicate_key
+
+5. PROBLEM: A rule ID in rules.md is used twice.  [record.valid]
+   Why it matters: A report or record citing this ID could mean either rule.
+   What to do: Give the later rule a number that has never been used.
+   - rules.md
+       file: rules.md
+       line: 7
+
+6. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
+   Why it matters: Digests, review marks and diffs depend on one exact form. No value is wrong because of this alone.
+   What to do: Run `fmt` on the file. It rewrites the layout and changes no value.
+   - src-fixture0compact01
+       file: records/sources/src-fixture0compact01.json
+
+7. PROBLEM: A record breaks a rule of the record format.  [record.valid]
+   Why it matters: Every other check reads these files. A broken record can hide a citation problem or create a false one.
+   What to do: Correct the field named in the evidence, then run `check` again.
+   - src-fixture0invalid01
+       file: records/sources/src-fixture0invalid01.json
+       field: /admission
+       problem: the value is not one of the allowed values
+
+8. PROBLEM: A record has a field the record format does not define. The field is kept as it is.  [record.valid]
+   Why it matters: A misspelled field name means the value you meant to record is not read.
+   What to do: Check the spelling. Put a field of your own under `x` with a namespaced name such as `myname.note`.
+   - src-fixture0invalid01
+       file: records/sources/src-fixture0invalid01.json
+       field: /tittle
+       problem: the field is not part of the record format
+
+9. PROBLEM: A record points at a record that is missing or is of the wrong kind.  [record.valid]
+   Why it matters: The link between your evidence and its source is broken, so anything relying on it cannot be traced.
+   What to do: Point the reference at the right record, or remove it.
+   - stemma.json
+       file: stemma.json
+       field: /bibliography_include/2
+       problem: no record has this ID
+       points at: src-fixture0missing01
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - whether cited figures appear in the stored source text  [number.present]
+   - whether you hold a copy of each cited source, with its text extracted  [source.held]
+
+Full report: $PROJECTS/seeded/.stemma/reports/check.json
+[exit 1]

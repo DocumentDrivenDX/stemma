@@ -1,0 +1,391 @@
+{
+  "body": {
+    "changed": [],
+    "inputs": {
+      "blobs": [],
+      "corpus_sha256": "42974ec440081b6f7ed8d7634f76094ab3778a4a67defbd6c45affe1e3be3897",
+      "manuscript": [],
+      "profiles": []
+    },
+    "label": "open_findings",
+    "mode": "work",
+    "not_run": [
+      {
+        "check": "build.uncommitted",
+        "reason": "input_absent"
+      },
+      {
+        "check": "changelog.missing",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.format",
+        "reason": "input_absent"
+      },
+      {
+        "check": "cite.unlinked",
+        "reason": "input_absent"
+      },
+      {
+        "check": "claim.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "claim.inactive",
+        "reason": "input_absent"
+      },
+      {
+        "check": "construct.complete",
+        "reason": "input_absent"
+      },
+      {
+        "check": "construct.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "draft.marked",
+        "reason": "input_absent"
+      },
+      {
+        "check": "id.resolves",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.alt",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.credit",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.font",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.metadata",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.permission",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.placement",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.resolution",
+        "reason": "input_absent"
+      },
+      {
+        "check": "image.vector",
+        "reason": "input_absent"
+      },
+      {
+        "check": "locator.extent",
+        "reason": "input_absent"
+      },
+      {
+        "check": "meta.resolver",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "meta.source",
+        "reason": "input_absent"
+      },
+      {
+        "check": "number.present",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "package.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "quote.present",
+        "reason": "input_absent"
+      },
+      {
+        "check": "quote.self",
+        "reason": "input_absent"
+      },
+      {
+        "check": "restricted.leak",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.changed",
+        "reason": "input_absent"
+      },
+      {
+        "check": "source.held",
+        "reason": "not_implemented"
+      },
+      {
+        "check": "support.current",
+        "reason": "input_absent"
+      },
+      {
+        "check": "takeover.removal",
+        "reason": "input_absent"
+      }
+    ],
+    "redaction": "none",
+    "results": [
+      {
+        "annotations": [],
+        "check": "bib.uncited",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          }
+        ],
+        "finding_key": "27bb033a1d98e31531bfbdbdae5cc6eaf00c58b2dd260301c423c269ede53eb9",
+        "fixes": [],
+        "item": {
+          "content_sha256": "87f2475ea978d46c83c1f52596b70887f50c62904e039a6f72c5a063aae34d92",
+          "record": "src-fixture0harbour01"
+        },
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "source": "src-fixture0harbour01",
+        "subject": "src-fixture0harbour01",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "cite.key",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "citation_file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          },
+          {
+            "class": "manuscript",
+            "name": "key",
+            "value": "hartwell1998"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "The invented town charged a toll at its harbour."
+          }
+        ],
+        "finding_key": "2888a66f099173405b8a92897e8b79bf44ee7bd16c52bf1c03c1ae4c97c58f5c",
+        "fixes": [],
+        "item": {
+          "content_sha256": "ef727f0a8ba832a8b68e81893791d02f2ce8e755393c0bfd54ce0dfb4ab3fcab",
+          "record": "cit-fixture0good00001"
+        },
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "sentence": {
+          "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
+          "text": "The invented town charged a toll at its harbour."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "cit-fixture0good00001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          }
+        ],
+        "finding_key": "066f02d34a569a50cc1c43cb3f3c3a9f7b0fa215ead3121b1447c45ba82884fe",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/citations/cit-fixture0good00001.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "84440d57951be3b327f6fa6ef4f4024481aa99e229f77439070a18a98179b21f",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "records/sources/src-fixture0harbour01.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          }
+        ],
+        "finding_key": "ec4bec4b7e31262dccd8f487e876da298a09064fd8da238012b55bfc109d5104",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "coordinate.stray",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          }
+        ],
+        "finding_key": "8746b02fa87edc21e1660a3e6e360035dc292831faa40176bd63fbf0c6b09263",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          }
+        ],
+        "finding_key": "ce1ddc8726d6a0227efebcc51de65060337e3ba8af911a375728383111b62abc",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "cit-fixture0good00001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "rules.md"
+          }
+        ],
+        "finding_key": "d52222def6a8d9a9cbf35d36ca26052a1bd340858189f36db5ce143d274c6803",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "rules.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "ab71455c1972be52386fa91c36231dc1b37a8174556dd2349cbc6ccf9bc3019a",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "src-fixture0harbour01",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "record.valid",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "file",
+            "value": "stemma.json"
+          }
+        ],
+        "finding_key": "7465519b749afb75a536a5e1360d62cb793eb639042b7dacddfcefed33f63fc0",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "stemma.json",
+        "suggestions": [],
+        "why": ""
+      }
+    ],
+    "scope": "all",
+    "summary": {
+      "confirmed": 0,
+      "could_not_check": 0,
+      "dismissed": 0,
+      "fail": 0,
+      "not_implemented": 3,
+      "open": 0,
+      "pass": 10,
+      "unreviewed": 0,
+      "unverifiable": 0
+    },
+    "tools": {
+      "bun": "1.4.5",
+      "sqlite": "(removed)",
+      "stemma": "0.0.1"
+    },
+    "unreviewed": []
+  },
+  "run": {
+    "started": "(removed)",
+    "duration_ms": 0,
+    "platform": "(removed)"
+  },
+  "schema": "stemma.check-report/0"
+}

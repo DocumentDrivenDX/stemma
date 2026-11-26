@@ -1,0 +1,32 @@
+/* Color, radius and space tokens (docs/stemma/02-design/DESIGN.md, Tokens).
+   The --arras-* values are the default role tokens of
+   @documentdrivendx/arras-ui 0.8.1 (MIT OR Apache-2.0, Copyright (c) 2026
+   DocumentDrivenDX contributors). The --stm-* values are Stemma's own.
+   light-dark() keeps one line per token. The page follows the system setting;
+   data-appearance on the root element overrides it. */
+:root {
+  color-scheme: light dark;
+  --arras-color-ground: light-dark(#f6f7f9, #0f131a);
+  --arras-color-surface: light-dark(#ffffff, #161b24);
+  --arras-color-surface-sunken: light-dark(#eef0f4, #1e2531);
+  --arras-color-text: light-dark(#151a23, #e8ebf1);
+  --arras-color-text-muted: light-dark(#4a5365, #a8b0c0);
+  --arras-color-border: light-dark(#d5d9e1, #2d3545);
+  --arras-color-accent: light-dark(#1f4fd8, #7aa2ff);
+  --arras-color-on-accent: light-dark(#ffffff, #0b1020);
+  --stm-color-line-strong: light-dark(#7f838c, #818792);
+  --stm-color-ok: light-dark(#197146, #479f73);
+  --stm-color-warn: light-dark(#905808, #bf8635);
+  --stm-color-bad: light-dark(#a12335, #d88896);
+  --arras-radius-control: 6px;
+  --arras-radius-card: 10px;
+  --stm-space-1: 4px;
+  --stm-space-2: 8px;
+  --stm-space-3: 12px;
+  --stm-space-4: 16px;
+  --stm-font-serif: "Source Serif 4", Georgia, serif;
+  --stm-font-sans: "Inter", system-ui, sans-serif;
+  --stm-font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+:root[data-appearance="light"] { color-scheme: light; }
+:root[data-appearance="dark"] { color-scheme: dark; }

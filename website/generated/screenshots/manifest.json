@@ -1,0 +1,47 @@
+[
+  {
+    "file": "check-findings-light.png",
+    "appearance": "light",
+    "width": 880,
+    "title": "check: the first three findings in the test fixture",
+    "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
+    "input_sha256": "02950ccafb6a84fb3e5ee18ea543882e07b0bef3781407bd3d98dbbedce15c75",
+    "png_sha256": "2f96462941c9d8fc4b4efbf8ca8bc5aabaed0e94c6f05a7386369b8072ec9515"
+  },
+  {
+    "file": "check-findings-dark.png",
+    "appearance": "dark",
+    "width": 880,
+    "title": "check: the first three findings in the test fixture",
+    "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
+    "input_sha256": "455fefb9f491e1ce1ce4ee4645949bd9fd428fbb305fa33c543120117e0c7033",
+    "png_sha256": "fed543e472c56be75a9a829c9b31e4b706ac4a27d45a9a6bfdf1daeece04cd67"
+  },
+  {
+    "file": "check-findings-phone.png",
+    "appearance": "light",
+    "width": 375,
+    "title": "check: findings at phone width",
+    "alt": "The same findings wrapped to a narrow page.",
+    "input_sha256": "0218332993fe2db176142933dcb948d6941247987602d641fd60f1b5b72c5885",
+    "png_sha256": "d1add136eefd67def6f08d82a0372e140f4ef95a4fb93f9dbae47c6e59892caf"
+  },
+  {
+    "file": "demo-first-check.png",
+    "appearance": "light",
+    "width": 880,
+    "title": "check: a mistyped citation key",
+    "alt": "Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form.",
+    "input_sha256": "ac17bb2caf633cd7dbe03abcdda0cb5cde3e52b12558db6a15f793eb541e41b1",
+    "png_sha256": "def6eb4f59bad5cfcf1ee0d8dc0f3b6baa2191da7de7502c2df6b9a77b2eea77"
+  },
+  {
+    "file": "check-clean.png",
+    "appearance": "light",
+    "width": 880,
+    "title": "check: checked clean, with nothing cited",
+    "alt": "Output of stemma check saying CHECKED CLEAN, followed by what that label does not mean.",
+    "input_sha256": "d8d96aae2e9cfa98ec77f2ce2e4298c0c366664fd579e273407ff49e018eade3",
+    "png_sha256": "1aeec3641905fb815859a7aff62df81845f676ca501ea16acbd2e94acfcca9bd"
+  }
+]

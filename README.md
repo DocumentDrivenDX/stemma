@@ -38,6 +38,23 @@ root="$PWD/dist/release"
 Keep all three flags: without them Bun can download packages, or load a
 `bunfig.toml` or `.env` from the working directory.
 
+## Website
+
+`website/` holds a static microsite: what Stemma is, what works today, a checks
+reference, real example output, and the design language. It is not deployed.
+
+```sh
+./scripts/dev.sh preview     # build it and serve it on http://127.0.0.1:4173/
+./scripts/dev.sh browsers    # once: fetch the pinned headless Chromium into .tools/
+./scripts/dev.sh docs        # regenerate transcripts, reports, check list, screenshots
+./scripts/dev.sh docs-check  # fail if that content is stale (also part of check)
+./scripts/dev.sh e2e         # Playwright tests of the built site
+```
+
+Run `docs` after changing command output, fixtures, the demo, or the report
+styles, and commit the result. `docs` and `e2e` need the browser; `check` does
+not.
+
 ## Idea
 
 Two strands run together, as in HELIX:
@@ -98,6 +115,7 @@ an unsupported experiment.
 skills/stemma/    the single public skill
 packages/         command line and its libraries
 fixtures/, tests/, scripts/
+website/          microsite sources and generated documentation
 docs/stemma/      Stemma's own governed documents (specified with HELIX)
 ```
 

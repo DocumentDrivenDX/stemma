@@ -1,0 +1,12 @@
+$ stemma check --all --project $PROJECTS/cited
+OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 10 result(s) passed.
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - whether cited figures appear in the stored source text  [number.present]
+   - whether you hold a copy of each cited source, with its text extracted  [source.held]
+
+Full report: $PROJECTS/cited/.stemma/reports/check.json
+[exit 1]

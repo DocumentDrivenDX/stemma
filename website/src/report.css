@@ -1,0 +1,27 @@
+/* Report excerpts, findings and figures. The site and the captured command
+   line pages both use this file. */
+.excerpt { margin: 0; border: 1px solid var(--stm-color-line-strong); border-radius: var(--arras-radius-card); background: var(--arras-color-surface); overflow: hidden; }
+.excerpt > figcaption { padding: var(--stm-space-2) var(--stm-space-4); border-bottom: 1px solid var(--stm-color-line-strong); background: var(--arras-color-surface-sunken); color: var(--arras-color-text-muted); font: 500 0.8125rem/1.5 var(--stm-font-sans); }
+.excerpt > figcaption strong { color: var(--arras-color-text); font-weight: 650; }
+.excerpt pre { margin: 0; padding: var(--stm-space-3) var(--stm-space-4); font: 400 0.8125rem/1.6 var(--stm-font-mono); font-variant-ligatures: none; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--arras-color-text); }
+.excerpt .v-bad { color: var(--stm-color-bad); font-weight: 700; }
+.excerpt .v-warn { color: var(--stm-color-warn); font-weight: 700; }
+.excerpt .v-ok { color: var(--stm-color-ok); font-weight: 700; }
+.excerpt .cmd { font-weight: 700; }
+.excerpt .dim { color: var(--arras-color-text-muted); }
+
+.finding { border: 1px solid var(--stm-color-line-strong); border-radius: var(--arras-radius-card); background: var(--arras-color-surface); padding: var(--stm-space-4); }
+.finding > * + * { margin-top: var(--stm-space-2); }
+.status { display: inline-block; border: 1px solid currentColor; border-radius: var(--arras-radius-control); padding: 0 var(--stm-space-2); font: 650 0.75rem/1.6 var(--stm-font-mono); }
+.status-fail { color: var(--stm-color-bad); }
+.status-unverifiable { color: var(--stm-color-warn); }
+.status-pass { color: var(--stm-color-ok); }
+.status-none { color: var(--arras-color-text-muted); }
+.finding .message { font-weight: 650; }
+.finding dt { font-size: 0.75rem; font-weight: 650; color: var(--arras-color-text-muted); }
+.finding dd { margin: 0 0 var(--stm-space-2); overflow-wrap: anywhere; }
+.finding .evidence { border-left: 3px solid var(--stm-color-line-strong); padding-left: var(--stm-space-3); font: 400 0.8125rem/1.6 var(--stm-font-mono); overflow-wrap: anywhere; list-style: none; }
+
+.shot { margin: 0; }
+.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--stm-color-line-strong); border-radius: var(--arras-radius-card); }
+.shot figcaption { margin-top: var(--stm-space-2); font-size: 0.8125rem; color: var(--arras-color-text-muted); }

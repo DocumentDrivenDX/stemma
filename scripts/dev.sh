@@ -5,6 +5,12 @@
 #   ./scripts/dev.sh demo          build, then run the demo in a fresh temporary directory
 #   ./scripts/dev.sh plugin-check  build, then install into an isolated Claude profile
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
+#   ./scripts/dev.sh docs          regenerate website/generated/ (needs browsers)
+#   ./scripts/dev.sh docs-check    fail if website/generated/ is stale
+#   ./scripts/dev.sh site          build the website into website/dist/
+#   ./scripts/dev.sh preview       build the website and serve it on 127.0.0.1
+#   ./scripts/dev.sh browsers      fetch the pinned headless Chromium into .tools/
+#   ./scripts/dev.sh e2e           build the website and run the Playwright tests
 set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
@@ -12,12 +18,14 @@ cd "$root"
 export BUN_INSTALL="$root/.tools/bun-home"
 export BUN_INSTALL_CACHE_DIR="$root/.tools/bun-cache"
 export BUN_RUNTIME_TRANSPILER_CACHE_PATH="$root/.tools/transpiler-cache"
+export PLAYWRIGHT_BROWSERS_PATH="$root/.tools/playwright-browsers"
+export PWTEST_CACHE_DIR="$root/.tools/playwright-cache"
 bun="$root/.tools/bun"
 # --no-install: no run-time package download. The other two stop Bun loading a
 # working directory's .env and bunfig.toml (SEC-014).
 run() { "$bun" --no-install --no-env-file --config=/dev/null "$@"; }
 
-if [ ! -d node_modules/typescript ]; then
+if [ ! -d node_modules/typescript ] || [ ! -d node_modules/@playwright/test ]; then
   "$bun" install --frozen-lockfile --ignore-scripts --registry=https://registry.npmjs.org
 fi
 
@@ -33,5 +41,11 @@ case "${1:-check}" in
   build) run scripts/build.ts ;;
   demo) run scripts/build.ts >/dev/null && run scripts/demo.ts ;;
   plugin-check) run scripts/build.ts >/dev/null && run scripts/plugin-check.ts ;;
-  *) echo "usage: $0 check|build|demo|plugin-check" >&2; exit 2 ;;
+  docs) run website/generate.ts ;;
+  docs-check) run website/generate.ts --check ;;
+  site) run website/build.ts ;;
+  preview) run website/build.ts && run website/preview.ts ;;
+  browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;
+  e2e) run website/build.ts && run --bun node_modules/.bin/playwright test --config website/playwright.config.ts ;;
+  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|site|preview|browsers|e2e" >&2; exit 2 ;;
 esac

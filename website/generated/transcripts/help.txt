@@ -1,0 +1,15 @@
+stemma 0.0.1
+Run as: bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js <command> [options]
+
+  version
+  doctor
+  init --project <dir>
+  record add <kind> --input <file|-> [--actor <person|model|software>:<name>]
+  validate [paths]
+  fmt [paths]
+  rules check
+  check [--changed | --all]
+
+Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
+Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
+3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.
