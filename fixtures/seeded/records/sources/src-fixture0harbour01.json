@@ -1,0 +1,19 @@
+{
+  "admission": "admitted",
+  "citation_key": "hartwell1998",
+  "created": {
+    "at": "2026-01-05T09:58:00Z",
+    "by": {
+      "kind": "person",
+      "name": "author"
+    }
+  },
+  "id": "src-fixture0harbour01",
+  "intake": "parsed",
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Harbour tolls of an invented town"
+  },
+  "type": "book"
+}

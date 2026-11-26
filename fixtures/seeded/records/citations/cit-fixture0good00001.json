@@ -1,0 +1,18 @@
+{
+  "created": {
+    "at": "2026-01-05T09:58:00Z",
+    "by": {
+      "kind": "person",
+      "name": "author"
+    }
+  },
+  "id": "cit-fixture0good00001",
+  "intake": "parsed",
+  "key": "hartwell1998",
+  "kind": "citation",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
+    "text": "The invented town charged a toll at its harbour."
+  }
+}

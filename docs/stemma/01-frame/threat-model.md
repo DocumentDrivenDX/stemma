@@ -230,7 +230,7 @@ modules, or the product owner for accepted risks.
 |----|--------|---|---|-------|-------|----------|
 | TM-E-001 | Hostile text makes the agent run commands, edit files or records, or record annotations or review marks | 5 | 3 | 15 | Author and host; `skills/stemma` | SEC-009, SEC-003 |
 | TM-E-002 | A crafted file exploits a parser or recognition engine and runs code. PDF libraries have had script-execution flaws | 5 | 2 | 10 | `extract`, `intake` | SEC-006, SEC-007, SEC-026 |
-| TM-E-003 | Bun reads `bunfig.toml` or `.env` from a working directory, which could preload code or redirect stores. Unverified for the pinned version | 5 | 2 | 10 | `cli`, `skills/stemma` | SEC-014 |
+| TM-E-003 | Bun reads `bunfig.toml` or `.env` from a working directory, which could preload code or redirect stores. Observed on the pinned version on macOS under `--no-install` alone; stopped by the CONTRACT-002 A flags | 5 | 2 | 10 | `cli`, `skills/stemma` | SEC-014 |
 | TM-E-004 | A hostile EPS file runs code or reads files in a converter | 5 | 2 | 10 | `publish` | SEC-012 |
 | TM-E-005 | Content becomes Typst code, reads files, or pulls a package | 4 | 2 | 8 | `publish` | SEC-010 |
 | TM-E-006 | Record, comment, resolver, or SVG content runs script in the explorer, including by breaking out of inlined data. In-browser Typst may need a looser policy | 4 | 3 | 12 | `explorer` | SEC-011 |

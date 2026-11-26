@@ -26,7 +26,7 @@ ddx:
 
 - Covers the runtime, the bundled command line, the plugin and its one skill, release packages, install delivery, and install tests.
 - Governed by the Architecture, ADR-001, ADR-003, ADR-004, ADR-007, CONTRACT-002 (commands, reports, exit codes), CONTRACT-004 (plugin, modes, agent obligations, host claims), and Project Concerns.
-- M1, first in the design order. No part is built. Install and host behaviour below is unverified unless a row says otherwise.
+- M1, first in the design order. A first part is built: the runtime guard, the bundle script, part of the command line, and a local load script that installs a locally built tree with the Claude command-line tool. Install and host behaviour below is otherwise unverified unless a row says so.
 
 ## Requirements Mapping
 
@@ -164,7 +164,7 @@ The tool record covers every tool and bundled library that can change a result, 
 
 The harness runs locally during development and in one workflow triggered only by release tags, which stops nothing. A desktop app with no automated route gets a recorded hand check or "not observed". A seeded broken component that still lists as installed must produce "failed". In the tested Claude Code version, folder validation missed broken hooks and manifest validation caught them; the harness still requires a load and run.
 
-**Runtime configuration.** Proposed and unverified: Bun may load `bunfig.toml` or `.env` from its working directory, which could preload code or redirect a store. The skill and documented terminal use therefore start Bun with the plugin root as the working directory and pass absolute paths (CONTRACT-002 A), and use any pinned-Bun setting that disables that loading. A seeded-file test must pass before the pilot (SEC-014). The author's own global Bun settings are outside this control.
+**Runtime configuration.** On Bun 1.4.5 (macOS), `bunfig.toml` and `.env` in the working directory were loaded even with `--no-install`; adding `--no-env-file --config=/dev/null` stopped both. The invocation uses all three flags, starts in the plugin root, and passes absolute paths (CONTRACT-002 A); the guard exits 4 without `--no-install`. A seeded-file test covers SEC-014. Windows is untested. The author's own global Bun settings and environment, such as `BUN_OPTIONS`, are outside this control.
 
 **Release integrity and delivery.** Each release publishes one release package with its version and SHA-256. The install proof compares the installed bundle with that digest (SEC-028), and the marketplace manifest claims no delivery it does not perform: today it says the command line is not delivered. A digest from the same publisher does not protect against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
 

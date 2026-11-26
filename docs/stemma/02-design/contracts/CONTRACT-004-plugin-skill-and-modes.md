@@ -128,8 +128,9 @@ with ordinary file access, and user-facing text MUST NOT say it does.
 
 ### D. Runtime discovery
 
-The skill invokes the command line as in CONTRACT-002 with the host's plugin
-root path as the working directory and absolute `--project` and file paths. Before the first command in a session it runs `doctor`. When Bun is
+The skill invokes the command line as in CONTRACT-002 A, with all three isolation
+flags, the host's plugin root path as the working directory, and absolute
+`--project` and file paths. Before the first command in a session it runs `doctor`. When Bun is
 missing or has another version, the agent shows the pinned version and official
 install instructions, runs no substitute check, and states that nothing was
 checked. It installs nothing unless the author asks it to. A missing runtime
@@ -204,6 +205,7 @@ project without network access.
 |---|---|---|
 | Layout and install | One repository layout installed and listed in Claude Code and Codex CLI with throwaway configuration and no network, one macOS system, with a different toy runtime | The bundled `dist/stemma.js`, Bun, desktop apps, Linux, Windows |
 | Validation | `claude plugin validate` on the folder missed broken hooks; validating the plugin manifest caught them | Any host's own review rules for bundled code. Research reports that an official directory's review holds minified code, which matters for the later listing |
+| Local release tree | A built tree (manifests, skill, `dist/stemma.js`) installed from a local marketplace into an empty profile with Claude Code 2.1.236, listing one skill; the installed command line ran `doctor` and `check`. One macOS system | The repository marketplace route, desktop app, a live session using the skill, network denied |
 | Separate context, agent obligations | None | All; no live agent session was run |
 
 ## Schema Basis

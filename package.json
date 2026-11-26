@@ -1,0 +1,11 @@
+{
+  "name": "stemma",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.5",
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "@types/bun": "1.4.5",
+    "typescript": "5.9.3"
+  }
+}

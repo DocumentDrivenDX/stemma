@@ -1,0 +1,10 @@
+{
+  "bibliography_include": [
+    "src-fixture0harbour01",
+    "src-fixture0orphan001",
+    "src-fixture0missing01"
+  ],
+  "format": 0,
+  "project_id": "fixtureseeded",
+  "schema": "stemma.project/0"
+}

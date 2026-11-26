@@ -37,8 +37,9 @@ Outside the boundary: the agent host and its model, git, resolver services, and
 the author's publisher. HELIX (the document method used to design Stemma) is not
 a runtime part (ADR-001).
 
-Nothing described here exists as code yet. Versions named are those used in
-feasibility tests on one macOS system; Linux, Windows, and desktop apps are
+A first part exists as code: parts of `records`, `core`, `workspace`, and `cli`,
+tested on one macOS system. The rest is design. Versions named are those used in
+feasibility and development tests there; Linux, Windows, and desktop apps are
 untested.
 
 ## Level 1: System Context

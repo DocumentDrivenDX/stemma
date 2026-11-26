@@ -1,0 +1,18 @@
+{
+  "created": {
+    "at": "2026-01-05T09:58:00Z",
+    "by": {
+      "kind": "person",
+      "name": "author"
+    }
+  },
+  "id": "cit-fixture0ghost0001",
+  "intake": "parsed",
+  "key": "ghost2020",
+  "kind": "citation",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "10c73d03ea7a173dcc0b1f5cf7e82a9f3dc979a55381d7871220ff3e5f7e1c6f",
+    "text": "A second invented harbour kept no toll books."
+  }
+}

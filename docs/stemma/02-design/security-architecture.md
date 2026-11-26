@@ -83,7 +83,7 @@ Verification names the SEC criterion that tests the control.
 | TM-S-002, TM-T-001, TM-R-001, TM-T-006 | Accepted. Honest wording; stated limits in the disclosure; git history as a changeable trail | `core`, `publish`, `skills/stemma` | SEC-002 |
 | TM-D-001, TM-E-002, TM-T-003 | CONTRACT-003 G for codecs. Starting caps for PDF, scan, and web extraction and URL fetch (SD-002), resolver responses of at most 10 MiB with a 60 s timeout (assumption), and image conversion (SD-008); no script or code evaluation (proposed). Digest-named blobs; input names never form paths | `intake`, `extract`, `workspace`, `publish` | SEC-005 to SEC-008 |
 | TM-I-011 | Scheme, size, time, redirect, and address limits on URL admission; stored pages never rendered (proposed) | `workspace`, `Resolver` port | SEC-013, SEC-023 |
-| TM-E-003 | Start Bun with the plugin root as the working directory and absolute project paths, and use any pinned-Bun setting that stops it loading `bunfig.toml` or `.env` from a project or caller directory (proposed; CONTRACT-002 A). `--no-install` alone is not shown to do this. The method needs a test on Bun 1.4.5 before the pilot | `cli`, `skills/stemma` invocation | SEC-014 |
+| TM-E-003 | Invoke with `--no-install --no-env-file --config=/dev/null`, the plugin root as working directory, and absolute project paths; exit 4 without `--no-install` (CONTRACT-002 A). On Bun 1.4.5 on macOS a working-directory `bunfig.toml` preload and `.env` were loaded under `--no-install` alone and not with all three flags. A start without the last two flags is only warned about, after any preload has run. The caller's own environment and global Bun settings are not covered | `cli`, `skills/stemma` invocation | SEC-014 |
 | TM-E-005 | Escaping in the Typst output format, build-directory file access, vendored packages, no network (CONTRACT-006 G). Make an unvendored package fail without download (proposed) | `cite`, `publish` | SEC-010 |
 | TM-E-004 | Run TIFF and EPS conversion as a recorded step with a pinned converter, without network or unrelated file access (proposed) | `publish` | SEC-012 |
 | TM-E-006, TM-I-012 | Render record and comment text as text; encode inlined data so it cannot end its script block; display SVG without script; restrictive content security policy (proposed). Any loosening for browser Typst is reviewed in SD-012 | `explorer`, `graph` | SEC-011 |
@@ -199,7 +199,7 @@ Remaining by design limits:
 - Preserved legacy values can hold local paths or private annotations in git, and
   author exports are open to any recipient (TM-I-014, TM-I-008).
 - Audits run only before release, so a new advisory can affect installed copies.
-- Nothing here is built; Linux, Windows, and desktop hosts are untested. On
+- Little here is built; Linux, Windows, and desktop hosts are untested. On
   Linux only the local tools are targeted; no desktop-app host is promised there.
 
 ## Security Test Hooks

@@ -185,7 +185,7 @@ All digests are lowercase hexadecimal SHA-256.
 
 | Digest | Input |
 |---|---|
-| Record digest | The canonical form (D) of the parsed record, so working-tree line endings do not affect it |
+| Record digest | The canonical form (D) of the parsed record, so working-tree line endings do not affect it. A file that cannot be parsed has no canonical form; the corpus digest uses its raw bytes |
 | Blob digest | Raw bytes; also the blob's store address |
 | `content_sha256` (review) | Canonical form of the record without `review`, `created`, `changed`, `legacy`, and `x` |
 | `claim_sha256`, `claim_text` | UTF-8 bytes of the claim's `text` |
@@ -301,8 +301,12 @@ control. `Project.persona.checkpoints` set to `0` turns every checkpoint off.
 `Project.book_style` holds the book design settings, `Project.tools` the pinned
 tools, and `Project.voice_profile` the profile in use.
 
-**Citations.** A `citation` record is written only for an occurrence in an
-imported manuscript. Occurrences in a Stemma-authored manuscript are read from
+**Project settings.** `Project.citation_style` is optional: it is absent until a
+style file is chosen (`init` ships none yet).
+
+**Citations.** A `citation` record is written only for an occurrence in the
+author's existing manuscript: by takeover for an imported one, or with
+`record add` (CONTRACT-002 B) for one Stemma has not imported (assumption). Occurrences in a Stemma-authored manuscript are read from
 its text and MUST NOT be duplicated as records. The record keeps what intake
 found. The manuscript, which links to it by the record ID, is authoritative for
 the current key, locator, quotation, sentence, and claim links (CONTRACT-006

@@ -12,8 +12,60 @@ argument-hint: "[mode] [intent or scope]"
 
 # Stemma Router
 
-Stub. The modes below are the planned contract; none is implemented yet.
-Rule: do not add separate public `stemma-*` skills. Add or refine a mode here.
+Pre-release. No mode below is delivered yet. A first part of the command line
+works: project setup, adding records, record and form checks, the two
+bibliography checks, and a coordinate-text warning. When asked for a mode, say it
+is not available yet and do not imitate its commands with unchecked file edits.
+
+## Run the command line
+
+The plugin root is `${CLAUDE_PLUGIN_ROOT}`. If that was not replaced by a path,
+use the directory two levels above this file. Run every command with the plugin
+root as the working directory and with absolute paths, exactly like this:
+
+```sh
+cd "<plugin root>" && bun --no-install --no-env-file --config=/dev/null "<plugin root>/dist/stemma.js" <command> --project "<absolute project path>"
+```
+
+Keep all three flags. Without them Bun can download packages, or load a `.env` or
+`bunfig.toml` from the working directory that runs code or changes settings.
+
+1. Before the first command in a session, run `doctor`. If `bun` is not found on
+   the search path, try `~/.bun/bin/bun`, then stop. If Bun is missing or is not
+   version 1.4.5, say so, say that nothing was checked, and point to the official
+   instructions at https://bun.com/docs/installation. Install nothing unless the
+   author asks. Run no substitute check. Writing work continues.
+2. If `dist/stemma.js` is missing, this copy of the plugin has no command line:
+   say that nothing was checked.
+3. At session start in a project, read its `rules.md`. (`index status` is not
+   implemented yet.)
+
+| Command | Use |
+|---|---|
+| `init` | Create a project in the `--project` directory; overwrites nothing |
+| `record add <kind> --input <absolute file> --actor <person\|model\|software>:<name>` | Add one record, for example a `source` or a `citation` |
+| `fmt [paths]` | Rewrite records in canonical form without changing values |
+| `validate [paths]`, `rules check` | Check record files and rule headings |
+| `check [--format json]` | Check the whole project and explain what is open |
+| `version`, `doctor` | Versions, paths, and how Bun was started |
+
+After writing or editing records, run `fmt` on them and then `check` before
+saying the work is done. Use `--actor model:<your model name>` for records you
+write; use `person:` only when entering the author's own words as given.
+
+A source record needs a `citation_key`; useful fields are `type`, `title`
+(`{"value": "…"}`), and `issued` (`{"edtf": "1998"}`). `record add` fills `id`,
+`created`, `admission` (`candidate`), and `intake`. A citation record holds one
+citation in the author's existing manuscript: `key` and `sentence`
+(`{"text": "…"}`; the digest is filled in). `bibliography_include` in
+`stemma.json` is a list of source IDs. Never invent any of these values.
+
+Exit code 0 means done with nothing open, and 1 means done with findings open: a
+report, not a reason to stop. 2 is a usage error or a command that is not
+implemented yet; 3 an unreadable project; 4 a wrong runtime; 5 a request that is
+not valid; 70 an internal error, after which no result may be read as a pass. A
+report is checked clean only when its label says `checked_clean`. Checks this
+version cannot yet run are listed and keep a project from that label.
 
 ## Planned modes
 

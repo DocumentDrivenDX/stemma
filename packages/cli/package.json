@@ -1,0 +1,7 @@
+{
+  "name": "@stemma/cli",
+  "private": true,
+  "type": "module",
+  "exports": "./src/main.ts",
+  "dependencies": { "@stemma/records": "workspace:*", "@stemma/core": "workspace:*", "@stemma/workspace": "workspace:*" }
+}

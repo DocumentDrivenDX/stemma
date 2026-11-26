@@ -1,0 +1,56 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "stemma",
+      "devDependencies": {
+        "@types/bun": "1.4.5",
+        "typescript": "5.9.3",
+      },
+    },
+    "packages/cli": {
+      "name": "@stemma/cli",
+      "dependencies": {
+        "@stemma/core": "workspace:*",
+        "@stemma/records": "workspace:*",
+        "@stemma/workspace": "workspace:*",
+      },
+    },
+    "packages/core": {
+      "name": "@stemma/core",
+      "dependencies": {
+        "@stemma/records": "workspace:*",
+      },
+    },
+    "packages/records": {
+      "name": "@stemma/records",
+    },
+    "packages/workspace": {
+      "name": "@stemma/workspace",
+      "dependencies": {
+        "@stemma/core": "workspace:*",
+        "@stemma/records": "workspace:*",
+      },
+    },
+  },
+  "packages": {
+    "@stemma/cli": ["@stemma/cli@workspace:packages/cli"],
+
+    "@stemma/core": ["@stemma/core@workspace:packages/core"],
+
+    "@stemma/records": ["@stemma/records@workspace:packages/records"],
+
+    "@stemma/workspace": ["@stemma/workspace@workspace:packages/workspace"],
+
+    "@types/bun": ["@types/bun@1.4.5", "", { "dependencies": { "bun-types": "1.4.5" } }, "sha512-DpgwNI9z0L1S0gtb45QLCWgwCUcMLnsHYMJHQvpNj7erGiCGBvpggltAIeARrtobNMKMuy0UP7i56tKKgwFs/Q=="],
+
+    "@types/node": ["@types/node@26.6.11", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-uUyQ2XLEz+EXh34lmS3GhKrkqn/8FU7KUiKRpk347At2bmnMVWss45yz8b4FG/tUtmV1tV/+TVkITItPROyeeQ=="],
+
+    "bun-types": ["bun-types@1.4.5", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-ECHn+9dhL3wv0G6u0+7dQvrnaimXiRDxxerYBmhTaLyJEEuvTPWk2Fye3XIf5Y++JIIiHKfQw4Z7V5D8KuiXbg=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@8.9.0", "", {}, "sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg=="],
+  }
+}

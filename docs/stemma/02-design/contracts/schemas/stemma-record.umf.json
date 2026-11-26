@@ -13619,7 +13619,7 @@
            "element": "CitationStyle"
           }
          },
-         "cardinality": "one"
+         "cardinality": "optional"
         },
         "trim_size": {
          "type": {
@@ -13745,7 +13745,7 @@
      "id": "Project.citation_style",
      "kind": "field",
      "name": "citation_style",
-     "nullability": "required",
+     "nullability": "absent-allowed",
      "extensions": {},
      "cardinality": "one"
     },

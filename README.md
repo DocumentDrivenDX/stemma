@@ -9,8 +9,34 @@ A *stemma codicum* is the family tree of a text's manuscripts: it shows which co
 derives from which. Stemma aims to give a book the same property: each cited
 claim has a traceable line of descent to a stored source.
 
-Nothing is implemented yet. The skill is a stub. The vision, requirements, and
-design decisions live under [`docs/stemma/`](docs/stemma/).
+Pre-release. A first part of the command line works: project setup, adding
+records, record-format checks, two bibliography checks, and a warning about
+coordinates written in project files. Everything else below is planned. The
+vision, requirements, and design decisions live under
+[`docs/stemma/`](docs/stemma/).
+
+## Try it from a checkout
+
+Set up and tried only on macOS on Apple silicon. The script fetches the pinned
+Bun into the ignored `.tools/` directory and installs nothing system-wide.
+
+```sh
+./scripts/dev.sh demo          # a guided run in a fresh temporary directory
+./scripts/dev.sh check         # type check and tests
+./scripts/dev.sh plugin-check  # needs the claude command; uses a throwaway profile
+```
+
+To run your own command after `./scripts/dev.sh build` (the project path must be
+absolute):
+
+```sh
+root="$PWD/dist/release"
+(cd "$root" && "$OLDPWD/.tools/bun" --no-install --no-env-file --config=/dev/null \
+  "$root/dist/stemma.js" check --project /absolute/path/to/project)
+```
+
+Keep all three flags: without them Bun can download packages, or load a
+`bunfig.toml` or `.env` from the working directory.
 
 ## Idea
 
@@ -70,6 +96,8 @@ an unsupported experiment.
 ```text
 .claude-plugin/   plugin and marketplace manifests
 skills/stemma/    the single public skill
+packages/         command line and its libraries
+fixtures/, tests/, scripts/
 docs/stemma/      Stemma's own governed documents (specified with HELIX)
 ```
 

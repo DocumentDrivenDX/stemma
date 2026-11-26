@@ -41,13 +41,18 @@ work.
 
 `bun --no-install <plugin root>/dist/stemma.js <command> [options]`
 
-- Proposed, unverified: Bun can load `bunfig.toml` and `.env` files from its
-  working directory, which could preload code or redirect a store. The skill and
-  the documented terminal invocation therefore start Bun with the plugin root as
-  the working directory, which holds neither file, and pass `--project` and every
-  path as absolute paths. If the pinned Bun offers settings that disable that
-  loading, the invocation also uses them. A test with seeded files in a project
-  and a calling directory MUST pass before the pilot (SEC-014).
+- Observed on Bun 1.4.5 (macOS): a `bunfig.toml` in the working directory ran
+  preload code and a `.env` there set a store variable, with or without
+  `--no-install`. Files beside the script were not loaded. The full invocation is
+  therefore
+  `bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js`,
+  and with those two added flags neither file was loaded. The skill and the
+  documented terminal use also start Bun with the plugin root as the working
+  directory, and pass `--project` and every path as absolute paths. A relative
+  path given to a command is resolved against the project directory. A command
+  started without `--no-install` exits 4; `doctor` warns when another of these
+  flags is missing, since a preload has already run by then. The `/dev/null`
+  form is untested on Windows. A test with seeded files covers SEC-014.
 - Common options: `--project <dir>` (default: nearest ancestor holding
   `stemma.json`), `--format text|json` (default `text`), `--store-dir`,
   `--restricted-dir`.
@@ -63,7 +68,9 @@ work.
 
 | Command | Effect | Step |
 |---|---|---|
-| `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries | M1 |
+| `version` | Report the Stemma version and the pinned Bun version | M1 |
+| `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries. Requires `--project`, because the documented working directory is the plugin root; overwrites nothing, and exits 5 if `stemma.json` exists | M1 |
+| `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). It never overwrites. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
 | `doctor` | Report Bun, SQLite, and external tool versions, paths, and platform test status | M1 |
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
 | `rules check` | Report malformed or duplicated rule headings in `rules.md` (CONTRACT-001 J) as `record.valid` results; `validate` includes it | M1 |
@@ -128,7 +135,7 @@ reviewed or not.
 | `record.valid` | FR-62 | CONTRACT-001 error | unreadable file |
 | `source.held` | FR-9 | A cited source has no non-retired capture with an extraction | blob missing |
 | `source.changed` | FR-10 | A note, claim, or citation depends on a replaced or retired capture, extraction, or source, or on a passage whose `source_record_sha256` differs from the source's current bibliographic digest | none |
-| `cite.key` | FR-29 | A citation key matches no source | none |
+| `cite.key` | FR-29 | A citation key matches no source | a source record is unreadable |
 | `bib.uncited` | FR-29, FR-15 | A source in `bibliography_include` is cited nowhere. Cited sources enter the built bibliography automatically, so no other entry can be uncited | no manuscript to read |
 | `quote.present` | FR-29, FR-20 | A quotation or note extract is absent from the stored text, or the `quote.exact` of a passage that a note, attestation, or support record uses is not in its extraction at its position | text missing or extraction quality too low |
 | `quote.self` | FR-29 | A quotation attributed to a source duplicates a claim marked as the book's own | no claims |
@@ -209,6 +216,38 @@ not checked. A claim edited after its support verdict is caught; a manuscript
 sentence strengthened while its claim is unchanged is not. An agent or person
 with file access can edit verdicts, review marks, annotations, and
 confirmations.
+
+**Record findings.** CONTRACT-001 calls a non-canonical file and an unknown
+field warnings. Each is reported as a `record.valid` `fail`
+(`record_noncanonical`, `unknown_field`), so that it is explained and counted
+like any finding (assumption). CRLF line endings from a checkout alone do not
+make a file non-canonical. An unreadable or newer-version file is
+`unverifiable`.
+
+**Citation items without a manuscript reader.** The manuscript is authoritative
+(CONTRACT-006 D). When `manuscript/` holds no `.md` file, `cite.key` and
+`bib.uncited` read the non-retired `citation` records; a record's `key`, or its
+`source` when it has no key, names the source. With no citation record either,
+each listed entry is `unverifiable` (`no_manuscript`). While a version cannot
+read manuscript files that are present, no citation record stands in for them:
+`bib.uncited` is `unverifiable` (`manuscript_not_read`) and `cite.key` is
+`not_implemented`. `cite.key` is `unverifiable` (`source_unreadable`) when a key
+matches no source and some source record cannot be read; `bib.uncited`
+likewise (`citation_unreadable`) for unread citation records (assumptions).
+
+**Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
+URI; degrees with a degree sign and a latitude then a longitude hemisphere
+letter, with optional minutes and seconds; and two decimal numbers with at least
+three decimal places each, separated by a comma, within coordinate ranges
+(assumption). In `check` it reads `stemma.json`, `rules.md`, and the files under
+`records/` and `manuscript/` as text. It does not read structured geometry
+fields, other files, or builds. Other forms are missed, so a pass is no proof.
+
+**What counts as input for a check not yet implemented** (assumption). When in
+doubt it is present. Metadata, resolver, and identifier checks look at sources
+that are cited or listed in `bibliography_include`. A record of a kind whose
+CONTRACT-001 rules a version does not all check makes `record.valid` itself
+`not_implemented`.
 
 ### D. Quotation matching
 
@@ -454,7 +493,7 @@ exits 1, and labels the build `open_findings`.
 | Rebuild recheck | Recomputed quote and page checks caught edited records; a forged "supported" verdict passed | Nothing prevents the forgery |
 | `meta.*`, `id.resolves`, `number.present`, `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Design only | All |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, and `check` with `record.valid`, `cite.key`, `bib.uncited`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations and confirmations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; real project data |
 
 ## Schema Basis
 

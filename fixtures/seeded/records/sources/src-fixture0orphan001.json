@@ -1,0 +1,19 @@
+{
+  "admission": "admitted",
+  "citation_key": "orphan1990",
+  "created": {
+    "at": "2026-01-05T09:58:00Z",
+    "by": {
+      "kind": "person",
+      "name": "author"
+    }
+  },
+  "id": "src-fixture0orphan001",
+  "intake": "parsed",
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "An invented work that nobody cites"
+  },
+  "type": "book"
+}

@@ -1,0 +1,20 @@
+{
+  "admission": "maybe",
+  "citation_key": "invalid2001",
+  "created": {
+    "at": "2026-01-05T09:58:00Z",
+    "by": {
+      "kind": "person",
+      "name": "author"
+    }
+  },
+  "id": "src-fixture0invalid01",
+  "intake": "parsed",
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "An invented record with a wrong value"
+  },
+  "tittle": "misspelled",
+  "type": "book"
+}
