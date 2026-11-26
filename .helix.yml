@@ -1,6 +1,6 @@
 # HELIX marker: Stemma's own documents are specified and designed with HELIX.
 flows:
-  - id: stemma
+  - id: helix
     root: docs/stemma/
 autonomy:
   level: medium

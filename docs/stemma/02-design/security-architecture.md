@@ -1,0 +1,220 @@
+---
+ddx:
+  id: stemma.security-architecture
+  type: security-architecture
+  activity: design
+  authoring:
+    home: repo
+  depends_on:
+    - stemma.architecture
+    - stemma.data-design
+    - stemma.security-requirements
+    - stemma.threat-model
+    - stemma.adr-003
+    - stemma.adr-007
+---
+
+# Security Architecture
+
+**Scope**: the whole of Stemma as laid out in the [architecture](architecture.md).
+Requirements are in [security requirements](../01-frame/security-requirements.md),
+threats in the [threat model](../01-frame/threat-model.md), interface rules in
+[DESIGN.md](DESIGN.md), and component design in the
+[solution designs](solution-designs/).
+
+## Decision
+
+Stemma secures what its own code does with files, and states plainly what it
+cannot control. It does not sandbox or authorize the agent. The design rests on
+five controls:
+
+1. Treat every outside file, response, and string as data. Parse it in the
+   owning adapter, within limits, and never run it.
+2. Keep binaries and restricted coordinates outside the repository.
+3. Filter and redact while constructing anything for a reviewer, then scan and
+   report what remains.
+4. Recompute scripted results at every build; label all other records as
+   records.
+5. Pin the toolchain and run without package downloads.
+
+Hosted-model use is not gated by source. Record forgery is not prevented. No
+citation, claim, source, support, image, coordinate, or working-tree finding
+blocks work or a build (ADR-003); the controls report, and shape outputs by
+exclusion and redaction. These are owner decisions. Items marked **(proposed)**
+come from P requirements in [security requirements](../01-frame/security-requirements.md)
+and bind only when the owning design or contract adopts them.
+
+```mermaid
+%% id: stemma-trust-boundaries
+graph LR
+    In["Files, web, libraries, comments"] -->|B1, B8| CLI["Command line"]
+    In -->|B2 text| Agent["Agent and host"]
+    Agent -->|B3| Model["Hosted model"]
+    Agent -->|B4 direct file access| Data["Project and both stores"]
+    CLI --> Data
+    CLI -->|B5| Net["Resolvers and web"]
+    CLI -->|B6| Out["Reviewer, static host"]
+    Rel["Tools and releases"] -->|B7| CLI
+```
+
+## Trust Boundaries
+
+Boundary IDs match the [threat model](../01-frame/threat-model.md).
+
+| Boundary | Assets | Trust Change | Control |
+|----------|--------|--------------|---------|
+| B1 Outside files and web | Machine, records | Hostile bytes enter parsers | Parsing only in `intake`, `extract`, `workspace`; limits; no execution or nested fetch |
+| B2 Text into agent context | Machine, private data | Data can be read as instructions | Bounded, marked excerpts; skill obligations. Instruction only, not containment |
+| B3 To hosted model | Sources, manuscript, coordinates | Leaves the author's machine | Needed excerpts; statement to author. No gate |
+| B4 Local processes to files | Records, stores | Any such process can read and write | None enforced. Commands validate what they read; builds recompute |
+| B5 To network services | Research interests, local network | Requests leave; responses are untrusted | Named commands only; saved responses; bounded URL fetch (proposed) |
+| B6 To reviewer or host | Protected text, positions | Recipient gets everything in the files | Audience filtering before writing, redaction, scan |
+| B7 Tools and releases | Machine | Third-party code runs with author's rights | Pins, digests, lockfile, no runtime download, release audit |
+| B8 Collaborator input | Records, rules, agent behavior | Others' text becomes project content | Validation; comment import writes only comment records. `rules.md` is followed by the agent, so the author reviews changes to it |
+
+## Control Mapping
+
+Verification names the SEC criterion that tests the control.
+
+| Threat / Risk | Control | Implementation Surface | Verification |
+|---------------|---------|-------------------------|--------------|
+| TM-E-001, TM-I-003, TM-S-001, TM-S-006 | Source text is data. Excerpts carry the CONTRACT-002 G marker. The agent obligations are in CONTRACT-004 C. No command takes an action named by input text | `skills/stemma`, `core` | SEC-009, SEC-003 |
+| TM-T-002 | The support judge gets only the prepared bundle and versioned prompt, in a separate context. Give it no tools where the host allows (proposed). A quoted-substring rule does not detect a steered verdict | `skills/stemma`, `core` | SEC-009; FR-52 error rates |
+| TM-S-002, TM-T-001, TM-R-001, TM-T-006 | Accepted. Honest wording; stated limits in the disclosure; git history as a changeable trail | `core`, `publish`, `skills/stemma` | SEC-002 |
+| TM-D-001, TM-E-002, TM-T-003 | CONTRACT-003 G for codecs. Starting caps for PDF, scan, and web extraction and URL fetch (SD-002), resolver responses of at most 10 MiB with a 60 s timeout (assumption), and image conversion (SD-008); no script or code evaluation (proposed). Digest-named blobs; input names never form paths | `intake`, `extract`, `workspace`, `publish` | SEC-005 to SEC-008 |
+| TM-I-011 | Scheme, size, time, redirect, and address limits on URL admission; stored pages never rendered (proposed) | `workspace`, `Resolver` port | SEC-013, SEC-023 |
+| TM-E-003 | Start Bun with the plugin root as the working directory and absolute project paths, and use any pinned-Bun setting that stops it loading `bunfig.toml` or `.env` from a project or caller directory (proposed; CONTRACT-002 A). `--no-install` alone is not shown to do this. The method needs a test on Bun 1.4.5 before the pilot | `cli`, `skills/stemma` invocation | SEC-014 |
+| TM-E-005 | Escaping in the Typst output format, build-directory file access, vendored packages, no network (CONTRACT-006 G). Make an unvendored package fail without download (proposed) | `cite`, `publish` | SEC-010 |
+| TM-E-004 | Run TIFF and EPS conversion as a recorded step with a pinned converter, without network or unrelated file access (proposed) | `publish` | SEC-012 |
+| TM-E-006, TM-I-012 | Render record and comment text as text; encode inlined data so it cannot end its script block; display SVG without script; restrictive content security policy (proposed). Any loosening for browser Typst is reviewed in SD-012 | `explorer`, `graph` | SEC-011 |
+| TM-I-007 | Allow list (CONTRACT-005 E), report redaction including sentence fields (CONTRACT-002 E1), the short-excerpt allowance (none kept until its limit is set), a verbatim scan whose unremovable hits are reported, and a coverage statement per package part (proposed) | `graph`, `core`, `publish` | SEC-017, SEC-018 |
+| TM-I-006 | Report location metadata such as EXIF position data in placed images (`image.metadata`); change no original (proposed) | `publish` | SEC-031 |
+| TM-I-002, TM-I-004, TM-I-005 | Outside store; structured values excluded; a packaged warning gives no location; skill instruction to read exact values only when a task needs them and never to write them into project files or outputs (proposed) | `workspace`, `core`, `skills/stemma` | SEC-016, SEC-021, SEC-022 |
+| TM-I-001 | Needed excerpts; plain statement that any source may be sent | `core`, `skills/stemma` | SEC-020 |
+| TM-I-009, TM-I-010, TM-I-015, TM-D-002 | Store placement refusals, ignore rules, digests, author guidance | `workspace` | SEC-015, SEC-019 |
+| TM-T-005, TM-T-004, TM-D-003 | Derived data is never authoritative; validate on read; digest verification | `core`, `graph`, `records` | SEC-004, SEC-008 |
+| TM-T-007, TM-E-007, TM-S-004, TM-R-004 | Pinned and recorded tools, lockfile, digests, controlled install scripts, identified release package, release audit and secret scan | Release and bundle scripts | SEC-025 to SEC-028 |
+| TM-I-013 | Synthetic or open fixtures; secret scan | Repository | SEC-029, SEC-026 |
+
+TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
+
+## Identity and Access
+
+- Authentication: none. Stemma has no accounts. An actor in a record is a
+  self-asserted label. Host, model, git, and hosting sign-ins belong to those
+  services.
+- Authorization: the operating system and the agent host decide access. Role
+  records (FR-5) are guidance, not access control. CONTRACT-004 C reserves
+  review marks, annotations, confirmations, and verdict handling by instruction.
+  `annotate`
+  cannot tell who ran it, and a host permission prompt adds no assurance.
+- Session or token handling: not applicable. No design stores a token or API
+  key. A resolver that needs one requires a new design decision.
+
+## Data Protection
+
+- Data at rest:
+
+| Data | Location | Protection and limit |
+|---|---|---|
+| Records, manuscript, rules | Git repository | Treat as private: holds excerpts, notes, and legacy values. Access is the author's choice of remote |
+| Held copies, extractions, originals | Content store outside git | Placement refusal and digests; no encryption by Stemma |
+| Exact restricted coordinates | Restricted store outside the project | No hash or copy elsewhere by design; no encryption by Stemma; readable by the agent's process |
+| Index, reports, builds, exports | `.stemma/`, `build/` | Ignored by git; may copy source text |
+
+- Data in transit:
+  - Hosted model: the host's transport. The data is what the threat model lists
+    for B3; `excerpt` and `support prepare` bound only their own output.
+  - Resolvers: HTTPS (architecture, Level 1). Requests disclose identifiers and
+    bibliographic queries. With certificate checks on (assumption), responses
+    are still untrusted. URL admission may use HTTP, which gives no transport
+    protection.
+  - Reviewer package and git: the author moves them; Stemma sends nothing.
+- Restricted coordinates: the store keeps them out of structured outputs only.
+  The agent may read exact values when a task needs them, which sends them to
+  its model.
+  Prose, images, original files, takeover copies, and history can still hold
+  them.
+- Reviewer package: filtering happens before writing. A withheld-text hit is
+  redacted from generated parts or, if it cannot be removed, reported with a
+  warning; the package is still written. A coordinate hit warns. The PDF is the
+  author's book, so its quotations and figures are not removed by report
+  redaction; the scan covers it and reports a hit as `package.leak`
+  (CONTRACT-002 E1). Whether claim text and model-written fields in the explorer
+  data are redacted or only scanned is not settled by the contracts (SEC-018).
+- Author exports and hosted explorers: everything in the files is readable by any
+  recipient.
+- Secrets and key handling: no Stemma secrets or keys. Nothing is signed.
+  Digests detect change against a trusted reference; they do not prove origin.
+- Supply chain: the bundle ships unminified in release packages, not in git. Each
+  release publishes the package digest, and the install proof compares it. The
+  marketplace route that delivers it is undesigned and untested. The current
+  manifest points at the git address without a pinned revision and delivers no
+  command line, so installed skill text can follow whatever that address
+  serves. Release packages are the first route tried. If the marketplace needs
+  a separate distribution repository for built files, that repository is a
+  second publishing surface: its entry pins a commit or tag, it holds only
+  outputs built from a tagged Stemma revision with the revision recorded, and
+  its write access is limited to the release maintainer (SEC-028). A published
+  digest from the same publisher helps comparison but does not protect against
+  a compromised publisher account.
+
+## Logging and Monitoring
+
+- Security events: none are logged. Errors use the contract exit codes and
+  messages. Leak, removal, and image findings appear in check reports.
+- Alerting: none beyond on-screen and report warnings. Advisory review happens at
+  release.
+- Audit trail: provenance stamps, retained records, build records, and git
+  history. All can be altered by whoever can write them. No record lists what was
+  sent to a model.
+
+## Residual Risk
+
+Accepted by owner decision:
+
+- Any project source, including unpublished or community-restricted material,
+  can be sent to a hosted model. Stemma cannot recall it (TM-I-001).
+- The agent may read exact restricted coordinates when a task needs them; they
+  then reach its model (TM-I-002).
+- An agent or person can forge review marks, annotations, confirmations,
+  restriction changes, and support verdicts without detection (TM-S-002,
+  TM-T-001).
+- Nothing blocks a build. A book or package can disclose a restricted site or
+  protected material, hold unsupported, unreviewed, or unsourced claims, or
+  carry image problems; the report and label are the only control (TM-I-004 to
+  TM-I-007, TM-T-006). The label reflects check results only, so a book
+  labelled checked clean can still hold unreviewed AI items; the report counts
+  them separately.
+
+Remaining by design limits:
+
+- Prompt injection is not contained. A steered agent has whatever the host
+  allows, including the restricted store and files unrelated to Stemma.
+- Package scans find verbatim text only. Paraphrase, altered copies, text inside
+  images, and legitimate quotations in the book are outside them.
+- Parser, converter, Typst, browser, and runtime flaws remain possible; Stemma
+  adds no process sandbox. Container tools are not a required dependency.
+- A cloned project from an untrusted person remains untrusted input to the agent.
+- Preserved legacy values can hold local paths or private annotations in git, and
+  author exports are open to any recipient (TM-I-014, TM-I-008).
+- Audits run only before release, so a new advisory can affect installed copies.
+- Nothing here is built; Linux, Windows, and desktop hosts are untested. On
+  Linux only the local tools are targeted; no desktop-app host is promised there.
+
+## Security Test Hooks
+
+Hooks run locally and, advisory only, on release tags (ADR-007). Results state
+the system they ran on; none is required to continue.
+
+| Hook | Proves | Step |
+|---|---|---|
+| Hostile corpus: Word archive and XML, libraries, PDF, scan, web page, resolver payload, comment file | SEC-005 to SEC-008, SEC-013 | M1; comments M3 |
+| Seeded injection in sources and support passages, live session per claimed host | Observed behavior for SEC-009, SEC-021; no guarantee | M1 |
+| Seeded `bunfig.toml` and `.env` start test | SEC-014 | M1, before pilot |
+| Tampered cache and report, then a build | SEC-004 | M2 |
+| Seeded restricted value, prose coordinate, image metadata, absent store | SEC-016, SEC-022, SEC-031 | M1; images M2 |
+| Typst escape, outside-file read, unvendored package, hostile EPS | SEC-010, SEC-012 | M1 basic build; EPS M2 |
+| Browser: hostile strings and SVG, network denied | SEC-011, SEC-023 | M3 |
+| Seeded protected text in every package part | SEC-017, SEC-018 | M3 |
+| Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

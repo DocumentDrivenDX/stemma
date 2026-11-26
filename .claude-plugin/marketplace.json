@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "stemma",
-      "description": "Research and writing discipline for academic books with verified citations.",
+      "description": "Pre-release stub for academic book research with checked citations. No command line is included; delivering a release package through this marketplace is not yet designed.",
       "version": "0.0.1",
       "source": {
         "source": "url",

@@ -1,7 +1,7 @@
 {
   "name": "stemma",
   "version": "0.0.1",
-  "description": "Research and writing discipline for academic books with verified citations.",
+  "description": "Pre-release stub for academic book research with checked citations. No checks or builds are implemented.",
   "author": {
     "name": "DocumentDrivenDX",
     "url": "https://github.com/DocumentDrivenDX"
