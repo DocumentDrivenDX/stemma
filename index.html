@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Scripted citation checks and reports for scholarly books. Pre-release.">
+<title>Stemma</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="border-b border-line bg-surface">
+<div class="mx-auto max-w-4xl px-4 py-3">
+<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
+<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html" aria-current="page">What Stemma is</a></li><li><a href="principles.html">Principles</a></li><li><a href="quickstart.html">Quick start</a></li><li><a href="status.html">What works today</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+</div>
+</header>
+<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
+<h1>Stemma</h1>
+<p class="lead">A plugin in the making that helps scholars research, write and typeset books with AI: it checks citations with scripts, explains what it finds, and aims to trace each cited claim to a stored source.</p>
+<p class="note"><strong>Pre-release.</strong> A first part of the command line works. Most of what Stemma is meant to do is not built. See <a href="status.html">what works today</a>.</p>
+<p><a class="button button-primary" href="quickstart.html">Try it on macOS</a> <a class="button" href="examples.html">See real output</a></p>
+<h2>The name</h2>
+<p>A <em>stemma codicum</em> is the family tree of a text's manuscripts: it shows which copy derives from which. Stemma aims to give a book the same property, so that each cited claim has a line of descent to a stored source.</p>
+<h2>How it is meant to work</h2>
+<p>Two strands run together. This describes the design, not what is built.</p>
+<ul><li><strong>Evidence strand:</strong> source records, reading notes with page-level locators, constructs, places, and a ledger tying claims to the sources that support them, kept as plain files.</li>
+<li><strong>Manuscript strand:</strong> thesis, outline, chapter specifications, drafts and the assembled book.</li></ul>
+<h2>What it does today</h2>
+<p>It sets up a project, adds records, checks the record format, runs two bibliography checks and warns about coordinates written in project files. Each finding says what is wrong, shows the evidence, says why it matters and suggests what to do.</p>
+<figure class="shot"><a href="screenshots/demo-first-check.png"><img src="screenshots/demo-first-check.png" width="880" height="1050" loading="lazy" alt="Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form."></a><figcaption>check: a mistyped citation key. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
+<h2>Part of a family</h2>
+<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. Its own documents are specified with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>, which authors do not need.</p>
+</main>
+<footer class="border-t border-line">
+<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Run the first slice of the Stemma command line from a checkout.">
+<title>Quick start on macOS | Stemma</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="border-b border-line bg-surface">
+<div class="mx-auto max-w-4xl px-4 py-3">
+<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
+<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html">What Stemma is</a></li><li><a href="principles.html">Principles</a></li><li><a href="quickstart.html" aria-current="page">Quick start</a></li><li><a href="status.html">What works today</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+</div>
+</header>
+<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
+<h1>Quick start on macOS</h1>
+<p class="lead">Run the first slice of the command line from a checkout.</p>
+<p class="note">Set up and tried only on macOS on Apple silicon. Intel Macs, Windows and Linux are untested, and the setup script stops on them. Installing the plugin from a marketplace for everyday use is not ready.</p>
+<h2>You need</h2>
+<ul><li>git, and the curl and openssl commands that macOS includes.</li><li>A network connection on the first run, to fetch the pinned Bun and the development packages from the npm registry.</li></ul>
+<h2>Run the demo</h2>
+<p>The script checks the Bun download against a pinned hash and keeps what it fetches inside the checkout. It installs nothing system-wide. All names and sources in the demo are invented. These steps need a checkout that holds this slice; if the repository's default branch does not hold it yet, a fresh clone will not have it.</p>
+<figure class="excerpt"><figcaption><strong>Commands</strong> to type in a terminal.</figcaption><pre tabindex="0">git clone https://github.com/DocumentDrivenDX/stemma.git
+cd stemma
+./scripts/dev.sh demo     # a guided run in a fresh temporary directory
+./scripts/dev.sh check    # type check and tests</pre></figure>
+<h2>Run your own command</h2>
+<p>Build first. The project path must be absolute.</p>
+<figure class="excerpt"><figcaption><strong>Commands</strong> to type in a terminal.</figcaption><pre tabindex="0">./scripts/dev.sh build
+root=&quot;$PWD/dist/release&quot;
+(cd &quot;$root&quot; &amp;&amp; &quot;$OLDPWD/.tools/bun&quot; --no-install --no-env-file --config=/dev/null \
+  &quot;$root/dist/stemma.js&quot; check --project /absolute/path/to/project)</pre></figure>
+<p>Keep all three flags: without them Bun can download packages, or load a <code>bunfig.toml</code> or <code>.env</code> from the working directory. To start a project, replace <code>check</code> with <code>init</code>.</p>
+<h2>Commands</h2>
+<figure class="excerpt"><figcaption><strong>Generated</strong> from <code>stemma --help</code>.</figcaption><pre tabindex="0">stemma 0.0.1
+Run as: bun --no-install --no-env-file --config=/dev/null &lt;plugin root&gt;/dist/stemma.js &lt;command&gt; [options]
+
+  version
+  doctor
+  init --project &lt;dir&gt;
+  record add &lt;kind&gt; --input &lt;file|-&gt; [--actor &lt;person|model|software&gt;:&lt;name&gt;]
+  validate [paths]
+  fmt [paths]
+  rules check
+  check [--changed | --all]
+
+Options: --project &lt;dir&gt; (default: nearest ancestor holding stemma.json), --format text|json
+Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
+3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.</pre></figure>
+<p>Where this page writes <code>stemma</code>, it means that long invocation. No <code>stemma</code> command is installed on your path.</p>
+</main>
+<footer class="border-t border-line">
+<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+</footer>
+</body>
+</html>
