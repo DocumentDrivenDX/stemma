@@ -1,0 +1,19 @@
+{
+  "name": "stemma",
+  "description": "Stemma book research and writing marketplace",
+  "owner": {
+    "name": "DocumentDrivenDX",
+    "url": "https://github.com/DocumentDrivenDX"
+  },
+  "plugins": [
+    {
+      "name": "stemma",
+      "description": "Research and writing discipline for academic books with verified citations.",
+      "version": "0.0.1",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/DocumentDrivenDX/stemma.git"
+      }
+    }
+  ]
+}

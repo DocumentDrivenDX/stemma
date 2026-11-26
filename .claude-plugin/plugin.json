@@ -1,0 +1,13 @@
+{
+  "name": "stemma",
+  "version": "0.0.1",
+  "description": "Research and writing discipline for academic books with verified citations.",
+  "author": {
+    "name": "DocumentDrivenDX",
+    "url": "https://github.com/DocumentDrivenDX"
+  },
+  "homepage": "https://github.com/DocumentDrivenDX/stemma",
+  "repository": "https://github.com/DocumentDrivenDX/stemma",
+  "license": "MIT",
+  "skills": "./skills/"
+}
