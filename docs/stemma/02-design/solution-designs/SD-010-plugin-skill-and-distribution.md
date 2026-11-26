@@ -39,6 +39,7 @@ FEAT-010 identifiers carry the PRD requirement in parentheses.
 | SKL-01 to SKL-03 (FR-48) | One skill file routes to one file per mode | Skill | P0 |
 | SKL-04 to SKL-06 (FR-48) | Delivery table in the skill, exit 2 backstop, relay and data-not-instruction rules | Skill, command line | P0 |
 | CLI-01 to CLI-03 (FR-49) | One bundle for terminal and agent; distinct exit codes | `cli` | P0 |
+| CLI-04, CLI-05 (FR-49) | Each function is a command over a core operation that interfaces also use | `cli`, `core` | P0 |
 | RUN-01 to RUN-06 (FR-75) | One pinned Bun, tool record, no run-time packages, platform rules | Runtime guard, bundler, release check | P0 |
 | DST-01, DST-06 (FR-50) | Self-contained release package delivered by the repository marketplace | Packager, manifests | P0 |
 | DST-02, DST-03, DST-05 (FR-50) | Support statement and skill wording per session type | Skill, README, release report | P0 |
@@ -138,7 +139,7 @@ Stemma does not enforce these instructions against an agent with file access (CO
 
 - **Purpose**: One composition root for every caller.
 - **Responsibilities**: Guard the version; parse arguments; read environment variables in one environment module with one schema; construct adapters; map outcomes to exit codes; answer unimplemented commands.
-- **Requirements Addressed**: CLI-01 to CLI-03, RUN-02, RUN-05.
+- **Requirements Addressed**: CLI-01 to CLI-05, RUN-02, RUN-05.
 - **Interfaces**: CONTRACT-002.
 - **Owned by TDs**: US-081, US-085.
 
@@ -202,6 +203,8 @@ Layered configuration files from `typescript-bun` are not used: CONTRACT-002 fix
 | SKL-05, SKL-06 | Skill | CONTRACT-004 C | Hand check with a seeded failing result and a source containing instructions |
 | CLI-01, CLI-02 | `cli` | One bundle | Same fixtures from terminal and harness; compare report bodies |
 | CLI-03 | `cli` | CONTRACT-002 I | Nothing-open, open-findings, and missing-tool fixtures |
+| CLI-04 | `cli` | CONTRACT-002 B | Command-line end-to-end test per function; then a Playwright test of the same function against the built interface (ADR-007) |
+| CLI-05 | `core` | Architecture, Command line first | Boundary check; review |
 | RUN-01, RUN-06 | `cli`, packager | BR-1010 | Seeded set with CRLF checkout, spaced and non-Latin paths; three systems on tags |
 | RUN-02, RUN-05 | Guard, skill | BR-1005 to BR-1008 | Wrong-version fixture; missing-Bun hand check in a desktop app |
 | RUN-03 | Packager | Tool record | Inspect record against lockfile and `doctor` |

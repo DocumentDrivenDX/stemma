@@ -27,6 +27,11 @@ tags and are advisory. Stemma's repository requires no CI job and no commit hook
 and its automation makes no paid model calls. A failing result is still a defect
 to fix or to state at release.
 
+Each function is tested end to end through the command line first. A web
+interface is then tested with Playwright, which drives it in a real browser
+against the built bundle. No Playwright test or browser tool is added until
+there is a web interface to test.
+
 ## Why We Chose This
 
 ### Over required checks on every change

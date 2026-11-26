@@ -178,6 +178,7 @@ describe("exit codes (CONTRACT-002 I)", () => {
     expect(stemma(["frobnicate"]).code).toBe(2);
     expect(stemma(["init"]).code).toBe(2);
     expect(stemma(["check", "--nope"]).code).toBe(2);
+    for (const args of [["record", "show", "x"], ["map", "places"], ["review", "comment", "add"]]) expect(stemma(args).err).toContain("not implemented");
     const run = stemma(["build", "draft", "--format", "json"]);
     expect([run.code, JSON.parse(run.out).error.code]).toEqual([2, "not_implemented"]);
   });

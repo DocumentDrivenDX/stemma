@@ -95,6 +95,12 @@ N/A — the tasks are traced in the user stories.
 - CLI-03. A command-line run must let a script distinguish a run with nothing
   open, a run with open findings, and a tool that could not run. Stemma itself
   must not treat open findings as a reason to stop.
+- CLI-04. Every function the product offers, including each function of a user
+  interface, must be available as a command, no later than the interface that
+  offers it. Controls that only change how something is shown, such as zoom,
+  pan, focus, or layout, need no command.
+- CLI-05. A user interface must call the same core operations as the commands
+  and must hold no business logic of its own.
 
 #### Runtime and portability (FR-75)
 

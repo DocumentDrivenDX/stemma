@@ -12,7 +12,7 @@ ddx:
 # US-081: Run checks and builds without an AI
 
 **Feature**: FEAT-010 — Plugin, skill, and distribution
-**Feature Requirements**: CLI-01, CLI-02, CLI-03
+**Feature Requirements**: CLI-01, CLI-02, CLI-03, CLI-04, CLI-05
 **PRD Requirements**: FR-49
 **Priority**: P0
 
@@ -39,6 +39,8 @@ Priya works in git and a terminal and may wire checks into automation of their o
 - [ ] **US-081-AC2** — Given a project and no AI host or model access, when Priya runs a delivered build, then it completes with its report as FEAT-008 specifies.
 - [ ] **US-081-AC3** — Given the same project files and tool versions, when checks run from the command line and from the agent, then the scripted results are identical.
 - [ ] **US-081-AC4** — Given a project with nothing open, a project with open findings, and a tool that cannot run, when Priya's script runs the command on each, then the script can tell the three outcomes apart.
+- [ ] **US-081-AC5** — Given a delivered function of a Stemma user interface, when Priya runs its command on the same inputs, then the command does the same thing and gives the same result.
+- [ ] **US-081-AC6** — Given a delivered user interface, when its code is inspected, then it gets results and makes changes only through the core operations the commands use, and applies no rule of its own.
 
 ## Edge Cases
 
@@ -55,12 +57,14 @@ Inputs are synthetic.
 | Build without AI | US-081-AC2 | Synthetic project with a finding, build delivered | Run a draft build | Draft PDF and report produced |
 | Parity | US-081-AC3 | Project with one invented quotation | Run from terminal and from agent | Same failing result and evidence |
 | Outcome signal | US-081-AC4 | Clean fixture; fixture with `p. 412` out of range; machine with a wrong runtime version | Run the command on each | Three distinguishable outcomes |
+| Interface parity | US-081-AC5 | A seeded export with one claim; a comment written in the explorer | Write the same comment with the command | Files with the same content apart from IDs and times |
+| No interface logic | US-081-AC6 | The built interface and its sources | Run the boundary check and inspect | No rule or write path outside the core operations |
 
 ## Dependencies
 
 - **Stories**: US-085
 - **Feature Spec**: FEAT-010
-- **Feature Requirements**: CLI-01, CLI-02, CLI-03
+- **Feature Requirements**: CLI-01, CLI-02, CLI-03, CLI-04, CLI-05
 - **PRD Requirements**: FR-49
 - **External**: The command-line Contract owns command names, options, outputs, and exit behavior.
 

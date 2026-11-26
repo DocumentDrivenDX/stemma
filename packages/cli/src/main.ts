@@ -37,7 +37,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 const NOT_YET = new Set([
   "migrate", "store", "source", "capture", "key", "resolve", "excerpt", "unreviewed", "reviewed", "retire", "rounds",
   "review", "support", "annotate", "import", "export", "takeover", "index", "research", "setup", "log", "activity",
-  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "graph",
+  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "graph", "map",
 ]);
 
 class CommandError extends Error {
@@ -228,7 +228,10 @@ function dispatch(positionals: string[], options: Options): number {
     case "fmt": return fmt(options, rest);
     case "check": only(0); return check(options);
     case "record":
-      if (rest[0] !== "add") throw usage("The only record command is `record add`.");
+      if (["show", "search", "trace"].includes(rest[0] ?? "")) {
+        throw new CommandError(2, "not_implemented", `\`record ${rest[0]}\` is not implemented in this version. Nothing was done.`);
+      }
+      if (rest[0] !== "add") throw usage("The record command available now is `record add`.");
       only(2);
       return recordAdd(options, rest[1]);
     case "rules":

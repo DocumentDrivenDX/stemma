@@ -134,12 +134,22 @@ Paths below are Bun workspace packages.
 | `packages/publish` | Markdown-to-Typst conversion, build orchestration, Typst process, reviewer package, which applies `core` redaction and runs the package scan | `Typesetter`, `Packager` | `records`, `manuscript`, `core`; `cite` and `graph` only through core ports | Direct citeproc-js import |
 | `packages/graph` | `GraphStore` implementations (disposable index now, engine later), arras export | CONTRACT-005 | `records`, `core`, `bun:sqlite` in its index code | Other adapters; writing record files |
 | `packages/cli` | Argument parsing, environment, output, composition root | CONTRACT-002 commands | All packages above | `explorer` |
-| `packages/explorer` | Browser application and host page | Built bundle | Browser-safe exports of `records`, `manuscript`, `cite`, and the pure Typst conversion in `publish/convert`; graph export types, React, arras UI | `workspace`, `extract`, `intake`, the rest of `publish`, `cli`; any Bun or Node API |
+| `packages/explorer` | Browser application and host page | Built bundle | Browser-safe exports of `records`, `core` operations, `manuscript`, `cite`, and the pure Typst conversion in `publish/convert`; graph export types, React, arras UI | `workspace`, `extract`, `intake`, the rest of `publish`, `cli`; any Bun or Node API |
 | `skills/stemma` | Skill and mode instructions | CONTRACT-004 | The command line only | Importing or editing package code |
 
 **Integration Owners**: filesystem, git, resolvers -> `workspace`; PDF, scan, and web formats -> `extract`; Word and legacy libraries -> `intake`; citeproc-js -> `cite`; Typst -> `publish`; SQLite and arras export -> `graph`; arras UI and browser Typst -> `explorer`; agent host -> `skills/stemma` and plugin manifests. Native shapes are translated in the owning package and do not appear in `core` ports.
 **Construction Policy**: only `packages/cli` constructs adapters and passes them to core use cases; the explorer entrypoint composes its own browser clients; tests substitute in-memory adapters.
 **Boundary Check**: `bun run check:boundaries`, a script that fails on a forbidden or cyclic import and on a deep import past a package's exports. It is part of the one local check command and release-tag runs, with no required hook or CI job (ADR-007). The script and its allowed and forbidden test cases precede feature code.
+
+### Command line first
+
+Every function is a `core` operation with a command (FR-49, CONTRACT-002 B). A
+user interface, the explorer included, is added for ease of use: it calls the
+same operations, or shows values those operations computed into an export, and
+holds no business logic of its own. An interface function is built after its
+command. Until the explorer exists, nothing shows that `core` and `records` run
+in a browser; `records` uses a runtime hashing library that would need
+replacing there.
 
 ### Ports
 

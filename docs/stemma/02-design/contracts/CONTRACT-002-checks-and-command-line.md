@@ -104,9 +104,22 @@ work.
 | `review baseline` / `review needed` | Save input digests; list what needs re-review since that baseline | P1 |
 | `restricted set <location id> --input <file>` / `restricted get <location id>` / `restricted mark <location id> --class restricted\|public --release exact\|area\|withhold` | Write or read an exact value in the restricted store (`get` sends it to whatever reads the output, including a model); set a location's mark and release (CONTRACT-001 H), with `public` for a person only and `exact` for `public` only | M3 |
 | `build draft` / `build camera-ready` / `build reviewer` | Typeset under the rules in F | Basic `draft` M1; `camera-ready` M2; `reviewer` M3 |
+| `record show <id>` / `record search <text> [--kind <kind>]` | Print one record with its forward and reverse links and its states (CONTRACT-005 J), a support result being a recorded model judgment; search records under the `search-fold` profile | M3 |
+| `record trace <record id \| sentence locus>` | From a linked sentence to its claims and their evidence, and from a claim or evidence back to each linked sentence; broken, missing, and withheld links are named | M3 |
+| `graph neighbors <record id> [--depth <n>] [--limit <n>]` | List the records and links connected to one record, and say what was left out | M3 |
+| `map argument [--chapter <id> \| --branch <claim id>]` / `map places` | Print the argument-map or places-map data of CONTRACT-005 J, including states and what cannot be drawn, filtered for `--audience <author\|reviewer>` | M3 |
+| `review comment add --export <dir> --claim <id> --input <text file> --file <comment file> [--reviewer <name>]` / `review comment list --file <comment file>` / `review comment edit\|remove <comment id> --file <comment file>` | Create or change a reviewer comment file (CONTRACT-005 E2) against a reviewer export, with no project; `edit` takes `--input`. Writes only that file | M3 |
 | `disclosure` | Generate the AI-use disclosure from records | M2 |
 | `scan release <path>…` | Search outputs and tracked files for restricted values, coordinate-shaped text, and withheld source material, and report what is found | M3 |
 | `graph export --audience <author\|reviewer> [--chapter <chapter id>] [--page] [--out <dir>]` / `graph status` | CONTRACT-005; `--chapter` scopes the export as CONTRACT-005 E states | M3 |
+
+**Command line first** (FR-49). Every function a user interface offers has a
+command above, delivered no later than the interface. Both call one `core`
+operation, so their results are equal. Zoom, pan, focus, selection, and layout
+controls need no command. Browser compilation of preview pages (CONTRACT-005 D)
+is a way of showing the manuscript; its command-line forms are `build draft`,
+which typesets the same inputs, `graph export --page`, and `graph status`. A new
+interface function needs its command added here first.
 
 A command that is not yet implemented MUST exit 2 and say so. Commands that
 record a review, decision, annotation, or confirmation cannot establish who ran

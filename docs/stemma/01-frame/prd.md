@@ -399,7 +399,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 ### Subsystem: 10. Plugin, skill, and distribution
 
 - **FR-48** (P0, M1) — Stemma ships as one public skill with modes. The modes cover starting a project, takeover, research, notes, outlining, drafting, voice and style, verification, building, audit, and review.
-- **FR-49** (P0, M1) — The scripted checks and the build run from a command line without an AI.
+- **FR-49** (P0, M1) — The scripted checks and the build run from a command line without an AI. Every function of Stemma is available on the command line first, and a user interface supports the same functions for ease of use; no function exists only in an interface. A function arrives on the command line no later than in an interface.
 - **FR-50** (P0, M1) — Stemma is published as a plugin in the project's repository marketplace and installs from it in Claude desktop; an official directory listing comes later. The bundled command line is not committed to the Stemma repository. It ships in release packages, and the repository marketplace install must deliver it; release packages are tried first, and a separate distribution repository for built files is allowed if the marketplace requires one. The first version promises full function only in the local Code tab of Claude desktop on macOS and Windows; it makes no desktop-app promise on Linux. Other sessions, including the Claude command-line tool, get no promise of local checks or builds. The command-line tool may serve as a test harness; its results do not verify the desktop app.
 - **FR-77** (P1) — The marketplace plugin installs in ChatGPT desktop and gives full function in ChatGPT and Codex sessions that run on the author's computer.
 - **FR-51** (P1) — Persona defaults control onboarding, explanation level, and number of checkpoints, and every default can be overridden. No default hides a finding or changes when an output is called checked clean.
@@ -504,7 +504,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-46 | Package for review | A project with a restricted source, a restricted coordinate typed in prose, and a failing quotation | The package holds the four items, protected text redacted from generated parts, and a coordinate warning |
 | FR-79 | Comment and import | A reviewer comments on a claim and saves the file | The author imports it; the comment is tied to the claim |
 | FR-48 | Use a mode | A takeover request | One skill routes it to takeover |
-| FR-49 | Run without an AI | A command-line check and build | Same scripted results as in the agent |
+| FR-49 | Run without an AI; command line first | A command-line check and build; one interface function and its command | Same scripted results as in the agent; the command does what the interface does, with the same result |
 | FR-50 | Install in Claude desktop | A clean profile and the repository marketplace | The release package's command line arrives and the plugin loads in a local Code tab session |
 | FR-75 | Run the tools on each system | The same fixtures on macOS, Linux, and Windows | Same results natively, with the documented Bun version |
 | FR-78 | Tag a release | A release tag with one failing system | The report shows the failure and stops nothing automatically |

@@ -140,8 +140,9 @@ attestations, inferences, evidence chains, constructs, and places.
 
 ### E2. Reviewer comment file
 
-The offline explorer lets a reviewer attach comments to claims and save one
-file, which the author imports. Nothing is sent anywhere.
+A reviewer attaches comments to claims and saves one file, which the author
+imports: on the command line with `review comment` (CONTRACT-002 B), or in the
+offline explorer, which uses the same operation. Nothing is sent anywhere.
 
 | Field | Rule |
 |---|---|
