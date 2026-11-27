@@ -11,8 +11,11 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   source add <file> --acquired-at <time> --actor <kind>:<name> [--source <id>] [--origin <text>]
              [--source-version <text>] [--unpublished yes|no] [--community-restricted yes|no] [--license <text>]
+  source pages <capture id> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>]
              [--method text_layer|ocr|manual] [--tool <name> --tool-version <version>] [--note <text>]
+  excerpt --source <id> --pages <printed pages> | --passage <id>
+  retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
   store verify [--unreferenced]
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json,

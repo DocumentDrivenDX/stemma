@@ -34,7 +34,7 @@ export function toRoman(value: number): string {
 }
 
 /** The number a lowercase roman numeral written the usual way stands for. */
-function fromRoman(text: string): number | undefined {
+export function fromRoman(text: string): number | undefined {
   let value = 0;
   let at = 0;
   for (const [amount, letters] of ROMAN) {

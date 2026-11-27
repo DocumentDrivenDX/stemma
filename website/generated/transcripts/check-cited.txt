@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/cited
 OPEN FINDINGS: 1 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 10 result(s) passed.
+Checked the whole project: 11 result(s) passed.
 
 1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held]
    Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.

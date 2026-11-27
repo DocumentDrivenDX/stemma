@@ -1,8 +1,9 @@
 // cite.key and bib.uncited over citation records. When manuscript files exist
 // they are authoritative and this version cannot read them (CONTRACT-002 C).
-import { citationKeys, type Corpus, digest, idOf, isObject, isRetired, type JsonObject, type LoadedFile } from "@stemma/records";
+import { citationKeys, type Corpus, idOf, isObject, isRetired, type JsonObject, type LoadedFile } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
+import { sourceBinding } from "./changed.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
 export const hasManuscript = (corpus: Corpus): boolean => corpus.manuscript.some((f) => f.path.endsWith(".md"));
@@ -88,8 +89,7 @@ export function uncitedResults(corpus: Corpus): Result[] {
     const key = source.data!.citation_key;
     const evidence: Evidence[] = [{ name: "source_file", class: "location", value: source.path }];
     if (typeof key === "string") evidence.push({ name: "key", class: "metadata", value: key });
-    const { type, subtype, title, contributions, issued, dates, bib, identifiers, relations, extents, locator_label } = source.data!;
-    const binding = digest({ type, subtype, title, contributions, issued, dates, bib, identifiers, relations, extents, locator_label });
+    const binding = sourceBinding(source.data!);
     const common = {
       check: "bib.uncited", subject: subjectOf(source), source: id, locus: "bibliography_include", evidence,
       item: { record: id, content_sha256: binding },

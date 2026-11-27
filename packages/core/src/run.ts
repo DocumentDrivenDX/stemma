@@ -2,11 +2,15 @@
 import { type Corpus, compareCodePoints, corpusDigest, idOf, sha256 } from "@stemma/records";
 import { active, citeKeyResults, resolveCitations, uncitedResults } from "./checks/bibliography.ts";
 import { coordinateResults } from "./checks/coordinates.ts";
+import { changedResults } from "./checks/changed.ts";
 import { heldResults } from "./checks/held.ts";
+import { locatorResults } from "./checks/locators.ts";
 import { notRun } from "./checks/not-run.ts";
+import { quoteResults } from "./checks/quotes.ts";
 import { fileResults, rulesResults } from "./checks/records.ts";
 import { result, sortResults } from "./findings.ts";
 import type { NotRun, ReportBody, Result, Summary, Unreviewed } from "./report.ts";
+import { QUOTE_PROFILE } from "./matching/quote-fold.ts";
 import { type BlobReader, NO_STORE } from "./store.ts";
 
 export function recordResults(corpus: Corpus): Result[] {
@@ -55,6 +59,9 @@ export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, blobs: BlobRead
   "cite.key": citeKeyResults,
   "bib.uncited": uncitedResults,
   "source.held": heldResults,
+  "source.changed": changedResults,
+  "quote.present": quoteResults,
+  "locator.extent": locatorResults,
   "coordinate.stray": coordinateResults,
 };
 
@@ -87,7 +94,7 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>, blobs: 
         .map((f) => ({ path: f.path, sha256: f.bytes ? sha256(f.bytes) : "unreadable" }))
         .sort((a, b) => compareCodePoints(a.path, b.path)),
       blobs: [...read].sort(),
-      profiles: [],
+      profiles: results.some((r) => r.check === "quote.present") ? [QUOTE_PROFILE] : [],
     },
     tools,
     results,

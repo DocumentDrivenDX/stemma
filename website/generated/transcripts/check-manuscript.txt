@@ -1,5 +1,5 @@
 $ stemma check --all --project $PROJECTS/manuscript
-OPEN FINDINGS: 0 problem(s), 1 could not be checked, 11 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 1 could not be checked, 12 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 7 result(s) passed.
 
 1. COULD NOT CHECK: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
@@ -21,6 +21,7 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
    - whether quotations appear in the stored source text  [quote.present]
+   - work that rests on a copy or source that has since changed  [source.changed]
    - whether you hold a copy of each cited source, with its text extracted  [source.held]
 
 Full report: $PROJECTS/manuscript/.stemma/reports/check.json

@@ -101,7 +101,7 @@ An **observation** is one result for a host and operating system: passed, failed
 
 - **BR-1001** — One version: the plugin manifest, marketplace entry, skill, bundle, and prompts of a release carry one version. The release script fails on a mismatch.
 - **BR-1002** — No built file in git: `dist/` is ignored, and the local check fails if a built bundle is tracked.
-- **BR-1003** — Self-contained package: the bundler fails if an import stays unresolved at run time. A library data file (fonts, character maps, workers) ships inside the package and is loaded by a package-relative path.
+- **BR-1003** — Self-contained package: the bundler fails if an import stays unresolved at run time. A library data file (fonts, character maps, workers) ships inside the package and is loaded by a package-relative path. For the PDF library, the worker is inside the bundle, and character maps, standard fonts, and licenses ship in `dist/pdfjs/`. No native module and no `node_modules` ships; a package test and the install check look for them.
 - **BR-1004** — Readable bundle: the bundle is unminified. Bundled third-party licenses ship with it. The citeproc-js license review precedes the first package that contains it (ADR-005).
 - **BR-1005** — One pin: one source file states the Bun version. The runtime guard, `doctor`, the tool record, the install instructions, and the harness all derive from it. The first pin is Bun 1.4.5 (Architecture assumption).
 - **BR-1006** — Guard first: the version guard runs before any command work. A wrong version exits 4 and names the found version, the required version, and the launcher that provides it.

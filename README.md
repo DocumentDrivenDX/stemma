@@ -29,9 +29,10 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - "Start a Stemma project in this folder."
 - "Add a source record for this book, taking the details from its title page."
 - "Keep this PDF as my copy of that source. I downloaded it from the library today."
-- "Attach the text of that copy, with its page breaks."
+- "Read the text of that copy and work out its page numbers."
 - "Record the citations in this chapter."
 - "Check the project and explain what is open."
+- "What does that book say on page 89?"
 - "Is anything missing from my source store?"
 
 ## What it does
@@ -39,21 +40,33 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - Keeps sources and citations as plain record files in your project.
 - Keeps copies of your sources and their text in a private store outside the
   project, with where and when each came from. Backing that store up is your job.
+- Reads the text layer of a PDF page by page, and proposes a map of printed page
+  numbers, from the numbers on the pages, for review.
 - Checks that each cited source has a stored copy with text that still matches,
-  that citation keys resolve, that listed bibliography entries are cited, that
-  record files are well formed, and that no coordinate text slips into the
-  project.
+  that quotations are in that text, that cited pages fall inside the work or the
+  pages mapped in your copy, that citation keys resolve, that listed
+  bibliography entries are cited, that record files are well formed, and that no
+  coordinate text slips into the project. It lists what rests on a retired copy
+  or source.
+- Shows a few pages or one passage of a stored source, marked as quoted data.
 - Explains every finding: what is wrong, the evidence, why it matters, and what
   to do. Nothing is blocked. A project is called checked clean only when nothing
   is open, and a report lists any check it did not run.
 
-For a PDF or scan, the text comes from a text layer given to Stemma with its page
-breaks. Stemma does not read a PDF's text itself and does not compare a supplied
-text layer with the pages.
+A quotation passes when it is in the stored text apart from white space and line
+breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same
+characters, straight against curly quotation marks of the same level, and a word
+split by a hyphen at a line end. A close but different passage is reported with
+both texts. A match shows agreement with the stored text, which can be wrong:
+Stemma compares no text with page images and recognizes no characters in a scan.
+While it reads a PDF, the PDF library warns that no native drawing module is
+there; the plugin ships none, and reading text draws nothing. Manuscript files
+are not read yet: quotations and pages are checked from citation records.
 
 ## Where it has been tried
 
-On one Mac with Apple silicon: the checks, and installation through the
+On one Mac with Apple silicon: the checks, reading PDFs (synthetic ones and one
+old scan with a text layer), and installation through the
 marketplace entry with the Claude command-line tool, using a local stand-in for
 the distribution repository. The Claude desktop app, a live Claude session using
 the skill, Windows, and Linux are untested. Setup on Windows needs Git Bash.

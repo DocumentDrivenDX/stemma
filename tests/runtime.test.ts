@@ -41,11 +41,11 @@ describe("one pinned runtime", () => {
 });
 
 describe("no run-time packages", () => {
-  test("no package has a run-time dependency outside this repository", () => {
-    for (const path of ["package.json", ...["records", "core", "workspace", "cli"].map((p) => `packages/${p}/package.json`)]) {
-      const versions = Object.values<string>(JSON.parse(read(path)).dependencies ?? {});
-      expect(versions.every((v) => v === "workspace:*")).toBe(true);
-    }
+  test("the one library from outside is the PDF reader, pinned exactly and bundled", () => {
+    const outside = ["package.json", ...["records", "core", "workspace", "cli", "extract"].map((p) => `packages/${p}/package.json`)]
+      .flatMap((path) => Object.entries<string>(JSON.parse(read(path)).dependencies ?? {}))
+      .filter(([, version]) => version !== "workspace:*");
+    expect(outside).toEqual([["pdfjs-dist", "6.5.438"]]);
   });
 
   test("the bundle imports only what is built into Bun", async () => {

@@ -1,6 +1,6 @@
 {
   "created": {
-    "at": "2026-11-27T00:06:55Z",
+    "at": "2026-11-27T00:35:12Z",
     "by": {
       "kind": "model",
       "name": "claude-sonnet-5-5"
@@ -14,9 +14,10 @@
     "label": "page",
     "value": "88"
   },
+  "quotation": "The theory most generally received on the formation of atolls, is that they are based on submarine craters",
   "schema": "stemma.record/0",
   "sentence": {
-    "sha256": "5707157be0d75431fa23505c2f3a53acce768107b70aaaca80da9b654d70524f",
-    "text": "Darwin's fifth chapter sets out a theory of how the different classes of coral reefs formed."
+    "sha256": "8583054abb940457cf486a435f601a0ab4b66fe803480532a4054553b29861ee",
+    "text": "Darwin opens his fifth chapter with the received view: “The theory most generally received on the formation of atolls, is that they are based on submarine craters”."
   }
 }

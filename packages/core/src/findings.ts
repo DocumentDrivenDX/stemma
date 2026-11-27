@@ -5,14 +5,23 @@ import type { Evidence, Outcome, Result } from "./report.ts";
 
 export interface Explanation { message: string; why: string; suggestions: string[]; fixes: string[] }
 
+function explain(message: string, why: string, suggestions: string[], fixes: string[] = []): Explanation {
+  return { message, why, suggestions, fixes };
+}
+
 const RECORD_WHY = "Every other check reads these files. A broken record can hide a citation problem or create a false one.";
 const HELD_WHY = "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.";
 const INTEGRITY_WHY = "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.";
 const KEY_WHY = "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.";
+const CHANGED_WHY = "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.";
+const QUOTE_WHY = "Readers take quoted words to be the source's own. Words the source does not hold misreport it.";
+const UNCOMPARED_WHY = "Until the quotation can be compared with your copy's text, it is unchecked.";
+const LOCATOR_WHY = "A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.";
+const UNLOCATED_WHY = "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.";
+const CHECK_FAILED = explain("The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
+  ["Report the defect together with the Stemma version."]);
 const COORDINATE_WHY = "This output can disclose a restricted site's position. The scan cannot tell whether a site is restricted, so it warns about every coordinate it recognizes.";
 
-const explain = (message: string, why: string, suggestions: string[], fixes: string[] = []): Explanation =>
-  ({ message, why, suggestions, fixes });
 
 export const TEMPLATES = {
   "record.valid:record_unreadable": explain(
@@ -94,7 +103,7 @@ export const TEMPLATES = {
     ["add_copy", "remove_citation"]),
   "source.held:no_text": explain(
     "A cited source has a stored copy but no extracted text, so this citation is unchecked.", HELD_WHY,
-    ["Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is. For a PDF or scan, supply its text layer with page breaks (`--text-layer <file>`); this version cannot read a PDF itself. A scan with no machine-readable text stays unchecked."],
+    ["Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is, and a PDF's own text layer is read page by page. For a scan with no text in it, supply recognized text with a form feed after each page (`--text-layer <file>`); Stemma recognizes no characters in page images."],
     ["add_text"]),
   "source.held:record_unreadable": explain(
     "Whether you hold this cited source could not be checked: at least one capture or extraction record cannot be read.",
@@ -121,6 +130,58 @@ export const TEMPLATES = {
   "source.held:check_error": explain(
     "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
     ["Report the defect together with the Stemma version."]),
+  "source.changed:depends_on_retired": explain(
+    "This rests on a copy, text or source that has since been replaced or retired.", CHANGED_WHY,
+    ["Compare what you took from it with what replaced it, then correct or retire this item if it no longer holds. Stemma cannot yet record that you have looked, so the finding stays listed."]),
+  "source.changed:source_details_changed": explain(
+    "The source's details changed after a passage this rests on was anchored.", CHANGED_WHY,
+    ["Check that the passage still belongs to the source as it is now recorded. Anchor it again as a new passage if it does."]),
+  "source.changed:record_unreadable": explain(
+    "Whether what this rests on has changed could not be checked: a record it depends on cannot be read.", CHANGED_WHY,
+    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
+  "source.changed:check_error": CHECK_FAILED,
+  "quote.present:near_match": explain(
+    "A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.", QUOTE_WHY,
+    ["Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences."],
+    ["correct_quotation"]),
+  "quote.present:absent": explain(
+    "A quotation was not found in your stored copy's text.", QUOTE_WHY,
+    ["Find the words on the page and correct the quotation, or remove the quotation marks if these are your words or a paraphrase. If the page does hold these words, the stored text is wrong there, or it is a different edition: attach a better text or add the copy you quoted. Words that run across a page break can also be missed, because running heads come between them."],
+    ["correct_quotation", "add_copy"]),
+  "quote.present:text_unavailable": explain(
+    "A quotation could not be compared: the stored text of its source cannot be used here.", UNCOMPARED_WHY,
+    ["See the source.held finding. Add a copy and attach its text, point `--store-dir` at the store that holds it, or restore it from your backup."],
+    ["add_copy", "add_text"]),
+  "quote.present:poor_quality": explain(
+    "A quotation was not found, but the only stored text is marked poor, so this does not show that the source lacks it.", UNCOMPARED_WHY,
+    ["Look at the page itself, or attach a better text."], ["add_text"]),
+  "quote.present:anchor_not_found": explain(
+    "A note extract could not be compared: none of the passages it is anchored to can be found in stored text.", UNCOMPARED_WHY,
+    ["See the findings on its passages, and anchor the note to a passage that is in the stored text."]),
+  "quote.present:check_error": CHECK_FAILED,
+  "locator.extent:outside_extent": explain(
+    "A citation's locator is outside the extent recorded for the work.", LOCATOR_WHY,
+    ["Check the locator against the work and correct it. If the recorded extent is wrong, correct the source record."],
+    ["repoint"]),
+  "locator.extent:outside_page_map": explain(
+    "A cited page is outside the printed pages mapped in your stored copy.", LOCATOR_WHY,
+    ["Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one)."],
+    ["repoint", "add_copy"]),
+  "locator.extent:page_not_mapped": explain(
+    "A cited page falls between mapped pages, on a page the page map gives no label, so it could not be checked.", UNLOCATED_WHY,
+    ["Look at the page in your copy. If its number can be established, attach the text again with a page map that includes it and says what shows the label."],
+    ["add_text"]),
+  "locator.extent:no_extent": explain(
+    "A locator could not be checked: no extent is recorded for it, and no page map covers its numbering.", UNLOCATED_WHY,
+    ["For pages, attach your copy's text with a page map (`source pages` proposes one from the printed numbers). For another kind of locator, record the work's extent on the source, taken from the work itself."],
+    ["add_text"]),
+  "locator.extent:unparsable_locator": explain(
+    "A locator is not written in a form that can be compared with the work's pages or extent.", UNLOCATED_WHY,
+    ["Write it as the printed label, or as a range with both ends in full, such as 41-43. Otherwise check it by hand."]),
+  "locator.extent:record_unreadable": explain(
+    "A locator could not be checked: at least one capture or extraction record cannot be read.", UNLOCATED_WHY,
+    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
+  "locator.extent:check_error": CHECK_FAILED,
   "coordinate.stray:coordinate_text": explain(
     "Text in a project file looks like a map coordinate. The value is not repeated here.", COORDINATE_WHY,
     ["Look at the position in the evidence. If it is a sensitive site, remove the value from the file (git history may still hold it). If it is public or not a coordinate, you need do nothing."]),

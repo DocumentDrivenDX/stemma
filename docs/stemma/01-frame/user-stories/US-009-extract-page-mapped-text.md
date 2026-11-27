@@ -63,7 +63,7 @@ Inputs are synthetic.
 - **Feature Spec**: FEAT-002 — Source corpus
 - **Feature Requirements**: TXT-01, TXT-02, TXT-03
 - **PRD Requirements**: FR-8
-- **External**: Pinned PDF text-extraction and recognition tools are open PRD questions. Behavior on real publisher PDFs, scans, and non-Latin scripts is unverified.
+- **External**: The PDF text library is pinned (SD-002); the recognition tool is an open PRD question. Behavior on real publisher PDFs, scans, and non-Latin scripts is unverified.
 
 ## Out of Scope
 

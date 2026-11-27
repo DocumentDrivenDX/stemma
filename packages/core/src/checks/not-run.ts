@@ -4,6 +4,9 @@
 import { type Corpus, FULLY_CHECKED_KINDS, isObject, type LoadedFile } from "@stemma/records";
 import type { NotRun } from "../report.ts";
 import { active, hasManuscript, listedSources, resolveCitations } from "./bibliography.ts";
+import { dependants } from "./changed.ts";
+import { locatorCitations } from "./locators.ts";
+import { quotationSubjects } from "./quotes.ts";
 
 /** What each check would tell the author, in plain words. */
 export const CHECK_DESCRIPTIONS: Record<string, string> = {
@@ -48,11 +51,7 @@ export function notRun(corpus: Corpus): NotRun[] {
   const someCitation = (field: string) => citations.some((c) => c.data![field] !== undefined);
 
   const missing: Record<string, boolean> = {
-    // A retired copy or text still counts: work may rest on it.
-    "source.changed": corpus.records.some((f) => ["capture", "extraction", "passage"].includes(String(f.data?.kind))),
-    "quote.present": manuscript || someCitation("quotation") || has("note", "passage"),
     "quote.self": has("claim") && (manuscript || someCitation("quotation")),
-    "locator.extent": manuscript || someCitation("locator"),
     "meta.source": used.length > 0 && has("capture"),
     "meta.resolver": manuscript || used.length > 0,
     "id.resolves": manuscript || used.some((s) => Array.isArray(s.data!.identifiers) && s.data!.identifiers.length > 0),
@@ -74,6 +73,16 @@ export function notRun(corpus: Corpus): NotRun[] {
 
   if (corpus.records.some((f) => f.state === "ok" && !FULLY_CHECKED_KINDS.has(String(f.data?.kind)))) {
     entries.push({ check: "record.valid", reason: "not_implemented" });
+  }
+  // These three run over records. Manuscript files, which say what is cited and quoted now, are not read.
+  const built: [string, boolean][] = [
+    ["source.changed", dependants(corpus).length > 0],
+    ["quote.present", quotationSubjects(corpus) > 0],
+    ["locator.extent", locatorCitations(corpus).length > 0],
+  ];
+  for (const [check, subjects] of built) {
+    if (manuscript) entries.push({ check, reason: "not_implemented" });
+    else if (!subjects) entries.push({ check, reason: "input_absent" });
   }
   // Which sources are cited is unknown while manuscript files cannot be read.
   if (manuscript) entries.push({ check: "source.held", reason: "not_implemented" });

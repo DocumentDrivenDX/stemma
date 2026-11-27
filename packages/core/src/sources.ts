@@ -11,7 +11,10 @@ import { type Actor, InvalidInput } from "./operations.ts";
 export interface RecordWrite { id: string; path: string; text: string }
 
 /** Hostile-input caps (SD-002, "Hostile input limits"); design assumptions. */
-export const LIMITS = { input_bytes: 500 * 1024 * 1024, pages: 5000, text_bytes: 100 * 1024 * 1024, page_map_bytes: 5 * 1024 * 1024 };
+export const LIMITS = {
+  input_bytes: 500 * 1024 * 1024, pages: 5000, text_bytes: 100 * 1024 * 1024, page_map_bytes: 5 * 1024 * 1024,
+  extraction_seconds: 300,
+};
 
 export const TEXT_PROFILE = "utf8-lf/0";
 
@@ -159,8 +162,10 @@ export interface TextRequest {
   capture: string;
   /** The held copy's bytes, already verified against its digest. */
   copy: Uint8Array;
-  /** A text layer the author supplies, for a copy this version cannot read itself. */
+  /** A text layer the author supplies in place of reading the copy. */
   layer?: Uint8Array;
+  /** What the PDF reader got from the copy: one string per file page. */
+  read?: { pages: string[]; tool: { name: string; version: string } };
   pageMap?: Uint8Array;
   method?: "text_layer" | "ocr" | "manual";
   tool?: { name: string; version: string };
@@ -173,11 +178,16 @@ export interface TextRequest {
 
 export class NoExtractor extends Error {}
 
+/** Each page ends with a form feed, the shape a text layer is saved in. */
+export const joinPages = (pages: string[]): string => pages.map((page) => `${page}\f`).join("");
+
 export interface TextPlan {
   record: RecordWrite;
   text: Uint8Array;
   text_sha256: string;
   pages: number;
+  /** File page indexes where reading the PDF found no text. */
+  empty: number[];
   /** File page indexes with no printed label. */
   unmapped: number[];
   method: string;
@@ -189,15 +199,19 @@ export function planSourceText(corpus: Corpus, request: TextRequest): TextPlan {
   if (isRetired(capture)) throw new InvalidInput(`The capture ${request.capture} is retired.`);
   const plain = capture.media_type === "text/plain";
   if (plain && request.layer) throw new InvalidInput("This copy is plain text, so it is read as it is. Leave out --text-layer.");
-  if (plain && (request.method || request.tool)) throw new InvalidInput("--method, --tool and --tool-version describe a supplied text layer.");
-  if (!plain && !request.layer) throw new NoExtractor();
+  if (plain && (request.method || request.tool)) throw new InvalidInput("--method, --tool and --tool-version describe a PDF's or a scan's text.");
+  const read = request.layer ? undefined : request.read;
+  if (!plain && !request.layer && !read) throw new NoExtractor();
+  if (read && request.tool) throw new InvalidInput("--tool and --tool-version describe a supplied text layer. Stemma records the reader it used itself.");
 
-  const bytes = request.layer ?? request.copy;
+  const bytes = request.layer ?? (read ? new TextEncoder().encode(joinPages(read.pages)) : request.copy);
   if (bytes.length > LIMITS.text_bytes) throw new InvalidInput("The text is larger than the limit of 100 MiB.");
   const text = normalizeText(decode(bytes, request.layer ? "The text layer" : "The copy"));
   if (text.includes("\0")) throw new InvalidInput("The text holds a NUL character, so it is not usable text.");
   if (!/\S/u.test(text)) {
-    throw new InvalidInput("There is no machine-readable text: it is empty or only white space. No extraction was saved, and this copy does not count as checkable.");
+    throw new InvalidInput(read
+      ? "There is no machine-readable text: no page of this PDF has a text layer, as with a scan that was never put through character recognition. No extraction was saved, and this copy does not count as checkable. Stemma recognizes no characters in page images; supply recognized text with --text-layer."
+      : "There is no machine-readable text: it is empty or only white space. No extraction was saved, and this copy does not count as checkable.");
   }
   // A plain text file with no form feed has no pages; a scan or PDF always has them.
   const spans = !plain || text.includes("\f") ? pageSpans(text) : undefined;
@@ -207,24 +221,31 @@ export function planSourceText(corpus: Corpus, request: TextRequest): TextPlan {
 
   const encoded = new TextEncoder().encode(text);
   const method = plain ? "born_text" : request.method ?? "text_layer";
+  // Pages with no text are said plainly: nothing on them can be checked.
+  const empty = read ? read.pages.flatMap((page, i) => (/\S/u.test(page) ? [] : [i])) : [];
+  const note = [
+    request.note,
+    empty.length > 0 ? `${empty.length} of ${read!.pages.length} pages have no text in the file's text layer (file indexes ${ranges(empty)}).` : undefined,
+  ].filter(Boolean).join(" ");
   const record = write("extraction", {
     ...fresh("extraction", request.token, request.actor, request.now),
     capture: request.capture,
     capture_sha256: capture.sha256,
     // For a supplied layer this is what the caller says made it; unstated stays "unknown".
-    tool: plain ? { name: "stemma", version: request.stemma } : request.tool ?? { name: "unknown", version: "unknown" },
+    tool: plain ? { name: "stemma", version: request.stemma } : read?.tool ?? request.tool ?? { name: "unknown", version: "unknown" },
     normalization_profile: TEXT_PROFILE,
     text_sha256: sha256(encoded),
     text_size: encoded.length,
     ...(pages ? { pages } : {}),
     ...(spans ? { page_spans: spans } : {}),
-    quality: { method, level: "unassessed", ...(request.note ? { note: request.note } : {}) },
+    quality: { method, level: "unassessed", ...(note ? { note } : {}) },
   });
   assertValid("Extraction", "extraction", record);
   const labels = pageLabels(pages ?? []);
   return {
     record, text: encoded, text_sha256: sha256(encoded), method,
     pages: spans?.length ?? 0,
+    empty,
     unmapped: (spans ?? []).map((s) => s.page_index).filter((i) => !labels.has(i)),
   };
 }

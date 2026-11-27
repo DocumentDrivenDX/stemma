@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { releaseInto } from "./release-repo.ts";
+import { makePdf } from "../tests/pdf.ts";
 
 const root = join(import.meta.dir, "..");
 const release = join(root, "dist/release");
@@ -103,6 +104,28 @@ const doctor = run([...launcher, "doctor", "--project", book]);
 if (!doctor.includes(join(data, "bun-"))) fail("the command line did not run on the plugin's own Bun");
 const report = run([...launcher, "check", "--project", book], 1);
 if (!report.includes("ghost2020")) fail("the installed command line did not report the seeded unknown key");
+// Reading a PDF from the installed copy. Its text is in a font that needs a
+// predefined character map, so it comes out only if the packaged data is found.
+const files = readdirSync(installed, { recursive: true }).map(String);
+const native = files.filter((f) => /\.(node|dylib|so|dll)$/i.test(f) || f.includes("node_modules"));
+if (native.length > 0) fail(`the installed plugin holds native modules or packages: ${native.slice(0, 5).join(", ")}`);
+console.log(`\nInstalled plugin: ${files.length} files and directories, none a native module, and no node_modules.`);
+const reading = join(base, "reading");
+const store = join(base, "store");
+run([...launcher, "init", "--project", reading]);
+const pdf = join(base, "invented.pdf");
+writeFileSync(pdf, makePdf({ pages: [["\u6e2f\u306e\u901a\u884c\u7a0e"]], font: "japanese" }));
+const added = run([...launcher, "source", "add", pdf, "--project", reading, "--store-dir", store, "--actor", "software:plugin-check", "--acquired-at", "2026-01-05T09:00:00Z"]);
+const capture = /recorded it as (cap-[0-9a-z]+)/.exec(added)?.[1] ?? fail("no capture was recorded");
+const extracted = run([...launcher, "source", "text", capture, "--project", reading, "--store-dir", store, "--actor", "software:plugin-check"]);
+if (!extracted.includes("pdfjs-dist 6.5.438")) fail("the installed copy did not read the PDF");
+if (extracted.includes("cMapUrl") || extracted.includes("standardFontDataUrl")) fail("the packaged font or character-map data was not found");
+const sourceId = /source: (src-[0-9a-z]+)/.exec(added)![1]!;
+const saved = readdirSync(join(reading, "records/extractions"));
+const record = JSON.parse(readFileSync(join(reading, "records/extractions", saved[0]!), "utf8"));
+const textFile = join(store, "sha256", record.text_sha256.slice(0, 2), record.text_sha256);
+if (!readFileSync(textFile, "utf8").includes("\u6e2f\u306e\u901a\u884c\u7a0e")) fail(`the text of ${sourceId} did not come out of the PDF`);
+
 if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.test(name))) fail("something was written to the home directory");
 
 console.log(`
@@ -110,6 +133,7 @@ PASSED on this machine with the Claude command-line tool: both manifests validat
 plugin installs from a marketplace whose entry installs a version tag of a local stand-in
 for the distribution repository, into an empty profile with one skill, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
-command line. Not checked: installation from GitHub (nothing is published), the desktop
+command line, which reads the text of a synthetic PDF with the packaged library data and
+no native module. The warnings the PDF library printed are shown above as they came. Not checked: installation from GitHub (nothing is published), the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);

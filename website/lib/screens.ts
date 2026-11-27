@@ -52,6 +52,12 @@ const SPECS: Spec[] = [
     text: (t) => between(t("transcripts/demo.txt"), "$ stemma check --project $DEMO/book", "\n=============== 4."),
   },
   {
+    file: "check-quotations.png", appearance: "light", width: 880, title: "check: a quotation that differs, and a page outside the source",
+    alt: "Output of stemma check: a cited page outside the mapped pages, a quotation shown beside the closest stored text, and a note that one quotation matched after joining a word split at a line end.",
+    command: "From the demo run. All names and sources are invented.",
+    text: (t) => between(t("transcripts/demo.txt"), "$ stemma check --project $DEMO/quoting-book", "\n=============== 10."),
+  },
+  {
     file: "check-clean.png", appearance: "light", width: 880, title: "check: checked clean, with nothing cited",
     alt: "Output of stemma check saying CHECKED CLEAN, followed by what that label does not mean.",
     command: "From the clean test fixture. The label says nothing about citations, because this project has none.",

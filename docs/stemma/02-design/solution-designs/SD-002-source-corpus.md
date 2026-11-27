@@ -33,7 +33,7 @@ ddx:
 
 - Covers admission, the private content store, rights fields, text extraction and printed page maps, citability, change flags, and bounded excerpts. All M1.
 - Governed by CONTRACT-001 (source, capture, extraction, passage, blobs, digests), CONTRACT-002 (`source add`, `source text`, `excerpt`, `support prepare`, checks), CONTRACT-004 (agent obligations), the Data Design, and ADR-002 to ADR-004.
-- The PDF text library and the recognition engine are PRD open questions and stay open. Real publisher PDFs, scans, and non-Latin scripts are untested.
+- The PDF text library is `pdfjs-dist`; the recognition engine stays a PRD open question. Real publisher PDFs, most scans, and non-Latin scripts are untested.
 
 ## Requirements Mapping
 
@@ -82,7 +82,7 @@ PDF extraction is the main unsettled choice.
 **Cons**: Research reports fluent but wrong text; output is not repeatable; pages go to a model.
 **Evaluation**: Rejected for M1.
 
-**Selected Approach**: A `TextExtractor` port in `core` with saved, immutable output. That makes the library and any recognition engine replaceable, so both stay open. The pinned library is chosen after a proof on pilot sources: page text, printed labels, hyphens, ligatures, right-to-left and diacritic text, repeat runs, and the same results from the installed package.
+**Selected Approach**: An extraction package with saved, immutable output, which keeps the library and any recognition engine replaceable. The product owner has approved `pdfjs-dist` 6.5.438 (see Built so far). The recognition engine stays open. Proof on pilot sources is still owed: right-to-left and diacritic text, and difficult layouts.
 
 **Architecture/ADR impact**: No change. The chosen library is pinned and recorded (ADR-004); an ADR is warranted if it adds a tool the plugin must set up.
 
@@ -101,23 +101,47 @@ For storage, git and git LFS (Large File Storage) were rejected by owner decisio
 - **Put**: temporary file in the store, hash of what was written, rename. A
   damaged blob is replaced only by bytes that match its address. Blob paths come
   from digests, and a symbolic link in the store is not followed.
-- **Text**: UTF-8 text copies and supplied text layers, under profile
-  `utf8-lf/0` (CONTRACT-001 G). Reading a PDF is not built. A pinned library has
-  not been added.
-- **PDF library trial** (one macOS arm64 system, outside the project, not
-  bundled): `pdfjs-dist` 6.5.438 (Apache-2.0, about 37 MB unpacked, one optional
-  native package that text extraction did not need) read a 258-page scan with an
-  old text layer in 0.65 s and a 22-page two-column article in 0.2 s on Bun
-  1.4.5, with equal output on a second run, one string per page, and embedded
-  page labels. On the scan its words agreed with the Internet Archive's text at
-  99.9%. A running head can come out in content order without a space. It warns
-  at load time about drawing support it cannot find. Not tried: bundling,
-  right-to-left, diacritic or CID-font text without an embedded character map,
-  and hostile files. Recommended as the library; adoption is not done.
+- **Text**: UTF-8 text copies, PDF text layers, and supplied text layers, under
+  profile `utf8-lf/0` (CONTRACT-001 G).
+- **PDF library**: `pdfjs-dist` 6.5.438 (Apache-2.0), approved by the product
+  owner, installed with install scripts off and pinned in `bun.lock`. It lives
+  behind `packages/extract`, is loaded only when a PDF is read, takes characters
+  without compatibility folding, and stops at the first page it cannot read.
+  No script, link, or attachment of a PDF is run or fetched.
+- **How it ships**: the library and its worker are inside the one bundled file;
+  the worker is handed to the library in the same process, so no second program
+  file is looked for. Its character maps, standard fonts, and licenses ship in
+  `dist/pdfjs/` and are found relative to the bundle (SD-010 BR-1003). Without
+  the character maps, text in some fonts is lost with only a warning; a test
+  and the install check use such a font.
+- **Native modules**: the library's optional `@napi-rs/canvas` packages appear
+  in `bun.lock`, and development installs hold one. The plugin ships no native
+  module. On load the library then warns on standard error that it cannot load
+  `@napi-rs/canvas` or provide `DOMMatrix` and `Path2D`, which it uses for
+  drawing; Stemma draws nothing. The warnings are left visible, and the skill
+  explains them. Removing their cause would mean shipping the native module.
+- **Observed** (one macOS arm64 system): equal text on a repeat run; the
+  installed plugin read a synthetic PDF in a clean profile; on a 258-page scan
+  with an old recognition layer, the quoted pages agreed with their images apart
+  from recognition errors seen elsewhere on them. A running head can come out in
+  content order. Not tried: right-to-left text, complex columns, large or
+  hostile files, Linux, Windows.
+- **Page maps**: `source pages` proposes runs where at least 3 pages, and at
+  least half of the run, show the expected arabic or lowercase roman number in
+  the first or last 3 lines of their text, with no more than 8 pages between
+  two such pages (assumptions). Other label sources are only compared (BR-208).
+  A reviewer edits the file; a label resting on a person's word carries
+  `author_statement`. On the scan above it also proposed the numbering of a
+  publisher's list bound at the back, which review removed; the command warns
+  when two runs give the same label.
+- **Excerpts, retirement, and change flags**: `excerpt` (CONTRACT-002 G),
+  `retire`, and `source.changed` (CONTRACT-002 C).
 - The command line is run by the plugin's launcher (SD-010); nothing here is set
   up by the author.
 - Not built: URL fetch, hostile-input time and memory limits, the project lock
-  and staged multi-record write, admission, replacement, retirement, excerpts.
+  and staged multi-record write, the per-extraction memory limit and page-image
+  limit, admission, `capture replace` and `capture retire` (`retire` does the
+  retiring).
 
 ## Domain Model
 
@@ -211,7 +235,7 @@ graph TD
 
 | Layer | Choice | Why | Alternatives Rejected |
 |---|---|---|---|
-| Extraction | Open; pinned behind `TextExtractor` after proof | PRD open question | None finally |
+| PDF text | `pdfjs-dist` 6.5.438, bundled, in `packages/extract` | One runtime, no native module, owner approval | Native extractors; model transcription |
 | Recognition | Open | PRD open question; research found no engine dependable without testing on the material | None finally |
 
 ## Traceability
@@ -237,7 +261,7 @@ Security (BR-213) is tested with traversal names, oversized, encrypted, damaged,
 
 - [ ] RGT-01: an unstated rights flag is treated as set in reviewer outputs (CONTRACT-001 assumption), so a project that never answers withholds more.
 - [ ] TXT-02: quality values exist in the contract. The rule assigning them, and the level at which `quote.present` is unverifiable, are open (SD-007 proposes it).
-- [ ] TXT-01: page boundaries and label evidence are defined (CONTRACT-001) and untested; how an author states labels has no command surface.
+- [ ] TXT-01: an author states a label by editing the reviewed page-map file (`author_statement`); nothing records who did. Roman numbering of front matter is proposed only where 3 pages show it.
 - [ ] CIT-02: no recognition engine.
 
 **Hostile input limits.** Starting caps, as design assumptions to test and report through `doctor`: input file 500 MiB; 5,000 pages; extracted text 100 MiB; 300 s and 2 GiB memory per extraction; a page image over 100 megapixels is skipped and reported. A URL fetch accepts HTTP and HTTPS only, at most 100 MiB, 60 s, and 5 redirects, and rejects loopback, link-local, and private addresses after each redirect (SEC-013). The stored page is never rendered or executed. Exceeding a cap yields no extraction and says which cap.
@@ -257,7 +281,7 @@ The CONTRACT-001 UMF schema in `ddx.schemas` (UMF core 0.10.0 with `umf.ddd` 0.1
 
 - **Constraints**: Extraction makes no network request and needs no WSL or Docker. A required recognition tool must run natively on all three systems.
 - **Assumptions**: Pilot sources have a usable text layer or can be given one; otherwise their citations stay reported as unchecked. The M1 type list above.
-- **Dependencies**: A pinned PDF library; later a recognition engine; the author's backup.
+- **Dependencies**: The pinned PDF library; later a recognition engine; the author's backup.
 
 ## Risks
 

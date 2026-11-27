@@ -157,7 +157,7 @@ replacing there.
 |---|---|
 | `RecordRepository`, `BlobStore`, `RestrictedStore` | Tests run without a filesystem; stores live outside the project |
 | `GraphStore` | The engine replaces the disposable index (ADR-006) |
-| `TextExtractor` | The PDF library and recognition engine are undecided |
+| `TextExtractor` | The PDF library may be replaced, and the recognition engine is undecided |
 | `ManuscriptRepository` | Reads and splices the Stemma copy (CONTRACT-006) without core touching files |
 | `CitationFormatter`, `Typesetter` | The citeproc-js license review and Typst process sit behind them |
 | `Resolver`, `Clock`, `Environment` | Network and time stay out of deterministic results |

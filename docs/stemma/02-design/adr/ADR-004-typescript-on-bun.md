@@ -60,7 +60,9 @@ plugin; a second runtime; a check or build that downloads; an unrecorded tool.
 ## Validation
 
 **Result**: partly tested
-**Evidence**: On one macOS arm64 system, with the Claude command-line tool
+**Evidence**: The PDF text library, `pdfjs-dist` 6.5.438, is bundled and
+recorded in each extraction it makes. It lists optional native packages that the
+plugin does not ship (SD-002). On one macOS arm64 system, with the Claude command-line tool
 2.1.236, a fresh profile and no Bun on the search path: the installed plugin's
 launcher fetched and verified Bun 1.4.5 into a stand-in for the plugin data
 directory and ran the installed command line. The host's substitution of that

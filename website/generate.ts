@@ -31,7 +31,19 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
   },
   "source.held": {
     summary: "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
-    limits: "It does not show that the text is a faithful reading of the copy, and for a text layer you supply it never compares the two. It does not show that a source supports a sentence. It reads citation records only.",
+    limits: "It does not show that the text is a faithful reading of the copy: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+  },
+  "quote.present": {
+    summary: "Each quotation held by a citation record must be in the stored text of the cited source, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
+    limits: "A pass is agreement with the stored text, which can be wrong, especially where it comes from character recognition. It does not test the cited page, though the text report says when the words were found on another one. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. Words running across a page break can be missed. It does not read manuscript files.",
+  },
+  "locator.extent": {
+    summary: "A citation's page or other locator must fall inside the extent recorded on the source or, for pages and folios, inside the printed pages mapped in your stored copy.",
+    limits: "It tests range only, not that anything is on that page. A page map made from a partial copy covers only that part. It reads citation records only.",
+  },
+  "source.changed": {
+    summary: "Lists the notes, claims and citations that rest on a copy, text or source since retired, or on a passage anchored before the source's details changed.",
+    limits: "A citation names no copy, so it is taken to rest on its source's copies and texts retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. A damaged or missing stored file is reported by source.held.",
   },
   "coordinate.stray": {
     summary: "Warns about written map coordinates in project files, without repeating the value.",

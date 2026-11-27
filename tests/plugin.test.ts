@@ -93,6 +93,17 @@ describe("what is released", () => {
     expect(JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).packageManager).toBe(`bun@${pinned}`);
   });
 
+  test("beside the one built file go the PDF reader's data and licenses, and no native module", () => {
+    const files = readdirSync(join(plugin, "dist"), { recursive: true }).map(String);
+    expect(files.filter((f) => /\.(node|dylib|so|dll)$|node_modules/i.test(f))).toEqual([]);
+    for (const needed of ["pdfjs/cmaps/UniJIS-UCS2-H.bcmap", "pdfjs/cmaps/LICENSE", "pdfjs/standard_fonts/LICENSE_FOXIT", "pdfjs/standard_fonts/LICENSE_LIBERATION", "pdfjs/LICENSE"]) {
+      expect(files).toContain(needed);
+    }
+    // The worker is inside the built file, so none is looked for beside it.
+    expect(files.filter((f) => f.endsWith(".mjs"))).toEqual([]);
+    expect(readFileSync(join(plugin, "dist/stemma.js"), "utf8")).toContain("WorkerMessageHandler");
+  });
+
   test("no built command line is tracked in this repository", () => {
     const tracked = Bun.spawnSync(["git", "ls-files", "-z"], { cwd: ROOT }).stdout.toString().split("\0");
     expect(tracked.filter((f) => f.startsWith("dist/") || f.endsWith("stemma.js"))).toEqual([]);

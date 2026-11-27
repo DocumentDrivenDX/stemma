@@ -15,7 +15,9 @@ export function groupResults(results: Result[]): Result[][] {
 }
 
 /** Keeps untrusted text on one line and free of terminal control characters. */
-export const printable = (text: string): string => text.replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, "?");
+export const printable = (text: string): string =>
+  // A line or page break inside quoted text is shown as a mark, and a soft hyphen as one too.
+  text.replace(/\r?\n|\f/g, " \u23ce ").replace(/\u00ad/g, "\u00ac").replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, "?");
 
 export function renderFindings(results: Result[]): string[] {
   const lines: string[] = [];
@@ -30,6 +32,28 @@ export function renderFindings(results: Result[]): string[] {
       for (const e of item.evidence) lines.push(`       ${e.name.replaceAll("_", " ")}: ${printable(e.value)}`);
     }
   });
+  return lines;
+}
+
+/**
+ * What a passing quotation check cannot show, said where it applies: a word
+ * joined at a line end can hide a hyphen that belongs to it, and the check does
+ * not test the cited page.
+ */
+function quotationNotes(results: Result[]): string[] {
+  const passed = results.filter((r) => r.check === "quote.present" && r.outcome === "pass");
+  const value = (r: Result, name: string) => r.evidence.filter((e) => e.name === name).map((e) => e.value);
+  const lines: string[] = [];
+  const joined = passed.flatMap((r) => value(r, "joined_at_line_end").map((word) => `   - ${printable(r.subject)}: ${printable(word)}`));
+  if (joined.length > 0) {
+    lines.push("", "For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.",
+      "If the hyphen belongs to the word, the quotation should keep it: look at the page.", ...joined);
+  }
+  const elsewhere = passed.flatMap((r) => value(r, "cited_page_differs").map((note) => `   - ${printable(r.subject)}: ${printable(note)}`));
+  if (elsewhere.length > 0) {
+    lines.push("", "For information, not a finding: these quotations are in the source, but not on the page the citation gives.",
+      "The quotation check does not test the cited page. Check the page number.", ...elsewhere);
+  }
   return lines;
 }
 
@@ -50,6 +74,7 @@ export function renderReport(body: ReportBody): string {
   }
   lines.push(`Checked the whole project: ${summary.pass} result(s) passed.`);
   lines.push(...renderFindings(body.results));
+  lines.push(...quotationNotes(body.results));
   const missing = body.not_run.filter((n) => n.reason === "not_implemented");
   if (missing.length > 0) {
     lines.push(

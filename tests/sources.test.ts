@@ -282,10 +282,11 @@ describe("source text", () => {
     expect(record(book, "extractions", name!.replace(".json", ""))).toMatchObject({ tool: { name: "unknown", version: "unknown" }, quality: { method: "text_layer" } });
   });
 
-  test("a PDF without a supplied layer is not read; a bad page map saves nothing", () => {
+  test("a scan with no text layer saves nothing; a bad page map saves nothing", () => {
     const { book, capture } = scannedBook();
     const done = attach(book, capture);
-    expect([done.code, done.json.error.code]).toEqual([2, "not_implemented"]);
+    expect([done.code, done.json.error.code]).toEqual([5, "invalid_input"]);
+    expect(done.json.error.message).toContain("no page of this PDF has a text layer");
     const bad = join(book.base, "map.json");
     for (const map of [
       [{ first_index: 0, last_index: 0, style: "arabic", first_label: "1" }],
@@ -340,7 +341,7 @@ describe("source.held", () => {
     const { code, json } = check(book);
     expect(outcomes(json)).toEqual(["pass"]);
     expect(json.body.results.filter((r) => r.open)).toEqual([]);
-    expect(unbuilt(json)).toEqual(["meta.resolver", "meta.source", "number.present", "source.changed"]);
+    expect(unbuilt(json)).toEqual(["meta.resolver", "meta.source", "number.present"]);
     expect([code, json.body.label]).toEqual([1, "open_findings"]);
     expect(json.body.inputs.blobs).toHaveLength(2);
   });

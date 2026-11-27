@@ -21,7 +21,8 @@ function stemma(expected: number, project: string, ...args: string[]): string {
     cwd: plugin, env: { ...process.env, STEMMA_STORE_DIR: store },
   });
   const out = run.stdout.toString();
-  process.stdout.write(out + run.stderr.toString());
+  // In a terminal the PDF library's warnings come while the copy is read, before the result is printed.
+  process.stdout.write(run.stderr.toString() + out);
   console.log(`[exit ${run.exitCode}]`);
   if (run.exitCode !== expected) {
     console.error(`demo: expected exit ${expected}, got ${run.exitCode}`);
@@ -105,7 +106,42 @@ stemma(1, book, "store", "verify");
 renameSync(`${store}-elsewhere`, store);
 stemma(0, book, "store", "verify");
 
-heading("8. What checked clean looks like: sources recorded, nothing cited");
+heading("8. A PDF with a text layer: Stemma reads it and proposes page numbers for review");
+// A second project, so that this part stands on its own.
+const quoting = join(base, "quoting-book");
+stemma(0, quoting, "init");
+const inQuoting = (kind: string, name: string, record: object) => {
+  const input = join(base, `${name}.json`);
+  writeFileSync(input, JSON.stringify(record));
+  stemma(0, quoting, "record", "add", kind, "--input", input, "--actor", "person:demo-author");
+};
+inQuoting("source", "levy", { id: "src-demo0levybook1", citation_key: "levy1911", type: "book", title: { value: "An invented book of harbour levies" }, issued: { edtf: "1911" } });
+const pdfAdded = stemma(0, quoting, "source", "add", join(materials, "harbour-book.pdf"), "--source", "src-demo0levybook1", "--origin", "an invented file", ...addArgs);
+const pdf = /recorded it as (cap-[0-9a-z]+)/.exec(pdfAdded)![1]!;
+const pageMap = join(base, "page-map.json");
+const proposed = stemma(0, quoting, "source", "pages", pdf, "--out", pageMap);
+expect(proposed.includes("file indexes 1-5: printed 1 onwards"), "the printed numbers should be proposed as one run");
+console.log("\nThe PDF library's warnings are shown as it prints them: the plugin ships no native drawing module, and reading text draws nothing.");
+const read = stemma(0, quoting, "source", "text", pdf, "--actor", "person:demo-author", "--page-map", pageMap);
+expect(read.includes("Read from the PDF's own text layer with pdfjs-dist"), "the PDF should be read");
+
+heading("9. Quotations and page numbers are checked against that text");
+const quote = (n: number, page: string, quotation: string, sentence: string) => inQuoting("citation", `quote-${n}`, {
+  id: `cit-demo0quote000${n}`, key: "levy1911", locator: { label: "page", value: page }, quotation, sentence: { text: sentence },
+});
+quote(1, "1", "paid in salt, and the agriculture of the shore", "The invented levy was \u201cpaid in salt, and the agriculture of the shore\u201d rested on it.");
+quote(2, "2", "All fields were abandoned by their holders.", "The invented book says: \u201cAll fields were abandoned by their holders.\u201d");
+quote(3, "41", "The last ship sailed in spring.", "\u201cThe last ship sailed in spring.\u201d");
+const quoted = stemma(1, quoting, "check");
+for (const needed of ["[quote.present]", "Some fields were abandoned", "[locator.extent]", "printed pages 1-5", "agri-|culture"]) {
+  expect(quoted.includes(needed), `the quotation report should mention ${needed}`);
+}
+
+heading("10. An excerpt: only the pages asked for, marked as quoted data");
+const shown = stemma(0, quoting, "excerpt", "--source", "src-demo0levybook1", "--pages", "2");
+expect(shown.includes("Some fields were abandoned") && !shown.includes("last ship"), "the excerpt should hold page 2 only");
+
+heading("11. What checked clean looks like: sources recorded, nothing cited");
 const shelf = join(base, "reading-list");
 stemma(0, shelf, "init");
 const input = join(base, "harbour.json");

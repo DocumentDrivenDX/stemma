@@ -114,13 +114,13 @@ CHG-02 (FR-10, P0, M1). A change or removal made outside the agent must be detec
 - RGT-02 governs what Stemma prepares. A local agent session with ordinary file access can read any stored file or extracted text directly, and Stemma must not claim otherwise.
 - Restricted and copyrighted stored sources are private to the project (`rights-and-permissions`).
 - Recognition of scans, extraction of real publisher PDFs, and non-Latin scripts are unverified. A feasibility test used synthetic files on one macOS machine and no scan.
-- Open (PRD): which recognition engine and which PDF text-extraction library are used?
+- Open (PRD): which recognition engine is used? PDF text layers are read with the pinned library SD-002 names.
 - Open: what quality values does TXT-02 record, and does low quality change a check result?
 
 ## Dependencies
 
 - **Other features**: FEAT-001 provides the project; FEAT-011 holds records; FEAT-003 owns bibliographic content; FEAT-004 and FEAT-015 admit sources; FEAT-007 runs checks on the corpus; FEAT-009 uses rights fields to filter reviewer packages.
-- **External services**: Pinned text-extraction and recognition tools, not yet chosen. Record, rights, and page-map shapes belong to Contract artifacts.
+- **External services**: A pinned PDF text library (SD-002); a recognition engine, not yet chosen. Record, rights, and page-map shapes belong to Contract artifacts.
 - **PRD requirements**: FR-6 to FR-10 and FR-61 (P0, M1).
 
 ## Out of Scope

@@ -6,6 +6,18 @@ import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
 
+/**
+ * What the PDF reader loads at run time, shipped beside the built command line
+ * and loaded by a path relative to it (BR-1003), with the licenses (BR-1004).
+ * The worker is inside the built file. No native module is shipped.
+ */
+export function copyPdfData(outdir: string): void {
+  const from = join(root, "node_modules/pdfjs-dist");
+  const to = join(outdir, "pdfjs");
+  mkdirSync(to, { recursive: true });
+  for (const name of ["cmaps", "standard_fonts", "LICENSE"]) cpSync(join(from, name), join(to, name), { recursive: true });
+}
+
 /** Fails unless every import left in the bundle is built into Bun (BR-1003). */
 export function unresolvedImports(bundle: string): string[] {
   const imports = new Bun.Transpiler({ loader: "js" }).scanImports(bundle);
@@ -21,6 +33,7 @@ export async function bundle(outdir: string): Promise<string> {
   const path = join(outdir, "stemma.js");
   const left = unresolvedImports(readFileSync(path, "utf8"));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
+  copyPdfData(outdir);
   return path;
 }
 
@@ -32,6 +45,7 @@ if (import.meta.main) {
   mkdirSync(join(release, ".claude-plugin"), { recursive: true });
   mkdirSync(join(release, "dist"));
   cpSync(built, join(release, "dist/stemma.js"));
+  cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });
   // The launcher is the only script the plugin ships.
   mkdirSync(join(release, "scripts"));

@@ -6,6 +6,6 @@ export const PAGES = [
   { file: "install.html", nav: "Install and ask", title: "Install and ask Claude", description: "Install the Stemma plugin, then ask Claude in plain words." },
   { file: "checks.html", nav: "Checks", title: "Checks reference", description: "What each check looks at and what a pass does not show." },
   { file: "examples.html", nav: "Examples", title: "Examples", description: "Real command output from the demo and test fixtures." },
-  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "One real source, three citations, and what Stemma can and cannot check." },
+  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "One real source, four quoted citations, and what Stemma can and cannot check." },
   { file: "design.html", nav: "Design", title: "Design language", description: "Identity, voice, color, type, components and accessibility." },
 ] as const;

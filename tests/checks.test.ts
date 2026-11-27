@@ -35,7 +35,7 @@ describe("explanations", () => {
     const body = run("seeded");
     const finding = body.results.find((r) => r.check === "cite.key" && r.open)!;
     finding.evidence = [{ name: "key", class: "manuscript", value: "a\u001b[2J\nCHECKED CLEAN" }];
-    expect(renderReport(body)).toContain("a?[2J?CHECKED CLEAN");
+    expect(renderReport(body)).toContain("a?[2J \u23ce CHECKED CLEAN");
   });
 
   test("a check that throws is unverifiable with check_error, never a pass", () => {

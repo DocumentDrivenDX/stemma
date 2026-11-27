@@ -647,8 +647,8 @@ Windows, desktop apps, and files saved by real tools are untested.
 
 - [ ] Which recognition engine produces text from scans on all three systems?
   Blocks FR-8 and FR-9; design owner.
-- [ ] Which PDF text-extraction library do the checks use? Blocks FR-8; design
-  owner.
+- [x] Which PDF text-extraction library do the checks use? Answered by the
+  product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a
   reviewer package? Blocks use of the allowance in FR-46; product owner.
 - [ ] Must the book's own thesis claim reach a note, or is it exempt from the

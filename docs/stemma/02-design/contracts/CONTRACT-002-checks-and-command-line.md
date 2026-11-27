@@ -86,11 +86,13 @@ absent (exit 4 if it cannot) and then runs
 | `source confirm <id> --capture <id> --pages <indexes> --basis title-page\|equivalent --fields <list>` | Save the author's `confirmation` of source details after showing the record values | M1 |
 | `capture replace <capture id> <file>` / `capture retire <capture id>` | Add a new capture and retire the old one, or retire it; blobs stay | M1 |
 | `key rename <source id> <key>` | Rename a citation key, keeping the old one as an alias | M1 |
-| `source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>] [--method text_layer\|ocr\|manual] [--tool <name> --tool-version <version>] [--note <text>]` | Save text and page map as a new extraction, after verifying the held copy. A UTF-8 text copy is read as it is (`born_text`). For a PDF this version takes only a supplied text layer: UTF-8 with a form feed after each page; without one it exits 2. Stemma does not compare a supplied layer with the copy and says so. `--page-map` is a JSON list of `PageSegment` objects; nothing else gives a page a label. `--tool` and `--method` record what the caller says made the layer; unstated, the tool is `unknown` and the method `text_layer`. Quality is `unassessed`. Text with nothing but white space exits 5 and saves nothing | M1; PDF reading is not built |
+| `source pages <capture id> [--text-layer <file>] [--page-numbers <file>] [--out <file>]` | Propose a page map for review, from the numbers printed in the pages' own text. It writes nothing in the project; `--out` writes the proposed `PageSegment` list to a file that does not exist yet. Supplied page-number data (an Internet Archive page-number file, whose `leafNum` counts from 1, or a list of `{"page_index", "label"}`) and labels stated inside a PDF are compared with the proposal and reported; they label nothing on their own. A warning names labels that more than one page would carry | M1 |
+| `source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>] [--method text_layer\|ocr\|manual] [--tool <name> --tool-version <version>] [--note <text>]` | Save text and page map as a new extraction, after verifying the held copy. A UTF-8 text copy is read as it is (`born_text`). A PDF's own text layer is read page by page with the pinned library, which is recorded as the tool; pages with no text are named, and a PDF with no text at all, encrypted, damaged, or over a limit exits 5 and saves nothing. A supplied text layer (UTF-8, a form feed after each page) takes the place of reading the PDF. Stemma recognizes no characters in page images, and does not compare any text with the page images; it says so. `--page-map` is a JSON list of `PageSegment` objects; nothing else gives a page a label. For a supplied layer, `--tool` records what the caller says made it, else `unknown`. `--method` says what the caller knows about how the text was made; unstated it is `text_layer`. Quality is `unassessed`. Text with nothing but white space exits 5 and saves nothing | M1 |
 | `check [--changed \| --all]` | Run scripted checks; `--changed` (default) covers what changed since the check baseline (below); `--all` covers the project | M1 |
 | `resolve [ids]` | Query resolvers; save `resolution` records | M1 |
-| `excerpt (--passage <id> \| --source <id> --pages <range>)` | Print a bounded piece of source text (G) | M1 |
-| `unreviewed list` / `reviewed <id@sha256…>` / `retire <id…> --reason <text>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`); retire records the author rejects. Nothing waits for these commands | M1 |
+| `excerpt (--passage <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text (G) | M1 |
+| `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
+| `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced copy or a record the author rejects. The files and blobs stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
 | `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close> …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding | M1 |
 | `review import <comment file>` | Import reviewer comments (CONTRACT-005) | M3 |
 | `support list` / `support prepare <claim id> --passage <passage id>` / `support record --input <file>` | List needed verdicts as claim and passage pairs; emit the input bundle for one pair; validate and save a verdict (H) | M1 |
@@ -152,12 +154,12 @@ reviewed or not.
 |---|---|---|---|
 | `record.valid` | FR-62 | CONTRACT-001 error | unreadable file |
 | `source.held` | FR-9 | A cited source has no non-retired capture with an extraction that holds text (`no_copy`, `no_text`) | blob missing or altered, an extraction that does not fit its text, or an unreadable capture or extraction record |
-| `source.changed` | FR-10 | A note, claim, or citation depends on a replaced or retired capture, extraction, or source, or on a passage whose `source_record_sha256` differs from the source's current bibliographic digest | none |
+| `source.changed` | FR-10 | A note, claim, or citation depends on a replaced or retired capture, extraction, or source, or on a passage whose `source_record_sha256` differs from the source's current bibliographic digest | a record it depends on cannot be read |
 | `cite.key` | FR-29 | A citation key matches no source | a source record is unreadable |
 | `bib.uncited` | FR-29, FR-15 | A source in `bibliography_include` is cited nowhere. Cited sources enter the built bibliography automatically, so no other entry can be uncited | no manuscript to read |
-| `quote.present` | FR-29, FR-20 | A quotation or note extract is absent from the stored text, or the `quote.exact` of a passage that a note, attestation, or support record uses is not in its extraction at its position | text missing or extraction quality too low |
+| `quote.present` | FR-29, FR-20 | A quotation or note extract is absent from the stored text, or the `quote.exact` of a passage that a note, attestation, or support record uses is not in its extraction at its position | no usable text, only `poor` text without a pass, or a note anchor that cannot be found |
 | `quote.self` | FR-29 | A quotation attributed to a source duplicates a claim marked as the book's own | no claims |
-| `locator.extent` | FR-29 | A locator is outside the page map or recorded extent | no extent or page map |
+| `locator.extent` | FR-29 | A locator is outside the recorded extent for its term, or else outside the printed pages mapped in the stored copy | no extent or page map in the locator's numbering, a page between mapped pages with no label, or a locator that cannot be read |
 | `meta.source` | FR-29 | Author, title, year, or venue disagrees with metadata extracted from the held copy | metadata not extractable |
 | `meta.resolver` | FR-29, FR-33 | The same fields disagree with a saved resolution | no saved resolution |
 | `id.resolves` | FR-29 | A saved resolution says the identifier is not found or names another work | no saved resolution |
@@ -198,6 +200,35 @@ While `manuscript/` holds files this version cannot read, it is
 field holds the store's path, which the text output prints outside the report
 when a stored file is missing or altered. A pass says nothing about whether the
 text is a faithful reading of the copy.
+
+**`source.changed`** (assumptions). It follows the links records hold: a claim
+through its non-retired attestations to notes and passages; a note to its
+passages and source; a passage to its extraction, capture, and source; a
+citation to its claims and to the source its key or `source` names, a retired
+source included. A citation names no copy, so it is also taken to rest on each
+copy and text of its source that was retired at or after the citation record was
+created; times are compared to the second and a tie is flagged. It emits one
+result for each non-retired note, claim, or citation that reaches a source,
+copy, or text. Reason codes are `depends_on_retired`,
+`source_details_changed`, and `record_unreadable`. Until annotations are built,
+nothing can record that the author has looked, so a finding stays listed. While
+`manuscript/` holds files this version cannot read, citations are left out and
+the check is also `not_implemented`.
+
+**`locator.extent`** (assumptions beyond SD-007 BR-715). It emits one result for
+each citation record with a locator that names exactly one source. A value is a
+printed label, a range with both ends in full (`41-43`), or a list of those;
+`--` and dashes count as range marks, and a label the page map holds whole, such
+as a folio, is taken whole. A recorded extent for the locator's term is the
+whole work: anything outside every recorded range fails. Against a page map, a
+number beyond the lowest or highest mapped number of its style fails
+(`outside_page_map`), and one between them that no page carries is
+`unverifiable` (`page_not_mapped`). A style with no extent or mapped page is
+`no_extent`. A range that runs backwards, mixes styles, or abbreviates its end,
+and forms such as `41ff.`, are `unparsable_locator`. A partial copy's map covers
+only its pages, and the finding says so. `quote.present` and `locator.extent`
+emit nothing for a citation whose key names no single source (`cite.key` reports
+it), and are `not_implemented` while manuscript files are present.
 
 **Every finding is explained.** Each `fail` or `unverifiable` result MUST say in
 plain language what is wrong or could not be checked, show its evidence, say why
@@ -299,6 +330,26 @@ can pass a wrong quotation when the source's hyphen belongs to the word (a
 compound broken at that hyphen); a result that used the join MUST say so in its
 evidence. A profile MUST be versioned, MUST NOT apply Unicode compatibility
 folding to whole texts, and MUST NOT change stored text.
+
+`quote-fold/0` as built. The ligatures are U+FB00 to U+FB06 as their own
+letters (U+FB05 is long s and t). Curly marks are U+2018, U+2019, U+201C, and
+U+201D; guillemets, low-9 marks, and primes are not on the list. The join applies
+only to the stored text: a letter, then a hyphen (U+002D, U+2010) or soft hyphen
+directly before a line break, then, after any indent, a letter; never across a
+page break. Evidence is in the result's evidence entries: `match`, `profile`,
+`cited_text`, `differences_allowed`, `joined_at_line_end`, `stored_text`,
+`found_on`, and `text_method`. Reason codes are `near_match` and `absent` for
+`fail`, and `text_unavailable`, `poor_quality`, and `anchor_not_found` for
+`unverifiable`. A near match fails even if another stored text of the source
+could not be used; with no close text and some text unusable, the result is
+`text_unavailable`. The closest stored text is shown, widened to whole words,
+when its edit distance to the folded quotation is at most 40 percent of the
+quotation's length; it is `near` at 15 percent or less, measured on the words
+shown. Quotations over 2,000 folded characters get no closest-text search
+(assumptions). The check does not test the cited page: when a quotation's
+citation gives a plain page and the words are only on other mapped pages, the
+result says so as information (`cited_page_differs`), in the text report too, as
+it does each join.
 
 ### E. Report
 
@@ -417,6 +468,14 @@ prints the source ID, locator range, and a marker that the content is quoted
 data, not instructions, and MUST limit output to the requested range plus
 bounded context. No source is gated. The command governs only its own output;
 a process with file access can read the store.
+
+As built (limits are assumptions): `--pages` takes printed labels, at most 5
+pages and 30,000 characters, and prints only those pages, from the newest stored
+text that maps all of them, naming any others. A passage comes with up to 300
+characters before and after it. Quoted text lies between begin and end lines
+carrying a token that the text itself does not hold; JSON output carries the
+same token and `content_is`. A long range, an unmapped page, or missing text
+exits 5 and prints no source text.
 
 ### H. Support records
 

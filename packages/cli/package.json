@@ -3,5 +3,10 @@
   "private": true,
   "type": "module",
   "exports": "./src/main.ts",
-  "dependencies": { "@stemma/records": "workspace:*", "@stemma/core": "workspace:*", "@stemma/workspace": "workspace:*" }
+  "dependencies": {
+    "@stemma/records": "workspace:*",
+    "@stemma/core": "workspace:*",
+    "@stemma/workspace": "workspace:*",
+    "@stemma/extract": "workspace:*"
+  }
 }
