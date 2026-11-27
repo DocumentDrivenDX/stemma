@@ -14,6 +14,8 @@ import { TAGS, type TagPair } from "../packages/core/src/browse-proof.ts";
 import { provedBytes, provedPost } from "../packages/explorer/src/proof.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { makePdf } from "../tests/pdf.ts";
+import { endMcp, McpHost, stubOpener } from "../tests/mcp-run.ts";
+import { removeTemporaries } from "../tests/helpers.ts";
 
 const root = join(import.meta.dir, "..");
 const release = join(root, "dist/release");
@@ -102,6 +104,25 @@ console.log(`\nInstalled command line matches the build: sha256 ${sha(bundle)}`)
 // the host substitutes for ${CLAUDE_PLUGIN_DATA}.
 const data = join(config, `plugins/data/stemma-${MARKETPLACE}`);
 const launcher = ["/bin/sh", join(installed, "scripts/stemma.sh"), data];
+
+// The MCP server the manifest declares, started by Claude Code itself, before
+// anything is set up: it must connect, and fetch and write nothing.
+function serverConnects(cwd: string): void {
+  const health = run([claude!, "mcp", "list"], 0, cwd);
+  if (!/^plugin:stemma:stemma: .*Connected/m.test(health)) fail("Claude Code did not connect to the plugin's MCP server");
+}
+serverConnects(base);
+if (existsSync(data) && readdirSync(data).length > 0) fail(`starting the MCP server before setup wrote to the plugin's data directory: ${readdirSync(data).join(", ")}`);
+const manifest = JSON.parse(readFileSync(join(installed, ".claude-plugin/plugin.json"), "utf8")) as { mcpServers: { stemma: { command: string; args: string[] } } };
+/** The declared command, with the two variables filled in as Claude Code fills them. */
+const declared = ["/bin/sh", ...manifest.mcpServers.stemma.args.map((a) => (a === "${CLAUDE_PLUGIN_ROOT}" ? installed : a === "${CLAUDE_PLUGIN_DATA}" ? data : a))];
+const unset = McpHost.start(declared, { ...env, CLAUDE_PROJECT_DIR: base }, base);
+await unset.initialize();
+if (!(await unset.call("status")).text.startsWith("setup_needed")) fail("without Bun the server did not say that setup has not run");
+await unset.end();
+if (existsSync(data) && readdirSync(data).length > 0) fail("a tool call before setup wrote to the plugin's data directory");
+console.log("\nBefore setup: the declared server lists its tools and says to run setup; nothing was fetched or written.");
+
 run([...launcher, "setup"]);
 const again = run([...launcher, "setup"]);
 if (again.includes("one-time setup")) fail("a second run set up again");
@@ -221,6 +242,49 @@ async function checkBrowse(): Promise<void> {
 }
 await checkBrowse();
 
+// The MCP server from the installed copy on the worked example: the declared
+// command for the reading tools, then, for `open`, the same launcher with a
+// stand-in for the system's opener, so that no browser is opened here.
+async function checkMcp(): Promise<void> {
+  const book = join(base, "served");
+  serverConnects(book);
+  const host = McpHost.start(declared, { ...env, CLAUDE_PROJECT_DIR: book }, book);
+  await host.initialize();
+  const tools = (await host.request("tools/list")).result.tools.map((t: { name: string }) => t.name).join(" ");
+  if (tools !== "status search source_view open stop") fail(`the installed server offers other tools: ${tools}`);
+  if ((await host.call("status")).data?.data !== "not_read") fail("the installed server's status read the project or failed");
+  const search = await host.call("search", { text: "subsid", limit: 5 });
+  if (!(search.data?.total > 5 && search.data.hits.length === 5)) fail(`the installed server answered no search: ${search.text}`);
+  const view = await host.call("source_view", { record: "cit-darwinreefs0001" });
+  if (view.data?.state !== "highlighted" || !view.data.passages[0].pages[0].quoted) fail(`the installed server gave no highlighted source view: ${view.text}`);
+  await host.end();
+  const opener = stubOpener();
+  const opening = McpHost.start([...launcher, "mcp", "--opener", opener.program], { ...env, CLAUDE_PROJECT_DIR: book }, book);
+  await opening.initialize();
+  const asked = opening.call("open", { record: "cit-darwinreefs0001" });
+  for (let i = 0; !opener.launched() && i < 1200; i++) await Bun.sleep(50);
+  const launched = opener.launched() ?? fail("the installed server gave the opener no launch file");
+  const send = (path: string, init: { headers: Record<string, string>; body: string }) =>
+    fetch(new URL(path, launched.address), { method: "POST", headers: { origin: launched.address.replace(/\/$/, ""), "content-type": "application/json", "x-stemma-request": "1", ...init.headers }, body: init.body });
+  const session = await provedPost(send, launched.code, TAGS.code, "/api/session", "{}") ?? fail("the code's answer proved nothing");
+  const secret = (JSON.parse(session.text) as { secret: string }).secret;
+  if (!secret || (await provedPost(send, secret, TAGS.call, "/api/boot", "{}"))?.status !== 200) fail("the installed server's explorer answered no call");
+  const opened = await asked;
+  if (opened.isError || !opened.data.link_opened_at || launched.route !== "explore/stemma/Citation/cit-darwinreefs0001") fail(`open did not lead to the record: ${opened.text}`);
+  if ((await opening.call("stop")).isError) fail("the installed server did not stop its explorer");
+  await opening.end("SIGINT");
+  for (const said of [host.stdout, host.stderr, opening.stdout, opening.stderr]) if (said.includes(secret) || said.includes(launched.code)) fail("the installed MCP server said a key");
+  if (readdirSync(join(data, "serve")).length !== 0) fail("the server lock was left behind");
+  if (Bun.spawnSync(["ps", "-A", "-o", "command="]).stdout.toString().includes(installed)) fail("a process of the installed copy was left running");
+  console.log("MCP from the installed copy: the declared command answered status, search and a highlighted source view; open gave a stand-in opener a launch file that led to the record; no output held the code or secret; no process or lock was left.");
+}
+try {
+  await checkMcp();
+} finally {
+  await endMcp();
+  removeTemporaries();
+}
+
 // Formatting a citation with the bundled citeproc-js, style and locale, whose licences ship beside it.
 for (const licence of ["CPAL-1.0.txt", "CC-BY-SA-3.0.txt", "citeproc-js-LICENSE", "NOTICE.txt"]) {
   if (!files.includes(join("dist/licenses/cite", licence))) fail(`the installed plugin lacks dist/licenses/cite/${licence}`);
@@ -247,7 +311,7 @@ plugin installs from a local stand-in for the DocumentDrivenDX marketplace
 into an empty profile with one skill, bringing a stand-in docsync dependency with it, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
-no native module, and formats Chicago notes and a bibliography with the bundled citeproc-js, and makes the explorer page from the shipped template (the page is not
+no native module, Claude Code connects to the plugin's declared MCP server before and after setup (before it, the server fetches and writes nothing), and formats Chicago notes and a bibliography with the bundled citeproc-js, and makes the explorer page from the shipped template (the page is not
 opened in a browser here), and serves the worked example on 127.0.0.1 from the shipped served page and its own child process
 (the served page is not opened in a browser here either, so no original is drawn here). The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
