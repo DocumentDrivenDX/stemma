@@ -125,12 +125,18 @@ without ambiguity but which are refused for now.
 - No segment is on a page with no text layer, so none is left unmarked for that.
   The example's source text came from the PDFs' own layers.
 - `ocr_layer_match` never runs on this example unaided. With the offsets
-  withheld it chose the same boxes for 115 of the 117 and refused 2 as too short.
+  withheld it chose the same boxes for 115 of the 117 and refused 2 as too short;
+  its checks of the surrounding words, numbers, and denials refused none.
 - With letters of the quoted and surrounding words changed at random, lost, or
-  added, at 3, 7, 10, 14, 20, and 35 in 100, it chose the same lines for 115,
-  112, 112, 88, 18, and 0, left out one line of one mark at 7 and at 14, marked
-  no other line, and refused the rest. This is made-up damage, not another
-  recognition engine's.
+  added, at 3, 7, 10, 14, 20, and 35 in 100, it chose the same lines for 84, 50,
+  37, 26, 5, and 0, marked no other line, and refused the rest. Before the checks
+  of numbers and denials it chose 115, 112, 112, 88, 18, and 0, so those checks
+  cost much on damaged text. This test often adds the digit 1: it changed the
+  digits of 29 quotations at 3 in 100. Without added digits, damage changed a
+  count of denials in 8 and of `nt` in 12 of the 117 at 3 in 100. This is made-up
+  damage, not another recognition engine's.
+- The reader decodes none of the example's scan images (data of none), so it
+  learns of no mask on them. All 117 pages are still read as scans.
 - Searched for 457 times on pages that do not hold them, quotations from other
   pages were placed 0 times.
 - Looked at by eye: all 117, as drawn by the served page's pdf.js with its

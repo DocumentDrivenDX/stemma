@@ -50,7 +50,7 @@ marked.
 - [ ] **US-123-AC6** — Given the server's refusal rules, a hostile or slow PDF, or many requests, then the work is bounded in time, number, and memory, no rule or policy is loosened, and no box is drawn from an unproved answer.
 - [ ] **US-123-AC7** — Given the installed plugin with no packages, then it places boxes.
 - [ ] **US-123-AC8** — Given a passage on a scanned PDF page with invisible recognition text, then an estimate may be shown (CONTRACT-005 M, "Estimates on scans"): it differs from a highlight in shape as well as color, says in words that it is approximate and estimated, how it was derived, and that nothing checks the page says the words, and it is never given or counted as a highlight.
-- [ ] **US-123-AC9** — Given a scan whose layer matches the words weakly, or in more than one place that the surrounding words do not settle, or has too few words to match, or no text layer; or a page that is not a scan; then no estimate is shown and the reason is given. Nothing is recognized in an image.
+- [ ] **US-123-AC9** — Given a scan whose layer matches the words weakly; or in more than one place that the surrounding words do not settle, a clean copy beside a garbled one included; or only where enough surrounding words disagree; or with other numbers or another denial; or has too few words to match, right-to-left text on the line, or no text layer; or a page that is not a scan, one with watermarks or repeated small pictures included; then no estimate is shown and the reason is given. Nothing is recognized in an image.
 
 ## Edge Cases
 
@@ -70,7 +70,7 @@ marked.
 | Bounds | US-123-AC6 | Crafted calls; slow and crashing reader; a small file that unpacks to gigabytes | Send | Refused or reason |
 | Installed | US-123-AC7 | Plugin check | Ask | Boxes |
 | Estimate | US-123-AC8 | Invented scans: plain, split by a hyphen, rotated, with a stamp, with corrected text | Ask; open | An estimate, labelled and dashed; no highlight |
-| No estimate | US-123-AC9 | Invented weak, doubled, short, textless, and not-a-scan pages | Ask | Its reason; no box |
+| No estimate | US-123-AC9 | Invented weak, doubled, garbled, other-context, other-number, denied, right-to-left, short, textless, watermarked, and not-a-scan pages | Ask | Its reason; no box |
 
 ## Dependencies
 

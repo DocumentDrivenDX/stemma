@@ -982,13 +982,23 @@ highlighted.
   approximate highlights where possible, by a method that can be refined. Where
   no highlight is placed, whatever the reason (a quotation split by a hyphen
   included, so its page is read too), the same process looks for an estimate:
-  - *Which pages.* Images must cover at least half the page, their areas added,
-    and at least half of the page's glyphs (white space and glyphs off the page
-    aside) must be unseen: drawn in rendering mode 3, or before an image that
-    covers them. Only unseen glyphs that meet an image are read, so a visible
-    stamp is left out. Any other page keeps its reason, as does one whose drawing
-    the server does not know, or with right-to-left text on a quoted line. A scan
-    with no text layer gets `no_text_layer`: nothing is recognized.
+  - *Which pages.* Images must cover at least half the page. The part covered is
+    that of their union, counted over the centers of a grid of 200 by 200 cells.
+    At least half of the page's glyphs (white space and glyphs off the page
+    aside) must be unseen: drawn in rendering mode 3, or before a solid image
+    that covers them. Only unseen glyphs that meet a counted image are read, so a
+    visible stamp is left out. An image drawn transparent or blended is not
+    counted, nor one that the pinned pdf.js decodes as having transparency, as
+    with a soft, explicit, or color-key mask, since a watermark may be any of
+    these. A one-bit stencil counts toward the half but hides nothing, since it
+    paints only where it is set. Any other page keeps its reason, as does one
+    whose drawing the server does not know. A page read as a scan with no text
+    layer gets `no_text_layer`: nothing is recognized.
+  - *What this cannot tell.* The reader decodes no image that needs a WebAssembly
+    decoder, as the worked example's scan images do, and learns of no mask on
+    one, so such an image counts as solid. A page made by another means, with
+    mostly invisible text over large images, is read as a scan too. So the words
+    shown say only that the text is not seen on a page read as a scan.
   - *`ocr_layer_offsets`.* Where the page's text read again equals the source
     text's part, and every character has its glyph as for a highlight, the
     quoted glyphs are those at the recorded offsets. If any of them is seen, no
@@ -998,16 +1008,40 @@ highlighted.
     are reduced to letters and digits after Unicode compatibility decomposition,
     in lower case, with combining marks dropped, so line breaks, hyphens at line
     ends, ligatures, spacing, punctuation, and accents count for nothing. The
-    words must have at least 20 such characters (`scan_short`), and one stretch
-    of the layer must agree with at least 85 of every 100 of them, counting
-    characters changed, added, or lost (`scan_weak_match`). Every other stretch,
-    not lying mostly on it, must need more edits by at least 6 in 100 of their
-    length, and by at least 2. Where one does not, the 80 characters before and
-    after must settle it: one place's surroundings agreeing at least 70 in 100
-    and 20 in 100 better than any other's; else `scan_ambiguous`.
+    words must have at least 20 such characters (`scan_short`). A place is a
+    stretch of the layer; one is good enough when it agrees with at least 85 of
+    every 100 of them, counting characters changed, added, or lost. Without one,
+    the answer is `scan_weak_match`.
+  - *Rivals.* Every place that is good enough is a rival, however much better
+    another is, since the cleanest copy of the words need not be the quoted one.
+    So is a place that needs more edits than the best by less than the larger of
+    2 and 6% of the quotation's length. Places lying mostly on one another count
+    once. More than 8 rivals give `scan_ambiguous`.
+  - *The words around.* Of the 80 characters before the quotation and the 80
+    after, a side counts when it has at least 20. Where a side counts, each
+    rival's surroundings are compared with it, and the place taken must agree at
+    least 70 in 100, whether it is the only rival or one of several; among
+    several, also by 20 in 100 more than any other. A lone rival that disagrees
+    gives `scan_context`; any other failure, or a place taken that is not good
+    enough, gives `scan_ambiguous`. Where no side counts, only a lone rival is
+    taken.
+  - *Numbers and denials.* The place taken must hold the quotation's digits, the
+    same and in order, and as many of each of the letter groups `no`, `never`,
+    `neither`, `without`, and `nt` (as in "didn't"); else `scan_differs`. They are
+    counted as letters, not words, so a wrong letter elsewhere can refuse a place
+    that is right.
   - *Boxes.* One for each stretch of chosen glyphs along one line of the page as
-    shown, from the layer's glyphs. Text that does not run within 5 degrees of
-    level gets none; so does a box off the page.
+    shown, from the layer's glyphs. For both methods, a quoted glyph whose
+    baseline rises or falls by more than 9 in 100 of its run (about 5 degrees),
+    or runs backward, gives `rotated_text`, and right-to-left text on a quoted
+    line gives `right_to_left`. A box partly off the page is cut to it; one with
+    nothing left gives `scan_off_page`.
+  - *A reason kept.* For a passage no highlight can mark (a line-end hyphen, or
+    text laid out again), the page is read only for an estimate. A page that is
+    not read as a scan keeps that reason, and so does one that cannot be read at
+    all: not held, changed, too large, another page count, or unreadable. A
+    passing failure, as `busy` or `too_slow`, is told as it is. Such a page that
+    is not a scan still costs one reading, since only reading it shows that.
   - *The answer* is `state` `estimate` with `method`, one of the two names above,
     and is otherwise as `boxes`. Another way to estimate is another `method`, in
     the estimator alone.
@@ -1017,16 +1051,19 @@ highlighted.
   drawing that each box of a highlight holds both dark and light pixels. A scan's
   paper may be dim or tinted, so for an estimate each box must hold pixels much
   darker than its own paper (by 60 of 255 from its 90th percentile of
-  brightness, 2 in 100 of them or more) and paper around them (20 in 100). A box
-  that fails is a disagreement, and then no box is drawn. These checks can only
-  remove a mark, and cannot tell which words are under a box.
+  brightness, more than 2 in 100 of them) and paper around them (more than 20 in
+  100, within 30 of that percentile), each brightness taken to the nearest of 0
+  to 255. A box that fails is a disagreement, and then no box is drawn. So it is,
+  before any pixel is read, when the boxes together hold more than 3 times the
+  drawing's pixels. These checks can only remove a mark, and cannot tell which
+  words are under a box.
 - **What the page says.** With boxes, it says that they are positions from the
   PDF's text layer, that the server read the page again, found its text equal to
   the source text, and found glyphs drawn there that the file's text layer names
   as those letters, with nothing detected over or under them, and that it cannot
   tell whether the printed shapes are those letters. With an estimate, it says in
-  words that this is an approximate highlight, an estimated place on a scanned
-  page; how it was derived; that nothing checks that the boxes lie on the printed
+  words that this is an approximate highlight, an estimated place on a page read
+  as a scan; how it was derived; that nothing checks that the boxes lie on the printed
   words or that the page says them; and to read the page. Its boxes are dashed
   outlines with no tint, outside the area they mark, so that it differs by shape
   and words as well as color; the drawing's text alternative says that they
