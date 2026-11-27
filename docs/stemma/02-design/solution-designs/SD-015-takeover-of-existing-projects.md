@@ -63,11 +63,11 @@ tests passing on invented files and `./scripts/dev.sh check` passing.
 
 | Step | Build | Done when |
 |---|---|---|
-| P1 | **Matcher marks.** Add `seams` and `hyphens` to a neutral paragraph and `unreadPages` and `unseparatedLists` to a neutral document; apply CONTRACT-003 I, "What the matcher does with the marks", in the list reader and matcher; add the reasons `uncertain_boundary`, `uncertain_hyphen`, `uncertain_layout`, `list_incomplete` | Hand-made neutral documents show each guard, with the split entry of US-116-AC3 not linked; every existing Word and matcher test passes unchanged; a property test shows that adding any mark to a document never adds a link |
+| P1 | **Matcher marks.** Add `seams` and `hyphens` to a neutral paragraph and `unreadPages` and `unseparatedLists` to a neutral document; apply CONTRACT-003 I, "What the matcher does with the marks", in the list reader and matcher; add the reasons `uncertain_boundary`, `uncertain_hyphen`, `uncertain_layout`, `list_incomplete` | Hand-made neutral documents show each guard, with the split entry of US-117-AC3 not linked; every existing Word and matcher test passes unchanged; a property test shows that adding any mark to a document never adds a link |
 | P2 | **PDF page facts.** Add the `core` port and implement it in `extract` over `readPdf`: for a manuscript, each page's lines and places, its state (invisible drawing, painted images or shapes), annotations, form values, link addresses, attachment names, layers, and image counts, read in a child process with a time stop. Move the CONTRACT-007 I layout rules the reader reuses into `core`. Extend `tests/pdf.ts` with annotations, invisible text, an image, and an attachment | Tests cover each page state and reported item; `pdf_unreadable` and `input_limit` cases; every source-conversion test gives byte-identical output |
-| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-116-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14 at the reader and matcher level; the library's own piece count equals the account on every invented file |
-| P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-116-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
-| P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the one-file-per-chapter check for both formats | US-116-AC1, AC10, AC11, AC13, AC14 through the command |
+| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-117-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14 at the reader and matcher level; the library's own piece count equals the account on every invented file |
+| P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-117-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
+| P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the one-file-per-chapter check for both formats | US-117-AC1, AC10, AC11, AC13, AC14 through the command |
 
 After P4, run the developer report script on PDF manuscripts the author supplies,
 privately; commit only counts and invented reproductions. Every producer stays
@@ -281,7 +281,7 @@ page data is designed.
 - **Responsibilities**: BR-1528, BR-1532, BR-1533, and the marks of BR-1529 to BR-1531.
 - **Requirements Addressed**: PDF-01 to PDF-09, INT-06, INT-07, INT-08.
 - **Interfaces**: Reads the `core` page-facts port, which `extract` implements; the port's shapes are Stemma's, not the library's. Source conversion's output does not change.
-- **Owned by TDs**: US-116.
+- **Owned by TDs**: US-117.
 
 ### Component: Reference resolver (`packages/intake`) — M1
 - **Purpose**: Classify notes and bind references by the binding profile.
@@ -372,12 +372,12 @@ graph TD
 | INT-08 | Coordinator | BR-1501 | Corrupt, encrypted, and interrupted imports leave no records |
 | INT-09 | Coordinator | BR-1519 | Second file after a choice; the choice stands |
 | INT-10 | Word reader | BR-1502 | Seeded comments all listed with text and position |
-| INT-11 | Coordinator | BR-1534 | Invented Word and PDF of one text, in both orders, and with `--separate` (US-116-AC13) |
-| PDF-01, PDF-09 | PDF reader, Coordinator | BR-1527 | US-116-AC1 |
-| PDF-02, PDF-03 | PDF reader | BR-1528 | US-116-AC2, AC7, AC12 on invented files |
-| PDF-04, PDF-05 | PDF reader, matcher, list reader | BR-1529 to BR-1531 | US-116-AC3 to AC6; added marks never add a link; Word tests unchanged |
-| PDF-06, PDF-07 | PDF reader, Intake report | BR-1533 | US-116-AC8, AC9 |
-| PDF-08 | PDF reader | BR-1532 | US-116-AC10 |
+| INT-11 | Coordinator | BR-1534 | Invented Word and PDF of one text, in both orders, and with `--separate` (US-117-AC13) |
+| PDF-01, PDF-09 | PDF reader, Coordinator | BR-1527 | US-117-AC1 |
+| PDF-02, PDF-03 | PDF reader | BR-1528 | US-117-AC2, AC7, AC12 on invented files |
+| PDF-04, PDF-05 | PDF reader, matcher, list reader | BR-1529 to BR-1531 | US-117-AC3 to AC6; added marks never add a link; Word tests unchanged |
+| PDF-06, PDF-07 | PDF reader, Intake report | BR-1533 | US-117-AC8, AC9 |
+| PDF-08 | PDF reader | BR-1532 | US-117-AC10 |
 | ADC-01, ADC-02 | Reference-list reader | BR-1521 | Invented lists in both layouts, with an unread entry and a file with no list |
 | ADC-03, ADC-04, ADC-07 | Author-date matcher | CONTRACT-003 H forms | One invented case per form, lead-in, locator, and date range |
 | ADC-05, ADC-06 | Author-date matcher | BR-1522 | Hand-made answer list with solo and co-authored look-alikes, a missing entry, and an unread one: zero wrong links; two runs identical |

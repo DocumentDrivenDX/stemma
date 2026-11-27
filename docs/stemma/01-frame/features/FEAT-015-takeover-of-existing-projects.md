@@ -280,7 +280,7 @@ INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
 - [US-106 — Review suggested constructs and methodology](../user-stories/US-106-review-suggested-constructs.md)
 - [US-113 — Link author-date citations to the chapter's reference list](../user-stories/US-113-link-author-date-citations.md)
 - [US-114 — Work through a usable first report](../user-stories/US-114-use-the-first-report.md)
-- [US-116 — Take over a PDF chapter](../user-stories/US-116-take-over-a-pdf-chapter.md)
+- [US-117 — Take over a PDF chapter](../user-stories/US-117-take-over-a-pdf-chapter.md)
 
 ## Edge Cases and Error Handling
 

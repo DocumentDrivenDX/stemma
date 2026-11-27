@@ -291,12 +291,12 @@ describe("US-116-AC5 the original", () => {
 
   test("withholds every local path among addresses and holdings", () => {
     const view = get({
-      records: [one, upstream("ups-localpath001", { url: "/data/scans/book.pdf", version: "~erik/scans/v2" })],
+      records: [one, upstream("ups-localpath001", { url: "/data/scans/book.pdf", version: "~reader/scans/v2" })],
       manifest: { original: { form: "physical", files: [], description: "/Users/author/notes/copy", held_at: "/srv/shelf/7", obtained_from: "file:///Users/author/book.pdf", version: "C:\\books\\1", acquired_at: AT } },
     }, "passage", one.id);
     expect(view.state).toBe("highlighted");
     expect(view.original).toEqual({ form: "physical", acquired_at: AT, files: [] });
-    for (const path of ["/Users/", "/data/", "/srv/", "~erik", "C:\\\\"]) expect(JSON.stringify(view)).not.toContain(path);
+    for (const path of ["/Users/", "/data/", "/srv/", "~reader", "C:\\\\"]) expect(JSON.stringify(view)).not.toContain(path);
   });
 
   test("a paper original keeps where it is held", () => {
@@ -322,5 +322,17 @@ describe("hidden characters", () => {
   test("a location field holding any whole path is local; a web address is not", () => {
     expect([isLocalPath("/data/a/b", true), isLocalPath("/data/a/b"), isLocalPath("https://example.invalid/a/b", true), isLocalPath("Obtained from: /data/a/b", true)])
       .toEqual([true, false, false, true]);
+  });
+});
+
+describe("a cited source that breaks a record rule", () => {
+  test("its citation is not highlighted", () => {
+    const cited = citation("cit-onepage00001", one);
+    const change = { records: [one, cited] };
+    const corpus = corpusOf(change);
+    expect(sourceView(corpus, { kind: "citation", id: cited.id as string }).state).toBe("highlighted");
+    const file = corpus.byId.get(VOLUME)!;
+    file.problems.push({ ...({} as (typeof file.problems)[number]), reason: "record_invalid" });
+    noText(sourceView(corpus, { kind: "citation", id: cited.id as string }), "citation_differs");
   });
 });

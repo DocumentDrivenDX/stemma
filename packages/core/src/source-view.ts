@@ -210,10 +210,17 @@ export class SourceViews {
   /** The one source in effect that a key or a source ID names. */
   private named(name: string): { id: string } | { problem: string } {
     const direct = this.record(name, "source");
-    if (direct && !isRetired(direct.data!)) return { id: name };
-    const found = [...(this.keys.get(name) ?? [])];
-    if (found.length === 1) return { id: found[0]! };
-    return { problem: found.length === 0 ? "names no source in effect" : "names more than one source" };
+    let id: string;
+    if (direct && !isRetired(direct.data!)) id = name;
+    else {
+      const found = [...(this.keys.get(name) ?? [])];
+      if (found.length !== 1) return { problem: found.length === 0 ? "names no source in effect" : "names more than one source" };
+      id = found[0]!;
+    }
+    // A broken record's relations must not decide which works match.
+    const container = this.containerOf(id);
+    const broken = [id, ...(container ? [container] : [])].some((each) => invalid(this.record(each, "source")!));
+    return broken ? { problem: "names a source that breaks a record rule, or is part of one" } : { id };
   }
 
   /** Whether a passage of `source` may be cited as `cited`: that source, or a part of it. */
