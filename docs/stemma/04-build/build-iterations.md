@@ -30,7 +30,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | On main; originals not opened yet (25) |
-| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, original pages and MCP on main; marks on original PDFs on this branch, never on scans or page images; other manuscripts not built |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, originals with highlighting where positions are certain (scans unmarked) and MCP on main; other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Faster export and complete paged search in `stemma browse` on main; export memory over 4 GB; offline page still limited |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
 
@@ -225,6 +225,12 @@ Before and after were both run on these projects.
   wrong cause. Retry with backoff, keeping the secret, and stop only on an
   unproved answer or a sustained outage.
 - The scale test does not catch scans that compare records by identity.
+- Highlighting on originals refuses scans (hidden recognition text), words split
+  by a line-end hyphen and ligatures: 6 of 125 passage segments of the worked
+  example were marked. Whether to show labelled estimates is the product
+  owner's decision.
+- The command-line PDF reader has no memory bound: a crafted 13 KB file drove it
+  to 19.6 GiB. Bound it before takeover reads PDF manuscripts.
 
 ## Not completable by an agent alone
 
