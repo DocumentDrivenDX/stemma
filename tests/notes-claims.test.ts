@@ -1,7 +1,7 @@
 // Note and claim rules and review marks (FR-20, FR-21, FR-23; CONTRACT-002 B1
 // and C). The records are invented.
 import { describe, expect, test } from "bun:test";
-import { PROBLEMS, recordStates, runChecks } from "@stemma/core";
+import { InvalidInput, prepareRecord, PROBLEMS, recordStates, runChecks } from "@stemma/core";
 import { canonical, digest, loadCorpus, type ProjectContent, recordPath } from "@stemma/records";
 
 type Value = Record<string, unknown>;
@@ -160,3 +160,41 @@ describe("claim.complete", () => {
     expect(states.records.get(ID)).toContain("open_finding");
   });
 });
+
+describe("record add and the review mark", () => {
+  const request = (fields: Value, actor?: { kind: "person" | "model" | "software"; name: string }, kind = "claim") =>
+    JSON.parse(prepareRecord({ kind, input: JSON.stringify(fields), ...(actor ? { actor } : {}), now: new Date(AT), token: () => "aaaaaaaa" }).text) as Value;
+  const fields = { text: "A claim", role: "claim" };
+
+  test("a kind with a review mark starts unreviewed; others get none", () => {
+    for (const actor of [person, model] as const) {
+      expect(request(fields, actor as never).review).toEqual({ state: "unreviewed" });
+    }
+    expect(request({ type: "comment", source: "src-aaaaaaaa", body: "A remark" }, model as never, "note").review).toEqual({ state: "unreviewed" });
+    expect(request({ citation_key: "one" }, model as never, "source").review).toBeUndefined();
+  });
+
+  test("a person's reviewed record gets the digest of its content and a dated decision, and the mark applies", () => {
+    const made = request({ ...fields, review: { state: "reviewed" } }, person as never);
+    expect(made.review).toEqual(reviewed(made).review);
+    expect(states(made)).not.toContain("unreviewed");
+    // With the person named only in `created`.
+    const typed = request({ ...fields, created: { at: AT, by: person }, review: { state: "reviewed" } });
+    expect(typed.review).toEqual(reviewed(typed).review);
+  });
+
+  test("a model or software actor cannot add a record as reviewed, however the input names people", () => {
+    const mark = { state: "reviewed" };
+    const asPerson = { at: AT, by: person };
+    for (const [input, actor] of [
+      [{ ...fields, review: mark }, model], [{ ...fields, review: mark }, { kind: "software", name: "s" }],
+      [{ ...fields, review: mark, created: asPerson }, model], [{ ...fields, review: mark, created: { at: AT, by: model } }, person],
+      [{ ...fields, review: { ...mark, decided: { at: AT, by: model } } }, person],
+      [{ ...fields, review: mark, created: { at: AT } }, undefined],
+    ] as const) {
+      expect(() => request(input as Value, actor as never)).toThrow(InvalidInput);
+    }
+  });
+});
+
+const states = (record: Value) => recordStates(loadCorpus(project([record]))).records.get(String(record.id)) ?? [];

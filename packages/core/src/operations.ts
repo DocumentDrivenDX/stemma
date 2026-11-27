@@ -2,8 +2,10 @@
 // functions; neither it nor the command line adds rules of its own.
 import {
   canonical, type Corpus, isObject, isRecordId, JsonUnreadable, KINDS, normalizeSentence, parseJson, RECORD_SCHEMA,
-  recordPath, sha256, serializeManifest, serializePart, splitFrontMatter, parseBlocks,
+  recordPath, sha256, serializeManifest, serializePart, splitFrontMatter, parseBlocks, type JsonObject, type LoadedFile,
 } from "@stemma/records";
+import { itemOf } from "./checks/records.ts";
+import { carriesReview } from "./review.ts";
 import { PROBLEMS } from "./findings.ts";
 import { citationFromPassage } from "./passages.ts";
 import type { Result } from "./report.ts";
@@ -15,6 +17,9 @@ export class InvalidInput extends Error {}
 export class ActorNeeded extends Error {}
 
 export interface Actor { kind: "person" | "model" | "software"; name: string }
+
+/** A time as a record stamp writes it. */
+export const stampTime = (now: Date): string => now.toISOString().replace(/\.\d+Z$/, "Z");
 
 export interface NewRecord { kind: string; input: string; actor?: Actor; now: Date; token: () => string; corpus?: Corpus }
 
@@ -50,7 +55,7 @@ export function prepareRecord(request: NewRecord): { id: string; path: string; t
   record.id = id;
   if (record.created === undefined) {
     if (!request.actor) throw new ActorNeeded();
-    record.created = { at: request.now.toISOString().replace(/\.\d+Z$/, "Z"), by: { ...request.actor } };
+    record.created = { at: stampTime(request.now), by: { ...request.actor } };
   }
   if (kind === "citation" && record.passage !== undefined) {
     if (!request.corpus) throw new InvalidInput("A citation made from a passage needs the project to copy from.");
@@ -63,7 +68,31 @@ export function prepareRecord(request: NewRecord): { id: string; path: string; t
     sentence.text = normalizeSentence(sentence.text);
     sentence.sha256 = sha256(sentence.text as string);
   }
+  if (carriesReview(kind)) reviewMark(record, request);
   return { id, path: recordPath(kind, id), text: canonical(record) };
+}
+
+/** The kind of the actor a stamp or `--actor` names, when it names one. */
+const actorKind = (by: unknown): string | undefined => (isObject(by) && typeof by.kind === "string" ? by.kind : undefined);
+
+/**
+ * A new record starts unreviewed. It is written as reviewed only when a person
+ * is the one writing it, since a review mark records what a person said.
+ */
+function reviewMark(record: JsonObject, request: NewRecord): void {
+  record.review ??= { state: "unreviewed" };
+  const review = record.review;
+  if (!isObject(review) || review.state !== "reviewed") return;
+  const created = isObject(record.created) ? record.created.by : undefined;
+  const decided = isObject(review.decided) ? review.decided.by : undefined;
+  const writers = [request.actor?.kind, actorKind(created), actorKind(decided)];
+  if (writers.includes("model") || writers.includes("software") || !writers.includes("person")) {
+    throw new InvalidInput("A record is added as reviewed only when a person writes it: a model or software actor cannot mark a record reviewed. Leave `review` out to add it unreviewed.");
+  }
+  review.content_sha256 ??= itemOf({ data: record } as unknown as LoadedFile)!.content_sha256;
+  // One of the two names a person: with no person actor and no person in `created`, `decided` already does.
+  const person = request.actor ?? (actorKind(created) === "person" ? (created as JsonObject) : undefined);
+  if (review.decided === undefined && person) review.decided = { at: stampTime(request.now), by: { ...person } };
 }
 
 /** Files that `fmt` would rewrite. A rewrite never changes a value. */
