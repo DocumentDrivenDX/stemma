@@ -50,7 +50,9 @@ case "${1:-check}" in
     echo "ok"
     echo "== tests"
     run scripts/build.ts >/dev/null
-    run test ./tests
+    # Many tests run several commands in turn, so they get longer than the
+    # 5-second default when workers share the machine.
+    run test ./tests --parallel=4 --timeout=30000
     ;;
   build) run scripts/build.ts ;;
   example)
