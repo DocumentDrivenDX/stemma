@@ -163,7 +163,7 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
     expect(socketsOf([host.child.pid, worker!.pid])).toEqual([]);
 
     const opening = host.call("open", { record: "cit-darwinreefs0001" });
-    while (!opener.launched()) await Bun.sleep(20);
+    while (opener.calls().length === 0) await Bun.sleep(20);
     const launched = opener.launched()!;
     expect(launched.route).toBe("explore/stemma/Citation/cit-darwinreefs0001");
     // The opener is given the launch file and nothing else.
