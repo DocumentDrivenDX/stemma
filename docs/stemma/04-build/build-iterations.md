@@ -31,6 +31,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Next after 11 |
 | 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs the manuscript reader and citation formatter on main |
+| 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Requested; measuring |
 
 ## Iteration 24: see a citation inline with its source
 
@@ -83,6 +84,26 @@ possible and falls back to the text snapshots in the repository.
 - To test: how the supported hosts start the MCP server from the plugin, which
   ships one bundled command line, and how long the localhost server lives.
 - Originals stay out of reviewer exports unless the rights rules allow them.
+## Iteration 26: large projects
+
+Requirement from the product owner: significant projects have thousands of
+sources, and the browser must not be limited to a few dozen. FEAT-012's scale
+assumption of 10,000 records is too small: the 14-source worked example already
+exports hundreds of entries.
+
+- Every record that matches a search is reachable, with the total shown, ranked
+  and paged. No type is left unsearched. Every link of a record is reachable.
+  The record browser's current limits (20 searched types, 50 results, also per
+  type) do not meet this.
+- Design target to confirm: 5,000 sources with their passages, notes, claims,
+  citations and source text.
+- Expected direction, to test: the localhost server (iteration 25) answers
+  searches and reads from a rebuildable SQLite index (the FEAT-011 engine), and
+  the page loads what it shows instead of holding the whole project. The single
+  offline file states its own measured limit.
+- Where arras itself imposes a limit, take the change to arras. No private fork.
+- A synthetic large project is part of the tests, with measured export time,
+  size, load time and search time.
 
 ## Not completable by an agent alone
 
