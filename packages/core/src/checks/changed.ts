@@ -9,6 +9,7 @@ import type { Evidence, Result } from "../report.ts";
 import { SourceTexts } from "../matching/texts.ts";
 import { textAt } from "../passages.ts";
 import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
+import { grouped, once } from "../corpus-index.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
 /** `SourceBinding.record_sha256` (CONTRACT-001 E). */
@@ -51,9 +52,11 @@ interface Walk { changes: Change[]; reached: number; unread: boolean }
 
 const list = (value: unknown): string[] => (value === undefined ? [] : [value].flat().map(String));
 
-function walker(corpus: Corpus) {
-  const texts = new SourceTexts(corpus);
-  const links = active(corpus, "attestation");
+function walker(corpus: Corpus, texts: SourceTexts) {
+  const links = grouped<unknown, LoadedFile>(active(corpus, "attestation"), (l) => [l.data!.claim]);
+  // Each source's digest is made once however many passages name it.
+  const bindings = new Map<LoadedFile, string>();
+  const bindingNow = (file: LoadedFile) => bindings.get(file) ?? bindings.set(file, sourceBinding(file.data!)).get(file)!;
   const unreadable = new Set(corpus.records.filter((f) => f.state !== "ok").map((f) => f.path.replace(/^.*\//, "").replace(/\.json$/, "")));
 
   /** Follows one record's dependencies. A dependency that cannot be read keeps the result open. */
@@ -81,21 +84,26 @@ function walker(corpus: Corpus) {
       } else if (now.state === "unavailable") walk.unread = true;
       next([...list(data.text), ...list(data.source)]);
       const source = corpus.byId.get(String(data.source));
-      if (source?.data?.kind === "source" && typeof data.source_record_sha256 === "string" && data.source_record_sha256 !== sourceBinding(source.data)
+      if (source?.data?.kind === "source" && typeof data.source_record_sha256 === "string" && data.source_record_sha256 !== bindingNow(source)
         && !onlyAdded(source.data, data.source_record_sha256)) {
         walk.changes.push({ reason: "source_details_changed", record: source, what: `source details changed since passage ${id} was anchored`, through: [...through, id] });
       }
     }
     if (kind === "note") next([...list(data.passages), ...list(data.source)]);
-    if (kind === "claim") next(links.filter((l) => l.data!.claim === id).map((l) => String(l.data!.evidence)));
+    if (kind === "claim") next((links.get(id) ?? []).map((l) => String(l.data!.evidence)));
   };
 }
 
 export interface Dependant { file: LoadedFile; walk: Walk; source?: string }
 
 /** Every passage, note, claim and citation that rests on a source, with what has changed under it. */
-export function dependants(corpus: Corpus): Dependant[] {
-  const follow = walker(corpus);
+export function dependants(corpus: Corpus, texts = new SourceTexts(corpus)): Dependant[] {
+  const follow = walker(corpus, texts);
+  const readable = (kind: string) => corpus.records.filter((f) => f.state === "ok" && f.data?.kind === kind);
+  const retiredSources = once(corpus, "retired sources", () => readable("source").filter((f) => isRetired(f.data!)));
+  const retiredByKey = grouped<unknown, LoadedFile>(retiredSources, (f) => citationKeys(f.data!));
+  const retiredById = grouped<unknown, LoadedFile>(retiredSources, (f) => [idOf(f)]);
+  const filesBySource = once(corpus, "source files by source", () => grouped<unknown, LoadedFile>(readable("source_text"), (f) => [f.data!.source]));
   const out: Dependant[] = [];
   for (const kind of ["passage", "note", "claim"]) {
     for (const file of active(corpus, kind)) {
@@ -111,8 +119,7 @@ export function dependants(corpus: Corpus): Dependant[] {
     const seen = new Set<string>();
     let sources = matches;
     if (sources.length === 0) {
-      sources = corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "source" && isRetired(f.data)
-        && (key !== undefined ? citationKeys(f.data).includes(key) : idOf(f) === citation.data!.source));
+      sources = (key !== undefined ? retiredByKey.get(key) : retiredById.get(citation.data!.source)) ?? [];
     }
     for (const claim of list(citation.data!.claims)) follow(claim, walk, [], seen);
     for (const passage of list(citation.data!.passage)) follow(passage, walk, [], seen);
@@ -123,7 +130,7 @@ export function dependants(corpus: Corpus): Dependant[] {
       // source had while the citation existed: the ones retired after it was recorded.
       if (citation.data!.passage === undefined) {
         const since = String(isObject(citation.data!.created) ? citation.data!.created.at : "");
-        for (const record of corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "source_text" && f.data.source === source)) {
+        for (const record of filesBySource.get(source) ?? []) {
           walk.reached++;
           const retired = record.data!.retired;
           if (!isObject(retired) || !isObject(retired.stamp) || Date.parse(String(retired.stamp.at)) < Date.parse(since)) continue;
@@ -138,9 +145,9 @@ export function dependants(corpus: Corpus): Dependant[] {
   return out;
 }
 
-export function changedResults(corpus: Corpus): Result[] {
+export function changedResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   const check = "source.changed";
-  return dependants(corpus).map(({ file, walk, source }) => {
+  return dependants(corpus, texts).map(({ file, walk, source }) => {
     const data = file.data!;
     const evidence: Evidence[] = [{ name: `${String(data.kind)}_file`, class: "location", value: file.path }];
     for (const change of walk.changes) {

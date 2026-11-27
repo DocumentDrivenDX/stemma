@@ -2,18 +2,16 @@
 // A run or a review binds to the text digest of each page it looked at, so it
 // goes stale exactly when that text changes. None of this blocks anything.
 import {
-  type Corpus, idOf, isObject, isRetired, type JsonObject, type LoadedFile, type LoadedText, sha256, streamsOf, textDigest,
+  type Corpus, idOf, isObject, type JsonObject, type LoadedFile, type LoadedText, sha256, streamsOf, textDigest,
 } from "@stemma/records";
+import { activeWhere } from "./corpus-index.ts";
 
 const list = (value: unknown): JsonObject[] => (Array.isArray(value) ? value.filter(isObject) : []);
-const records = (corpus: Corpus, kind: string): LoadedFile[] =>
-  corpus.records.filter((f) => f.state === "ok" && f.data?.kind === kind && !isRetired(f.data));
-
 const atOf = (data: JsonObject, field: string): string => String(isObject(data[field]) ? data[field].at : "");
 
 /** The reconversion runs of a source file, newest first. */
 export const reconversions = (corpus: Corpus, text: string): LoadedFile[] =>
-  records(corpus, "comparison_run").filter((r) => r.data!.text === text && r.data!.method === "reconversion")
+  activeWhere(corpus, "comparison_run", "text", text).filter((r) => r.data!.method === "reconversion")
     .sort((a, b) => atOf(b.data!, "run").localeCompare(atOf(a.data!, "run")) || (a.path < b.path ? 1 : -1));
 
 /**
@@ -73,7 +71,7 @@ export function coverageOf(corpus: Corpus, text: LoadedText, tools: Record<strin
   const whole = new Set<number>();
   let stale = 0;
   let flags = 0;
-  for (const file of records(corpus, "text_review").filter((r) => r.data!.text === id)) {
+  for (const file of activeWhere(corpus, "text_review", "text", id)) {
     const review = file.data!;
     if (!currentReview(review, text)) stale++;
     else if (byPerson(review) && review.scope === "whole_page" && review.outcome !== "flagged") {
@@ -81,7 +79,7 @@ export function coverageOf(corpus: Corpus, text: LoadedText, tools: Record<strin
     }
     if (review.outcome === "flagged" || review.outcome === "disagrees") flags += Math.max(1, list(review.flags).length);
   }
-  const runs = records(corpus, "comparison_run").filter((r) => r.data!.text === id)
+  const runs = [...activeWhere(corpus, "comparison_run", "text", id)]
     .sort((a, b) => (a.path < b.path ? -1 : 1))
     .map((file): RunCoverage => {
       const run = file.data!;

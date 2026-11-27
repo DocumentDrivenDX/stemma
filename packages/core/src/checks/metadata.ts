@@ -9,6 +9,7 @@ import { result } from "../findings.ts";
 import { SourceTexts, type TextView } from "../matching/texts.ts";
 import type { Evidence, Result } from "../report.ts";
 import { byPerson, currentReview } from "../verification.ts";
+import { activeWhere } from "../corpus-index.ts";
 import { active, listedSources, resolveCitations } from "./bibliography.ts";
 import { sourceBinding } from "./changed.ts";
 import { itemOf, subjectOf } from "./records.ts";
@@ -273,11 +274,11 @@ export function describedSources(corpus: Corpus, texts: SourceTexts): LoadedFile
 /** A person's current review of the source details that covers every field left open (FR-30). */
 function confirmation(corpus: Corpus, source: LoadedFile, fields: Field[]): string | undefined {
   const binding = sourceBinding(source.data!);
-  const found = active(corpus, "text_review").find((r) => {
+  const found = activeWhere(corpus, "text_review", "source", idOf(source)).find((r) => {
     const data = r.data!;
     const loaded = corpus.texts.get(String(data.text));
     const covered = (Array.isArray(data.fields) ? data.fields : []).map(String);
-    return data.source === idOf(source) && data.scope === "source_details" && data.outcome === "agrees" && byPerson(data)
+    return data.scope === "source_details" && data.outcome === "agrees" && byPerson(data)
       && data.source_record_sha256 === binding && loaded !== undefined && currentReview(data, loaded) && fields.every((f) => covered.includes(f));
   });
   return found && idOf(found);
@@ -326,7 +327,7 @@ export function sourceMetaResults(corpus: Corpus, texts = new SourceTexts(corpus
 const score = (statuses: Map<Field, Status>) => [...statuses.values()].reduce((n, s) => n + (s === "differs" ? 100 : s === "not_found" ? 1 : 0), 0);
 
 const lookupsOf = (corpus: Corpus, source: string): LoadedFile[] =>
-  active(corpus, "resolution").filter((r) => r.data!.source === source)
+  [...activeWhere(corpus, "resolution", "source", source)]
     .sort((a, b) => String(b.data!.queried_at).localeCompare(String(a.data!.queried_at)) || (a.path < b.path ? -1 : 1));
 
 const identifierKey = (value: unknown): string => (isObject(value) ? `${String(value.scheme).toLowerCase()}:${String(value.value).toLowerCase()}` : "");

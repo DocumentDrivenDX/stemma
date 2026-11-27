@@ -110,13 +110,17 @@ export function parseJson(text: string): ParseResult {
 }
 
 export function compareCodePoints(a: string, b: string): number {
-  const left = Array.from(a);
-  const right = Array.from(b);
-  for (let i = 0; i < Math.min(left.length, right.length); i++) {
-    const difference = left[i]!.codePointAt(0)! - right[i]!.codePointAt(0)!;
+  // No arrays are made: this runs for every key of every record written.
+  let i = 0;
+  for (; i < a.length && i < b.length; ) {
+    const left = a.codePointAt(i)!;
+    const difference = left - b.codePointAt(i)!;
     if (difference !== 0) return difference;
+    i += left > 0xffff ? 2 : 1;
   }
-  return left.length - right.length;
+  // What is left of the longer one, in code points.
+  const points = (text: string) => { let n = 0; for (let at = i; at < text.length; at += text.codePointAt(at)! > 0xffff ? 2 : 1) n++; return n; };
+  return points(a) - points(b);
 }
 
 /** Fields whose exact code points are kept (CONTRACT-001 D). */

@@ -5,7 +5,7 @@ import { type Corpus, isObject } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
 import { currentRun, reconversions } from "../verification.ts";
-import { active } from "./bibliography.ts";
+import { activeWhere } from "../corpus-index.ts";
 import { itemOf, subjectOf } from "./records.ts";
 import { activeTexts } from "./structure.ts";
 
@@ -16,7 +16,7 @@ export function originalResults(corpus: Corpus, tools: Record<string, string>): 
   const check = "source.original";
   return activeTexts(corpus).flatMap(([id, text]) => {
     const data = text.manifest.data!;
-    const upstreams = active(corpus, "upstream").filter((u) => u.data!.source === data.source);
+    const upstreams = activeWhere(corpus, "upstream", "source", data.source);
     const runs = reconversions(corpus, id);
     if (upstreams.length === 0 && runs.length === 0) return [];
     const files = isObject(data.original) && Array.isArray(data.original.files) ? data.original.files.filter(isObject) : [];

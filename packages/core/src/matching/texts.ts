@@ -6,6 +6,7 @@ import {
   type Corpus, idOf, isObject, isRetired, type LoadedPart, type LoadedText, PARAGRAPH_ROLES, blockText, streamsOf, type Streams, textDigest,
 } from "@stemma/records";
 import { type Folded, fold } from "./quote-fold.ts";
+import { grouped } from "../corpus-index.ts";
 
 export type StreamName = "main" | "notes";
 
@@ -50,13 +51,23 @@ export interface TextView {
   address(stream: StreamName, start: number, end: number): Anchor[];
 }
 
+const SURROGATE = /[\ud800-\udfff]/;
+
 export const codePoints = (text: string): number => {
+  if (!SURROGATE.test(text)) return text.length;
   let n = 0;
   for (const _ of text) n++;
   return n;
 };
+
+/** The code points from `start` up to `end`, counted as `Array.prototype.slice` counts. */
+export const slicePoints = (text: string, start: number, end?: number): string =>
+  // Where every code point is one unit, no array of them is needed.
+  Number.isInteger(start) && start >= 0 && (end === undefined || (Number.isInteger(end) && end >= 0)) && !SURROGATE.test(text)
+    ? text.slice(start, end) : [...text].slice(start, end).join("");
+
 /** The string offset of a code-point offset. */
-export const unitAt = (text: string, points: number): number => [...text].slice(0, points).join("").length;
+export const unitAt = (text: string, points: number): number => slicePoints(text, 0, points).length;
 
 function paragraphsOf(part: LoadedPart, main: string): { start: number; end: number }[] {
   const spans: { start: number; end: number }[] = [];
@@ -127,6 +138,7 @@ export function viewOf(loaded: LoadedText): TextView {
 /** Reads each source file once in a run. A damaged one yields no view. */
 export class SourceTexts {
   private readonly known = new Map<string, TextView | undefined>();
+  private bySource?: Map<unknown, string[]>;
   constructor(readonly corpus: Corpus) {}
 
   view(id: string): TextView | undefined {
@@ -139,8 +151,9 @@ export class SourceTexts {
 
   /** The IDs of a source's non-retired source files, damaged ones included, in path order. */
   idsOf(source: string): string[] {
-    return [...this.corpus.texts].filter(([, t]) => t.manifest.data!.source === source && !isRetired(t.manifest.data!))
-      .sort(([, a], [, b]) => (a.directory < b.directory ? -1 : 1)).map(([id]) => id);
+    this.bySource ??= new Map([...grouped<unknown, [string, LoadedText]>([...this.corpus.texts].filter(([, t]) => !isRetired(t.manifest.data!)),
+      ([, t]) => [t.manifest.data!.source])].map(([of, list]) => [of, list.sort(([, a], [, b]) => (a.directory < b.directory ? -1 : 1)).map(([id]) => id)]));
+    return [...(this.bySource.get(source) ?? [])];
   }
 
   /** The usable views of a source, and how many source files could not be used. */

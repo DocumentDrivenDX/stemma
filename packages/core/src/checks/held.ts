@@ -5,7 +5,8 @@
 import { type Corpus, idOf, isObject } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
-import { SourceTexts } from "../matching/texts.ts";
+import { SourceTexts, type TextView } from "../matching/texts.ts";
+import { once } from "../corpus-index.ts";
 import { coverageOf, coverageWords } from "../verification.ts";
 import { hasManuscript, resolveCitations } from "./bibliography.ts";
 import { itemOf, subjectOf } from "./records.ts";
@@ -15,8 +16,13 @@ type Reason = "no_source_file" | "no_text" | "record_unreadable" | "source_damag
 const at = (name: string, value: string): Evidence => ({ name, class: "location", value });
 const meta = (name: string, value: string): Evidence => ({ name, class: "metadata", value });
 
-export const manifestsUnread = (corpus: Corpus): boolean =>
-  corpus.records.some((f) => f.state !== "ok" && f.state !== "stray" && f.path.startsWith("sources/"));
+export const manifestsUnread = (corpus: Corpus): boolean => once(corpus, "manifests unread", () =>
+  corpus.records.some((f) => f.state !== "ok" && f.state !== "stray" && f.path.startsWith("sources/")));
+
+/** A source file's coverage in words, made once however often it is cited. */
+const coverageSaid = new WeakMap<TextView, string>();
+const coverageOnce = (corpus: Corpus, view: TextView): string =>
+  coverageSaid.get(view) ?? coverageSaid.set(view, coverageWords(coverageOf(corpus, view.loaded))).get(view)!;
 
 /** The state of one source's source files. */
 export function holding(texts: SourceTexts, source: string): { outcome: "pass" | "fail" | "unverifiable"; reason?: Reason; evidence: Evidence[] } {
@@ -39,7 +45,7 @@ export function holding(texts: SourceTexts, source: string): { outcome: "pass" |
     evidence.push(
       at("source_text", view.loaded.manifest.path),
       meta("text_method", `${view.method}, quality ${view.level}`),
-      meta("verification", coverageWords(coverageOf(corpus, view.loaded))));
+      meta("verification", coverageOnce(corpus, view)));
   }
   return held ? { outcome: "pass", evidence } : { outcome: "fail", reason: "no_text", evidence: ids.map((id) => at("source_text", corpus.texts.get(id)!.manifest.path)) };
 }

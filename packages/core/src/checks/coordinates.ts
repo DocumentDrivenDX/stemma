@@ -39,7 +39,9 @@ export function scannedGroups(corpus: Corpus): { subject: string; files: SourceF
   for (const file of corpus.sources) {
     const [, name, ...rest] = file.path.split("/");
     const subject = rest.length > 0 ? `sources/${name}` : file.path;
-    grouped.set(subject, [...(grouped.get(subject) ?? []), file]);
+    const group = grouped.get(subject);
+    if (group) group.push(file);
+    else grouped.set(subject, [file]);
   }
   return [...grouped].sort(([a], [b]) => compareCodePoints(a, b))
     .map(([subject, files]) => ({ subject, files: files.sort((a, b) => compareCodePoints(a.path, b.path)) }));

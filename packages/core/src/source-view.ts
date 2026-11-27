@@ -9,9 +9,10 @@ import {
   canonical, citationKeys, compareCodePoints, type Corpus, idOf, isLocalPath, isObject, isRetired, type Json, type JsonObject,
   type LoadedFile,
 } from "@stemma/records";
-import { placeOf, SourceTexts, type StreamName, type TextView, codePoints } from "./matching/texts.ts";
+import { placeOf, slicePoints, SourceTexts, type StreamName, type TextView, codePoints } from "./matching/texts.ts";
 import { renderQuotation } from "./matching/quote-fold.ts";
 import { InvalidInput } from "./operations.ts";
+import { grouped } from "./corpus-index.ts";
 import { anchorsOf, textAt } from "./passages.ts";
 import { comparedDigest, currentReview } from "./verification.ts";
 
@@ -149,6 +150,9 @@ export class SourceViews {
   private readonly context: { paged: number; unpaged: number };
   private readonly quotations: unknown[];
   private readonly passages = new Map<string, SourceView>();
+  private readonly digests = new Map<unknown, Map<string, string>>();
+  private readonly runPages = new Map<JsonObject, Map<number, JsonObject[]>>();
+  private readonly currency = new Map<JsonObject, boolean>();
   /** Records in effect that break no rule, by kind and by what they are looked up by. */
   private readonly runs = new Map<string, JsonObject[]>();
   private readonly reviews = new Map<string, JsonObject[]>();
@@ -293,15 +297,16 @@ export class SourceViews {
   private segment(view: TextView, passage: string, index: number, stream: StreamName, start: number, end: number): PageSegment {
     const part = view.part(index)!;
     const front = part.part.front;
-    const points = [...part.streams[stream]];
+    const text = part.streams[stream];
+    const length = codePoints(text);
     const most = view.paged ? this.context.paged : this.context.unpaged;
     const from = Math.max(0, start - most);
-    const to = Math.min(points.length, end + most);
+    const to = Math.min(length, end + most);
     return {
       index, place: `${stream === "notes" ? "notes on " : ""}${placeOf(view, index)}`, stream,
       ...optional("printed_label", part.label), label_status: part.labelStatus, ...optional("label_basis", releasable(front.label_basis)),
-      before: points.slice(from, start).join(""), quoted: points.slice(start, end).join(""), after: points.slice(end, to).join(""),
-      ...(from > 0 ? { trimmed_before: true as const } : {}), ...(to < points.length ? { trimmed_after: true as const } : {}),
+      before: slicePoints(text, from, start), quoted: slicePoints(text, start, end), after: slicePoints(text, end, to),
+      ...(from > 0 ? { trimmed_before: true as const } : {}), ...(to < length ? { trimmed_after: true as const } : {}),
       quality: { method: String(front.method), level: String(front.level), ...optional("note", releasable(front.note)) },
       comparisons: this.comparisons(view, index),
       reviews: this.pageReviews(view, passage, index),
@@ -310,12 +315,27 @@ export class SourceViews {
 
   private comparisons(view: TextView, index: number): ViewComparison[] {
     const blocks = view.part(index)!.part.blocks;
-    return (this.runs.get(view.id) ?? []).flatMap((run) => list(run.pages)
-      .filter((p) => Number(p.index) === index && p.sha256 === comparedDigest(String(run.method), blocks))
+    const digests = this.digests.get(blocks) ?? new Map<string, string>();
+    this.digests.set(blocks, digests);
+    const digestFor = (method: string) => digests.get(method) ?? digests.set(method, comparedDigest(method, blocks)).get(method)!;
+    return (this.runs.get(view.id) ?? []).flatMap((run) => this.pagesOf(run, index)
+      .filter((p) => p.sha256 === digestFor(String(run.method)))
       .map((p) => ({
         run: String(run.id), method: String(run.method), ...optional("against", releasable(run.against)), independent: run.independent === true,
         agreement_permille: Number(p.agreement_permille), words: Number(p.words), differing_words: Number(p.differing_words),
       })));
+  }
+
+  /** A run's entries for one page. */
+  private pagesOf(run: JsonObject, index: number): JsonObject[] {
+    let pages = this.runPages.get(run);
+    if (!pages) this.runPages.set(run, pages = grouped(list(run.pages), (p) => [Number(p.index)]));
+    return pages.get(index) ?? [];
+  }
+
+  /** Whether a review still describes the text. */
+  private stillCurrent(review: JsonObject, view: TextView): boolean {
+    return this.currency.get(review) ?? this.currency.set(review, currentReview(review, view.loaded)).get(review)!;
   }
 
   private pageReviews(view: TextView, passage: string, index: number): ViewReview[] {
@@ -323,7 +343,7 @@ export class SourceViews {
       const scope = String(review.scope);
       if (!["whole_page", "page_number", "quotations", "passage"].includes(scope)) return [];
       if (scope === "passage" && review.passage !== passage) return [];
-      if (!list(review.pages).some((p) => Number(p.index) === index) || !currentReview(review, view.loaded)) return [];
+      if (!list(review.pages).some((p) => Number(p.index) === index) || !this.stillCurrent(review, view)) return [];
       const flags = list(review.flags).filter((f) => Number(f.index) === index).flatMap((f): ViewFlag[] => {
         const reading = releasable(f.reading);
         return reading === undefined ? [] : [{ reading, ...optional("suggested", releasable(f.suggested)), ...optional("note", releasable(f.note)) }];

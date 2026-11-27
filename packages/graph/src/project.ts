@@ -378,9 +378,10 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
   const valid = readable.filter((f) => !invalid(f));
   const checked = new Set(valid.map((f) => idOf(f)!).filter((id) => !excess.has(id)));
   for (const f of readable.filter(invalid)) checked.delete(idOf(f)!);
+  const taken = new Set<LoadedFile>(valid);
   const leftOut: string[] = [];
   for (const file of corpus.records) {
-    if (valid.includes(file as typeof valid[number])) continue;
+    if (taken.has(file)) continue;
     const kind = String(file.data?.kind);
     const reason = file.state === "stray" ? "stray_file" : file.state === "unreadable" ? "unreadable" : file.state === "version_unsupported" ? "newer_version" : "invalid_record";
     walker.omitted.add(Object.hasOwn(KIND_TYPES, kind) ? KIND_TYPES[kind]! : "File", reason);

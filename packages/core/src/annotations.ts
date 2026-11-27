@@ -9,6 +9,7 @@ import type { RecordWrite } from "./capture.ts";
 import { active } from "./checks/bibliography.ts";
 import { sourceBinding } from "./checks/changed.ts";
 import type { Result } from "./report.ts";
+import { grouped } from "./corpus-index.ts";
 
 /** Facts that keep a project from being checked clean: they can be explained, not dismissed. */
 const NOT_DISMISSIBLE = new Set(["source.held", "record.valid", "build.uncommitted"]);
@@ -38,14 +39,17 @@ const same = (a: unknown, b: unknown): boolean => canonical({ value: a ?? false 
 
 /** Marks each finding with the notes that still apply to it. */
 export function annotate(corpus: Corpus, results: Result[]): Result[] {
-  const notes = active(corpus, "annotation").sort((a, b) => (a.path < b.path ? -1 : 1));
+  const notes = [...active(corpus, "annotation")].sort((a, b) => (a.path < b.path ? -1 : 1));
   if (notes.length === 0) return results;
+  const byFinding = grouped<unknown, (typeof notes)[number]>(notes, (f) => [f.data!.finding_key]);
   return results.map((found) => {
     if (found.outcome === "pass") return found;
+    const named = byFinding.get(found.finding_key);
+    if (!named) return found;
     const binding = bindingOf(corpus, found);
-    const applying = notes.flatMap((file) => {
+    const applying = named.flatMap((file) => {
       const note = file.data!;
-      if (note.check !== found.check || note.finding_key !== found.finding_key) return [];
+      if (note.check !== found.check) return [];
       if (!["sentence", "source", "item"].every((name) => same(note[name], binding[name]))) return [];
       if (note.compared !== undefined) {
         const now = comparedOf(found);

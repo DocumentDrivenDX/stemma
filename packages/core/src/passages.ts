@@ -3,7 +3,7 @@
 // source file by this code; nothing here accepts typed quotation text.
 import { canonical, type Corpus, isObject, isRetired, type Json, type JsonObject, recordPath, RECORD_SCHEMA, KINDS } from "@stemma/records";
 import { findQuotation, renderQuotation } from "./matching/quote-fold.ts";
-import { type Anchor, codePoints, paragraphNumbers, placeOf, SourceTexts, type StreamName, type TextView, unitAt } from "./matching/texts.ts";
+import { type Anchor, codePoints, paragraphNumbers, placeOf, slicePoints, SourceTexts, type StreamName, type TextView, unitAt } from "./matching/texts.ts";
 import { type Actor, InvalidInput } from "./operations.ts";
 import { sourceBinding } from "./checks/changed.ts";
 import { numberOf } from "./checks/locators.ts";
@@ -155,8 +155,7 @@ export function textAt(texts: SourceTexts, passage: JsonObject):
   for (const a of anchor) {
     const part = view.part(a.index);
     if (!part || part.digest !== a.page_sha256) return { state: "changed", index: a.index };
-    const points = [...part.streams[a.stream]];
-    pieces.push(points.slice(a.start, a.end).join(""));
+    pieces.push(slicePoints(part.streams[a.stream], a.start, a.end));
   }
   return { state: "ok", view, stream: anchor[0]!.stream, text: pieces.join("\n"), indexes: anchor.map((a) => a.index) };
 }

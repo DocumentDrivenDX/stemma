@@ -62,8 +62,17 @@ export interface Mapped {
   unmapped: number;
 }
 
-/** The printed page labels, chapters, or paragraph numbers of a source's source files. */
+const places = new WeakMap<SourceTexts, Map<string, Mapped>>();
+
+/** The printed page labels, chapters, or paragraph numbers of a source's source files, read once for each source and term. */
 export function mappedPlaces(texts: SourceTexts, source: string, term: string): Mapped {
+  const made = places.get(texts) ?? new Map<string, Mapped>();
+  places.set(texts, made);
+  const key = `${term}\0${source}`;
+  return made.get(key) ?? made.set(key, readPlaces(texts, source, term)).get(key)!;
+}
+
+function readPlaces(texts: SourceTexts, source: string, term: string): Mapped {
   const out: Mapped = { labels: new Set(), from: [], unmapped: 0 };
   for (const view of texts.of(source).views) {
     const found = term === "chapter" ? view.parts.flatMap((p) => p.chapter ?? [])

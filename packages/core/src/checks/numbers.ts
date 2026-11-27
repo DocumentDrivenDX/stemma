@@ -41,11 +41,15 @@ export const figureCitations = (corpus: Corpus) => (hasManuscript(corpus) ? [] :
 });
 
 export function numberResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
-  const all = hasManuscript(corpus) ? [] : resolveCitations(corpus);
+  const citing = new Map<unknown, number>();
+  for (const { citation } of hasManuscript(corpus) ? [] : resolveCitations(corpus)) {
+    const { sentence } = citation.data!;
+    if (isObject(sentence)) citing.set(sentence.sha256, (citing.get(sentence.sha256) ?? 0) + 1);
+  }
   return figureCitations(corpus).flatMap(({ citation, key, matches, figures, sentence }) => {
     if (matches.length !== 1) return [];
     const source = idOf(matches[0]!)!;
-    const several = all.filter((r) => isObject(r.citation.data!.sentence) && r.citation.data!.sentence.sha256 === sentence.sha256).length > 1;
+    const several = (citing.get(sentence.sha256) ?? 0) > 1;
     const { views, unusable } = texts.of(source);
     const missing = figures.filter((f) => !views.some((v) => present(v.streams.main.text, f) || present(v.streams.notes.text, f)));
     const outcome = several || views.length === 0 || (missing.length > 0 && unusable > 0) ? "unverifiable" : missing.length > 0 ? "fail" : "pass";

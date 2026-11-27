@@ -38,9 +38,15 @@ export function unreviewedItems(corpus: Corpus): Unreviewed[] {
   const reached = new Map<string, Unreviewed>();
   const add = (record: string, kind: string, reason: Unreviewed["reason"], location: string) => {
     const entry = reached.get(record) ?? { record, kind, reason, locations: [] };
-    if (!entry.locations.includes(location)) entry.locations.push(location);
+    const seen = listed.get(record) ?? new Set<string>();
+    listed.set(record, seen);
+    if (!seen.has(location)) entry.locations.push(location);
+    seen.add(location);
     reached.set(record, entry);
   };
+  // The first claim in effect with each ID.
+  const claimsById = new Map([...active(corpus, "claim")].reverse().map((c) => [idOf(c) as unknown, c]));
+  const listed = new Map<string, Set<string>>();
   for (const { citation, matches } of resolveCitations(corpus)) {
     const location = idOf(citation) ?? citation.path;
     for (const source of matches) {
@@ -48,7 +54,7 @@ export function unreviewedItems(corpus: Corpus): Unreviewed[] {
     }
     const claims = citation.data!.claims;
     for (const id of Array.isArray(claims) ? claims : []) {
-      const claim = active(corpus, "claim").find((c) => idOf(c) === id);
+      const claim = claimsById.get(id);
       const review = claim?.data!.review as { state?: string } | undefined;
       if (claim && review?.state !== "reviewed") add(String(id), "claim", "unreviewed", location);
     }
@@ -75,7 +81,7 @@ export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckC
   "source.labels": labelResults,
   "source.footnotes": footnoteResults,
   "source.original": (c, x) => originalResults(c, x.tools),
-  "source.changed": changedResults,
+  "source.changed": (c, x) => changedResults(c, x.texts),
   "cite.key": citeKeyResults,
   "bib.uncited": uncitedResults,
   "quote.present": (c, x) => quoteResults(c, x.texts),

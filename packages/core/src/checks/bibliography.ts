@@ -1,33 +1,33 @@
 // cite.key and bib.uncited over citation records. When manuscript files exist
 // they are authoritative and this version cannot read them (CONTRACT-002 C).
-import { citationKeys, type Corpus, idOf, isObject, isRetired, type JsonObject, type LoadedFile } from "@stemma/records";
+import { citationKeys, type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
 import { sourceBinding } from "./changed.ts";
+import { activeRecords, grouped, once } from "../corpus-index.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
 export const hasManuscript = (corpus: Corpus): boolean => corpus.manuscript.some((f) => f.path.endsWith(".md"));
 
 /** Records of a kind that can be read and are not retired. */
-export function active(corpus: Corpus, kind: string): LoadedFile[] {
-  return corpus.records.filter((f) => f.state === "ok" && f.data?.kind === kind && !isRetired(f.data));
-}
+export const active = activeRecords;
 
-const unreadableIn = (corpus: Corpus, directory: string): boolean =>
-  corpus.records.some((f) => (f.state === "unreadable" || f.state === "version_unsupported") && f.path.startsWith(`records/${directory}/`));
+const unreadableIn = (corpus: Corpus, directory: string): boolean => once(corpus, `unreadable in ${directory}`, () =>
+  corpus.records.some((f) => (f.state === "unreadable" || f.state === "version_unsupported") && f.path.startsWith(`records/${directory}/`)));
 
 interface Resolution { citation: LoadedFile; key?: string; matches: LoadedFile[] }
 
-export function resolveCitations(corpus: Corpus): Resolution[] {
+/** Each citation with the sources in effect that it names. The list is made once and shared. */
+export const resolveCitations = (corpus: Corpus): Resolution[] => once(corpus, "resolved citations", () => {
   const sources = active(corpus, "source");
+  const byKey = grouped(sources, (s) => citationKeys(s.data!));
+  const byId = grouped<unknown, LoadedFile>(sources, (s) => [idOf(s)]);
   return active(corpus, "citation").map((citation) => {
     const { key, source } = citation.data as JsonObject;
-    if (typeof key === "string") {
-      return { citation, key, matches: sources.filter((s) => citationKeys(s.data!).includes(key)) };
-    }
-    return { citation, matches: sources.filter((s) => idOf(s) === source) };
+    if (typeof key === "string") return { citation, key, matches: byKey.get(key) ?? [] };
+    return { citation, matches: byId.get(source) ?? [] };
   });
-}
+});
 
 export function listedSources(corpus: Corpus): LoadedFile[] {
   const list = corpus.settings.data?.bibliography_include;
