@@ -65,6 +65,7 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - "What does that book say on page 89?"
 - "Are any of my source files missing or changed?"
 - "Let me browse and search my evidence."
+- "Show me that citation on my screen."
 
 ## Before you add material
 
@@ -110,6 +111,11 @@ PDFs and page images stay out of the repository.
   through the page it opens. Where you tell it which folder holds your originals,
   it shows the original PDF page or page image beside the highlighted text. The
   text is highlighted; the original is not.
+- Lets Claude search your records, read a citation or passage in its source, and
+  open your browser at one when you ask to see it. These tools only read the
+  project your session is open in. Excerpts they give go to the model, marked as
+  quoted data; text that looks like a coordinate is withheld. They do nothing
+  until used.
 - Explains every finding: what is wrong, the evidence, why it matters, and what
   to do. Nothing is blocked. A project is called checked clean only when nothing
   is open, and a report lists any applicable check it could not run.

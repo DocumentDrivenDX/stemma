@@ -43,6 +43,8 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
   const { banner, views, manuscript, data_identity } = data;
   const search = createSearch(data.search);
   const record = agentRecordOf(data.search.entries);
+  // What the export warns of, such as records left out, so that no result passes for the whole project when it is not.
+  const warnings = ((data.banner as { warnings?: { code: string; records: string[] }[] } | null)?.warnings ?? []).map((w) => ({ code: w.code, named: w.records.length }));
   const texts = data.originals ?? {};
   const recorded = recordedOriginals(texts);
   const moduleName = (JSON.parse(data.moduleText) as { id: string }).id;
@@ -91,7 +93,7 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
     if (route === "agent-view") {
       if (typeof body.record !== "string") return BAD;
       const made = agentView(data.views as Record<string, SourceView>, body.record);
-      return ok(made ? { view: made } : { view: null, record: record.shown(body.record) });
+      return ok(made ? { view: { ...made, ...(warnings.length > 0 ? { project_warnings: warnings } : {}) } } : { view: null, record: record.shown(body.record) });
     }
     if (route === "agent-search") {
       const { text, type, offset, limit } = body;
@@ -102,7 +104,7 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
       if (!asked || !wholeFrom(offset, 0, Number.MAX_SAFE_INTEGER) || !wholeFrom(limit, 1, SEARCH_LIMITS.page)) {
         return refusal(400, "bad_request", `A search is 1 to ${SEARCH_LIMITS.chars} characters and at most ${SEARCH_LIMITS.words} words.`);
       }
-      return ok(agentSearch(search.page(asked, type as string | undefined, offset, limit), record.entry));
+      return ok({ ...agentSearch(search.page(asked, type as string | undefined, offset, limit), record.entry), ...(warnings.length > 0 ? { project_warnings: warnings } : {}) });
     }
     if (route === "source-view") {
       if (typeof body.id !== "string") return BAD;

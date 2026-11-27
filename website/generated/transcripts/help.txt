@@ -47,6 +47,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   browse [--no-open] [--idle-minutes <n>] [--originals <path>]...
              serves the explorer to a browser on this computer until stopped;
              originals are shown from .stemma/originals/ and the named places
+  mcp [--idle-minutes <n>] [--opener <program>]
+             read-only tools for an agent over standard input and output (MCP);
+             the plugin declares it, and the host starts it
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.

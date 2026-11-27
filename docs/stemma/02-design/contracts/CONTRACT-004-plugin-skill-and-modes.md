@@ -261,6 +261,7 @@ project without network access.
 | Layout and install | One repository layout installed and listed in Claude Code and Codex CLI with throwaway configuration and no network, one macOS system, with a different toy runtime | The bundled `dist/stemma.js`, Bun, desktop apps, Linux, Windows |
 | Validation | `claude plugin validate` on the folder missed broken hooks; validating the plugin manifest caught them | Any host's own review rules for bundled code. Research reports that an official directory's review holds minified code, which matters for the later listing |
 | Marketplace install and setup | One macOS system: from a local stand-in for the marketplace repository, the release tree installed into an empty profile with one skill, and with no Bun on the search path the installed launcher fetched, verified, and used Bun 1.4.5 and ran `doctor` and `check`. Version 0.0.2 installed from GitHub with the command-line tool | The desktop app, a live session using the skill, the host's data-directory substitution, updates, network denied, Windows, Linux |
+| MCP declaration | CONTRACT-005, Proof Status: Claude Code 2.1.236 starts it in a command-line session; Codex CLI 0.150.1 runs nothing from it, by the guard | Desktop apps and other hosts; a model using the tools |
 | Separate context, agent obligations | None | All; no live agent session was run |
 
 ## Schema Basis

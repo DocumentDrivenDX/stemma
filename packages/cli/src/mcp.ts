@@ -337,7 +337,7 @@ export function mcpTools(options: { project?: string | undefined; idleMinutes?: 
       const offset = whole(args.offset, 0, 0, Number.MAX_SAFE_INTEGER, "offset");
       const { result, data_identity } = await ask(root(), "agent-search", { text, ...(type === undefined ? {} : { type }), limit, offset });
       return resultText(
-        `${result.total} record(s) match; this answer lists ${result.hits.length}, from number ${offset + 1}. Data identity ${data_identity.slice(0, 12)}. Excerpts are of folded search text (lower case, without diacritics): never quote from them. Source page text beyond what passages quote, the manuscript and research notes are not searched.`,
+        `${result.total} record(s) match; this answer lists ${result.hits.length}, from number ${offset + 1}. Data identity ${data_identity.slice(0, 12)}. Excerpts are of folded search text (lower case, without diacritics): never quote from them. Source page text beyond what passages quote, the manuscript and research notes are not searched.${result.project_warnings ? " The project has warnings (project_warnings below): with records_left_out, records that cannot be read or break a rule are not searched, so say the result is incomplete and use check to explain." : ""}`,
         result,
       );
     }

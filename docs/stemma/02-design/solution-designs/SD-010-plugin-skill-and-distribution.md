@@ -88,7 +88,8 @@ as a dependency, which that command installs too (ADR-011). The install check
 uses a stand-in `docsync` to show this.
 
 **Observed.** Version 0.0.2 installed from GitHub with the Claude command-line
-tool.
+tool. The declared MCP server's behaviour in Claude Code and Codex CLI is in
+CONTRACT-005, Proof Status.
 
 **Not shown.** Any install or run in Claude desktop, an update from one version
 to the next, and operation with the network denied after setup.

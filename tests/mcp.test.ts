@@ -294,6 +294,18 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
     await host.end();
   }, 60_000);
 
+  test("records left out of the data are said with each search and source view", async () => {
+    const dir = coral();
+    writeFileSync(join(dir, "records/citations/cit-broken000001.json"), "not JSON");
+    const { host } = await start(dir);
+    await host.initialize();
+    const search = await host.call("search", { text: "reef", limit: 1 });
+    expect(search.data.project_warnings).toContainEqual({ code: "records_left_out", named: 1 });
+    expect(search.text).toContain("say the result is incomplete");
+    expect((await host.call("source_view", { record: "cit-darwinreefs0001" })).data.project_warnings).toContainEqual({ code: "records_left_out", named: 1 });
+    await host.end();
+  }, 60_000);
+
   test("what changes is not answered from earlier data", async () => {
     const dir = coral();
     const { host } = await start(dir);

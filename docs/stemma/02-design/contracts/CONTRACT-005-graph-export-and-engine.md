@@ -1073,7 +1073,7 @@ outside its bounds, and then does nothing.
 
 | Tool | Arguments | Does and gives |
 |---|---|---|
-| `status` | none | The project, or why there is none; whether its data is held (`not_read`, `current`, `rebuilding`, `failed`); whether the HTTP server runs, its address, and the times its one-time links were opened. It reads no project file but the presence of `stemma.json`, builds nothing, and starts nothing |
+| `status` | none | The project, or why there is none; whether its data is held (`not_read`, `reading`, `held`, or `failed`; it makes no scan, so it never says the data is current); whether the HTTP server runs, its address, and the times its one-time links were opened. It reads no project file but the presence of `stemma.json`, builds nothing, and starts nothing |
 | `search` | `text` (1 to 200 code points), `type?`, `limit?` (1 to 20, default 10), `offset?` | M's search: `total`, `all`, counts by type, and hits with `rank`, `type`, `id`, `label` (at most 200 code points), and `excerpt` (at most 160, from the folded search text, so not for quoting) |
 | `source_view` | `record`, a citation or passage ID | A bounded form of the source view (K): `state`, `why`, work, locator, and the citation's sentence and quotation; and for `highlighted` each page's place, printed label, quality, the quoted words, and at most 300 code points on each side |
 | `open` | `record?`, a record ID | Starts the HTTP server of M if it is not running and has the system's browser open a new one-time link, at that record or at the start. Gives the address without a code or secret, the record's type and label, and whether the system took the file |
@@ -1099,7 +1099,13 @@ removed when its code is used or ends. The launch address may name a record, as
 the page goes there only when the text has that form. If the system's opener
 does not take the file, the code is ended, the file removed, and the result says
 to use the `browse` command instead: **no result names a launch file**. At most
-one `open` in 5 seconds and 30 in an hour are accepted.
+one `open` in 5 seconds and 30 in an hour are accepted. A server started by that
+call is then stopped.
+
+**Originals** are looked for only in `.stemma/originals/` in the project: no
+tool takes a path, so no other place can be named. To show originals kept
+elsewhere, the author's agent stops this server and runs `browse` with
+`--originals`.
 
 **One server for a project.** Before it listens, `mcp` and `browse` alike take
 a lock: a file of mode 600 in `serve/` of the plugin's data directory (the
@@ -1123,9 +1129,13 @@ it, JSON escaped, with hidden characters shown as visible code points. A refused
 call is a result marked as an error, with a code and words. A whole result is at
 most 32,000 UTF-16 units; one that would be longer is refused with
 `answer_too_large`. A `source_view` gives at most 5 pages and 2,000 code points
-of quoted words; beyond either it gives no page text and says where to see it. A
+of quoted words, over at most 20 passages; beyond any of these it gives no page text and says where to see it. A
 cut label, sentence, or context ends in `…` and is marked; quoted words are
 never cut.
+
+**Incomplete data is said.** A `search` or `source_view` result carries the
+code of each warning of the served data and how many records or files it names.
+With records left out, the result says so in Stemma's own words for `search`.
 
 **What a result may hold.** Only what the author export holds (E): no restricted
 store value, local path, `legacy`, or `x`. A source view's record of the
@@ -1241,6 +1251,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Served search (M, "Search") | Local tests against a brute-force scan on a synthetic project of 150 sources, every substring of 1 to 6 code points of Latin, Greek, Arabic, Japanese, Thai, and hostile test titles, bounds, and headless Chromium (every page of a search, and all 260 links of a record in each direction). Synthetic project of 5,000 sources (79,020 entries of 14 types, 20 million characters of search text, one macOS machine): 400 queries gave the matches, counts, and order of a brute-force scan over all 38,690 pages (7.7 million listed matches, up to 78,441 for one query); 542 records of every type were found by ID, and 294 by words read from their record files. One page took a median of 13 ms in the process (95th percentile 22 ms, at most 62 ms; 60 ms for 16 words), and about 0.2 s through the server, nearly all of it the freshness scan. Preparing search took 0.12 s and 22 MB of heap at the start of each snapshot; against the previous version the holding process's footprint grew from 1.42 GB to 1.46 GB, half a minute after a build that took 30.3 s before and 30.8 s after. The largest page of 200 matches measured 431 KB. In the page: the Search view showed a first page in 0.3 to 0.8 s and another page in 0.2 to 0.3 s; arras's box showed 200 matches in about 0.8 s, its 0.25 s typing delay included, at up to 3,400 elements (500 matches: up to 8,200, and narrowing to one type took 0.44 s against 0.30 s); a chapter's 375 citations and 125 claims were all listed after 12 presses of "Show more", each 0.3 to 0.5 s | A real author's project; much larger projects; other browsers, systems, and slower machines; a record with thousands of links; keyboard and screen-reader use by hand |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | MCP: how hosts start it (spike, one macOS system, throwaway profiles, a stand-in model API on 127.0.0.1 and no sign-in) | Claude Code 2.1.236 started a probe plugin's server from `plugin.json`, both through `claude mcp list` and at the start of a headless session (`claude -p`), before any tool call: it filled `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}` in the arguments, set `CLAUDE_PROJECT_DIR` to the directory the session was started in (also a subdirectory of a git repository, not its root), used that as the working directory, had made the data directory, offered the tool to the model as `mcp__plugin_probe_probe__status`, and ended the server with SIGINT. A declared plugin dependency was still installed. **Codex CLI 0.150.1** read the same `mcpServers` from `.claude-plugin/plugin.json`, listed the variables unfilled, and in a session started the plain form from the session's directory, with its read-only sandbox: a script planted there under the literal name ran. With the guard, in the same setup, nothing ran, and Claude Code still connected. Anthropic's documentation says that claude.ai chat ignores local MCP servers and that Cowork loads them only for sessions on the author's computer (fetched 2026-11-27) | A tool call made by a real session's model; the desktop app; the interactive terminal; Cowork, claude.ai, ChatGPT desktop; Windows and Linux; how Codex shows the guard's refusal; later releases of any host |
+| MCP server (N) | Local tests on one macOS system (Apple silicon) of the built command: quiet starts with and without a project (no file written, listener, or child process), each tool on the worked example with a stand-in opener, the project unchanged, the code and secret searched for in both outputs, process arguments, the lock, and the kept files, hostile arguments and lines, an invented source whose text gives orders and one that holds a coordinate, one server across two MCP processes and `browse`, endings by closed input, signals, idle time, and a call under way; the shell answers without Bun, and hands over when it appears; the declared command run with unfilled variables from a directory holding planted scripts. In headless Chromium, `open` led to the cited record's page. The install check ran the declared command from the installed copy: Claude Code 2.1.236 connected to it before setup, when it wrote nothing, and after; a test client got status, search, a highlighted source view, and with a stand-in opener an explorer at the record. Once, by hand, a headless Claude Code 2.1.236 session with the installed plugin in a throwaway profile and a stand-in model API connected to the server in 98 ms, offered its five tools to the model as `mcp__plugin_stemma_stemma__<tool>`, and ended it with SIGINT, leaving no process and no change in the data directory | A tool call chosen by a real model; the desktop app; the interactive terminal; the system's real opener from the server; Windows and Linux; a large project through the tools; any outside security review |
 | MCP: protocol module (spike) | The official SDKs bundle with no unresolved import: `@modelcontextprotocol/sdk` 1.32.2 installs 92 packages and a minimal tools server bundles to 530 KB; `@modelcontextprotocol/server` 2.4.0 installs 3 and bundles to 805 KB; each bundle holds a `new Function`. Stemma's own module is used (ADR-012) | Another host's protocol behaviour |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 
