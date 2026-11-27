@@ -20,6 +20,13 @@ manuscripts, and takeover of an existing project into a source graph that the
 author reviews. This finding covers a limited search. No competitor was
 installed or run, so each competitor capability is the maker's own description.
 
+The search was about scholarly writing. Stemma's focus is now research into
+technical subjects (see the [product vision](product-vision.md)). No tool aimed
+at technical research, such as a research agent, a documentation search
+assistant, or a docs-as-code citation or link checker, was searched for, so
+nothing below shows how Stemma compares with one. The ratings, profiles, and
+differentiators were written for scholarly book authors and have not been redone.
+
 Evidence was gathered and checked on 2026-11-26. Each claim carries a basis:
 
 | Mark | Meaning |
@@ -281,11 +288,13 @@ labelled checked clean had no open finding in those checks. It cannot support "n
 misattributed claims" or "tamper-proof", and it says nothing about whether a
 source is right.
 
-**Positioning**: For scholarly book authors who use AI and must answer for every
-citation, Stemma is a candidate book-length evidence and publishing workspace
-that shows what was checked, how, and by whom, including in a manuscript started
-elsewhere. Unlike the paper and review tools above, it would connect stored
-source copies, footnote-style locators, author decisions, and the book build.
+**Positioning**: For technologists who research technical subjects with AI and
+must answer for what their reports and books say, and for scholars who face the
+same risk, Stemma is a candidate evidence and publishing workspace that shows
+what was checked, how, and by whom, including in a manuscript started elsewhere.
+Unlike the paper and review tools above, it would connect stored source copies,
+places a reader can find, author decisions, and the report or book build. Whether
+this sets it apart for technical research is untested.
 The [product vision](product-vision.md) states the positioning.
 
 ## Strategic Implications
@@ -326,6 +335,8 @@ Product questions that remain open are in the
 - A recognition test on pilot scans.
 - A browser Typst compilation trial, including citation formatting.
 - A labeled humanities test set for quotation and support checks.
+- A search for tools aimed at technical research, and interviews with
+  technologists who write research reports or books.
 - A wider competitor search, including commercial author tools and publisher
   integrity services, which the survey did not research.
 - Author interviews on demand and willingness to pay; market size is unknown.
