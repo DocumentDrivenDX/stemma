@@ -57,8 +57,16 @@ const front = join(base, "plugins");
 mkdirSync(join(front, ".claude-plugin"), { recursive: true });
 writeFileSync(join(front, ".claude-plugin/marketplace.json"), `${JSON.stringify({
   name: MARKETPLACE, owner: { name: "DocumentDrivenDX" },
-  plugins: [{ name: "stemma", description: "Stemma, as built here.", source: PLUGIN_SOURCE }],
+  plugins: [
+    { name: "stemma", description: "Stemma, as built here.", source: PLUGIN_SOURCE },
+    { name: "docsync", description: "A stand-in for the dependency.", source: "./plugins/docsync" },
+  ],
 }, null, 2)}\n`);
+// Stemma declares docsync as a dependency (ADR-011). The stand-in shows that
+// installing Stemma installs it; it is not the real plugin.
+mkdirSync(join(front, "plugins/docsync/.claude-plugin"), { recursive: true });
+writeFileSync(join(front, "plugins/docsync/.claude-plugin/plugin.json"),
+  `${JSON.stringify({ name: "docsync", version: "0.0.0", description: "A stand-in." })}\n`);
 publishInto(front, release);
 
 for (const tree of [root, release]) {
@@ -71,6 +79,8 @@ run([claude, "plugin", "install", id]);
 const listed = JSON.parse(run([claude, "plugin", "list", "--json"])) as { id: string; installPath: string; enabled: boolean; errors?: unknown[] }[];
 const entry = listed.find((p) => p.id === id) ?? fail(`${id} is not listed`);
 if (!entry.enabled || entry.errors?.length) fail("the plugin is listed as disabled or with errors");
+const dependency = listed.find((p) => p.id === `docsync@${MARKETPLACE}`);
+if (!dependency?.enabled || dependency.errors?.length) fail("installing the plugin did not install and enable docsync");
 const installed = entry.installPath;
 if (relative(config, installed).startsWith("..")) fail("the installed copy is outside the isolated profile");
 run([claude, "plugin", "details", id]);
@@ -80,7 +90,10 @@ if (skills.length !== 1 || skills[0] !== "stemma") fail(`expected one skill, fou
 const bundle = join(installed, "dist/stemma.js");
 if (!existsSync(bundle)) fail("the installed copy has no command line");
 const sha = (path: string) => new Bun.CryptoHasher("sha256").update(readFileSync(path)).digest("hex");
-if (sha(bundle) !== sha(join(release, "dist/stemma.js"))) fail("the installed command line differs from the built one");
+for (const part of new Bun.Glob("*.js").scanSync(join(release, "dist"))) {
+  const copy = join(installed, "dist", part);
+  if (!existsSync(copy) || sha(copy) !== sha(join(release, "dist", part))) fail(`the installed command line differs from the built one: ${part}`);
+}
 console.log(`\nInstalled command line matches the build: sha256 ${sha(bundle)}`);
 
 // What the skill tells Claude to run. The data directory stands in for the one
@@ -120,15 +133,33 @@ const explorer = readFileSync(join(reading, "build/graph/author/explorer.html"),
 if (!explorer.includes("connect-src 'none'") || !explorer.includes(identity)) fail("the installed copy made no explorer page for this data");
 run([...launcher, "graph", "status", "--project", reading]);
 
+// Formatting a citation with the bundled citeproc-js, style and locale, whose licences ship beside it.
+for (const licence of ["CPAL-1.0.txt", "CC-BY-SA-3.0.txt", "citeproc-js-LICENSE", "NOTICE.txt"]) {
+  if (!files.includes(join("dist/licenses/cite", licence))) fail(`the installed plugin lacks dist/licenses/cite/${licence}`);
+}
+const invented = join(base, "invented-source.json");
+writeFileSync(invented, JSON.stringify({
+  kind: "source", citation_key: "example1987", type: "book", title: { value: "An Invented Harbour Survey" },
+  contributions: [{ lid: "a1", role: "author", as_printed: { family: "Example", given: "Ann" } }], issued: { edtf: "1987" },
+  bib: [{ name: "publisher", value: { value: "Invented Press" } }],
+}));
+run([...launcher, "record", "add", "source", "--input", invented, "--actor", "software:plugin-check", "--project", reading]);
+const clusters = join(base, "clusters.json");
+writeFileSync(clusters, JSON.stringify({ notes: [[{ key: "example1987", locator: "41" }], [{ key: "example1987", locator: "42" }]] }));
+const cited = run([...launcher, "cite", "format", "--input", clusters, "--project", reading]);
+for (const expected of ["1. Ann Example, An Invented Harbour Survey (Invented Press, 1987), 41.", "2. Example, An Invented Harbour Survey, 42.", "Example, Ann. An Invented Harbour Survey. Invented Press, 1987."]) {
+  if (!cited.replaceAll("*", "").includes(expected)) fail(`the installed command line did not format the citation: expected ${expected}`);
+}
+
 if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.test(name))) fail("something was written to the home directory");
 
 console.log(`
 PASSED on this machine with the Claude command-line tool: both manifests validate, the
 plugin installs from a local stand-in for the DocumentDrivenDX marketplace
-into an empty profile with one skill, and with no bun on the search path the
+into an empty profile with one skill, bringing a stand-in docsync dependency with it, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
-no native module, and makes the explorer page from the shipped template. The page is not
-opened in a browser here. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
+no native module, and formats Chicago notes and a bibliography with the bundled citeproc-js, and makes the explorer page from the shipped template (the page is not
+opened in a browser here). The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);

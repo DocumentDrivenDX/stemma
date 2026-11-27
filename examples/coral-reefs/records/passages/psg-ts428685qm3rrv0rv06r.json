@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 525,
+      "index": 359,
+      "page_sha256": "9f4cd9685ba86e97941c58c7cb138eb5c4dd2bc8dff842e3430b739683454f1d",
+      "start": 267,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:31Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-ts428685qm3rrv0rv06r",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "332"
+  },
+  "quote": {
+    "exact": "It is then, I think, premature to regard the theory\nwhich was advanced by Mr. Darwin, and has received the\napproval of an observer of such an exceptional experience\nas Professor Dana, as conclusively disproved by the results\nof the more recent investigations"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "source_record_sha256": "5439812aad6f92b8499b1d4afaae0243088e005d33f33c9d7fb4dbf37566b5e9",
+  "text": "txt-0j25y9a786mfy0ntdtcx"
+}

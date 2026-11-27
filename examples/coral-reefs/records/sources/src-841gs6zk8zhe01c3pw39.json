@@ -1,0 +1,98 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "genre",
+      "value": {
+        "value": "preface"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:36Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:35Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.genre",
+      "from": "contents (file index 10): Preface, page vii; heading 'By Professor T. G. Bonney' (file index 14)",
+      "value": "preface"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:35Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "contents (file index 10): Preface, page vii; heading 'By Professor T. G. Bonney' (file index 14)",
+      "value": "Bonney, T. G."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:36Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:36Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "funafuti"
+    }
+  ],
+  "citation_key": "bonney1904-preface",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Bonney",
+        "given": "T. G."
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-841gs6zk8zhe01c3pw39",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-n7pw0cvq9y0d742wr45f",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "evidence:boring",
+    "funafuti"
+  ],
+  "type": "chapter"
+}

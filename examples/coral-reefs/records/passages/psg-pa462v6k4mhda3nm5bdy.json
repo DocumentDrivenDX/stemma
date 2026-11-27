@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1084,
+      "index": 523,
+      "page_sha256": "f46efdc6c9ab28302b91f0510f49f5da507c785e314a0264c95e961a6fa1efce",
+      "start": 908,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:35Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-pa462v6k4mhda3nm5bdy",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "506"
+  },
+  "quote": {
+    "exact": "there\nare other agencies at work in the tropical oceanic regions by which\nsubmarine elevations can be built up from very great depths so as\nto form a foundation for coral reefs"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eh71qk5hm5zhpwzcz2v7",
+  "source_record_sha256": "569e2ae8e9030c39ffcf1206d722c39ae41e793da5d06b05ddae1aef1b75e409",
+  "text": "txt-ft7bv7ra8nre9mzsvrrv"
+}

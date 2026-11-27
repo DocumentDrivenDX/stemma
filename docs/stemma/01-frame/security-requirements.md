@@ -170,7 +170,7 @@ controls cover only its instructions and its own commands.
 - **SEC-029**: The public repository and release packages hold only synthetic or
   openly licensed fixtures, with no private source, personal data, or secret.
 - **SEC-030**: A license review of citeproc-js is recorded before the pilot
-  bundles it (FR-83).
+  bundles it (FR-83). Recorded in ADR-005 (CPAL-1.0 chosen).
 
 ## Requirements Matrix
 

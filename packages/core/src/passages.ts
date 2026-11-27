@@ -59,7 +59,11 @@ export function locatorOf(view: TextView, stream: StreamName, start: number, end
   const parts = indexes.map((i) => view.part(i)!);
   if (parts.length === 0) return undefined;
   if (view.paged) {
-    return parts.every((p) => p.label !== undefined) ? { label: "page", value: rangeOf(parts.map((p) => p.label!)) } : undefined;
+    if (parts.every((p) => p.label !== undefined)) return { label: "page", value: rangeOf(parts.map((p) => p.label!)) };
+    // An unnumbered title page that the source file's identity names is cited as such.
+    const identity = view.loaded.manifest.data?.identity;
+    const titlePages = isObject(identity) && Array.isArray(identity.title_pages) ? identity.title_pages.map(Number) : [];
+    return parts.length === 1 && parts[0]!.labelStatus !== "labelled" && titlePages.includes(parts[0]!.index) ? { label: "page", value: "title page" } : undefined;
   }
   const chapter = parts[0]!.chapter;
   if (parts.some((p) => p.chapter !== chapter)) return undefined;

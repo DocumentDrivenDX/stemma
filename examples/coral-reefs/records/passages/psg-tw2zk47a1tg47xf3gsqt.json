@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1491,
+      "index": 316,
+      "page_sha256": "c899a5c10efd7f6c301b0823f017e4a6de5a454e66872f7bc351c25d489d22c3",
+      "start": 1264,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:14Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-tw2zk47a1tg47xf3gsqt",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "291"
+  },
+  "quote": {
+    "exact": "It may be objected that the circles formed by some coral reefs\nor groups of coral islets, varying as they do from ten to thirty\nmiles and upwards in diameter, are so great as to preclude the\nidea of their being volcanic craters"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-rd44yd9ctbs143rpe1be",
+  "source_record_sha256": "dd7034a5ee4591cfd01d8382c0ea9fd43af984dc0821772992491765177876ab",
+  "text": "txt-g5myzs9ef0b53mhq2pe1"
+}

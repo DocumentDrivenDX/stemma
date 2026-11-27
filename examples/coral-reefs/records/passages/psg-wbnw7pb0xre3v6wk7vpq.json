@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 326,
+      "index": 31,
+      "page_sha256": "2da533347e1ef9c229eb4cc035240939e703f4af7abaefdf8494ab1cca9e9c1e",
+      "start": 75,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-wbnw7pb0xre3v6wk7vpq",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xxii"
+  },
+  "quote": {
+    "exact": "penetrated either\nan underlying mass of tertiary limestone similar to that of the raised\ntertiary limestones of Tonga, Fiji, Niue, Nauru, and Paanopa, or have\npassed through the mass of recent reef rock forming the outer talus of the\natoll of Funafuti"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

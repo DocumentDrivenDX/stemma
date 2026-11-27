@@ -1,4 +1,4 @@
-stemma 0.0.9
+stemma 0.0.14
 The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version
@@ -30,6 +30,8 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   coverage [<text id>]
   passage find --source <id> <words>
   passage capture --address <address> --actor <kind>:<name>
+  cite format --input <file|->
+  build report [<dir>] [--check] [--pdf]
   record add <kind> --input <file|-> [--actor <kind>:<name>]
   resolve <source id>... --actor <kind>:<name> [--via crossref|internet_archive --identifier <value>]
   validate [paths]
@@ -44,6 +46,6 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   graph status [--out <dir>]
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
-Only ingest --fetch, ingest --refresh-lookups and resolve use the network.
+Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.

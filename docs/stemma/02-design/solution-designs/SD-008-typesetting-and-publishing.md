@@ -193,7 +193,8 @@ graph TD
 
 | Layer | Choice | Why | Alternatives Rejected |
 |---|---|---|---|
-| Layout and citations | Typst 0.15.1, citeproc-js 2.4.63 | ADR-005 | See ADR-005 |
+| Layout and citations | Typst 0.15.1 (release digests pinned in `packages/publish/src/typst.ts`), citeproc-js 2.4.63 | ADR-005 | See ADR-005 |
+| Citation style and locale | `chicago-notes-bibliography.csl` (Chicago Manual of Style 18th edition, notes and bibliography) and `locales-en-US.xml`, each pinned by its upstream revision and SHA-256 in `packages/cite/vendor/pins.json`, with their licenses | The official CSL repositories; no `ibid.` (the style gives shortened notes) | A hand-written style |
 | Indexes and endnotes (M2) | Vendored Typst packages `in-dexter` 0.7.2 and `deixis` 0.2.0, candidates | Worked in feasibility tests | Writing both now; fetching packages at build time |
 | Sort order for index | Stemma-computed keys | Native sorting misplaced diacritic initials in a test | Typst native sort |
 
@@ -247,7 +248,7 @@ N/A: FEAT-008 user stories name the tasks.
 
 ## Constraints & Assumptions
 
-- **Constraints**: citeproc-js is licensed CPAL (Common Public Attribution License) or AGPL (GNU Affero General Public License). Its review must finish before the pilot bundles it.
+- **Constraints**: citeproc-js is licensed CPAL (Common Public Attribution License) or AGPL (GNU Affero General Public License). The review is recorded in ADR-005; Stemma distributes it under CPAL-1.0.
 - **Assumptions**: Typst can report or be queried for note numbers and font coverage; if not, BR-812 and note agreement need another method before the pilot.
 - **Dependencies**: Typst, citeproc-js, CSL style and locale files, fonts with distribution rights; SD-007, SD-003.
 
@@ -265,6 +266,17 @@ N/A: FEAT-008 user stories name the tasks.
 | PDF/A not produced because of placed PDF figures or missing alternative text | M | M | BR-815; independent validation still needed |
 | Typst version change alters layout | M | M | Pin and record; compare pages on upgrade |
 
+Golden tests (`tests/cite.test.ts`) fix the first and shortened notes and the
+bibliography entry for fifteen kinds of source in the worked example; the
+strings were compared with Chicago practice by a model, not by a person, and
+not against the manual. Known differences from Chicago that come from the style
+or the processor and are left as they print: year ranges in full (1879–1880,
+where Chicago abbreviates 1879–80); the place of publication omitted, as the
+18th edition allows; a report's series and its larger work printed in the
+order the record gives them (Ladd and Schlanger); an article with an article
+number prints a page locator without the number in notes. From record data: the
+1842 Darwin title keeps the full stop before "Being" that its record holds;
+changing it would leave the example's four citations to be captured again.
 Feasibility tests on one macOS system used hand-prepared inputs: citeproc-js passed 12 of 14 Chicago rows against strings not checked against the manual; bleed wrote no bleed box; TIFF and EPS were rejected. No converter from this markup exists. Linux and Windows are untested.
 
 ## Schema Basis

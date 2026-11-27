@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1151,
+      "index": 315,
+      "page_sha256": "f84c5f1129d6fac6dc6dd5e76bd4cf73f56823edf979a7522165844e9a907c70",
+      "start": 887,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:13Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-canw74xkt67evynrbyga",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "290"
+  },
+  "quote": {
+    "exact": "The circular or oval forms of the numerous coral isles of\nthe Pacific, with the lagoons in their centre, naturally suggest\nthe idea that they are nothing more than the crests of sub-\nmarine volcanos, having the rims and bottoms of their craters\novergrown by corals"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-rd44yd9ctbs143rpe1be",
+  "source_record_sha256": "dd7034a5ee4591cfd01d8382c0ea9fd43af984dc0821772992491765177876ab",
+  "text": "txt-g5myzs9ef0b53mhq2pe1"
+}

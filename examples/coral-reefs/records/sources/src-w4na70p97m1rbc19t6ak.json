@@ -6,13 +6,31 @@
       "value": {
         "value": "Scientific Reports"
       }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "4"
+      }
+    },
+    {
+      "name": "number",
+      "value": {
+        "value": "4997"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Postglacial Fringing-Reef to Barrier-Reef Conversion"
+      }
     }
   ],
   "changed": {
-    "at": "2026-11-27T03:14:54Z",
+    "at": "2026-11-27T03:40:04Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -26,69 +44,123 @@
       "field": "tags",
       "from": "report/report.md, section 6",
       "value": "position:later-assessment"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:03Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.volume",
+      "from": "first page (file index 0): authors and the journal line 'Scientific Reports | 4 : 4997'",
+      "value": "4"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:03Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.number",
+      "from": "first page (file index 0): authors and the journal line 'Scientific Reports | 4 : 4997'",
+      "value": "4997"
+    },
+    {
+      "action": "replaced",
+      "at": "2026-11-27T03:40:03Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "first page (file index 0): authors and the journal line 'Scientific Reports | 4 : 4997'",
+      "previous": "Blanchon; Granados-Corea; Abbey; Braga; Braithwaite; Kennedy; Spencer; Webster; Woodroffe",
+      "value": "Blanchon, Paul; Granados-Corea, Marian; Abbey, Elizabeth; Braga, Juan C.; Braithwaite, Colin; Kennedy, David M.; Spencer, Tom; Webster, Jody M.; Woodroffe, Colin D."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:04Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Postglacial Fringing-Reef to Barrier-Reef Conversion"
     }
   ],
   "citation_key": "blanchon2014",
   "contributions": [
     {
       "as_printed": {
-        "family": "Blanchon"
+        "family": "Blanchon",
+        "given": "Paul"
       },
       "lid": "a1",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Granados-Corea"
+        "family": "Granados-Corea",
+        "given": "Marian"
       },
       "lid": "a2",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Abbey"
+        "family": "Abbey",
+        "given": "Elizabeth"
       },
       "lid": "a3",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Braga"
+        "family": "Braga",
+        "given": "Juan C."
       },
       "lid": "a4",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Braithwaite"
+        "family": "Braithwaite",
+        "given": "Colin"
       },
       "lid": "a5",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Kennedy"
+        "family": "Kennedy",
+        "given": "David M."
       },
       "lid": "a6",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Spencer"
+        "family": "Spencer",
+        "given": "Tom"
       },
       "lid": "a7",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Webster"
+        "family": "Webster",
+        "given": "Jody M."
       },
       "lid": "a8",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Woodroffe"
+        "family": "Woodroffe",
+        "given": "Colin D."
       },
       "lid": "a9",
       "role": "author"

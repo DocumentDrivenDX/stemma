@@ -29,6 +29,7 @@ export interface Options {
   finding?: string; effect?: string; "add-identifier"?: string[]; set?: string[]; author?: string[]; lookup?: string;
   replace?: boolean; from?: string; add?: string[]; remove?: string[]; tag?: string[]; stage?: string; has?: string[];
   audience?: string; page?: boolean; chapter?: string;
+  check?: boolean; pdf?: boolean;
 }
 
 export const sqliteVersion = (): string => {

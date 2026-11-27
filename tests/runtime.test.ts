@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { bundle, unresolvedImports } from "../scripts/build.ts";
 import { ISOLATION_FLAGS, PINNED_BUN, runtimeProblem } from "../packages/cli/src/runtime.ts";
@@ -41,11 +41,11 @@ describe("one pinned runtime", () => {
 });
 
 describe("no run-time packages", () => {
-  test("the one library from outside is the PDF reader, pinned exactly and bundled", () => {
-    const outside = ["package.json", ...["records", "core", "workspace", "cli", "extract"].map((p) => `packages/${p}/package.json`)]
+  test("the libraries from outside are the PDF reader and the citation processor, pinned exactly and bundled", () => {
+    const outside = ["package.json", ...["records", "core", "workspace", "cli", "extract", "cite", "publish"].map((p) => `packages/${p}/package.json`)]
       .flatMap((path) => Object.entries<string>(JSON.parse(read(path)).dependencies ?? {}))
       .filter(([, version]) => version !== "workspace:*");
-    expect(outside).toEqual([["pdfjs-dist", "6.5.438"]]);
+    expect(outside).toEqual([["citeproc", "2.4.63"], ["pdfjs-dist", "6.5.438"]]);
   });
 
   test("what the explorer page is built from is pinned exactly, and is needed only when Stemma is built", () => {
@@ -56,8 +56,12 @@ describe("no run-time packages", () => {
   });
 
   test("the bundle imports only what is built into Bun", async () => {
-    const path = await bundle(temporary());
-    expect(unresolvedImports(readFileSync(path, "utf8"))).toEqual([]);
+    const dir = temporary();
+    await bundle(dir);
+    // The only imports left are built into Bun or name another built file.
+    const parts = readdirSync(dir).filter((f) => f.endsWith(".js"));
+    const left = parts.flatMap((f) => unresolvedImports(readFileSync(join(dir, f), "utf8")));
+    expect(left.filter((i) => !(i.startsWith("./") && parts.includes(i.slice(2))))).toEqual([]);
     expect(unresolvedImports('import x from "left-pad"; x()')).toEqual(["left-pad"]);
   });
 

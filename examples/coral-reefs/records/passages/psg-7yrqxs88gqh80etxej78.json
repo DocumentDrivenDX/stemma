@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2596,
+      "index": 0,
+      "page_sha256": "237bb10bc08cb8281afe46cae46c550984c184744bd044f9dfaaba9a5cc2e5b0",
+      "start": 2382,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:33Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-7yrqxs88gqh80etxej78",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "1"
+  },
+  "quote": {
+    "exact": "D arwin’s coral-reef hypothesis, that fringing reefs transform first into barrier reefs and then atolls during\nsubsidence, came into focus in November 1835 when HMS Beagle visited the South Pacific island of\nTahiti"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w4na70p97m1rbc19t6ak",
+  "source_record_sha256": "567c698ea6891ceca265c876153a1e905c75dd4115fdf6ad5a2c39085c3d5c0c",
+  "text": "txt-80v3xw39pbvb4ksf7vj3"
+}

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1861,
+      "index": 312,
+      "page_sha256": "56b783e6a51ac1cb22a5167b6f50a713f948d1a28fb78e1cd2cb4026d7dc0228",
+      "start": 1741,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:40Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-6dfab9dqpytadtje46hn",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "291"
+  },
+  "quote": {
+    "exact": "They are not evidence against the subsi-\ndence theory,_but simply local examples under the general\nprinciple just stated"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "source_record_sha256": "3f05610d26b6f92fc2544617eb4ebf00fade8df0fbcf2c33374723f72646a8d2",
+  "text": "txt-adczshjjk43q6v0qryx8"
+}

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 108,
+      "index": 313,
+      "page_sha256": "7c754e1a8a352c57261fd9ad9643b7f430eb72b9b191dee396ed64e7c60b5bc1",
+      "start": 0,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-m01wp9bq8h178h2av9t9",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "292"
+  },
+  "quote": {
+    "exact": "The wide oceans are, however, wonderfully free from\nbanks approaching the surface within one hundred fathoms"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "source_record_sha256": "3f05610d26b6f92fc2544617eb4ebf00fade8df0fbcf2c33374723f72646a8d2",
+  "text": "txt-adczshjjk43q6v0qryx8"
+}

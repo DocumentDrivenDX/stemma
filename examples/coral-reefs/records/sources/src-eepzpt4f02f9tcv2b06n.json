@@ -1,10 +1,30 @@
 {
   "admission": "candidate",
+  "bib": [
+    {
+      "name": "edition",
+      "value": {
+        "value": "3"
+      }
+    },
+    {
+      "name": "publisher",
+      "value": {
+        "value": "Dodd, Mead, and Company"
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "New York"
+      }
+    }
+  ],
   "changed": {
-    "at": "2026-11-27T03:14:52Z",
+    "at": "2026-11-27T03:39:55Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -18,6 +38,39 @@
       "field": "tags",
       "from": "report/report.md, section 4",
       "value": "position:subsidence"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:55Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.edition",
+      "from": "title page (file index 6)",
+      "value": "3"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:55Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher",
+      "from": "title page (file index 6)",
+      "value": "Dodd, Mead, and Company"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:55Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher-place",
+      "from": "title page (file index 6)",
+      "value": "New York"
     }
   ],
   "citation_key": "dana1890",

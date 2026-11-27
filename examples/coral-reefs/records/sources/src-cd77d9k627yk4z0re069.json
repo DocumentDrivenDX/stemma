@@ -1,0 +1,128 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Report on Dredging"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:41Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "contents (file index 10): section VII, page 151; running head on page 156 (file index 187)",
+      "value": "Report on Dredging at Funafuti"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:41Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "contents (file index 10): section VII, page 151; running head on page 156 (file index 187)",
+      "value": "David, T. W. Edgeworth; Halligan, G. H.; Finckh, A. E."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:42Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:42Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "funafuti"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:43Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Report on Dredging"
+    }
+  ],
+  "citation_key": "david1904-dredging",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "David",
+        "given": "T. W. Edgeworth"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Halligan",
+        "given": "G. H."
+      },
+      "lid": "a2",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Finckh",
+        "given": "A. E."
+      },
+      "lid": "a3",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:40Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-cd77d9k627yk4z0re069",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-n7pw0cvq9y0d742wr45f",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "evidence:boring",
+    "funafuti"
+  ],
+  "title": {
+    "value": "Report on Dredging at Funafuti"
+  },
+  "type": "chapter"
+}

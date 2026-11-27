@@ -1,0 +1,72 @@
+{
+  "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:40:33Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:33Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, sections 1 and 4",
+      "value": "position:subsidence"
+    }
+  ],
+  "citation_key": "darwin-agassiz1881",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Agassiz",
+        "given": "Alexander"
+      },
+      "lid": "a2",
+      "role": "recipient"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "1881-05-05"
+      },
+      "variable": "event-date"
+    }
+  ],
+  "id": "src-pd88x8pzdh0858cd6bjr",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-a04mqd3jch9s39zbmpjp",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "position:subsidence"
+  ],
+  "type": "personal_communication"
+}

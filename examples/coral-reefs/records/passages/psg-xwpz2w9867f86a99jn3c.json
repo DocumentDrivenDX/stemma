@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2342,
+      "index": 2,
+      "page_sha256": "87ef6c4870d8d9983ded03a23db5bb486f9a41b23210f4785fdab2315759c8d6",
+      "start": 2170,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:08Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-xwpz2w9867f86a99jn3c",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "303"
+  },
+  "quote": {
+    "exact": "Darwin correctly\nrecognized that atolls are linked to the remnants of submerged volcanoes, around which coral\nreefs grew upward against the steady subsidence of the volcano"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-9y5zh0m86v7n3fkawade",
+  "source_record_sha256": "de575a85c33844c4a50210860b6b138a690448a7dbd0765742148b0f46f2613e",
+  "text": "txt-r8t6cvfg4wwj6jbwqqg1"
+}

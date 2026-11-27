@@ -237,7 +237,8 @@ describe.skipIf(!browser)("the worked example's page, as the built command line 
     await main.getByRole("link", { name: /^(Passage|Citation|Source) / }).first().waitFor();
     await box.fill("theory most generally received");
     await box.press("Enter");
-    await main.getByRole("link", { name: /^Passage .*theory most generally/i }).click();
+    // The example holds two passages of this quotation; either one carries the flow.
+    await main.getByRole("link", { name: /^Passage .*theory most generally/i }).first().click();
     await page.waitForURL(/\/Passage\/psg-/);
     const passage = new URL(page.url()).hash;
     const links = page.getByRole("complementary").getByRole("listitem").getByRole("link");

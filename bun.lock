@@ -5,6 +5,7 @@
     "": {
       "name": "stemma",
       "dependencies": {
+        "citeproc": "2.4.63",
         "pdfjs-dist": "6.5.438",
       },
       "devDependencies": {
@@ -23,12 +24,20 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/cite": {
+      "name": "@stemma/cite",
+      "dependencies": {
+        "@stemma/records": "workspace:*",
+      },
+    },
     "packages/cli": {
       "name": "@stemma/cli",
       "dependencies": {
+        "@stemma/cite": "workspace:*",
         "@stemma/core": "workspace:*",
         "@stemma/extract": "workspace:*",
         "@stemma/graph": "workspace:*",
+        "@stemma/publish": "workspace:*",
         "@stemma/records": "workspace:*",
         "@stemma/workspace": "workspace:*",
       },
@@ -48,6 +57,17 @@
     "packages/graph": {
       "name": "@stemma/graph",
       "dependencies": {
+        "@stemma/core": "workspace:*",
+        "@stemma/records": "workspace:*",
+      },
+    },
+    "packages/intake": {
+      "name": "@stemma/intake",
+    },
+    "packages/publish": {
+      "name": "@stemma/publish",
+      "dependencies": {
+        "@stemma/cite": "workspace:*",
         "@stemma/core": "workspace:*",
         "@stemma/records": "workspace:*",
       },
@@ -138,6 +158,8 @@
 
     "@playwright/test": ["@playwright/test@1.63.0", "", { "dependencies": { "playwright": "1.63.0" }, "bin": { "playwright": "cli.js" } }, "sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ=="],
 
+    "@stemma/cite": ["@stemma/cite@workspace:packages/cite"],
+
     "@stemma/cli": ["@stemma/cli@workspace:packages/cli"],
 
     "@stemma/core": ["@stemma/core@workspace:packages/core"],
@@ -147,6 +169,10 @@
     "@stemma/extract": ["@stemma/extract@workspace:packages/extract"],
 
     "@stemma/graph": ["@stemma/graph@workspace:packages/graph"],
+
+    "@stemma/intake": ["@stemma/intake@workspace:packages/intake"],
+
+    "@stemma/publish": ["@stemma/publish@workspace:packages/publish"],
 
     "@stemma/records": ["@stemma/records@workspace:packages/records"],
 
@@ -195,6 +221,8 @@
     "axe-core": ["axe-core@4.13.0", "", {}, "sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A=="],
 
     "bun-types": ["bun-types@1.4.5", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-ECHn+9dhL3wv0G6u0+7dQvrnaimXiRDxxerYBmhTaLyJEEuvTPWk2Fye3XIf5Y++JIIiHKfQw4Z7V5D8KuiXbg=="],
+
+    "citeproc": ["citeproc@2.4.63", "", {}, "sha512-68F95Bp4UbgZU/DBUGQn0qV3HDZLCdI9+Bb2ByrTaNJDL5VEm9LqaiNaxljsvoaExSLEXe1/r6n2Z06SCzW3/Q=="],
 
     "csstype": ["csstype@3.2.4", "", {}, "sha512-PoKaoPzQapnEoqUSnHx1u6W6ku8CVEgKsnpmmzU3m1nwkidpPBQ8V/Zq2+bWNrsOKoKLwTGdbx6xF7BXP1zLVQ=="],
 

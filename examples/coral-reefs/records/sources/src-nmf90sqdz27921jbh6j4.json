@@ -1,10 +1,36 @@
 {
   "admission": "candidate",
+  "bib": [
+    {
+      "name": "collection-title",
+      "value": {
+        "value": "The International Scientific Series"
+      }
+    },
+    {
+      "name": "publisher",
+      "value": {
+        "value": "D. Appleton and Company"
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "New York"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Animal Life"
+      }
+    }
+  ],
   "changed": {
-    "at": "2026-11-27T03:14:52Z",
+    "at": "2026-11-27T03:39:55Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -18,6 +44,50 @@
       "field": "tags",
       "from": "report/report.md, section 4",
       "value": "position:critic"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:54Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.collection-title",
+      "from": "title page (file index 8)",
+      "value": "The International Scientific Series"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:54Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher",
+      "from": "title page (file index 8)",
+      "value": "D. Appleton and Company"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:54Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher-place",
+      "from": "title page (file index 8)",
+      "value": "New York"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:55Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Animal Life"
     }
   ],
   "citation_key": "semper1881",

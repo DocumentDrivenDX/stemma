@@ -1,0 +1,7 @@
+{
+  "name": "@stemma/publish",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": { "@stemma/records": "workspace:*", "@stemma/core": "workspace:*", "@stemma/cite": "workspace:*" }
+}

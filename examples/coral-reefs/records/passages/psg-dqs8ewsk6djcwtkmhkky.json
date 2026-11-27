@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 785,
+      "index": 109,
+      "page_sha256": "225c1ce8b9f89266799be97ffe39716a94809217fef000a0fbb80053d1036413",
+      "start": 594,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-dqs8ewsk6djcwtkmhkky",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "92"
+  },
+  "quote": {
+    "exact": "enormous spaces, both in the Pacific\nand Indian oceans, are interspersed with islands, of which not\none rises above that height, to which the waves and winds\nin an open sea can heap up matter"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-darwinreefs1842",
+  "source_record_sha256": "c37163df88dd21745cc919fab59dab7cd447fdaa64b21fc5a4967613b3b03b02",
+  "text": "txt-bm6whwjm6vv9ce26mgbr"
+}

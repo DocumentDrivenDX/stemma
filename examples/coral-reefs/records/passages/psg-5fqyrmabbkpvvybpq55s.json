@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2748,
+      "index": 29,
+      "page_sha256": "04e707b8559e9199dbd421f92e4ad3a0e20ced116213af0ba4c3d48af3ecc71b",
+      "start": 2541,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-5fqyrmabbkpvvybpq55s",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xx"
+  },
+  "quote": {
+    "exact": "we may justly reply that\nthey have great interest as they are opposed to the application of the theory of subsidence as explana-\ntory of the formation of coral reefs in the areas where these rock bases occur"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

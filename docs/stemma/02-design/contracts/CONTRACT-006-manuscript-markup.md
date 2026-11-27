@@ -162,7 +162,7 @@ updated. The record's current source is the one the manuscript key resolves to.
 |---|---|---|
 | Paragraphs, emphasis, strong emphasis, hard line break | CommonMark | M1 |
 | Headings, levels 1 to 4; level 1 is the chapter title | `#`, optional `{#sec-id}` | M1 |
-| Block quotes | `>`; optional attribute line | M1 |
+| Block quotes | `>`; optional attribute line directly under the last quoted line | M1 |
 | Ordered and bulleted lists | CommonMark | M1 |
 | Footnotes | `[^label]` with `[^label]: text`; continuation lines indented | M1 |
 | Citations, quotations, claim anchors, marks | C | M1 |
@@ -199,7 +199,9 @@ contract. An unresolved ID or cross-reference is reported.
 - An unbound or ambiguous reference is written with key `?`.
 - An author-date parenthesis whose every part is a citation form (CONTRACT-003
   H) is replaced by one cluster, one item per work and year. Lead-ins become
-  `prefix` and pages a `page` locator. Here the locator comes from the form the
+  `prefix` and pages a `page` locator. A working marker that CONTRACT-003 H
+  keeps with an item is written as its `suffix`, exactly as typed, so it stays
+  with the citation. Here the locator comes from the form the
   intake profile names, not from a guess by the markup reader. Each item has its
   own `citation` record, whose `as_found` keeps the bracketed text as typed,
   with any narrative names, and whose `document_position` keeps where it was.
@@ -207,7 +209,8 @@ contract. An unresolved ID or cross-reference is reported.
   `mode="suppress-author"`. How a note style typesets it is not settled (PRD
   open question on the pilot's citation style).
 - A parenthesis left unlinked stays as text, escaped as B requires. So do the
-  author's own bracketed working markers.
+  author's own bracketed working markers, other than those written as an item's
+  `suffix`.
 - A tool edit (round choice, retired claim, repoint) MUST change only the
   affected byte span and leave the rest of the file identical. It MUST refuse if
   the file changed since it was read.
@@ -256,6 +259,46 @@ mismatch is a tool failure, because the citations would be wrong.
 - An edit reaches the preview when the agent rebuilds it and the author reloads
   the page (CONTRACT-005 D). The page compiles the rebuilt text; it does not
   update while open.
+
+### I. Assembled reports (M1)
+
+Before the manuscript reader exists, a report is built from a template and the
+project's records by `build report` (CONTRACT-002 B). Its directory holds:
+
+- `report.json`: `manuscript` (the template's file name), `quotations` (each with
+  an `id`, `cites` (a citation key), `passages` (passage IDs in order, with an
+  optional `join` string and `join_note`), and optional `note` (the passage is a
+  note on its page: the locator gains `n`), `corrections` (`was`, `now`, `by`,
+  `basis`; each must match exactly once), `italic`, `keep_hyphens`, and
+  `checked`), and `verification.preamble`.
+- The template: paragraphs separated by blank lines. `{{q:<id>}}` is replaced by
+  the quotation in curly double quotation marks; `[^<id>,<id>…]` is a note citing
+  those quotations; `[^<ids>|<comment>]` adds the author's comment, which may hold
+  `{{q:<id>}}`; `{{bibliography}}` is replaced by the bibliography.
+
+A quotation is copied from each passage's address, which must still give the
+passage's `quote.exact`, and the passage must belong to the cited source or the
+work it is `part_of`. Line-end hyphens are joined unless listed in
+`keep_hyphens`; line breaks become spaces; `corrections` and `italic` apply.
+Template text is never changed.
+
+**Notes: quotation, then source.** Each note gives its quotations verbatim, each
+in quotation marks with a full stop inside them unless it ends with a full stop,
+question mark or exclamation mark, then the citation formatted by citeproc-js
+(G), so the locator appears once. Consecutive quotations from the same work and
+page share one citation; a quotation from another page or work is followed by
+its own citation, shortened as the style shortens a repeated one. The author's
+comment follows as a separate paragraph. A letter printed in a collection is
+cited as the collection at its page, preceded by the style's own description of
+the letter (author to recipient, date), so that a shortened note still names the
+volume and page. The order follows the practice that secondary guides attribute
+to the Chicago Manual of Style, 17th edition, 14.38; neither that text nor the
+18th edition's wording has been checked against the manual.
+
+`verification.md` lists, for each note, each passage's address, record, printed
+page, how it was checked, and every change from the source text; and, for each
+cited work, where its details were read, from the source record's change log. It
+is not part of the publication. `report.typ` escapes all text (G5).
 
 ## Precedence and Compatibility
 

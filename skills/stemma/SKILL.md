@@ -171,6 +171,14 @@ Evidence appears through normal citation, quotation, and footnotes: full
 citation, locator, verbatim quotation. Addresses, digests, review state, and
 reports stay in the records and in your messages to the author.
 
+Never type a citation, a quotation, or a page into a report's notes. Record the
+work's details on its source record (`source enrich`, with `--from` naming the
+page they were read from; a chapter, letter, preface or article in a volume gets
+a source record of its own with a `part_of` relation), capture each quotation
+with `passage capture`, name the passages in the report's `report.json`, and
+run `build report`. Each note gives the quotation, then its citation; text in
+the manuscript is never changed by the build.
+
 ## Run Stemma
 
 Run every command through the plugin's launcher, with absolute paths:
@@ -212,6 +220,8 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `review add …` / `review list` / `coverage [<text id>]` | Track reviews and flags; show verification coverage and disagreements |
 | `passage find --source <id> <words>` / `passage capture --address <address>` | Find words; copy a passage and its locator |
 | `resolve <source id> [--via crossref\|internet_archive --identifier <value>]` | Make and save a catalogue lookup (uses the network) |
+| `cite format --input <absolute file>` | Format notes and a bibliography in Chicago notes-and-bibliography style (18th edition, citeproc-js) from source records: `{"notes": [[{"key": "…", "locator": "…"}], …]}` |
+| `build report [<dir>] [--check] [--pdf]` | Build a report from `<dir>/report.json` (its manuscript file and quotation list) and the passage and source records: Markdown, Typst, a verification table, and with `--pdf` a PDF typeset by the pinned Typst, fetched once into the data directory and checked against its digest. `--check` writes nothing and exits 1 if the files are stale |
 | `check [--format json]` | Check the whole project and explain what is open |
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `research list` | List research notes under `research/` by path, with date and first heading |
@@ -286,6 +296,25 @@ or a catalogue disagrees, show the author both values.
 author has a recognition tool, use its output with `--method ocr` and name it;
 otherwise the author types the passages (`--method manual`) or the citation stays
 reported as unchecked.
+
+## Editing a manuscript in a shared doc
+
+When the author wants to edit or discuss a manuscript file in a Claude Doc, or
+bring a reviewer's doc edits back, use the `docsync` skill. It comes from a
+separate plugin that Claude Code installs with Stemma. Do not sync by exporting a
+doc over the file or by copying text across by hand. If the skill is not
+available, say that shared editing needs the docsync plugin
+(https://github.com/DocumentDrivenDX/docsync), install it only if the author
+asks, and carry on in the file. Nothing else in Stemma uses it.
+
+- Before the first doc, tell the author it is a hosted copy of the whole
+  manuscript, quotations included.
+- Editors can change quotations and citations in the doc. Never repair or retype
+  one yourself; show the author each such change in the diff, and capture new
+  evidence by passage address as usual.
+- After edits land, update the affected records and run `check`. Say that
+  `check` reads the records and source files, not the manuscript text, so a
+  quotation or citation changed only in the manuscript is not detected.
 
 ## Checking and verification
 

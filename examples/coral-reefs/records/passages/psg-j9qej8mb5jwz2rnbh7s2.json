@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1124,
+      "index": 14,
+      "page_sha256": "2c6e0faf8c5a46b504b4e825ca94c685dec765695d830fb1a741d5d2b85761ef",
+      "start": 985,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-j9qej8mb5jwz2rnbh7s2",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "vii"
+  },
+  "quote": {
+    "exact": "the origin and history of a coral reef must remain\nuncertain until the experiment so earnestly desired by the late CuHarntes Darwin\nhimself"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

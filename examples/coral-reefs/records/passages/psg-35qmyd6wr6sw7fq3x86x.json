@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 164,
+      "index": 77,
+      "page_sha256": "ce047054d06ee994ea72e5c80fe5f1dbfdcdae0edabde6407d1936f837807f66",
+      "start": 5,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:13Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-35qmyd6wr6sw7fq3x86x",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "54"
+  },
+  "quote": {
+    "exact": "The depth for which Darwin had asked that a coral atoll should be bored\nwith a view to testing his theory (500-600 feet) had been exceeded by reaching\n698 feet"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

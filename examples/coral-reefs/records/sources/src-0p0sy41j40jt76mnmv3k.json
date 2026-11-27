@@ -1,0 +1,182 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "genre",
+      "value": {
+        "value": "abstract"
+      }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "2"
+      }
+    },
+    {
+      "name": "issue",
+      "value": {
+        "value": "51"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "552–54"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Areas of Elevation and Subsidence"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:09Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "On Certain Areas of Elevation and Subsidence in the Pacific and Indian Oceans, as Deduced from the Study of Coral Formations"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "issued",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "1837"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.genre",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "abstract"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.volume",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "2"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.issue",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "51"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.page",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "552–54"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:07Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "masthead 'Vol. II. 1837. No. 51.' (file index 452); article heading and 'May 31.' (file index 467, page 552); text ends on page 554 (file index 469)",
+      "value": "Darwin, Charles"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:08Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, sections 2 and 3",
+      "value": "position:subsidence"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:09Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Areas of Elevation and Subsidence"
+    }
+  ],
+  "citation_key": "darwin1837-areas",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:06Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-0p0sy41j40jt76mnmv3k",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1837"
+  },
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-ymdxbsxjmc5fbmq0t4a0",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "position:subsidence"
+  ],
+  "title": {
+    "value": "On Certain Areas of Elevation and Subsidence in the Pacific and Indian Oceans, as Deduced from the Study of Coral Formations"
+  },
+  "type": "article-journal"
+}

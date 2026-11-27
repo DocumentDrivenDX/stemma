@@ -1,0 +1,182 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "genre",
+      "value": {
+        "value": "abstract"
+      }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "10"
+      }
+    },
+    {
+      "name": "issue",
+      "value": {
+        "value": "107"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "505–18"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Structure and Origin"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "On the Structure and Origin of Coral Reefs and Islands"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "issued",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "1879/1880"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.genre",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "abstract"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.volume",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "10"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.issue",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "107"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.page",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "505–18"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:11Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "first page of the article with masthead 'Vol. X. 1879–80. No. 107.' and '(Abstract.)' (file index 522, page 505); text ends on page 518 (file index 535)",
+      "value": "Murray, John"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:12Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 4",
+      "value": "position:critic"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:12Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Structure and Origin"
+    }
+  ],
+  "citation_key": "murray1880-structure",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Murray",
+        "given": "John"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:10Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-2cfn0t8w3z0sbj54g143",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1879/1880"
+  },
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-eh71qk5hm5zhpwzcz2v7",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "position:critic"
+  ],
+  "title": {
+    "value": "On the Structure and Origin of Coral Reefs and Islands"
+  },
+  "type": "article-journal"
+}

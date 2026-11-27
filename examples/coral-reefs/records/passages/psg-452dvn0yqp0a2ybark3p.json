@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2329,
+      "index": 42,
+      "page_sha256": "718c310462a6378a2be8c7d44f3ba403594de4e93b5df9860273aa396a075f96",
+      "start": 2088,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:31Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-452dvn0yqp0a2ybark3p",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "900"
+  },
+  "quote": {
+    "exact": "In both places there appear to have been times when\nthe tops of the atolls stood above the sea for appreciable\nlengths of time and the shells and skeletons of aragonite-\nsecreting organisms were largely leached or recrystal-\nlized to calcite"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "225881d33fe38eaf9bb75d49af608a97a79e1e16c426bdbd20e236b4560bbb75",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

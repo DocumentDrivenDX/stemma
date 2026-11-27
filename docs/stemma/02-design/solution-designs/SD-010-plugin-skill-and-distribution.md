@@ -83,7 +83,9 @@ none, even if publishing fails, and publishing a release on GitHub for a new tag
 creates the tag. A release therefore does not show that the version reached the
 marketplace; the workflow run does. Deleting a tag or a release leaves the other. An author
 installs with `claude plugin marketplace add DocumentDrivenDX/plugins` and
-`claude plugin install stemma@documentdrivendx`.
+`claude plugin install stemma@documentdrivendx`. The manifest declares `docsync`
+as a dependency, which that command installs too (ADR-011). The install check
+uses a stand-in `docsync` to show this.
 
 **Observed.** Version 0.0.2 installed from GitHub with the Claude command-line
 tool.

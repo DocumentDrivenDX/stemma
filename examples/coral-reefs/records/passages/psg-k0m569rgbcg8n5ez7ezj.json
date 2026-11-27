@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2683,
+      "index": 5,
+      "page_sha256": "8fe8fcd24c53d3a5400b20d30951ec245673fd7fd06a830961364aac1b014d8f",
+      "start": 2500,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:30Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-k0m569rgbcg8n5ez7ezj",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "863"
+  },
+  "quote": {
+    "exact": "In connection with tests carried out in the Marshall\nIslands by the Atomic Energy Commission and the\nLos Alamos Scientific Laboratory, considerable drilling\nwas done on Eniwetok Atoll"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "225881d33fe38eaf9bb75d49af608a97a79e1e16c426bdbd20e236b4560bbb75",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

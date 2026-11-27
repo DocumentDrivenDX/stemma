@@ -362,7 +362,8 @@ function reference(source: any): string {
 
 function darwin(): string {
   const { source, upstream, manifest, pages, citations, passages } = darwinBook();
-  const works = records("sources").sort((a, b) => Number(a.issued.edtf) - Number(b.issued.edtf) || String(a.citation_key).localeCompare(String(b.citation_key)));
+  // The works whose text the example holds; a letter, chapter or article cited within one has its own record and is not listed.
+  const works = records("sources").filter((s) => !(s.relations ?? []).some((r: any) => r.type === "part_of")).sort((a, b) => Number(a.issued.edtf) - Number(b.issued.edtf) || String(a.citation_key).localeCompare(String(b.citation_key)));
   const cited = citations.map((c) => {
     const [before, after] = c.sentence.text.split(c.quotation) as [string, string?];
     if (after === undefined) throw new Error(`${c.id}: the sentence no longer holds its quotation`);

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 365,
+      "index": 22,
+      "page_sha256": "4304851382d9338294c8b10e062a0e6f3c764d8b5f32abb7372107d9a0c8bde9",
+      "start": 305,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:40Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-7pkzjk62c6q8nb4e9sgt",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xiii"
+  },
+  "quote": {
+    "exact": "As\nfar back as 1861 he spent nearly ten months in the Pelews"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

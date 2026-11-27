@@ -101,5 +101,7 @@ fi
 
 [ -f "$root/dist/stemma.js" ] || die "this copy of the plugin holds no built command line."
 BUN_RUNTIME_TRANSPILER_CACHE_PATH="$data/transpiler-cache"
-export BUN_RUNTIME_TRANSPILER_CACHE_PATH
+# The data directory also holds the pinned Typst, which `build report --pdf` fetches and checks.
+STEMMA_DATA="$data"
+export BUN_RUNTIME_TRANSPILER_CACHE_PATH STEMMA_DATA
 exec "$bun" --no-install --no-env-file --config=/dev/null "$root/dist/stemma.js" "$@"

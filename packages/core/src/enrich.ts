@@ -86,7 +86,7 @@ export function planTags(corpus: Corpus, request: { source: string; add: string[
 const PLAIN_FIELDS = ["title", "type", "subtype", "issued", "citation_key", "locator_label"];
 export const BIB_FIELDS = [
   "publisher", "publisher-place", "container-title", "collection-title", "collection-number", "volume", "number-of-volumes",
-  "issue", "edition", "page", "number", "language", "abstract", "URL",
+  "issue", "edition", "page", "number", "genre", "title-short", "language", "abstract", "URL",
 ];
 
 export interface Detail { field: string; value: string }

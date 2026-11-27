@@ -6,13 +6,31 @@
       "value": {
         "value": "Bikini and Nearby Atolls, Marshall Islands"
       }
+    },
+    {
+      "name": "genre",
+      "value": {
+        "value": "Geological Survey Professional Paper 260-Y"
+      }
+    },
+    {
+      "name": "publisher",
+      "value": {
+        "value": "United States Government Printing Office"
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "Washington"
+      }
     }
   ],
   "changed": {
-    "at": "2026-11-27T03:14:54Z",
+    "at": "2026-11-27T03:40:02Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -37,6 +55,39 @@
       "field": "tags",
       "from": "report/report.md, section 6",
       "value": "eniwetok"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:02Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.genre",
+      "from": "title page (file index 1)",
+      "value": "Geological Survey Professional Paper 260-Y"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:02Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher",
+      "from": "title page (file index 1)",
+      "value": "United States Government Printing Office"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:02Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher-place",
+      "from": "title page (file index 1)",
+      "value": "Washington"
     }
   ],
   "citation_key": "ladd1960",

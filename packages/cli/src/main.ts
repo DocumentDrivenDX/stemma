@@ -18,6 +18,7 @@ import {
 import { sourceCapture, sourceEnrich, sourceHistoryCommand, sourceList, sourceTag } from "./enrich.ts";
 import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
+import { buildReportCommand, citeFormat } from "./publish.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
   coverage, MODEL_NOTICE, passageCapture, passageFind, resolveCommand, reviewAdd, reviewList, sourceCompare, sourceConvert,
@@ -59,6 +60,8 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   coverage [<text id>]
   passage find --source <id> <words>
   passage capture --address <address> --actor <kind>:<name>
+  cite format --input <file|->
+  build report [<dir>] [--check] [--pdf]
   record add <kind> --input <file|-> [--actor <kind>:<name>]
   resolve <source id>... --actor <kind>:<name> [--via crossref|internet_archive --identifier <value>]
   validate [paths]
@@ -73,7 +76,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   graph status [--out <dir>]
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
-Only ingest --fetch, ingest --refresh-lookups and resolve use the network.
+Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.
 `;
@@ -82,7 +85,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 const NOT_YET = new Set([
   "migrate", "key", "unreviewed", "reviewed", "rounds",
   "support", "import", "export", "takeover", "index", "setup", "log", "activity",
-  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "map",
+  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "disclosure", "scan", "map",
 ]);
 
 const STRING = { type: "string" } as const;
@@ -90,6 +93,7 @@ const FLAG = { type: "boolean" } as const;
 const LIST = { type: "string", multiple: true } as const;
 
 const OPTIONS = {
+  check: FLAG, pdf: FLAG,
   project: STRING, format: STRING, help: FLAG, input: STRING, actor: STRING, changed: FLAG, all: FLAG, source: STRING, origin: STRING,
   "acquired-at": STRING, "source-version": STRING, "held-at": STRING, description: STRING, image: LIST, "text-layer": STRING,
   transcription: STRING, method: STRING, recognition: STRING, tool: STRING, "tool-version": STRING, "page-map": STRING,
@@ -113,7 +117,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "source verify": ["actor", "original"],
   "source compare": ["actor", "with", "against", "independent"],
   "review add": ["actor", "scope", "pages", "passage", "fields", "against", "outcome", "flag", "original-sha256", "note"],
-  "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"],
+  "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"], "cite format": ["input"], "build report": ["check", "pdf"],
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages"], retire: ["actor", "reason", "replaced-by"],
   annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
@@ -368,12 +372,14 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "research list": only(0); return researchList(options);
     case "graph export": only(0); return graphExport(options);
     case "graph status": only(0); return graphStatus(options);
+    case "cite format": only(0); return citeFormat(options);
+    case "build report": only(1); return buildReportCommand(options, rest[0]);
     default: throw usageError(`Unknown command: ${command}`);
   }
 }
 
-const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "graph"]);
-const NOT_YET_SUB = new Set(["source admit", "source reject", "record show", "record search", "record trace", "review import", "review comment", "review baseline", "review needed", "research record", "research corpus", "research admit", "research reject", "research coverage"]);
+const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "cite", "build", "graph"]);
+const NOT_YET_SUB = new Set(["source admit", "source reject", "record show", "record search", "record trace", "review import", "review comment", "review baseline", "review needed", "research record", "research corpus", "research admit", "research reject", "research coverage", "build draft", "build camera-ready", "build reviewer"]);
 
 export async function main(argv: string[]): Promise<number> {
   let json = argv.includes("--format=json") || argv[argv.indexOf("--format") + 1] === "json";

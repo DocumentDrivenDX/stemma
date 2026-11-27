@@ -1,0 +1,20 @@
+Third-party material in Stemma's citation formatter
+
+citeproc-js 2.4.63 (npm package "citeproc"), Copyright (c) 2009-2019 Frank
+Bennett. It is offered under either the Common Public Attribution License 1.0
+or the GNU Affero General Public License; Stemma distributes it under the
+Common Public Attribution License 1.0 (CPAL-1.0.txt). Its own notice is in
+citeproc-js-LICENSE. It is included unmodified and unminified, as source code,
+in dist/stemma.js. The same source is published at
+https://registry.npmjs.org/citeproc/-/citeproc-2.4.63.tgz and
+https://github.com/Juris-M/citeproc-js. The package names no Attribution
+Information (CPAL Exhibit B), so CPAL section 14 asks for no display.
+
+chicago-notes-bibliography.csl ("Chicago Manual of Style 18th edition (notes
+and bibliography)", author Andrew Dunning and the contributors named in the
+file) from https://github.com/citation-style-language/styles at commit
+1aaf551f864d50e875a617b4faf2bf5da30f3f15, and locales-en-US.xml from
+https://github.com/citation-style-language/locales at commit
+938c09c164a60b3cfeabe61089f1bf4c3ea6a4ed. Both are licensed under the Creative
+Commons Attribution-ShareAlike 3.0 Unported License (CC-BY-SA-3.0.txt). Both
+are included unchanged; each file keeps its own credits and rights statement.

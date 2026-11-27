@@ -266,7 +266,9 @@ publisher, and venue read from the response, each only when present.
 source file), `anchor` (the passage address of CONTRACT-007 H), `quote.exact`
 (the stream text at that address, joined across parts by a line feed, copied by
 script), and `locator`, derived from the printed labels of the pages it lies on,
-or, for a source with no pages, from its chapter and paragraph. A writer copies
+or, for a source with no pages, from its chapter and paragraph. A passage wholly
+on an unnumbered page that the source file's identity names as a title page has
+the locator `title page`. A writer copies
 `quote.exact` and `locator` from the source file; they are never typed.
 `created.by` records who selected the passage. A passage keeps
 `source_record_sha256`, the source's `SourceBinding.record_sha256` when it was
