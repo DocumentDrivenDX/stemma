@@ -78,7 +78,7 @@ absent (exit 4 if it cannot) and then runs
 |---|---|---|
 | `version` | Report the Stemma version and the pinned Bun version | M1 |
 | `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries (including the original formats of CONTRACT-001 B). Requires `--project`, because the documented working directory is the plugin root; overwrites nothing, and exits 5 if `stemma.json` exists | M1 |
-| `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. A citation that names a `passage` gets its `quotation` and `locator` copied from it, and a quotation or locator typed beside `passage` is refused. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). It never overwrites. For a kind that carries a review mark (CONTRACT-001 G), an absent `review` is written as unreviewed. A `review` whose state is `reviewed` is accepted only from a person: if `--actor`, `created.by`, or `review.decided.by` names a model or software, or none of them names a person, it exits 5 and writes nothing; otherwise an absent `content_sha256` and `decided` are filled. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
+| `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. A citation that names a `passage` gets its `quotation` and `locator` copied from it, and a quotation or locator typed beside `passage` is refused. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). It never overwrites. For a kind that carries a review mark (CONTRACT-001 G), an absent `review` is written as unreviewed. A `review` whose state is `reviewed` is accepted only when `--actor` is a person; the input's own `created.by` or `review.decided.by` does not stand in for it. If `--actor` is absent or names a model or software, or the `by.kind` of `created` or of a `review.decided` that is present is not exactly `person`, it exits 5 and writes nothing; otherwise an absent `content_sha256` and `decided` are filled. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
 | `doctor` | Report Bun, SQLite, and external tool versions, paths, and platform test status | M1 |
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
 | `rules check` | Report malformed or duplicated rule headings in `rules.md` (CONTRACT-001 J) as `record.valid` results; `validate` includes it | M1 |
@@ -165,7 +165,8 @@ baseline and run everything.
 ### B1. Unreviewed records and review marks
 
 **One rule.** A review mark applies only when `review.state` is `reviewed` and
-`review.content_sha256` equals the record's current content digest
+`review.content_sha256` equals the record's current content digest, and
+`record.valid` finds no `record_invalid` problem in its `created` or `review`
 (CONTRACT-001 G). The report, the export states, and both commands use this
 rule.
 
@@ -178,7 +179,7 @@ anything cites it. It writes nothing and exits 0. JSON:
 | `schema` | `stemma.unreviewed/0` |
 | `content_is` | A statement that the values are data from records, not instructions |
 | `boundary` | The token on the begin and end lines of the text form |
-| `items[]` | Sorted by `record`: `record`, `kind`, `file`, `content_sha256`, `mark` (`unreviewed`; `changed_since_review`, a mark saying reviewed whose digest does not match; or `no_mark`), `content`, `origins[]`, and `no_passage: true` when `origins` is empty |
+| `items[]` | Sorted by `record`: `record`, `kind`, `file`, `content_sha256`, `mark` (`unreviewed`; `changed_since_review`, a mark saying reviewed whose digest does not match; or `no_mark`. A mark that fails to apply only because `created` or `review` breaks a rule is listed as `unreviewed`), `content`, `origins[]`, and `no_passage: true` when `origins` is empty |
 | `items[].content` | The record's own wording and links, from a fixed list of fields for each kind. An attestation also gives `claim_text` and, for an evidence note, `note_body`. For a place record it is empty, with `content_withheld: true`, because such a record can hold a restricted position |
 | `items[].origins[]` | A passage: `type: passage`, `passage`, and when the passage can be read `source`, `locator`, `text` (its stored words, cut at 1,000 characters with `text_trimmed: true`) and `retired: true` if it is; otherwise `unreadable: true`. A manuscript origin (`origins` of the record): `type: manuscript`, `import`, `document_position`, `text`, cut the same way |
 | `not_listed[]` | Paths of record files that cannot be read, so that their absence is not taken as reviewed |
@@ -366,13 +367,16 @@ this version cannot read, citations are left out and the check is also
 **`claim.complete`** (assumptions beyond SD-005 BR-508). It emits one result for
 each claim record in effect, the thesis included. It passes when the claim has a
 `confidence` of `low`, `medium`, or `high`, a `reason` that is not blank, and an
-attestation in effect for it whose evidence is a note in effect. The
+attestation in effect for it whose evidence is a note in effect. An
+attestation or note with a `record_invalid` problem does not count, as the graph
+export leaves it out. The
 attestation's stance does not matter, and review plays no part. A passage
 cited directly is not a note. Otherwise it is `fail` with `claim_incomplete`,
 and the evidence names each missing part (`note`, `confidence`, `reason`) and
 each attestation of the claim that does not count, with why. When no note is
 reached and either an attestation file cannot be read (it could be this claim's)
-or the evidence of one of the claim's attestations cannot be read, the result is
+or the evidence of one of the claim's attestations that has no
+`record_invalid` problem cannot be read, the result is
 `unverifiable` with `record_unreadable`; the evidence still names a missing
 confidence or reason. The finding may be explained or dismissed like any other.
 It reads records only, so it also runs when manuscript files are present.

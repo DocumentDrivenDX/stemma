@@ -3,7 +3,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { InvalidInput, prepareRecord, PROBLEMS, recordStates, runChecks } from "@stemma/core";
+import { InvalidInput, prepareRecord, PROBLEMS, recordStates, runChecks, unreviewedListing } from "@stemma/core";
 import { canonical, digest, loadCorpus, type ProjectContent, recordPath } from "@stemma/records";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { bundle } from "../scripts/build.ts";
@@ -91,6 +91,26 @@ describe("one review rule", () => {
   });
 });
 
+describe("a mark on a record whose stamps break a rule", () => {
+  test("it does not apply: the report, the states and the listing all say unreviewed", () => {
+    const marked = reviewed(claim("clm-aaaaaaaa"));
+    const broken = [
+      { ...marked, created: { at: AT, by: { kind: "Model", name: "m" } } },
+      { ...marked, created: { at: AT } },
+      { ...marked, review: { ...(marked.review as Value), decided: { at: AT, by: { kind: "Model", name: "m" } } } },
+    ];
+    for (const record of broken) {
+      const content = project([source, record, citation("cit-aaaaaaaa", ["clm-aaaaaaaa"])]);
+      expect(of(content, "record.valid", "clm-aaaaaaaa").map((r) => r.reason_code)).toContain("record_invalid");
+      expect(check(content).unreviewed.filter((u) => u.reason === "unreviewed").map((u) => u.record)).toEqual(["clm-aaaaaaaa"]);
+      expect(states(record)).toContain("unreviewed");
+      expect(unreviewedListing(loadCorpus(content)).items.map((i) => [i.record, i.mark])).toEqual([["clm-aaaaaaaa", "unreviewed"]]);
+    }
+    // A rule broken elsewhere in the record leaves the mark as it is.
+    expect(states(reviewed(claim("clm-aaaaaaaa", { confidence: "certain" })))).not.toContain("unreviewed");
+  });
+});
+
 describe("claim.complete", () => {
   const ID = "clm-aaaaaaaa";
   const good = [source, claim(ID), note("nte-aaaaaaaa"), link("att-aaaaaaaa", ID, "nte-aaaaaaaa", { stance: "contradicts" })];
@@ -132,6 +152,30 @@ describe("claim.complete", () => {
     const passage = { ...base("psg-aaaaaaaa", "passage"), source: source.id };
     const found = one(project([source, claim(ID), passage, link("att-aaaaaaaa", ID, "psg-aaaaaaaa")]));
     expect(evidence(found, "attestation_without_a_note")).toEqual(["records/attestations/att-aaaaaaaa.json: its evidence is a passage, not a note"]);
+  });
+
+  test("a note or attestation that breaks a rule does not count, and the evidence says so", () => {
+    const noStance = link("att-aaaaaaaa", ID, "nte-aaaaaaaa");
+    delete noStance.stance;
+    const cases: [Value[], string][] = [
+      [swap(good, note("nte-aaaaaaaa", { type: "extract" })), "its note does not take part in checks"],
+      [swap(good, noStance), "the attestation does not take part in checks"],
+    ];
+    for (const [records, why] of cases) {
+      const content = project(records);
+      const found = one(content);
+      expect([found.outcome, found.reason_code, evidence(found, "missing")[0]]).toEqual(["fail", "claim_incomplete", "note"]);
+      expect(evidence(found, "attestation_without_a_note")).toEqual([`records/attestations/att-aaaaaaaa.json: ${why}`]);
+      // What is reached for review still includes it.
+      const cited = project([...records, citation("cit-aaaaaaaa", [ID])]);
+      expect(check(cited).unreviewed.map((u) => u.record)).toContain("att-aaaaaaaa");
+    }
+    // An attestation that takes no part cannot make an unreadable note matter; one that does, can.
+    for (const [attestation, outcome] of [[noStance, "fail"], [good[3]!, "unverifiable"]] as const) {
+      const content = project([source, claim(ID), attestation]);
+      content.records.push({ path: "records/notes/nte-aaaaaaaa.json", bytes: bytes("{") });
+      expect(one(content).outcome).toBe(outcome);
+    }
   });
 
   test("a retired claim gives no result", () => {
@@ -183,8 +227,8 @@ describe("record add and the review mark", () => {
     const made = request({ ...fields, review: { state: "reviewed" } }, person as never);
     expect(made.review).toEqual(reviewed(made).review);
     expect(states(made)).not.toContain("unreviewed");
-    // With the person named only in `created`.
-    const typed = request({ ...fields, created: { at: AT, by: person }, review: { state: "reviewed" } });
+    // The input may name a person in its own stamps too.
+    const typed = request({ ...fields, created: { at: AT, by: person }, review: { state: "reviewed" } }, person as never);
     expect(typed.review).toEqual(reviewed(typed).review);
   });
 
@@ -196,6 +240,14 @@ describe("record add and the review mark", () => {
       [{ ...fields, review: mark, created: asPerson }, model], [{ ...fields, review: mark, created: { at: AT, by: model } }, person],
       [{ ...fields, review: { ...mark, decided: { at: AT, by: model } } }, person],
       [{ ...fields, review: mark, created: { at: AT } }, undefined],
+      // No `--actor`: the input's own stamps do not stand in for it.
+      [{ ...fields, review: mark, created: asPerson }, undefined],
+      [{ ...fields, review: { ...mark, decided: asPerson }, created: { at: AT, by: { kind: "Model", name: "m" } } }, undefined],
+      // Any kind that is not exactly `person`.
+      [{ ...fields, review: mark, created: { at: AT, by: { kind: "Model", name: "m" } } }, person],
+      [{ ...fields, review: mark, created: { at: AT } }, person],
+      [{ ...fields, review: { ...mark, decided: { at: AT, by: { kind: "Person", name: "p" } } } }, person],
+      [{ ...fields, review: { ...mark, decided: { at: AT } } }, person],
     ] as const) {
       expect(() => request(input as Value, actor as never)).toThrow(InvalidInput);
     }
@@ -328,6 +380,8 @@ describe("unreviewed list and reviewed", () => {
     const input = join(temporary(), "claim.json");
     writeFileSync(input, JSON.stringify({ text: "Mine", role: "claim", review: { state: "reviewed" } }));
     expect(run(root, "record", "add", "claim", "--input", input, "--actor", "model:a-model").code).toBe(5);
+    writeFileSync(input, JSON.stringify({ text: "Mine", role: "claim", created: { at: AT, by: { kind: "Model", name: "m" } }, review: { state: "reviewed", decided: { at: AT, by: person } } }));
+    expect(run(root, "record", "add", "claim", "--input", input).code).toBe(5);
     expect(snapshot(root)).toEqual(before);
   }, 120_000);
 });

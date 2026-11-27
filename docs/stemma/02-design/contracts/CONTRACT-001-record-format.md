@@ -304,7 +304,8 @@ unchanged and its tool versions match the current ones.
 moment it is written until it is retired; nothing waits for approval. Records
 that carry `review` are marked `unreviewed` or `reviewed`. The mark `reviewed`
 applies while `review.content_sha256` equals the record's current content
-digest. The author's own edits keep a record reviewed: a writer that applies an
+digest, and never while the record's `created` or `review` breaks a rule of
+this contract. The author's own edits keep a record reviewed: a writer that applies an
 edit whose `changed.by.kind` is `person` to a reviewed record updates
 `review.content_sha256` in the same write. An edit by a `model` or `software`
 actor sets `review.state` to `unreviewed`; the record stays in effect. A

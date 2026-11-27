@@ -103,7 +103,7 @@
         "message": "A claim in the ledger is incomplete: the evidence names what is missing of a note behind it, a confidence level and a reason.",
         "why": "Without all three, nobody can see later what the claim rests on, how sure its writer was, or why the sources support it.",
         "suggestions": [
-          "For a missing note, record a note on the source passage and link it to the claim with an attestation; a passage linked directly is not a note, and a retired note or attestation no longer counts. For a missing confidence level (low, medium or high) or reason, add them to the claim. Stemma has no command that edits a record: change the claim's file and run `fmt` on it. If you no longer hold the claim, retire it. Writing can carry on meanwhile, and a claim that is rightly left as it is, such as your own thesis, can be explained or dismissed."
+          "For a missing note, record a note on the source passage and link it to the claim with an attestation; a passage linked directly is not a note, and a retired note or attestation no longer counts, nor does one that breaks a rule (see the record.valid findings). For a missing confidence level (low, medium or high) or reason, add them to the claim. Stemma has no command that edits a record: change the claim's file and run `fmt` on it. If you no longer hold the claim, retire it. Writing can carry on meanwhile, and a claim that is rightly left as it is, such as your own thesis, can be explained or dismissed."
         ]
       },
       {

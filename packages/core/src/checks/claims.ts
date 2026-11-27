@@ -4,7 +4,7 @@
 import { type Corpus, idOf, isRetired, type LoadedFile, TYPES } from "@stemma/records";
 import { grouped, once } from "../corpus-index.ts";
 import { result } from "../findings.ts";
-import { claimLinks } from "../review.ts";
+import { claimLinks, linksInEffect, takesPart } from "../review.ts";
 import type { Evidence, Result } from "../report.ts";
 import { active } from "./bibliography.ts";
 import { itemOf, subjectOf } from "./records.ts";
@@ -36,7 +36,8 @@ export function claimResults(corpus: Corpus): Result[] {
     const data = claim.data!;
     const links = claimLinks(corpus, idOf(claim) ?? "");
     const noted = links.some((l) => l.note);
-    // An unreadable attestation could be any claim's; an unreadable note matters only to a claim that points at it.
+    // An unreadable attestation could be any claim's; an unreadable note matters only to a claim that an
+    // attestation taking part points at it from.
     const hidden = noted ? [] : [...new Set([
       ...unread(corpus).attestations,
       ...links.flatMap((l) => unread(corpus).notes.get(String(l.attestation.data!.evidence)) ?? []),
@@ -50,8 +51,9 @@ export function claimResults(corpus: Corpus): Result[] {
     if (missing.length > 0) evidence.push({ name: "missing", class: "metadata", value: missing.join(", ") });
     for (const path of hidden) evidence.push({ name: "cannot_be_read", class: "location", value: path });
     if (!noted) {
-      for (const link of links) {
-        evidence.push({ name: "attestation_without_a_note", class: "location", value: `${link.attestation.path}: ${whyNot(corpus, link.attestation.data!.evidence)}` });
+      for (const { attestation } of linksInEffect(corpus, idOf(claim) ?? "")) {
+        const why = takesPart(attestation) ? whyNot(corpus, attestation.data!.evidence) : "the attestation does not take part in checks";
+        evidence.push({ name: "attestation_without_a_note", class: "location", value: `${attestation.path}: ${why}` });
       }
       for (const file of retiredLinks(corpus).get(idOf(claim)) ?? []) evidence.push({ name: "attestation_without_a_note", class: "location", value: `${file.path}: the attestation is retired` });
     }

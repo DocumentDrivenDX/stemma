@@ -72,27 +72,24 @@ export function prepareRecord(request: NewRecord): { id: string; path: string; t
   return { id, path: recordPath(kind, id), text: canonical(record) };
 }
 
-/** The kind of the actor a stamp or `--actor` names, when it names one. */
-const actorKind = (by: unknown): string | undefined => (isObject(by) && typeof by.kind === "string" ? by.kind : undefined);
+/** Whether a stamp names a person, spelled exactly. */
+const byPerson = (stamp: unknown): boolean => isObject(stamp) && isObject(stamp.by) && stamp.by.kind === "person";
 
 /**
- * A new record starts unreviewed. It is written as reviewed only when a person
- * is the one writing it, since a review mark records what a person said.
+ * A new record starts unreviewed. It is written as reviewed only when `--actor`
+ * is a person, since a review mark records what a person said. The input's own
+ * stamps do not stand in for that, and none of them may name anything else.
  */
 function reviewMark(record: JsonObject, request: NewRecord): void {
   record.review ??= { state: "unreviewed" };
   const review = record.review;
   if (!isObject(review) || review.state !== "reviewed") return;
-  const created = isObject(record.created) ? record.created.by : undefined;
-  const decided = isObject(review.decided) ? review.decided.by : undefined;
-  const writers = [request.actor?.kind, actorKind(created), actorKind(decided)];
-  if (writers.includes("model") || writers.includes("software") || !writers.includes("person")) {
-    throw new InvalidInput("A record is added as reviewed only when a person writes it: a model or software actor cannot mark a record reviewed. Leave `review` out to add it unreviewed.");
+  const { actor } = request;
+  if (actor?.kind !== "person" || !byPerson(record.created) || (review.decided !== undefined && !byPerson(review.decided))) {
+    throw new InvalidInput("A record is added as reviewed only with --actor person:<name>, and only when `created` and any `review.decided` name a person: a model or software actor cannot mark a record reviewed. Leave `review` out to add it unreviewed.");
   }
   review.content_sha256 ??= itemOf({ data: record } as unknown as LoadedFile)!.content_sha256;
-  // One of the two names a person: with no person actor and no person in `created`, `decided` already does.
-  const person = request.actor ?? (actorKind(created) === "person" ? (created as JsonObject) : undefined);
-  if (review.decided === undefined && person) review.decided = { at: stampTime(request.now), by: { ...person } };
+  review.decided ??= { at: stampTime(request.now), by: { ...actor } };
 }
 
 /** Files that `fmt` would rewrite. A rewrite never changes a value. */

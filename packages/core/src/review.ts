@@ -10,35 +10,51 @@ import { boundaryFor } from "./excerpt.ts";
 import { type Actor, InvalidInput, stampTime } from "./operations.ts";
 import type { RecordWrite } from "./capture.ts";
 
+/** A record that breaks a rule is left out of the graph export, and counts toward no claim. */
+export const takesPart = (file: LoadedFile): boolean => !file.problems.some((p) => p.reason === "record_invalid");
+
+/** Whether who wrote the record, or its mark, is recorded in a way that breaks a rule. */
+const markBroken = (file: LoadedFile): boolean =>
+  file.problems.some((p) => p.reason === "record_invalid" && /^\/(created|review)(\/|$)/.test(p.field));
+
 /**
  * A record is reviewed only while its mark says so and the content is still
- * what the mark was made on. A record with no mark is not reviewed.
+ * what the mark was made on. A record with no mark is not reviewed, nor is one
+ * whose `created` or `review` breaks a rule.
  */
 export function isReviewed(file: LoadedFile): boolean {
   const review = file.data?.review;
-  return isObject(review) && review.state === "reviewed" && review.content_sha256 === itemOf(file)!.content_sha256;
+  return isObject(review) && review.state === "reviewed" && !markBroken(file) && review.content_sha256 === itemOf(file)!.content_sha256;
 }
 
+// Reversed, so that of two notes with one ID the first is kept, as in `byId`.
 const notesById = (corpus: Corpus) => once(corpus, "notes in effect by ID", () =>
-  new Map<unknown, LoadedFile>(activeRecords(corpus, "note").map((n) => [idOf(n), n])));
+  new Map<unknown, LoadedFile>(activeRecords(corpus, "note").toReversed().map((n) => [idOf(n), n])));
 
 /** Whether records of this kind have a review mark. */
 export const carriesReview = (kind: string): boolean => Object.hasOwn(KIND_TYPES, kind) && TYPES[KIND_TYPES[kind]!]!.review !== undefined;
 
 /** The attestations in effect for a claim, each with its evidence note when that is a note in effect. */
-export function claimLinks(corpus: Corpus, claim: string): { attestation: LoadedFile; note?: LoadedFile }[] {
+export function linksInEffect(corpus: Corpus, claim: string): { attestation: LoadedFile; note?: LoadedFile }[] {
   return activeWhere(corpus, "attestation", "claim", claim).map((attestation) => {
     const note = notesById(corpus).get(attestation.data!.evidence);
     return { attestation, ...(note ? { note } : {}) };
   });
 }
 
+/** The links that count toward a claim: neither end of one breaks a rule. */
+export function claimLinks(corpus: Corpus, claim: string): { attestation: LoadedFile; note?: LoadedFile }[] {
+  return linksInEffect(corpus, claim).filter((l) => takesPart(l.attestation))
+    .map((l) => (l.note && !takesPart(l.note) ? { attestation: l.attestation } : l));
+}
+
 /**
  * Every record with a review mark that a cited claim brings with it. What a
- * manuscript reaches beyond a claim's evidence is added here.
+ * manuscript reaches beyond a claim's evidence is added here. A record that
+ * breaks a rule is still reached, so that it is not left off the unreviewed list.
  */
 export function claimReach(corpus: Corpus, claim: LoadedFile): LoadedFile[] {
-  return [claim, ...claimLinks(corpus, idOf(claim)!).flatMap((l) => [l.attestation, ...(l.note ? [l.note] : [])])];
+  return [claim, ...linksInEffect(corpus, idOf(claim)!).flatMap((l) => [l.attestation, ...(l.note ? [l.note] : [])])];
 }
 
 /** How much of one stored passage or manuscript origin the listing shows (an assumption). */
@@ -98,7 +114,7 @@ function passagesOf(corpus: Corpus, evidence: unknown): string[] {
 
 function passagesNamed(corpus: Corpus, data: JsonObject): string[] {
   if (data.kind === "claim") {
-    return claimLinks(corpus, String(data.id)).flatMap((l) => {
+    return linksInEffect(corpus, String(data.id)).flatMap((l) => {
       if (l.note) return strings(l.note.data!.passages);
       // A note that is not in effect brings nothing; a passage linked directly is shown.
       return corpus.byId.get(String(l.attestation.data!.evidence))?.data?.kind === "note" ? [] : passagesOf(corpus, l.attestation.data!.evidence);
@@ -151,7 +167,8 @@ export function unreviewedListing(corpus: Corpus): UnreviewedListing {
     const origins = originsOf(corpus, data, withheld);
     items.push({
       record: id, kind, file: file.path, content_sha256: itemOf(file)!.content_sha256,
-      mark: !isObject(data.review) ? "no_mark" : data.review.state === "reviewed" ? "changed_since_review" : "unreviewed",
+      mark: !isObject(data.review) ? "no_mark"
+        : data.review.state === "reviewed" && data.review.content_sha256 !== itemOf(file)!.content_sha256 ? "changed_since_review" : "unreviewed",
       content: withheld ? {} : contentOf(corpus, data), ...(withheld ? { content_withheld: true as const } : {}),
       origins, ...(origins.length === 0 ? { no_passage: true as const } : {}),
     });
@@ -187,12 +204,20 @@ export function planReviewed(corpus: Corpus, request: ReviewedRequest): ReviewPl
     if (named.has(id) && named.get(id) !== shown) throw new InvalidInput(`${id} is named with two different digests.`);
     named.set(id, shown);
   }
+  const holders = once(corpus, "records by ID, counted", () => {
+    const counts = new Map<string, number>();
+    for (const f of corpus.records) {
+      const id = idOf(f);
+      if (id !== undefined) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
+  });
   const wanted = [...named].map(([id, shown]) => {
     const file = corpus.byId.get(id);
     if (!file?.data) throw new InvalidInput(`No readable record has the ID ${id}.`);
     if (!carriesReview(String(file.data.kind))) throw new InvalidInput(`${id} is a ${String(file.data.kind)} record, which carries no review mark.`);
     if (isRetired(file.data)) throw new InvalidInput(`${id} is retired.`);
-    if (corpus.records.some((f) => f !== file && idOf(f) === id)) throw new InvalidInput(`More than one record has the ID ${id}. See the record.valid finding.`);
+    if (holders.get(id)! > 1) throw new InvalidInput(`More than one record has the ID ${id}. See the record.valid finding.`);
     if (!file.formattable) throw new InvalidInput(`${file.path} holds values that rewriting would change. Correct it first.`);
     return { id, shown, file };
   });
