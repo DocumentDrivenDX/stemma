@@ -6,7 +6,8 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { createSession, linesOf, lockHolder, lockPath, MCP_LIMITS, MCP_TOOLS, serveMcp, takeLock } from "@stemma/server";
+import { parseExplore } from "@documentdrivendx/arras-ui/browser";
+import { createSession, LAUNCH_ROUTE, linesOf, lockHolder, lockPath, MCP_LIMITS, MCP_TOOLS, recordRoute, SEARCH_LIMITS, serveMcp, takeLock, writeLaunchFile } from "@stemma/server";
 import { agentSearch, agentView, holdsCoordinate, WITHHELD } from "../packages/server/src/agent.ts";
 import { TAGS } from "../packages/core/src/browse-proof.ts";
 import { mcpTools, resultText } from "../packages/cli/src/mcp.ts";
@@ -396,7 +397,7 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
     const refused: [string, unknown][] = [
       ["open", { record: "" }], ["open", { record: "x".repeat(129) }], ["open", { record: ["cit-darwinreefs0001"] }], ["open", { record: 1 }],
       ["open", { address: "https://example.invalid/" }], ["open", { url: "https://example.invalid/" }], ["open", { record: "cit-darwinreefs0001", project: "/tmp" }],
-      ["search", { text: "reef", project: "/" }], ["search", { text: "reef", path: "/etc" }], ["search", { text: "" }], ["search", { text: "x".repeat(401) }], ["search", { text: 5 }],
+      ["search", { text: "reef", project: "/" }], ["search", { text: "reef", path: "/etc" }], ["search", { text: "" }], ["search", { text: "x".repeat(201) }], ["search", { text: 5 }],
       ["search", { text: "reef", limit: 21 }], ["search", { text: "reef", limit: 0 }], ["search", { text: "reef", offset: -1 }], ["search", { text: "reef", type: 3 }],
       ["source_view", {}], ["source_view", { record: "cit-darwinreefs0001", originals: "/" }], ["status", { project: "/" }], ["stop", { pid: 1 }],
     ];
@@ -409,6 +410,19 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
     expect([opener.calls(), readdirSync(places.data), socketsOf([host.child.pid])]).toEqual([[], [], []]);
     await host.end();
   }, 90_000);
+
+  test("search takes 200 characters, counted as code points, as its message, its schema and the search itself say", async () => {
+    const { host } = await start(coral());
+    await host.initialize();
+    const schema = (await host.request("tools/list")).result.tools.find((t: any) => t.name === "search").inputSchema;
+    expect([schema.properties.text.maxLength, SEARCH_LIMITS.chars]).toEqual([200, 200]);
+    for (const text of ["x".repeat(200), "𝔛".repeat(200)]) expect((await host.call("search", { text })).isError).toBe(false);
+    for (const text of ["x".repeat(201), "𝔛".repeat(201), "x".repeat(400)]) {
+      const got = await host.call("search", { text });
+      expect([got.isError, got.text]).toEqual([true, "bad_arguments: text is a string of 1 to 200 characters. Nothing was done."]);
+    }
+    await host.end();
+  }, 60_000);
 
   test("lines that are not requests, and a line too long, are answered with an error and change nothing", async () => {
     const { host } = await start(coral());
@@ -528,6 +542,58 @@ describe("what is given for a model", () => {
       at += 3_600_000;
       expect((await tools.call("open", {})).isError).toBeUndefined();
       expect(windows).toBe(31);
+    } finally {
+      await tools.close();
+    }
+  }, 120_000);
+});
+
+describe("a record's route, and a later step of open that fails", () => {
+  test("an ID or type with ' ( ) * ! or spaces is encoded into a route that the command and the page accept, and that reads back as it was", () => {
+    // The page keeps its own copy of the form.
+    expect(readFileSync(join(ROOT, "packages/explorer/src/remote.ts"), "utf8")).toContain(LAUNCH_ROUTE.source.slice(1, -1));
+    for (const [type, key] of [["Citation", "cit-darwinreefs0001"], ["Source file", "a'b(c)d*e!f"], ["Text_review", "src-1.p:2 100% /?#&\"<é😀"]] as const) {
+      const route = recordRoute(type, key)!;
+      expect(route).toMatch(LAUNCH_ROUTE);
+      expect(route.split("/").map(decodeURIComponent)).toEqual(["explore", "stemma", type, key]);
+      expect(parseExplore(`#/${route}`)).toMatchObject({ kind: "explore", loc: { module: "stemma", type, key } });
+      const launch = writeLaunchFile("http://127.0.0.1:5000/", "c", temporary(), route);
+      expect(readFileSync(launch.path, "utf8")).toContain(`#code=c&amp;to=${route}"`);
+      launch.remove();
+    }
+    expect([recordRoute("Source", ""), recordRoute("", "a"), recordRoute("Source", "\ud800")]).toEqual([undefined, undefined, undefined]);
+    for (const bad of ["explore/stemma/Source/a b", "explore/stemma/Source/a'b", "explore/stemma/Source/100%", "explore/stemma/Source file/a", "explore/stemma/Source/a/b"]) {
+      expect(bad).not.toMatch(LAUNCH_ROUTE);
+      expect(() => writeLaunchFile("http://127.0.0.1:5000/", "c", temporary(), bad)).toThrow("Not a record route");
+    }
+  });
+
+  test("a server that the failing call started is stopped; one that was already running stays", async () => {
+    const dir = coral();
+    const data = join(temporary(), "data");
+    let at = 1_000_000;
+    const tools = mcpTools({ project: dir, dataDirectory: data, now: () => at, bounds: { openedMs: 0, idleMinutes: 10_000 }, open: async () => true });
+    const was = process.env.TMPDIR;
+    const running = async () => quotedData((await tools.call("status", {})).text).explorer.running;
+    // Where no launch file can be made.
+    const failing = async () => {
+      process.env.TMPDIR = join(dir, "stemma.json");
+      try {
+        return await tools.call("open", { record: "cit-darwinreefs0001" });
+      } finally {
+        if (was === undefined) delete process.env.TMPDIR;
+        else process.env.TMPDIR = was;
+      }
+    };
+    try {
+      await tools.call("search", { text: "reef", limit: 1 });
+      expect((await failing()).isError).toBe(true);
+      expect([await running(), lockHolder(data, dir)]).toEqual([false, undefined]);
+      at += 5_000;
+      expect((await tools.call("open", {})).isError).toBeUndefined();
+      at += 5_000;
+      expect((await failing()).isError).toBe(true);
+      expect(await running()).toBe(true);
     } finally {
       await tools.close();
     }

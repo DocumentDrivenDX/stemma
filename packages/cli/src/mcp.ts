@@ -11,7 +11,7 @@ import { findProject, inputsChanged, mayShowTheSame, scanInputs } from "@stemma/
 import {
   createOriginals, createSession, type LaunchFile, type Listening, listen, type Lock, lockDirectory, lockHolder, openInBrowser,
   ProcessGone, type Session, type SnapshotProcess, Snapshots, spawnSnapshotProcess, takeLock, writeLaunchFile, serveMcp, type ToolResult,
-  AGENT_LIMITS,
+  AGENT_LIMITS, recordRoute, SEARCH_LIMITS,
 } from "@stemma/server";
 import { pageAssets, workerCommand } from "./browse.ts";
 import { type Options, usageError, VERSION } from "./context.ts";
@@ -272,6 +272,11 @@ export function mcpTools(options: { project?: string | undefined; idleMinutes?: 
       if (!result) throw new Refused("unknown_record", "No record of this project has that ID, so nothing was opened. `open` takes only a record ID, as `search` gives it, and never an address or a path.");
       found = result;
     }
+    // And its route is made and checked, so that nothing is started for one the link cannot hold.
+    const route = found ? recordRoute(found.type, found.key) : undefined;
+    if (found && route === undefined) {
+      throw new Refused("no_record_route", "A link cannot name this record, so nothing was opened or started. Call open without a record, and the author can find it with the explorer's search.");
+    }
     const at = now();
     opens = opens.filter((t) => at - t < 3_600_000);
     if (opens.length >= bounds.openHourly || at - (opens.at(-1) ?? Number.NEGATIVE_INFINITY) < bounds.openEveryMs) {
@@ -280,21 +285,26 @@ export function mcpTools(options: { project?: string | undefined; idleMinutes?: 
     const { run, started } = await serve(project);
     opens.push(at);
     touch();
-    const code = run.unused ?? run.session.issue();
-    run.unused = undefined;
-    if (served !== run) throw ENDED();
-    const route = found ? `explore/stemma/${encodeURIComponent(found.type)}/${encodeURIComponent(found.key)}` : undefined;
-    const before = run.opened.length;
-    const file = writeLaunchFile(run.server.address, code, undefined, route);
-    run.files.set(code, file);
-    if (!(await open(file.path).catch(() => false))) {
+    let link: string | undefined;
+    try {
+      const code = run.unused ?? run.session.issue();
+      run.unused = undefined;
+      if (served !== run) throw ENDED();
+      const before = run.opened.length;
+      const file = writeLaunchFile(run.server.address, code, undefined, route);
+      run.files.set(code, file);
+      if (!(await open(file.path).catch(() => false))) {
+        throw new Refused("browser_not_opened", "The system could not open the author's browser, so the link was withdrawn. To give them a file to open themselves, stop here and run the `browse` command with --no-open as a background command (the stemma skill, Browsing the records).");
+      }
+      const end = Date.now() + bounds.openedMs;
+      while (run.opened.length === before && Date.now() < end && served === run) await Bun.sleep(50);
+      link = run.opened.length > before ? times(run.opened.slice(before))[0] : undefined;
+    } catch (error) {
+      // The code is ended, and a server that this call started does not stay.
       run.session.expire();
-      if (started) await stopServer();
-      throw new Refused("browser_not_opened", "The system could not open the author's browser, so the link was withdrawn. To give them a file to open themselves, stop here and run the `browse` command with --no-open as a background command (the stemma skill, Browsing the records).");
+      if (started && served === run) await stopServer();
+      throw error;
     }
-    const end = Date.now() + bounds.openedMs;
-    while (run.opened.length === before && Date.now() < end && served === run) await Bun.sleep(50);
-    const link = run.opened.length > before ? times(run.opened.slice(before))[0] : undefined;
     return resultText(
       [
         "The author's browser on this computer was asked to open the explorer. The address below gives no access by itself: only the page Stemma opened can read the project. Do not open it.",
@@ -331,7 +341,10 @@ export function mcpTools(options: { project?: string | undefined; idleMinutes?: 
     }
     if (name === "search") {
       const { text, type } = args;
-      if (typeof text !== "string" || text === "" || text.length > 400) throw badArguments("text is a string of 1 to 200 characters.");
+      // Code points, as the snapshot's search and the tool's schema count them.
+      if (typeof text !== "string" || text === "" || text.length > SEARCH_LIMITS.chars * 2 || Array.from(text).length > SEARCH_LIMITS.chars) {
+        throw badArguments(`text is a string of 1 to ${SEARCH_LIMITS.chars} characters.`);
+      }
       if (type !== undefined && (typeof type !== "string" || type.length > 64)) throw badArguments("type is a record type's name.");
       const limit = whole(args.limit, AGENT_LIMITS.defaultHits, 1, AGENT_LIMITS.hits, "limit");
       const offset = whole(args.offset, 0, 0, Number.MAX_SAFE_INTEGER, "offset");

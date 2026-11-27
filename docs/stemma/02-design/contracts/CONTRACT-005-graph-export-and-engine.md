@@ -1049,6 +1049,11 @@ a result saying that Stemma's one-time setup has not been run and how the agent
 runs it. It repeats nothing from a request but its ID, and only an ID that is a
 number or a short plain string. Once the pinned Bun is there, the next tool call
 hands the connection to the command line, which answers that call and the rest.
+A line over 64 KiB gets -32700 and is not parsed, and no more than one byte over
+that is held of a line, ended or not. POSIX `read` has no such bound, so this
+part runs in bash, to which the launcher hands itself when `sh` is another shell;
+without bash it takes a `sh` whose `read` has `-n`, and otherwise ends with 4,
+having read nothing. It parses in one process, which a kill ends whole.
 
 **Protocol.** JSON-RPC 2.0, one message on each line. Answered: `initialize`,
 `ping`, `tools/list`, and `tools/call`. Notifications are taken and not
@@ -1096,11 +1101,15 @@ new one ends an unused earlier one (which is then `code_expired`), and a used
 one stays `code_used`. The code's launch file is rule 8's, one for each `open`,
 removed when its code is used or ends. The launch address may name a record, as
 `#code=<code>&to=explore/stemma/<type>/<key>`, built from the snapshot's entry;
-the page goes there only when the text has that form. If the system's opener
+`<type>` and `<key>` hold only letters, digits, `. _ ~ -`, and percent escapes
+for everything else. The route is made and checked before anything is started (a
+record no route can name is `no_record_route`), and the page goes there only when
+the text has that form. If the system's opener
 does not take the file, the code is ended, the file removed, and the result says
 to use the `browse` command instead: **no result names a launch file**. At most
-one `open` in 5 seconds and 30 in an hour are accepted. A server started by that
-call is then stopped.
+one `open` in 5 seconds and 30 in an hour are accepted. When the opener or any
+other step fails after the server is listening, the code is ended, and a server
+started by that call is stopped.
 
 **Originals** are looked for only in `.stemma/originals/` in the project: no
 tool takes a path, so no other place can be named. To show originals kept

@@ -14,16 +14,31 @@ export interface LaunchFile {
   remove(): void;
 }
 
-/** The record route a launch address may name: only this form (CONTRACT-005 N). */
-export const LAUNCH_ROUTE = /^explore\/stemma\/[A-Za-z0-9]+\/[A-Za-z0-9%._~-]+$/;
+/**
+ * The record route a launch address may name: only this form (CONTRACT-005 N).
+ * Each part is unreserved characters and percent escapes, as `recordRoute` writes
+ * them. The page accepts the same form (`takeCode`).
+ */
+export const LAUNCH_ROUTE = /^explore\/stemma\/(?:[A-Za-z0-9._~-]|%[0-9A-F]{2})+\/(?:[A-Za-z0-9._~-]|%[0-9A-F]{2})+$/;
+
+/** encodeURIComponent leaves ! ' ( ) * as they are, and a route holds none of them. */
+const encodePart = (part: string): string => encodeURIComponent(part).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+
+/** The route of a record, or nothing when no route of the allowed form can name it. */
+export function recordRoute(type: string, key: string): string | undefined {
+  // A lone surrogate cannot be encoded.
+  if (!type.isWellFormed() || !key.isWellFormed()) return undefined;
+  const route = `explore/stemma/${encodePart(type)}/${encodePart(key)}`;
+  return LAUNCH_ROUTE.test(route) ? route : undefined;
+}
 
 /** The code goes in the fragment, which a browser sends in no request and no referrer. */
 export function writeLaunchFile(address: string, code: string, parent = tmpdir(), route?: string): LaunchFile {
+  if (route !== undefined && !LAUNCH_ROUTE.test(route)) throw new Error("Not a record route.");
   // mkdtemp makes the directory for its owner only; the modes are set again in case a system does not.
   const directory = mkdtempSync(join(parent, "stemma-browse-"));
   chmodSync(directory, 0o700);
   const path = join(directory, LAUNCH_NAME);
-  if (route !== undefined && !LAUNCH_ROUTE.test(route)) throw new Error("Not a record route.");
   // `&amp;` because both places are attributes of the page below.
   const target = `${address}#code=${code}${route === undefined ? "" : `&amp;to=${route}`}`;
   writeFileSync(path, [

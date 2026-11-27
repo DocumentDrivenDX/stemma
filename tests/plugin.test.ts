@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { bundle } from "../scripts/build.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "../scripts/publish-plugin.ts";
 import { ROOT, temporary } from "./helpers.ts";
+import { childrenOf } from "./browse-run.ts";
 import { endMcp, McpHost } from "./mcp-run.ts";
 
 let plugin = "";
@@ -162,6 +163,78 @@ describe.skipIf(process.platform === "win32")("the declared MCP server", () => {
     expect(await host.end()).toBe(0);
     expect([readdirSync(data), readdirSync(home), readdirSync(session), host.stderr]).toEqual([["bun-1.4.5"], [], [], ""]);
   }, 60_000);
+
+  const oversize = (bytes: number) => `{"method":"tools/call","jsonrpc":"2.0","id":900,"params":{"x":"${"y".repeat(bytes)}"}}`;
+  const tooLong = { id: null, error: { code: -32700, message: "The message is longer than this server reads." } };
+  /** A ping whose line is exactly `bytes` long, with the ID last. */
+  const pingOf = (bytes: number, id: number) => {
+    const [head, tail] = ['{"method":"ping","jsonrpc":"2.0","params":{"x":"', `"},"id":${id}}`];
+    return `${head}${"y".repeat(bytes - head.length - tail.length)}${tail}`;
+  };
+  const shells = ["/bin/sh", ...(existsSync("/bin/dash") ? ["/bin/dash"] : [])];
+  const bare = (shell: string, data: string, path = "/usr/bin:/bin") => McpHost.start([shell, join(plugin, "scripts/stemma.sh"), data, "mcp"], { PATH: path, HOME: temporary() }, temporary());
+
+  test.each(shells)("without the pinned Bun, %s answers a line over 64 KiB with -32700, unparsed, and goes on; the next call after one still reaches the command line", async (shell) => {
+    const data = join(temporary(), "data");
+    const host = bare(shell, data);
+    await host.initialize();
+    // Each of the several-MB lines would take hours to parse as one request.
+    for (const line of [pingOf(65_537, 1), oversize(131_074), oversize(1_000_000), oversize(5_000_000)]) {
+      host.send(line);
+      expect(await host.reply(null, 30_000)).toMatchObject(tooLong);
+      expect((await host.request("ping")).result).toEqual({});
+    }
+    host.send(pingOf(65_536, 777));
+    expect((await host.reply(777)).result).toEqual({});
+    expect(host.stdout).not.toContain("yyyy");
+    expect((await host.call("status")).text).toStartWith("setup_needed");
+
+    host.send(oversize(1_000_000));
+    await host.reply(null, 30_000);
+    mkdirSync(join(data, "bun-1.4.5"), { recursive: true });
+    symlinkSync(process.execPath, join(data, "bun-1.4.5/bun"));
+    // A long call within the limit is handed over whole.
+    const got = await host.call("search", { text: "y".repeat(60_000) });
+    expect([got.isError, got.text]).toEqual([true, expect.stringContaining("bad_arguments")]);
+    expect((await host.call("stop")).isError).toBe(false);
+    expect(await host.end()).toBe(0);
+    expect(host.stderr).toBe("");
+  }, 90_000);
+
+  test("a line that never ends is answered once it is over the limit, before its end or the input's", async () => {
+    const host = bare("/bin/sh", join(temporary(), "data"));
+    host.child.stdin.write("y".repeat(3_000_000));
+    host.child.stdin.flush();
+    expect(await host.reply(null, 30_000)).toMatchObject(tooLong);
+    expect(await host.end()).toBe(0);
+    expect(host.stdout.trim().split("\n")).toHaveLength(1);
+  }, 60_000);
+
+  test.each([
+    ["parsing a long line", `{"jsonrpc":"2.0","x":"${"y".repeat(65_000)}","id":5,"method":"ping","params":{}}\n`],
+    ["reading a line that has not ended", "y".repeat(2_000_000)],
+  ])("a kill while it is %s leaves no process behind, and it had started none", async (_when, input) => {
+    const data = join(temporary(), "data of a killed launcher");
+    for (const signal of ["SIGTERM", "SIGKILL"] as const) {
+      const host = McpHost.start(filled(data), { PATH: "/usr/bin:/bin", HOME: temporary() }, temporary());
+      await host.initialize();
+      host.child.stdin.write(input);
+      host.child.stdin.flush();
+      await Bun.sleep(400);
+      expect(childrenOf(host.child.pid)).toEqual([]);
+      await host.end(signal, 5_000);
+      // A subshell left behind would still show the command line it was forked with.
+      expect(Bun.spawnSync(["pgrep", "-f", data]).stdout.toString()).toBe("");
+    }
+  }, 60_000);
+
+  test.skipIf(!existsSync("/bin/dash"))("where there is no shell that can bound a read, it ends before reading anything", () => {
+    const tools = temporary();
+    for (const name of ["uname", "dirname", "cat"]) symlinkSync(Bun.which(name, { PATH: "/usr/bin:/bin" })!, join(tools, name));
+    const done = Bun.spawnSync(["/bin/dash", join(plugin, "scripts/stemma.sh"), join(temporary(), "data"), "mcp"], { env: { PATH: tools, HOME: temporary() }, stdin: new TextEncoder().encode('{"method":"ping","jsonrpc":"2.0","id":1}\n') });
+    expect([done.exitCode, done.stdout.toString()]).toEqual([4, ""]);
+    expect(done.stderr.toString()).toContain("needs bash");
+  });
 
   test("with the pinned Bun it starts the command line, writing nothing, a transpiler cache included", async () => {
     const data = ready();

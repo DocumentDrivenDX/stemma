@@ -69,8 +69,33 @@ ready() {
   [ -f "$bun" ] && [ "$("$bun" --no-env-file --config=/dev/null --version 2>/dev/null)" = "$version" ]
 }
 
-# A request's ID as it may be repeated: a whole number, or a short plain string. Nothing else of a request is.
+# The longest line the command line's server reads, in bytes (MCP_LIMITS.lineBytes).
+line_most=65536
+
+# The next line of the input, in `line`. It takes no byte past the line's end, so
+# what follows is left for the command line, and it never holds more than one
+# byte over the limit: a longer line is answered as soon as it is known to be one,
+# and the rest of it is let go in pieces. POSIX `read` has no bound of its own,
+# so this needs a shell whose `read` takes -n.
+mcp_line() {
+  while :; do
+    line=
+    IFS= read -r -n $((line_most + 1)) line || [ -n "$line" ] || return 1
+    [ "${#line}" -gt "$line_most" ] || return 0
+    printf '{"jsonrpc":"2.0","id":null,"error":{"code":-32700,"message":"The message is longer than this server reads."}}\n'
+    while [ "${#line}" -gt "$line_most" ]; do
+      line=
+      IFS= read -r -n $((line_most + 1)) line || return 1
+    done
+  done
+}
+
+# A request's ID as it may be repeated, in `id`: a whole number, or a short plain
+# string, and otherwise nothing. Nothing else of a request is. It starts no
+# subshell, which a kill of this script would leave running.
 mcp_id() {
+  id=
+
   case "$1" in
     *'"id":'*) ;;
     *) return 0 ;;
@@ -99,7 +124,7 @@ mcp_id() {
     '' | *[!0-9]*) return 0 ;;
   esac
   [ "${#v}" -le 66 ] || return 0
-  printf '%s' "$v"
+  id=$v
 }
 
 # The protocol while the pinned Bun is missing: the same tools, each saying so.
@@ -108,13 +133,17 @@ mcp_id() {
 mcp_without_bun() {
   tools=$(cat "$root/dist/mcp-tools.json") || die "this copy of the plugin holds no list of its tools."
   first=
-  while IFS= read -r line; do
+  # Bytes, not characters: for the limit, and because matching is much faster.
+  locale_was=${LC_ALL-}
+  locale_set=${LC_ALL+yes}
+  LC_ALL=C
+  while mcp_line; do
     case "$line" in *'"method"'*) ;; *) continue ;; esac
     method=${line#*'"method"'}
     method=${method#*'"'}
     method=${method%%'"'*}
     case "$method" in notifications/*) continue ;; esac
-    id=$(mcp_id "$line")
+    mcp_id "$line"
     [ -n "$id" ] || continue
     case "$method" in
       initialize)
@@ -129,6 +158,7 @@ mcp_without_bun() {
       tools/call)
         if ready; then
           first=$line
+          if [ -n "$locale_set" ]; then LC_ALL=$locale_was; else unset LC_ALL; fi
           return 0
         fi
         printf '{"jsonrpc":"2.0","id":%s,"result":{"content":[{"type":"text","text":"setup_needed: Stemma has not had its one-time setup on this computer, so nothing was read, started or downloaded. Tell the author in one sentence that Stemma fetches its pinned copy of Bun into the plugin data directory and changes nothing else, run the plugin launcher with setup (the stemma skill, Run Stemma), then call this tool again."}],"isError":true}}\n' "$id"
@@ -140,6 +170,14 @@ mcp_without_bun() {
 }
 
 if [ "$1" = mcp ] && ! ready; then
+  # Some systems' sh, dash among them, cannot bound a read, and is also many times
+  # slower on a long line. bash is used where there is one. In its POSIX mode it
+  # reads no startup file.
+  if [ -z "${BASH_VERSION:-}" ] && bash --posix -c '[ -n "${BASH_VERSION:-}" ]' >/dev/null 2>&1; then
+    exec bash --posix "$root/scripts/stemma.sh" "$data" "$@"
+  fi
+  printf 'ab\n' | { IFS= read -r -n 1 probe 2>/dev/null && [ "$probe" = a ]; } ||
+    die "before setup, the MCP server needs bash, or a sh whose read takes -n, and neither was found. Run setup."
   mcp_without_bun
   STEMMA_MCP_FIRST_LINE=$first
   export STEMMA_MCP_FIRST_LINE
