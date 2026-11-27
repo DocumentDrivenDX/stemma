@@ -308,7 +308,9 @@ The microsite presents the plugin. Its home page leads with what the author is
 after, creating academically rigorous research reports and books, and presents
 the checks as how Stemma serves that: the problem, how the author works, what
 each recorded citation rests on, what is checked, and what stays the author's
-judgment. It claims for Stemma only what works.
+judgment. It claims for Stemma only what works. It carries no testing history:
+nothing about which machines, versions, or sessions have or have not been tried.
+Requirements a reader must meet, and the limits of what a check shows, stay.
 
 Its voice is approachable and nontechnical, for an author rather than a
 programmer: everyday words, "you" for the reader, a term explained where it is
