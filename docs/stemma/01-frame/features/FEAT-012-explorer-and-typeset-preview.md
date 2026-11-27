@@ -52,6 +52,7 @@ what is unverified, and says when a preview page differs from print.
 |------|----------------------|------------------------|
 | Record exploration | What is in my evidence? | Browse and search records |
 | Source view | What does the source say where I cite it? | Show a citation's quotation highlighted in its source text |
+| Manuscript browser | What stands behind this note in my report? | Read the report and open each quotation, note citation, and bibliography entry in its source |
 | Connected-graph view | How does it connect? | A larger view, contributed to arras |
 | Typeset pages | What supports this sentence? | Typeset pages with links in both directions |
 | Live preview | How will my edit look? | Typst compiled in the browser |
@@ -107,6 +108,36 @@ N/A — the user stories name the tasks.
   must not show a local path. Viewing must fetch nothing. The command line says
   whether a file with the recorded digest is held in the project or its cache.
   Opening an original is not part of this requirement.
+
+#### Manuscript browser (FR-64; disclosure also obeys FR-61)
+
+The first manuscript is the report that `build report` assembles (CONTRACT-006
+I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
+
+- MAN-01. From a visible control, the author must be able to read the report in
+  the explorer: its headings, text, quotations, numbered notes with their
+  citations and comments, and bibliography. It must be the manuscript as the
+  export read it, from the report directory the export names, and the page must
+  say that it is not the printed PDF and that originals are not opened yet.
+- MAN-02. Clicking a quotation, or the citation of a note, must show the cited
+  source with the quoted words highlighted in its source text, under SRC-02 to
+  SRC-04 and by the same source view. A quotation over several passages lists
+  each. A citation of a quotation that records no passage opens the source and
+  highlights nothing.
+- MAN-03. Clicking a bibliography entry must show the source with every place
+  the report cites it, each openable. Quotations of it given without a citation
+  of their own are listed apart.
+- MAN-04. Every link must come from the data the report builder itself used. No
+  link, citation, or highlight may be made by matching text.
+- MAN-05. A quotation that cannot be built as `build report` would build it must
+  be shown as broken, with why, without its text and without a highlight, and the
+  rest of the report must stay readable. `build report` itself still fails.
+- MAN-06. The manuscript data must obey the author export's disclosure rules:
+  no local path, nothing that rests on a record the export leaves out, and a
+  warning where its text holds what looks like a coordinate. A change to a report
+  input must make the export stale.
+- MAN-07. On a narrow screen the source must be shown over the text being read,
+  not after it, and be closable.
 
 #### Connected-graph view (FR-64)
 
@@ -180,6 +211,7 @@ N/A — the user stories name the tasks.
 - [US-093 — Preview typeset pages while editing](../user-stories/US-093-preview-pages-while-editing.md)
 - [US-094 — Open the explorer as a local browser bundle](../user-stories/US-094-open-explorer-from-local-file.md)
 - [US-116 — See a citation in its source](../user-stories/US-116-see-a-citation-in-its-source.md)
+- [US-118 — Read the report and open its sources](../user-stories/US-118-read-the-report-and-open-its-sources.md)
 
 ## Edge Cases and Error Handling
 
@@ -241,6 +273,8 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
+- Opening or highlighting an original or page image, and a localhost server.
+- Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).
 - Reviewer package contents and removal rules (FEAT-009).
 - Reviewer comment behavior (FR-79, FEAT-009 COM-01 to COM-04). The offline

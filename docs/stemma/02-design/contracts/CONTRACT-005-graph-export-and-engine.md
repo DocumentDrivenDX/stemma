@@ -57,6 +57,7 @@ fact.
 | `arras-static.json` | arras static configuration naming the two files by relative path, for hosted delivery |
 | `stemma.states.json` | Record states (J), for exported records |
 | `stemma.sourceviews.json` | Source views (K) of exported passages and citations, `author` audience only |
+| `stemma.manuscript.json` | The manuscript view (L), `author` audience only. Written by every export; it says so when the project has no report |
 | `stemma.export.json` | Manifest, schema `stemma.graph-export/0`: `audience`, `scope`, `corpus_digest`, `data_identity` (J), `exporter`, `arras`, `arras_view`, `search_fold`, SHA-256 of each other file (`files`), `counts`, `omissions[]` (type, reason, count), `dropped_links[]` (relationship, reason, count), `states` (computed, not computed, the checks used and those left out with why), `warnings[]` (code, message, records) |
 | `explorer.html` | With `--page`: one self-contained page with the module and graph texts inlined |
 
@@ -121,8 +122,9 @@ application, database, or write path.
 
 **The Stemma host page.** The plugin ships a page template, built with Stemma
 from the host, arras, React, and their styles, with the licenses of that code.
-An export fills four `application/json` script elements: the banner data, the
-module, the graph, and the source views (K), the last byte for byte as written. Nothing is bundled on the author's machine. The page's
+An export fills five `application/json` script elements: the banner data, the
+module, the graph, the source views (K), and the manuscript view (L), the last
+two byte for byte as written. Nothing is bundled on the author's machine. The page's
 content security policy is `default-src 'none'; script-src 'sha256-<script>';
 style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action
 'none'; base-uri 'none'`. arras routes in the URL fragment. The host folds the
@@ -180,15 +182,17 @@ Filtering happens before any file is written; the page does no filtering.
   whole with no `record_invalid` problem; otherwise it is omitted and counted
   `unchecked_digest`, or `restricted_digest` as below.
 - The graph holds no page text, part list of a source file, manuscript file,
-  research note, or standing rule. Each is counted. The `author` export's source
+  research note, or standing rule. Each is counted. The `author` export's
+  manuscript view (L) does hold the text of the report it reads, which may be
+  unpublished. The `author` export's source
   views (K) do hold the text of pages that exported passages lie on: the
   `page_text` count is of the parts none of whose text is in the export. No
   other source text is added.
 - Retired records, and views that would be `retired`, are in no export. `rights`
   fields filter nothing (CONTRACT-001 G): a source marked in any way has its
   cited pages in the author export like any other.
-- `stemma.sourceviews.json` is never part of a reviewer package or reviewer
-  export, however it is filtered.
+- `stemma.sourceviews.json` and `stemma.manuscript.json` are never part of a
+  reviewer package or reviewer export, however they are filtered.
 - A project record can wrongly hold restricted data. For a location whose
   `sensitivity.class` is `restricted`, an export MUST emit its geometry only
   when `release` is `area` and the geometry is a polygon. Otherwise it emits
@@ -375,7 +379,9 @@ filtering of its own.
 
 The **data identity** is the SHA-256 of the corpus digest and then each
 manuscript file's digest (SHA-256 of its bytes), in digest order, each followed
-by LF; pages show its first 12 characters. `graph status` compares it, so a
+by LF. The manuscript files are those under `manuscript/` and, when the project
+has `report/report.json`, that file and the template it names (L); one that is
+missing or cannot be read counts as `unreadable`; pages show its first 12 characters. `graph status` compares it, so a
 manuscript edit makes an export stale.
 
 **States as built.** `unreviewed` (a cited claim or source that the check report
@@ -481,8 +487,8 @@ citation and passage, except a `retired` one, counted as `SourceView`
 file under J: listed with its digest in the manifest and byte-identical for the
 same data. The passage views that hold source text are capped at 8,000,000 bytes
 in all, as written; citation views and views without text are not counted.
-Those that a highlighted citation points to are kept first, then the rest, each
-in ID order. A view that does not fit is written as `not_exported` with no
+Those that a highlighted citation, or a highlighted report quotation of the
+manuscript view (L), points to are kept first, then the rest, each in ID order. A view that does not fit is written as `not_exported` with no
 source text, counted as `SourceView` `size_cap`, and warned
 `source_views_cut`; the citation and the command line still reach it. Parts with
 trimmed text are counted as `SourceText` `page_text_trimmed`.
@@ -495,6 +501,88 @@ code points. The highlight is a `mark` element. An address is a link only when
 its scheme is `http` or `https`, with `rel="noreferrer noopener"`; nothing is
 fetched or preloaded, and the content security policy (D) is unchanged. The panel
 does not open originals.
+
+### L. The manuscript view
+
+`stemma.manuscript.json` (`stemma.manuscript/0`) is the assembled report
+(CONTRACT-006 I) as the export read it, for reading in the page and opening its
+sources. It is derived, never read back, holds no time or machine value, and is
+listed with its digest in the manifest.
+
+**What is read.** `report/report.json` and the template its `manuscript` names:
+the directory `build report` uses when none is named. Other report directories,
+the generated `report.md`, `report.typ`, `report.pdf`, and `verification.md`,
+and the files under `manuscript/` are not read. The template name is a relative
+path that stays inside `report/`. It, `report.json`, and each directory on the
+way are read only when they are plain files and directories, never links.
+
+**Made by the builder.** `publish` assembles the report once, into the segments
+from which `build report` writes `report.md`: for each block, text, quotations,
+and note references; for each note, its citations in order and its comment. The
+view is made from the same assembly. citeproc-js formats the citations and
+bibliography again (CONTRACT-006 G) and gives the source IDs of each
+bibliography entry. No link comes from reading the Markdown output or from
+matching text. Where `build report` would refuse a quotation, the view's
+assembly collects why and goes on. `build report` is unchanged: it fails, and its
+output for the same inputs keeps the same bytes. `graph` receives the view
+through a port and does not import `publish`; `cli` composes them.
+
+| Field | Holds |
+|---|---|
+| `schema`, `state`, `why?` | `state` is `none` (no `report/report.json`), `unavailable` (the report cannot be read; `why` says why), or `read` |
+| `inputs?` | `directory` (`report`) and `template`, project relative |
+| `blocks[]` | In order: `kind` `text` with `level?` (1 to 3, a heading) and `parts[]`, or `kind` `bibliography`, where the template places it |
+| a part | `{kind: "text", text}`, `{kind: "quotation", id}`, `{kind: "note", number}`, or `{kind: "withheld"}` (a local path was left out). Text is the Markdown subset the Typst output reads: `*italic*` and bare web addresses |
+| `notes[]` | `number`, `citations[]`, `comment?` (parts). A citation is `quotations[]` (quotation IDs, in order), `text?` (the formatted citation without the quotations before it), `withheld?` (why it has no text), `source?` (the cited source), `entry?` (the source whose bibliography entry lists it) |
+| `quotations{}` | By quotation ID, for each one the report gives: `text?`, `italic?`, `changes[]` (how the report's text differs from the source text: corrections, joined words, join notes, and labels that are the author's statement), and `view`, a source view of `kind` `quotation` (K) |
+| `bibliography[]` | In the formatter's order: `source?`, `text?`, `withheld?`, `places[]` (`note`, `citation`: every note citation listed under the entry, by its index in the note) and `quoted[]` (quotations of a work listed there, given in the text or a comment and listed by no citation: `quotation`, and `note?` or `block?`) |
+| `works{}` | By source ID, for each linked source: `id`, `key?`, `title?`, `part_of?` |
+| `problems[]` | Citation keys the formatter could not use, in words |
+
+**Broken quotations.** A quotation's `text` is present only when `build report`
+would give it and its view is `highlighted` (K), or was cut only by the size cap.
+Otherwise the page shows a marker, the state, and why, and highlights nothing.
+The view is not `highlighted` when the builder refuses the quotation for any
+reason, a correction or italic that does not match included; such a view carries
+`citation_differs` where K gives it no other state. A quotation that lists no
+passage is `no_passage`: its citation still names the source and links to it. A
+broken quotation's citation is formatted without a page.
+
+**Disclosure (E).** The same rules apply as to the rest of an author export.
+
+- A string that begins as a path on a machine is left out: a text part becomes
+  `withheld`; a quotation's text, change, or reason, and a citation or
+  bibliography entry formatted from a record that holds such a value, are
+  replaced by a statement that they were withheld.
+- Nothing rests on a record the export leaves out. A quotation whose passage or
+  cited source is not an exported entity, or whose view would be `retired`, is
+  `not_exported`, with no text, passage pointer, or recorded detail. A citation
+  or bibliography entry of a source that is not exported has no text and no
+  link.
+- The export runs the coordinate scan over each block, note, quotation, change,
+  citation, and bibliography entry, and warns `coordinates_in_manuscript`, naming
+  the places; the file is written.
+- A broken quotation or something withheld warns `manuscript_incomplete`, naming
+  the places; a report that cannot be read warns `manuscript_unavailable`.
+- A view whose file would exceed 8,000,000 bytes is `unavailable` instead, with
+  that reason (a design assumption).
+
+A passage view that the source views' cap left out (K) makes each quotation view
+that rests on it `not_exported`.
+
+**Showing it.** When the state is not `none`, the host page shows a control that
+opens the manuscript, at the fragment route `#/manuscript`, in place of the
+record browser. It says that this is the manuscript as the export read it, not
+the printed PDF, and that originals are not opened yet. Text is rendered as text
+nodes, isolated and with hidden characters shown as in K. `*italic*` becomes
+emphasis and a bare `http` or `https` address a link as in K; in a quotation only
+the italics its list entry names are applied. A quotation, a citation, and a
+bibliography entry each open a pane at their own route. The pane shows quotation
+views under the K rules with the components of the record's source panel, taking
+passage views from `stemma.sourceviews.json`. A bibliography entry's pane
+highlights nothing and lists its places. On a narrow screen the pane lies over
+the lower part of the window and can be closed. The content security policy (D)
+is unchanged and the page sends no request.
 
 ## Precedence and Compatibility
 
@@ -519,6 +607,9 @@ does not open originals.
 | Withheld source material found in a reviewer export | Removed from generated files; anything that cannot be removed is a `package.leak` finding and a warning; export written | no | The author checks the named part before sending it |
 | Restricted coordinate found by the scan | Warning with the location; export written | no | The author removes it or accepts the disclosure |
 | Export stale | `graph status` exits 1 | yes | Re-export |
+| `report/report.json` or its template cannot be read (L) | The manuscript view says why; `manuscript_unavailable` warning; export written; exit 1 | no | Fix the report, export again |
+| A quotation `build report` would refuse, or something withheld (L) | Shown broken or withheld; `manuscript_incomplete` warning; export written; exit 1 | no | Fix the quotation or passage, export again |
+| Coordinate-shaped text in the manuscript view (L) | `coordinates_in_manuscript` warning; export written; exit 1 | no | The author checks it before passing the export on |
 | Source views exceed the size cap (K) | Export written without the text that does not fit; counted, `source_views_cut` warning | no | Use `excerpt` for those |
 | `--out` names a path git would track, or another refused place (C) | Exit 5; nothing written | no | Use an ignored path |
 | The output directory holds something with an export file's name that no export manifest there lists as its own (C) | Exit 5; nothing written or removed | no | Use another directory, or move it |
@@ -565,6 +656,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Scale | The stock static browser loaded 10,000 synthetic nodes in about 0.28 s and 100,000 in 2.5 to 2.9 s in an earlier feasibility test | This projection at that size, real note text; arras claims support for 1,024 nodes and 7.9 MB, past which an export warns |
 | arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |
 | Source views (K) | Tests over invented sources for every state, and the worked example: 4 citations and 125 passages highlighted, 748,172 bytes of source views in a 2.7 MB page, of which about 212 KB is page text repeated for passages that share a page. A synthetic page at the cap (8.0 MB of source views, 9.2 MB in all, 450 passages) opened in about 0.13 s and showed its first citation in about 0.04 s, in headless Chromium from a local file on one macOS system (Apple silicon) | A real large project; slower machines and other browsers; right-to-left and complex-script page text; keyboard and screen-reader use by hand |
+| Manuscript view (L) | Local tests over invented reports for every state, disclosure rule, and hostile text; the worked example's report; headless Chromium from a local file on one macOS system (Apple silicon) | A real author's report; other browsers; keyboard and screen-reader use by hand |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 

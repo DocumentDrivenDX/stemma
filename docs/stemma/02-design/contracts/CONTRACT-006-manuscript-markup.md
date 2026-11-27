@@ -262,6 +262,10 @@ mismatch is a tool failure, because the citations would be wrong.
 
 ### I. Assembled reports (M1)
 
+`graph export` also reads the report in `report/` and shows it in the explorer
+with links to its sources (CONTRACT-005 L), from the same assembly that writes
+`report.md`.
+
 Before the manuscript reader exists, a report is built from a template and the
 project's records by `build report` (CONTRACT-002 B). Its directory holds:
 

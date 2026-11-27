@@ -142,7 +142,10 @@ operation, so their results are equal. Zoom, pan, focus, selection, and layout
 controls need no command. Browser compilation of preview pages (CONTRACT-005 D)
 is a way of showing the manuscript; its command-line forms are `build draft`,
 which typesets the same inputs, `graph export --page`, and `graph status`. A new
-interface function needs its command added here first.
+interface function needs its command added here first. The command-line forms of
+the manuscript browser (CONTRACT-005 L) are `graph export`, which writes the same
+manuscript view with each bibliography entry's citing places, and `excerpt` with
+a report quotation's ID, which shows it in its source.
 
 A command that is not yet implemented MUST exit 2 and say so. Commands that
 record a review, decision, or annotation cannot establish who ran them.
