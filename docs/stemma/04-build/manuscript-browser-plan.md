@@ -1,7 +1,74 @@
 # Implementation plan: large projects and the manuscript browser (26 and 25)
 
 Requirements and measurements: [build iterations](build-iterations.md),
-iterations 25 and 26. Three stages, each committed and mergeable on its own.
+iterations 25 and 26. Each stage is committed and mergeable on its own.
+
+## Review amendments (binding; they override the stage text below)
+
+**Order:** C (clickable manuscript, snapshot text, offline file), then A, then
+B1 (specs, server, security, static executor, source views per ID), B2 (search
+and paging beyond arras limits), B3 (originals, shown unhighlighted), B4 (MCP),
+then D (highlighting on originals). A SQLite query engine is the later FEAT-011
+P1 engine with its own conformance suite, not part of these stages.
+
+**C.** `buildReport` returns less than assumed: no blocks or positions, no
+bibliography entry IDs, and it throws on any changed passage. Refactor it to
+produce per-block segments (text; quotation with its ID and passages; note
+reference) and render `report.md` from them, byte-identical (tested). Return
+entry IDs from `formatCitations`. Add a mode that collects errors, so one broken
+quotation is shown as broken and not highlighted while the rest is readable.
+`build report` itself keeps failing as now. State which report directories are
+read. Render the needed Markdown subset (italics, links) into text elements. A
+report quotation over several passages gets one view listing each passage.
+Report quotations are `report.json` specs, not citation records.
+
+**B1.** An HTTP client cannot answer arras's reads from SQL without writing a
+GraphQL engine: `GraphBrowser` sends arbitrary `moduleQuery` GraphQL. Instead
+the server runs arras's own static executor in Bun over the export's graph; the
+page client forwards `moduleQuery` unchanged. The served data is the export
+(with states and search text), so B depends on A. Freshness: a stat scan of
+records, sources and manuscript, recomputing digests only on change; on change,
+rebuild fully while the page says so, or answer `index_stale`. Measure rebuild.
+Say that `GraphStore` is not implemented here.
+
+**B2.** Stemma's own search answers only the search query, in arras's result
+shape (a SQLite full-text index is allowed for it); larger pages come from the
+client rewriting variables, measured.
+
+**Security.** No cookie (cookies ignore ports). A one-time code in the first
+address is exchanged for the secret, then invalidated; the secret lives in
+`sessionStorage`, is sent as a header, and is compared in constant time. It
+never appears in stdout, transcripts or process arguments; the MCP "open" tool
+launches the browser itself and returns an address without it. Exact `Host`
+check; POSTs need `application/json` and a custom header. Server template (not
+the inlined offline one) with `default-src 'none'; script-src 'self';
+worker-src 'self'; style-src` as needed; `frame-ancestors`, `object-src`,
+`base-uri`, `form-action` all `'none'`. Specs to amend also: CONTRACT-005 I,
+the security requirements ("no server") and the threat model (hostile page,
+other local user, other local port, hostile PDF, injection through MCP). Tests
+for each, plus oversize and slow requests.
+
+**B3.** Look only in `.stemma/originals/<sha256>` and places the author names;
+no symlinks (lstat, O_NOFOLLOW); serve the very bytes that were hashed; size
+limit. `/original` is `application/octet-stream`, attachment, sandbox policy,
+`Cross-Origin-Resource-Policy: same-origin`. Never use the browser's PDF viewer:
+render with the pinned pdf.js from bytes, with eval, scripting and XFA off and
+links inert; ship its browser build, worker and cmaps. Convert TIFF or say it is
+not shown. Check that a snapshot part maps to a PDF page before showing it.
+
+**B4.** Declare the MCP server in the plugin (the release tree and plugin tests
+must include it); the spike confirms `${CLAUDE_PLUGIN_DATA}` is filled in. It
+starts in every session, so until a tool is called it does nothing: no download,
+listener or index; without Bun it says to run setup; nothing else writes to
+stdout. The project is the session's, never a tool argument. HTTP starts lazily,
+stops when idle, one per project, lock file without the secret. "Open" takes
+only record IDs found in the index, never addresses; results are bounded (IDs,
+labels, short excerpts); rights and coordinate rules apply to returned text.
+The bundle keeps no unresolved import.
+
+**D.** Highlight on an original only from the server re-extracting that page
+with the same pinned pdf.js, and only when that page's text equals the snapshot
+part.
 
 ## Stage A: export that scales
 
