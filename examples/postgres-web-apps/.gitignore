@@ -21,7 +21,7 @@ build/
 # One line per source: its licence does not clearly permit republishing the full
 # text (see the table in README.md). To commit one after all, delete its line.
 # Each source's manifest (source.md), records, short quotations and citations
-# stay committed. tools/restore-text.ts fetches and converts these again.
+# stay committed. `stemma ingest --fetch` fetches and converts these again (README.md).
 # ---------------------------------------------------------------------------
 sources/pgbouncer/sections/
 sources/ports2012/pages/

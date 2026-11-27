@@ -1,4 +1,11 @@
 {
+  "changed": {
+    "at": "2026-11-27T18:35:29Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "created": {
     "at": "2026-11-27T18:02:35Z",
     "by": {
@@ -8,6 +15,24 @@
   },
   "id": "ups-7p2jhkhv4pn0ff6mx4zz",
   "kind": "upstream",
+  "locations": [
+    {
+      "added": {
+        "at": "2026-11-27T18:35:29Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:35:29Z",
+        "sha256": "29ea89b404b68db56c801abf0550cef46ec7e1ca94f07005811702f1c685850a"
+      },
+      "kind": "web_archive",
+      "note": "Internet Archive capture, asked for in its unmodified (id_) form",
+      "url": "https://web.archive.org/web/20261014044211id_/https://vldb.org/pvldb/vol5/p1850_danrkports_vldb2012.pdf"
+    }
+  ],
   "media_type": "application/pdf",
   "retrieved_at": "2026-11-27T18:02:35Z",
   "retrieved_by": {

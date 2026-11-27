@@ -1,4 +1,11 @@
 {
+  "changed": {
+    "at": "2026-11-27T18:34:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "created": {
     "at": "2026-11-27T18:02:34Z",
     "by": {
@@ -8,6 +15,24 @@
   },
   "id": "ups-mam3jqr1h14nk0jfsc2z",
   "kind": "upstream",
+  "locations": [
+    {
+      "added": {
+        "at": "2026-11-27T18:34:32Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:34:32Z",
+        "sha256": "1b432bf3be9401e9ed0677b44d2baca20d72d88aef8c6801e777fa19d0209d63"
+      },
+      "kind": "web_archive",
+      "note": "Internet Archive capture, asked for in its unmodified (id_) form",
+      "url": "https://web.archive.org/web/20260823215441id_/https://www.postgresql.org/docs/18/tutorial-arch.html"
+    }
+  ],
   "media_type": "text/html",
   "retrieved_at": "2026-11-27T18:02:34Z",
   "retrieved_by": {

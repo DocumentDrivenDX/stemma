@@ -1,4 +1,11 @@
 {
+  "changed": {
+    "at": "2026-11-27T18:35:24Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "created": {
     "at": "2026-11-27T18:02:35Z",
     "by": {
@@ -8,6 +15,24 @@
   },
   "id": "ups-fn06k3f3bmes0m234hyk",
   "kind": "upstream",
+  "locations": [
+    {
+      "added": {
+        "at": "2026-11-27T18:35:24Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:35:24Z",
+        "sha256": "de61b01c3f31037b63fe8bc422f924a286f3cacdc6e792be57fb28ada4d7e60e"
+      },
+      "kind": "web_archive",
+      "note": "Internet Archive capture, asked for in its unmodified (id_) form",
+      "url": "https://web.archive.org/web/20261110220742id_/https://www.pgbouncer.org/features.html"
+    }
+  ],
   "media_type": "text/html",
   "retrieved_at": "2026-11-27T18:02:35Z",
   "retrieved_by": {

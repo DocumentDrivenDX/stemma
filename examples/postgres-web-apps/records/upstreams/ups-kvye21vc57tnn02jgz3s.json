@@ -1,4 +1,11 @@
 {
+  "changed": {
+    "at": "2026-11-27T18:34:58Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "created": {
     "at": "2026-11-27T18:02:34Z",
     "by": {
@@ -8,6 +15,24 @@
   },
   "id": "ups-kvye21vc57tnn02jgz3s",
   "kind": "upstream",
+  "locations": [
+    {
+      "added": {
+        "at": "2026-11-27T18:34:58Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:34:58Z",
+        "sha256": "04813ed35af6e5aa9deca7075a26d00bf3624517e7556303a059c528c7b517fe"
+      },
+      "kind": "web_archive",
+      "note": "Internet Archive capture, asked for in its unmodified (id_) form",
+      "url": "https://web.archive.org/web/20261013123839id_/https://www.postgresql.org/docs/18/datatype-json.html"
+    }
+  ],
   "media_type": "text/html",
   "retrieved_at": "2026-11-27T18:02:34Z",
   "retrieved_by": {

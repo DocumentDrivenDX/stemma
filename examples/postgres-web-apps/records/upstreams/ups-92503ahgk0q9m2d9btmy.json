@@ -1,4 +1,11 @@
 {
+  "changed": {
+    "at": "2026-11-27T18:34:22Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "created": {
     "at": "2026-11-27T18:02:36Z",
     "by": {
@@ -8,6 +15,40 @@
   },
   "id": "ups-92503ahgk0q9m2d9btmy",
   "kind": "upstream",
+  "locations": [
+    {
+      "added": {
+        "at": "2026-11-27T18:34:11Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:34:11Z",
+        "sha256": "2fef8dbe4565a4655097a02a7e146b7924a307942b07e86ee0c7ae168c688885"
+      },
+      "kind": "publisher",
+      "note": "The live article. The server's bytes differ from one request to another",
+      "url": "https://www.notion.com/blog/sharding-postgres-at-notion"
+    },
+    {
+      "added": {
+        "at": "2026-11-27T18:34:22Z",
+        "by": {
+          "kind": "model",
+          "name": "claude-sonnet-5-5"
+        }
+      },
+      "compared": {
+        "at": "2026-11-27T18:34:22Z",
+        "sha256": "ea26d1d6c8e46c35c2e38779f80b35b110402e91ea677057c97bf96781b2f14c"
+      },
+      "kind": "web_archive",
+      "note": "Internet Archive capture, asked for in its unmodified (id_) form",
+      "url": "https://web.archive.org/web/20261101125153id_/https://www.notion.com/blog/sharding-postgres-at-notion"
+    }
+  ],
   "media_type": "text/html",
   "retrieved_at": "2026-11-27T18:02:36Z",
   "retrieved_by": {
