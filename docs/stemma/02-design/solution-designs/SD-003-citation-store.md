@@ -144,6 +144,74 @@ Formatting belongs to `packages/cite` behind `CitationFormatter` (SD-008).
 - **Interfaces**: CONTRACT-003; `import` and `export` (CONTRACT-002); writes go through core ports and the staged write.
 - **Owned by TDs**: US-015.
 
+#### Codec design: CSL-JSON, BibLaTeX, RIS (iteration 3)
+
+Each codec has its own parser, versioned with the repository and adding no
+dependency, so that comments, repeated values, source text, and line numbers are
+kept. No parsing library was evaluated. Files are `packages/intake/src/legacy*`.
+
+| Part | Does | Does not |
+|---|---|---|
+| Parsers (`legacy-biblatex`, `legacy-csl`, `legacy-ris`) | Bytes to entries, preserved fields, file-level blocks, and faults or notes with line numbers (CONTRACT-003 B, C, G) | Run LaTeX, open a file, or use a network |
+| Mapping (`legacy-map`, `legacy-tex`) | A subset of preserved fields to source record fields, with `mapped_to` | Guess: an unreadable value stays preserved and unmapped |
+| Import (`legacy-import`) | One `import_batch` and one `source` per entry, in memory, and a report | Write. A core use case saves the result as one staged write, or nothing |
+| Replay (`legacy-export`) | An unedited batch back to its own format from the preserved data | Export an edited record, another format, or records with no batch |
+
+The caller supplies the time, the actor, record IDs, the keys already in use,
+and the digests of earlier batches. Only the original's file name is saved,
+never its folder.
+
+**Mapping.** Names go to `contributions` as printed, with no agent record. The
+record type is the CSL type that corresponds to the native type; a type with no
+correspondence is stored as given in lowercase and reported (BR-302). Field and
+variable names follow the CSL-JSON projection, so that a projected item reads
+back to the same names. When two native fields claim one record field, the
+first in the codec's order of preference is mapped and the other stays
+preserved. A repeated RIS tag that has no list in the record, such as two notes,
+is not mapped at all. No inheritance from `crossref` or `xdata` is applied; the report
+counts the entries that name them. Each `@xdata` and `@set` entry becomes a
+candidate source like any other (CONTRACT-003 B2), and is reported.
+
+**TeX.** To map a BibLaTeX value, the codec drops grouping braces and decodes
+accent commands, named letters, escaped punctuation, `~`, dashes, and quote
+ligatures, with a fixed table. Formatting commands such as `\emph` are dropped
+and their text kept, recorded as an `approximated` loss. Any other command, or
+math, leaves the field unmapped, recorded as `unrepresented`. The preserved
+value is never changed.
+
+**Keys.** A native key becomes the `citation_key` when it matches the
+CONTRACT-001 C pattern and is not only digits (a RIS `ID` or CSL `id` is often
+a row number). Keys that collide, with one another or with a key in use,
+compared without ASCII case, are given to none of the new records (BR-306);
+the report names each.
+
+**Possible duplicates.** Entries that share a DOI, or a folded title, first
+author family name, and year, are reported as a group and left separate.
+
+**Local paths.** The report names each preserved field whose value looks like a
+local absolute path (CONTRACT-001 B), without repeating the value. Such a value
+is not mapped: only the preserved data holds it. The test for one is a fixed
+pattern, so it can miss a path or take other text for one.
+
+**Limits** (CONTRACT-003 G): library file 100 MiB; 100,000 entries; JSON or
+brace depth 64; one field 1 MiB (SD-015). This design adds: expanded text over
+a whole file 100 MiB, and at most 100 faults listed from one file.
+
+**Replay.** It runs only when every non-retired record of the batch still holds
+what the codec maps from its preserved fields, and no native key has been
+renamed. Otherwise it writes nothing and names the records and paths
+(CONTRACT-003 D). It also reads its own output back, and withholds it if that
+does not hold the preserved data; one known cause is stray text between BibLaTeX
+entries, such as a word starting with `@` in mid-line, that cannot be written at
+the start of a line. Retired sources are left out. Its loss report covers the
+fields of the exported records; items for linked records (passages, notes,
+claims, source files) need the corpus and are left to the export use case.
+
+**Not built:** the `import` and `export` commands and their staged write;
+export after edits (CONTRACT-003 D); export of records from another format or
+from no batch, with the strict policy and the full loss report (E); the limits
+in `doctor`.
+
 ### Component: Completeness check (`core`)
 
 - **Purpose**: Catch listed but uncited entries.
@@ -192,7 +260,9 @@ graph TD
 
 - [ ] REC-03: no source names the CSL types that cover archive items and code. The mapping needs fixtures at technical design.
 - [ ] XCH-01: no file saved by a real tool has been tested, so no format is yet "supported" (CONTRACT-003 A). RIS has only had a spike-written reader.
-- [ ] XCH-01: per-field export after edits (CONTRACT-003 D) is untested.
+- [ ] XCH-01: per-field export after edits (CONTRACT-003 D) is not built.
+- [ ] XCH-01: the codec tests use invented libraries written by the same agent as the codecs. The CSL-JSON comparator is independent of the parser and the exporter; the BibLaTeX and RIS comparisons use the codec's own parser, with expected values written by hand. Pandoc, where installed, reads original and replayed BibLaTeX as a second reader.
+- [ ] The `%` comment rules, the RIS continuation rule, and the type and field tables are assumptions to test against real tools.
 - [ ] KEY-03: whether citeproc-js produces every required Chicago form is unverified (SD-008).
 
 ## Concern Alignment
