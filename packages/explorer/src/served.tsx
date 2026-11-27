@@ -38,9 +38,11 @@ type Phase =
 
 function Notice({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <main className="st:p-4" role="status" aria-live="polite">
-      <h1 className="st:text-lg st:font-semibold">{title}</h1>
-      {children}
+    <main className="st:p-4">
+      <div role="status" aria-live="polite">
+        <h1 className="st:text-lg st:font-semibold">{title}</h1>
+        {children}
+      </div>
     </main>
   );
 }

@@ -47,7 +47,7 @@ test("without headless Chromium, the check's last word is that the explorer page
 });
 
 test("every package whose code is in the page ships its license", async () => {
-  const inputs = (await bundleHost()).inputs;
+  const inputs = [...(await bundleHost()).inputs, ...(await bundleHost("served.tsx")).inputs];
   const bundled = [...new Set(inputs.flatMap((path) => /.*node_modules\/((?:@[^/]+\/)?[^/]+)\//.exec(path)?.[1] ?? []))].sort();
   expect(bundled).toEqual(["@documentdrivendx/arras-ui", "@tanstack/query-core", "@tanstack/react-query", "react", "react-dom", "scheduler"]);
   const licenses = explorerLicenses();

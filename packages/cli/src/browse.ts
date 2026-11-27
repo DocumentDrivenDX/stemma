@@ -81,28 +81,29 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
   for (const [name, stop] of signals) process.on(name, stop);
   dependencies.stop?.addEventListener("abort", () => ending("stopped"), { once: true });
 
-  let snapshots: { stop(): Promise<void> } | undefined;
+  const snapshots = new Snapshots(
+    { scan: () => scanInputs(root), changed: (since) => inputsChanged(root, since), alike: (a, b) => researchFiles(a) === researchFiles(b) },
+    () => spawnSnapshotProcess(command, root),
+    (event) => tell(eventLine(event)),
+  );
   let server: { close(): Promise<void> } | undefined;
   let launch: LaunchFile | undefined;
   let timer: ReturnType<typeof setInterval> | undefined;
   try {
     tell("Reading the project. The browser opens when it is ready.");
     const began = Date.now();
-    const starting = Snapshots.start(
-      { scan: () => scanInputs(root), changed: (since) => inputsChanged(root, since), alike: (a, b) => researchFiles(a) === researchFiles(b) },
-      () => spawnSnapshotProcess(command, root),
-      (event) => tell(eventLine(event)),
-    );
-    // A signal during a long first read ends it; the child ends when this process does.
-    const first = await Promise.race([starting, ended]);
-    if (typeof first === "string") return 0;
+    const starting = snapshots.start();
+    // A signal during a long first read ends it: the child is ended below.
+    const built = await Promise.race([starting, ended]);
+    if (typeof built === "string") {
+      starting.catch(() => {});
+      return 0;
+    }
     const buildMs = Date.now() - began;
-    const { built } = first;
-    snapshots = first.snapshots;
 
     let used = Date.now();
     const session = createSession(() => launch?.remove());
-    const listening = await listen({ assets, session, check: () => first.snapshots.check(), used: () => (used = Date.now()) }).catch((error: unknown) => {
+    const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()) }).catch((error: unknown) => {
       throw new CommandError(5, "cannot_listen", `No port on 127.0.0.1 could be opened, so nothing is served. ${error instanceof Error ? error.message : ""}`);
     });
     server = listening;
@@ -139,7 +140,7 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
     clearInterval(timer);
     launch?.remove();
     await server?.close();
-    await snapshots?.stop();
+    await snapshots.stop();
     for (const [name, stop] of signals) process.off(name, stop);
   }
 }

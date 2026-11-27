@@ -67,19 +67,12 @@ export class Snapshots<S> {
   private running: Promise<unknown> = Promise.resolve();
   private queued: Promise<Verdict> | undefined;
 
-  private constructor(private readonly inputs: Inputs<S>, private readonly spawn: () => SnapshotProcess, private readonly on: (event: SnapshotEvent) => void) {}
+  constructor(private readonly inputs: Inputs<S>, private readonly spawn: () => SnapshotProcess, private readonly on: (event: SnapshotEvent) => void = () => {}) {}
 
-  /** Builds the first snapshot, and fails when it cannot be built. */
-  static async start<S>(inputs: Inputs<S>, spawn: () => SnapshotProcess, on: (event: SnapshotEvent) => void = () => {}): Promise<{ snapshots: Snapshots<S>; built: Built }> {
-    const snapshots = new Snapshots(inputs, spawn, on);
-    const scan = await inputs.scan();
-    try {
-      const held = await snapshots.buildFrom(scan);
-      return { snapshots, built: held.built };
-    } catch (error) {
-      snapshots.stop();
-      throw error;
-    }
+  /** Builds the first snapshot, and fails when it cannot be built. `stop` ends it at any point. */
+  async start(): Promise<Built> {
+    const scan = await this.inputs.scan();
+    return (await this.buildFrom(scan)).built;
   }
 
   private async buildFrom(scan: S): Promise<Held<S>> {
