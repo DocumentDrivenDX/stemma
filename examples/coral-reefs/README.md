@@ -49,6 +49,21 @@ with the recognition, which is not the same as agreeing with the page. Where the
 layout could not be determined, such as paragraphs and footnotes in these scans,
 each page file says so.
 
+## Tags
+
+Each work is tagged with its place in the argument: `position:crater-rim` (the
+earlier explanation), `position:subsidence`, `position:critic`,
+`position:later-assessment`, and `evidence:boring`, with `funafuti` and
+`eniwetok` for the two borings. A model (claude-sonnet-5-5) chose the tags from
+the report's account of the works; each source's history says so. Tagging
+changed no source file, passage, or word of the report. From the repository
+root, after `./scripts/dev.sh build`:
+
+```sh
+./.tools/bun --no-install --no-env-file --config=/dev/null dist/stemma.js source list --tag position:critic --project examples/coral-reefs
+./.tools/bun --no-install --no-env-file --config=/dev/null dist/stemma.js source history darwin1842 --project examples/coral-reefs
+```
+
 ## Run it
 
 From the repository root:

@@ -1,5 +1,25 @@
 {
   "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:14:51Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:51Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 2",
+      "value": "position:crater-rim"
+    }
+  ],
   "citation_key": "lyell1832",
   "contributions": [
     {
@@ -31,6 +51,9 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "position:crater-rim"
+  ],
   "title": {
     "value": "Principles of Geology"
   },

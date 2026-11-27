@@ -8,6 +8,26 @@
       }
     }
   ],
+  "changed": {
+    "at": "2026-11-27T03:14:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:52Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 4",
+      "value": "position:critic"
+    }
+  ],
   "citation_key": "daly1915",
   "contributions": [
     {
@@ -39,6 +59,9 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "position:critic"
+  ],
   "title": {
     "value": "The Glacial-Control Theory of Coral Reefs"
   },

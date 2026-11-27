@@ -24,7 +24,8 @@ const versionIn = (dir: string): string => JSON.parse(readFileSync(join(dir, ".c
 /**
  * Replaces plugins/stemma in the marketplace checkout with `tree`. Installed
  * copies update only when the version changes, so different content under the
- * published version is an error and nothing is written.
+ * published version is an error and nothing is written. So is an older version,
+ * so that running an old release again does not take authors back to it.
  */
 export function publishInto(marketplaceDir: string, tree: string): { version: string; changed: boolean } {
   const manifest = join(marketplaceDir, ".claude-plugin/marketplace.json");
@@ -40,6 +41,9 @@ export function publishInto(marketplaceDir: string, tree: string): { version: st
     if (contents(target) === contents(tree)) return { version, changed: false };
     if (versionIn(target) === version) {
       throw new Error(`Version ${version} is already published with different content. Give the plugin a new version.`);
+    }
+    if (Bun.semver.order(version, versionIn(target)) < 0) {
+      throw new Error(`Version ${version} is older than the published ${versionIn(target)}.`);
     }
     rmSync(target, { recursive: true });
   }

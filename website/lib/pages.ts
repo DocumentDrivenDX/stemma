@@ -269,6 +269,8 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
     limit: "Some kinds of record are only partly checked. The report says when your project has one." },
   { id: "coordinate.stray", question: "Is a location written where it should not be?", looks: "Warns about map coordinates written in project files, without repeating them.",
     limit: "It only recognizes some ways of writing coordinates, and cannot tell whether a place is sensitive." },
+  { id: "project.binary", question: "Does your project hold only text?", looks: "Reports binary files, such as Word, PDF or image files, that git tracks or would add. Originals stay outside the project, and their text is converted into it.",
+    limit: "It does not read files git ignores, or earlier history, where a file once added remains." },
 ];
 
 function checksPage(): string {

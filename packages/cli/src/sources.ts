@@ -4,20 +4,20 @@ import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
-  applyPageMap, asConverted, capturePassage, coverageOf, currentReview, findPassages, InvalidInput, LIMITS, lookupAddress,
+  applyPageMap, findSource, holdersOf, type SourceTextPlan, upstreamOf, asConverted, capturePassage, coverageOf, currentReview, findPassages, InvalidInput, LIMITS, lookupAddress,
   type OriginalTie, parsePageMap, planComparison, planLabel, planResolution, planReview, planSeal, planSourceText, printable,
   PROPOSAL, type Proposal, readLookup, renderCoverage, type Resolver, RESOLVERS, resolverFor, type ReviewRequest, normalizeText, SourceTexts,
 } from "@stemma/core";
 import { PDFJS_VERSION, CONVERTER_VERSION, parseTranscription, removeStamps, Unconvertible, withoutStamps } from "@stemma/extract";
-import { canonical, type Corpus, idOf, isObject, isRetired, type JsonObject, parseJson } from "@stemma/records";
+import { canonical, fileDigest, type Corpus, idOf, isObject, isRetired, type JsonObject, parseJson } from "@stemma/records";
 import {
   FetchRefused, fetchBytes, IMAGE_TYPES, type Original, randomToken, readOriginal, writeProjectFile, writeSourceDirectory,
 } from "@stemma/workspace";
-import { emit, namedFile, openCorpus, type Options, reportRecords, requireActor, requireProject, tools, usageError, USER_AGENT, written } from "./context.ts";
+import { CommandError, emit, namedFile, openCorpus, type Options, reportRecords, requireActor, requireProject, tools, usageError, USER_AGENT, written } from "./context.ts";
+import { TIME } from "./enrich.ts";
 import { convertOriginal, proposalFor, readPdfCopy, suppliedPages } from "./conversion.ts";
 
 export const MODEL_NOTICE = "Stemma holds back no source: any source in this project may be sent to a hosted model.";
-const TIME = /^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(Z|[+-]\d\d:\d\d)$/;
 
 const only = <T extends string>(value: string | undefined, allowed: readonly T[], flag: string): T | undefined => {
   if (value !== undefined && !(allowed as readonly string[]).includes(value)) throw usageError(`--${flag} is one of ${allowed.join(", ")}.`);
@@ -107,6 +107,16 @@ export interface ConvertRequest {
   identity?: JsonObject;
 }
 
+function sameText(corpus: Corpus, plan: SourceTextPlan) {
+  const digests = plan.files.filter((f) => !f.path.endsWith("/source.md")).map((f) => fileDigest(f.text)).join();
+  for (const [text, loaded] of corpus.texts) {
+    const data = loaded.manifest.data!;
+    if (data.source === plan.source && !isRetired(data) && loaded.usable
+      && (data.pages as JsonObject[]).map((p) => String(p.sha256)).join() === digests) return { text, directory: loaded.directory };
+  }
+  return undefined;
+}
+
 /** Converts and writes one source file. Shared by `source convert` and `ingest`. */
 export async function convertAndWrite(request: ConvertRequest) {
   const { root, corpus, originals, options, actor } = request;
@@ -179,22 +189,53 @@ export async function convertAndWrite(request: ConvertRequest) {
     ...(options["coverage-note"] ? { coverage_note: options["coverage-note"] } : {}),
     ...(options.note ? { note: options.note } : {}), ...(options.name ? { name: options.name } : {}),
   });
+  const labelled = converted.parts.filter((p) => p.label.status === "labelled").length;
+  // The same conversion run again for the same source is already held: nothing is duplicated.
+  const repeated = sameText(corpus, plan);
+  if (repeated) return { plan: { ...plan, text: repeated.text, directory: repeated.directory }, converted, notes, labelled, repeated: true };
   for (const record of plan.records) writeProjectFile(root, record.path, record.text);
   writeSourceDirectory(root, plan.directory, plan.files);
-  const labelled = converted.parts.filter((p) => p.label.status === "labelled").length;
-  return { plan, converted, notes, labelled };
+  return { plan, converted, notes, labelled, repeated: false };
 }
 
-export async function sourceConvert(options: Options, files: string[]): Promise<number> {
-  const actor = requireActor(options, "source convert records who captured the original");
+/** What `source capture` already recorded about these originals, so that it is not typed again. */
+function asCaptured(corpus: Corpus, options: Options, originals: Original[]): Options {
+  const held = originals.flatMap((o) => holdersOf(corpus, o.sha256));
+  if (options.source === undefined) {
+    // One that a source file already holds is refused where the conversion is planned.
+    const mapped = [...corpus.texts.values()].some((t) => !isRetired(t.manifest.data!)
+      && originals.some((o) => JSON.stringify(t.manifest.data!.original).includes(o.sha256)));
+    if (held.length > 0 && !mapped) {
+      throw new CommandError(5, "already_held", `This original is already held for source ${[...new Set(held)].join(", ")}. Nothing was written. Name the source with --source.`, [...new Set(held)]);
+    }
+    return options;
+  }
+  const source = String(findSource(corpus, options.source).data!.id);
+  const upstream = originals[0] ? upstreamOf(corpus, source, originals[0].sha256) : undefined;
+  const origin = upstream && (typeof upstream.url === "string" ? upstream.url : /^Obtained from: (.*)$/s.exec(String(upstream.note ?? ""))?.[1]);
+  return {
+    ...options, source,
+    ...(upstream && !options["acquired-at"] ? { "acquired-at": String(upstream.retrieved_at) } : {}),
+    ...(origin && !options.origin ? { origin } : {}),
+    ...(typeof upstream?.version === "string" && !options["source-version"] ? { "source-version": upstream.version } : {}),
+  };
+}
+
+export async function sourceConvert(given: Options, files: string[]): Promise<number> {
+  const actor = requireActor(given, "source convert records who captured the original");
+  if (files.some((f) => /^[a-z][a-z0-9+.-]+:\/\//i.test(f))) throw usageError("source convert reads files. To fetch from a web address, list it in an ingest plan.");
+  const root = requireProject(given);
+  const corpus = openCorpus(root);
+  const originals = [...files, ...(given.image ?? [])].map((f) => readOriginal(resolve(root, f), LIMITS.input_bytes));
+  const options = asCaptured(corpus, given, originals);
   if (!options["acquired-at"] || !TIME.test(options["acquired-at"])) {
     throw usageError("source convert records when you got the original and does not guess it: give --acquired-at, for example 2026-01-05T09:58:00Z.");
   }
-  if (files.some((f) => /^[a-z][a-z0-9+.-]+:\/\//i.test(f))) throw usageError("source convert reads files. To fetch from a web address, list it in an ingest plan.");
-  const root = requireProject(options);
-  const corpus = openCorpus(root);
-  const originals = [...files, ...(options.image ?? [])].map((f) => readOriginal(resolve(root, f), LIMITS.input_bytes));
-  const { plan, converted, labelled } = await convertAndWrite({ root, corpus, originals, options, actor });
+  const { plan, converted, labelled, repeated } = await convertAndWrite({ root, corpus, originals, options, actor });
+  if (repeated) {
+    emit(options, { source: plan.source, text: plan.text, directory: plan.directory, written: false }, `This conversion is already held as ${plan.text} in ${plan.directory}/. Nothing was written.\n`);
+    return 0;
+  }
   const unit = plan.paged ? "page" : "section";
   const head = [
     `Wrote the source file ${plan.text} to ${plan.directory}/`,
@@ -454,7 +495,15 @@ export async function resolveCommand(options: Options, sources: string[]): Promi
       : corpus.records.filter((f) => f.data?.kind === "upstream" && f.data.source === source && !isRetired(f.data))
         .flatMap((f) => (Array.isArray(f.data!.lookups) ? f.data!.lookups.filter(isObject) : []))
         .map((l) => ({ resolver: String(l.resolver) as Resolver, scheme: String((l.identifier as JsonObject).scheme), value: String((l.identifier as JsonObject).value) }));
-    if (wanted.length === 0) lines.push(`${source}: its upstream records list no lookup; give --via and --identifier.`);
+    // With none listed there, the identifiers on the source record are looked up.
+    if (wanted.length === 0) {
+      const held = corpus.byId.get(source)!.data!.identifiers;
+      for (const i of Array.isArray(held) ? held.filter(isObject) : []) {
+        const resolver = resolverFor(String(i.scheme));
+        if (resolver) wanted.push({ resolver, scheme: String(i.scheme), value: String(i.value) });
+      }
+    }
+    if (wanted.length === 0) lines.push(`${source}: no lookup is listed and the record has no identifier this version looks up; give --via and --identifier.`);
     for (const lookup of wanted) {
       if (!RESOLVERS.includes(lookup.resolver) || resolverFor(lookup.scheme) !== lookup.resolver) {
         lines.push(`${source}: this version does not look up ${lookup.scheme} at ${lookup.resolver}.`);
@@ -464,7 +513,7 @@ export async function resolveCommand(options: Options, sources: string[]): Promi
       try {
         const record = await lookUp(root, source, lookup.resolver, lookup.scheme, lookup.value, actor);
         made.push(record.path);
-        lines.push(`${source}: saved ${record.id} (${lookup.resolver} ${lookup.value})`);
+        lines.push(`${source}: saved ${record.id} (${lookup.resolver} ${lookup.value}). To take what it adds and see where it differs: source enrich ${source} --lookup ${record.id}`);
       } catch (error) {
         if (!(error instanceof FetchRefused)) throw error;
         failed = true;

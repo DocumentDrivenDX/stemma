@@ -100,6 +100,15 @@ describe("the worked example", () => {
     expect(report.body.results.filter((r) => r.check === "quote.present" && r.subject.startsWith("cit-")).length).toBe(4);
   });
 
+  test("tags every work with its place in the argument, by command, with who and from what", () => {
+    for (const source of records("sources")) {
+      expect(source.tags.some((t: string) => /^(position|evidence):/.test(t)), source.citation_key).toBe(true);
+      const logged = source.changes.filter((c: any) => c.field === "tags");
+      expect(logged.map((c: any) => c.value).sort(), source.citation_key).toEqual(source.tags);
+      expect(logged.every((c: any) => c.by.kind === "model" && c.from.startsWith("report/report.md")), source.citation_key).toBe(true);
+    }
+  });
+
   test("is checked clean: every applicable check runs and nothing is open", () => {
     expect(report.body.results.filter((r) => r.open)).toEqual([]);
     expect(report.body.not_run).toEqual([]);

@@ -91,7 +91,7 @@ const FIELDS = ["title", "authors", "year", "venue"] as const;
 type Field = (typeof FIELDS)[number];
 
 /** What one saved lookup says of one field of the record. */
-interface Said {
+export interface Said {
   field: Field;
   verdict: "agrees" | "differs" | "silent" | "set_date";
   mine: string;
@@ -101,7 +101,7 @@ interface Said {
 }
 
 /** One record against one saved lookup, from the two alone. */
-function compareLookup(record: Described, lookup: JsonObject): Said[] {
+export function compareLookup(record: Described, lookup: JsonObject): Said[] {
   const says = lookup.found as JsonObject;
   const catalogue = {
     title: text(says.title), authors: (Array.isArray(says.contributors) ? says.contributors : []).map(String),
@@ -245,7 +245,8 @@ export function againstCopy(record: Described, view: TextView): { statuses: Map<
   }
   if (record.authors.length > 0) {
     const byIdentity = stated.authors.length === 0 ? undefined : namesWithin(record, stated.authors);
-    judge("authors", record.authors.join("; "), byIdentity, record.authors.every((a) => holds(pages.text, foldName(a))), stated.authors.join("; "));
+    // A copy that names no author states nothing against the record's.
+    judge("authors", record.authors.join("; "), byIdentity, record.authors.every((a) => holds(pages.text, foldName(a))), stated.authors.join("; ") || undefined);
   }
   if (record.year) {
     // A title page may print its year as a roman numeral.
