@@ -4,37 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="description" content="How Stemma decides between two reasonable options.">
+<meta name="description" content="What Stemma does when two reasonable choices pull apart.">
 <title>Principles | Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="border-b border-line bg-surface">
-<div class="mx-auto max-w-4xl px-4 py-3">
-<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
-<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html">What Stemma is</a></li><li><a href="principles.html" aria-current="page">Principles</a></li><li><a href="install.html">Install and ask</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<header class="masthead">
+<div class="shell">
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html" aria-current="page">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
-<h1>Principles</h1>
-<p class="lead">How Stemma decides between two reasonable options.</p>
-<p class="note">These are the rules Stemma is designed by, not a list of its features. For what it does, with real output, see <a href="checks.html">Checks</a> and <a href="examples.html">Examples</a>. This page is generated from the project's principles document.</p>
-<ol><li><strong>Tools and reports, not gates and approvals.</strong> Stemma finds problems and explains them. It never stops the author from writing, or asks them to verify or approve something before they can continue. Review and attestation happen out of line, when the author chooses. Every finding says what is wrong, shows the evidence, says why it matters and suggests what to do, in plain language; unexplained noise is a Stemma defect. This changes decisions when a block, a required confirmation, or one more warning would seem the safe choice.</li>
-<li><strong>No source, no citation.</strong> A citation rests on a source record and a stored copy. The assistant never invents one, and a citation without them is shown as unchecked. This changes decisions when a faster path would let an assistant's word look like a checked reference.</li>
-<li><strong>Scripts verify, models propose.</strong> A scripted check never depends on a model's judgment. A model result counts only as a record that a script checks for presence, currency, and findings. This changes decisions when a model check would be simpler than a deterministic one.</li>
-<li><strong>The author decides.</strong> The assistant drafts, searches, and files, and marks what it wrote as unreviewed. Interpretation, structure, theoretical framing, method, and disclosure stay with the author. This changes decisions when automation could settle an interpretive question.</li>
-<li><strong>Limits are stated.</strong> &quot;Checked clean&quot; means only that the checks found nothing open. Review marks, annotations, confirmations, and model verdicts are records, not proof, and the product says so. This changes decisions when a stronger-sounding claim would outrun what a check shows.</li>
-<li><strong>Plain text and hashes.</strong> Prefer files that diff, merge, and survive a change of tool, and identify binaries by content hash. This changes decisions when a proprietary or opaque format would be easier today.</li>
-<li><strong>One source of truth.</strong> Notes, claims, citations, maps, and the typeset book derive from the same record files. This changes decisions when a second writable copy would save a build step.</li>
-<li><strong>Reproducible with the same inputs.</strong> Someone with the project, the sources they have rights to, and the same tool versions gets the same scripted check results. This changes decisions when a result depends on a local setting, a network call, or an unrecorded step.</li>
-<li><strong>Respect what is not yours to share.</strong> Rights, permissions, restricted locations, and community data limits shape the corpus and what goes into outputs that leave the project. Material that may not be sent to a language model does not belong in a project that uses a hosted one; Stemma does not filter it by source. This changes decisions when completeness conflicts with permission.</li>
-<li><strong>Deliverable over machinery.</strong> Ship what authors use. Bound the process around it, freeze it, and deliver; reuse a family tool before building a new one. Real defect checks stay. This changes decisions when new checks, reviews, or automation would delay working behavior without catching a material defect.</li>
-<li><strong>The plugin is the product.</strong> Stemma is first and foremost a Claude plugin. Every other part is designed to support it. Installing the plugin is the only installation a person does; the plugin and Claude obtain and set up whatever else it needs, from pinned and verified downloads, within the host's permission prompts. This changes decisions when a feature would ask the author to install, configure, or type something.</li></ol>
+<main id="main" tabindex="-1" class="shell page">
+<div class="opening"><h1>Principles</h1>
+<p class="lead">What Stemma does when two reasonable choices pull apart.</p>
+<p class="note">These are the rules Stemma is designed by, not a list of features. For what it does today, see <a href="how.html">How it works</a> and <a href="checks.html">Checks</a>. The wording here is simplified. The project's exact wording is in its <a href="https://github.com/DocumentDrivenDX/stemma/blob/main/docs/stemma/01-frame/principles.md">principles document</a>.</p></div>
+<ol class="principles"><li><strong>Tools and reports, not gates and approvals.</strong> <span>Stemma points things out and explains them. It never stops you writing, or asks you to approve something before you can carry on.</span></li>
+<li><strong>No source, no citation.</strong> <span>A citation should rest on a source you hold. The assistant is told never to invent one, and a citation with no source to compare it with is shown as unchecked.</span></li>
+<li><strong>Scripts verify, models propose.</strong> <span>Checks are done by ordinary programs that give the same answer every time. An AI's opinion is never counted as a check.</span></li>
+<li><strong>The author decides.</strong> <span>Interpretation, structure, theory, method and what you disclose are your calls. The assistant helps; it does not settle them.</span></li>
+<li><strong>Limits are stated.</strong> <span>A clean result means only that the checks found nothing open. Notes and sign-offs are records of what someone said, not proof.</span></li>
+<li><strong>Plain text and hashes.</strong> <span>Your work is kept in ordinary files that you can read and compare, and that will outlast any one tool. Other files are recognized by a digital fingerprint.</span></li>
+<li><strong>One source of truth.</strong> <span>Everything Stemma tells you comes from the same set of records, so there is no second copy to fall out of step.</span></li>
+<li><strong>Reproducible with the same inputs.</strong> <span>Someone with your project, copies of the sources they are entitled to, and the same version of the tool should get the same check results.</span></li>
+<li><strong>Respect what is not yours to share.</strong> <span>Permissions and community limits matter. Stemma does not filter what reaches a hosted AI model, so material that may not be sent there does not belong in such a project.</span></li>
+<li><strong>Deliverable over machinery.</strong> <span>What helps authors comes before process for its own sake, without dropping checks that catch real mistakes.</span></li>
+<li><strong>The plugin is the product.</strong> <span>You install one plugin. It and Claude set up whatever else is needed, from versions that are fixed and verified, and you keep control of permissions.</span></li></ol>
 </main>
-<footer class="border-t border-line">
-<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+<footer class="colophon">
+<div class="shell">
+<p>Stemma is pre-release, free and open source (MIT license), and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</p>
+<p>Set in Source Serif 4, Inter and JetBrains Mono. These pages run no scripts and request nothing from another host.</p>
+</div>
 </footer>
 </body>
 </html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="The research cycle with Stemma, step by step, and where your material lives.">
+<title>How it works | Stemma</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+<div class="shell">
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html" aria-current="page">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
+</div>
+</header>
+<main id="main" tabindex="-1" class="shell page">
+<div class="opening"><h1>How it works</h1>
+<p class="lead">You ask in plain words. Claude does the clerical work, scripts do the comparing, and you make the decisions.</p>
+</div>
+<section class="spread" aria-labelledby="loop">
+<h2 id="loop">The research cycle</h2>
+<figure class="cycle">
+<ol aria-label="The research cycle"><li><h3>Gather</h3><p class="who">You and Claude</p><p>Choose a work. Claude writes down what it is and where each detail came from.</p></li><li><h3>Keep and read</h3><p class="who">Claude and scripts</p><p>Your copy goes into a private store. Its text is read page by page, and page numbers are proposed for review.</p></li><li><h3>Write and cite</h3><p class="who">You and Claude</p><p>Research and write. Each citation is recorded with its sentence, page and any quotation.</p></li><li><h3>Check</h3><p class="who">Scripts</p><p>The records are compared with your copies. Every finding comes with its evidence and a suggestion.</p></li><li><h3>Decide</h3><p class="who">You</p><p>Look at the page, then fix, replace or leave it. Nothing waits for you.</p></li></ol>
+<p class="cycle-return">Then go round again: a new source, a better scan, a corrected sentence. Check as often as you like.</p>
+</figure>
+</section>
+<section class="band"><div class="band-head"><h2>One round, step by step</h2></div><div class="band-body">
+<ol class="steps"><li><h3>Start a project</h3><div><p class="ask"><span>You might say</span> &ldquo;Start a Stemma project in this folder.&rdquo;</p><p>Claude creates a few project files and overwrites nothing.</p><p>One of them, <code>rules.md</code>, holds your standing rules, such as how to spell a place name. Claude is instructed to read it at the start of each session.</p></div></li><li><h3>Gather your sources</h3><div><p class="ask"><span>You might say</span> &ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</p><p>Claude writes a record of the work and tells you where each detail came from. It is instructed never to invent one.</p></div></li><li><h3>Keep your copies</h3><div><p class="ask"><span>You might say</span> &ldquo;Keep this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</p><p>The file goes into your private store, with where and when you got it, and a digital fingerprint so that any later change shows.</p><p>You can also note that material is unpublished, restricted by a community, or under a particular license. These notes inform you; they do not stop anything being sent to the AI model.</p></div></li><li><h3>Read the text and number the pages</h3><div><p class="ask"><span>You might say</span> &ldquo;Read the text of that copy and work out its page numbers.&rdquo;</p><p>Stemma reads the text a PDF already contains, or takes a plain text file. It cannot read words from a picture of a page: a scan with no text stays unchecked until you supply its text.</p><p>It proposes page numbers only where the numbers printed on the pages support them. Someone, you or Claude, reviews the proposal before it is used.</p></div></li><li><h3>Write, and record what you cite</h3><div><p class="ask"><span>You might say</span> &ldquo;Record the citations in this chapter.&rdquo;</p><p>Each citation gets its own record: the sentence, the source, the page and any quotation, exactly as you wrote it.</p><p>You can ask to see a few pages while you write. They are marked as text quoted from the source, which may contain errors.</p></div></li><li><h3>Check</h3><div><p class="ask"><span>You might say</span> &ldquo;Check the project and explain what is open.&rdquo;</p><p>The whole project is checked. Claude explains what is wrong, shows the evidence, says why it matters and suggests what to do.</p><p>A check that cannot be done is reported as <em>could not check</em>. It never counts as a pass.</p></div></li><li><h3>Decide, and go round again</h3><div><p class="ask"><span>You might say</span> &ldquo;I have a better scan of this book. Replace the old one.&rdquo;</p><p>You choose what to fix. When a copy is replaced, you see what relied on the old one. This version cannot note that you have looked again, so those items stay listed.</p><p>Ask <q>Is anything missing from my source store?</q> to find files that have gone missing or changed.</p></div></li></ol>
+</div></section>
+<section class="spread" aria-labelledby="rounds">
+<h2 id="rounds">What going round looks like</h2>
+<p>In the demo, one project is checked five times. The numbers rise and fall as things are fixed, added and lost.</p>
+<figure class="rounds">
+<ol aria-label="Five checks of the demo project, in order"><li><h3>First check</h3><dl><div><dt>Problems</dt><dd>4</dd></div><div><dt>Could not check</dt><dd>0</dd></div><div><dt>Kinds not run</dt><dd>2</dd></div></dl><p>A mistyped citation key, a listed work that is never cited, a file out of its standard layout, and a cited book with no copy.</p></li><li><h3>After three fixes</h3><dl><div><dt>Problems</dt><dd>2</dd></div><div><dt>Could not check</dt><dd>0</dd></div><div><dt>Kinds not run</dt><dd>2</dd></div></dl><p>The key is corrected, the extra listing removed and the file tidied. Both citations of the book still have no copy to compare with.</p></li><li><h3>A scan is added</h3><dl><div><dt>Problems</dt><dd>2</dd></div><div><dt>Could not check</dt><dd>0</dd></div><div><dt>Kinds not run</dt><dd>3</dd></div></dl><p>The copy is stored, but a picture of a page holds no text to compare.</p></li><li><h3>Its text is added</h3><dl><div><dt>Problems</dt><dd>0</dd></div><div><dt>Could not check</dt><dd>0</dd></div><div><dt>Kinds not run</dt><dd>3</dd></div></dl><p>Nothing is left open among the checks that ran. Some kinds of check do not run, so the project is still not called checked clean.</p></li><li><h3>The store goes missing</h3><dl><div><dt>Problems</dt><dd>0</dd></div><div><dt>Could not check</dt><dd>2</dd></div><div><dt>Kinds not run</dt><dd>3</dd></div></dl><p>On a machine without the copies, nothing passes by default. The report says it could not check.</p></li></ol>
+<figcaption>This site's drawing of five runs in the <a href="examples.html#demo">demo</a>, with the counts each run printed. All names and sources in the demo are invented.</figcaption>
+</figure>
+</section>
+<section class="band"><div class="band-head"><h2>Where a finding sends you</h2></div><div class="band-body">
+<div class="table-wrap" tabindex="0" role="region" aria-label="Where a finding sends you"><table><thead><tr><th scope="col">When a check reports</th><th scope="col">Go back to</th></tr></thead><tbody><tr><td>A cited source has no copy, or its copy has no text</td><td>Keep your copies, or read the text</td></tr><tr><td>A quotation differs from your copy</td><td>Look at the page, then correct your record or your sentence</td></tr><tr><td>A cited page is not in the work</td><td>Check the citation, then the page numbering</td></tr><tr><td>A citation does not point to one source</td><td>Correct the citation or the source record</td></tr><tr><td>Something relied on a copy you replaced</td><td>Compare it with the new copy</td></tr></tbody></table></div>
+</div></section>
+<section class="spread" aria-labelledby="places">
+<h2 id="places">Where your material lives</h2>
+<figure class="places">
+<ul aria-label="Where things are kept">
+<li><h3>Your project folder</h3><p>Plain files you can open, compare and back up like any others.</p><ul><li>A record for each source, copy, text and citation</li><li>Your standing rules, in <code>rules.md</code></li><li>The project's settings, in <code>stemma.json</code></li></ul></li>
+<li><h3>Your private store</h3><p>Kept outside the project. Stemma never copies it anywhere, so backing it up is your job.</p><ul><li>Your copies of sources</li><li>The text read from them</li></ul></li>
+<li><h3>The AI model</h3><p>Claude is instructed to read only the pages a task needs.</p><ul><li>Stemma holds back no source: anything in a project may be sent</li><li>If something may not go to a hosted model, leave it out of the project</li></ul></li>
+</ul>
+</figure>
+</section>
+<section class="band"><div class="band-head"><h2>Words used here</h2></div><div class="band-body">
+<dl class="entries"><div><dt>Record</dt><dd>A small plain file about one thing: a source, a copy, its text or a citation.</dd></div><div><dt>Stored copy</dt><dd>Your file of the work, such as a PDF, kept in your private store.</dd></div><div><dt>Page map</dt><dd>A list that says which page of the file carries which printed page number.</dd></div><div><dt>Finding</dt><dd>One thing a check reports, with its evidence and a suggestion.</dd></div><div><dt>Could not check</dt><dd>Something needed was missing, so there is no answer yet.</dd></div><div><dt>Checked clean</dt><dd>The checks found nothing open. It does not mean the book is correct. A project that cites sources does not get this label, because some kinds of check do not run.</dd></div><div><dt>Unreviewed, not admitted</dt><dd>A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding.</dd></div></dl>
+</div></section>
+</main>
+<footer class="colophon">
+<div class="shell">
+<p>Stemma is pre-release, free and open source (MIT license), and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</p>
+<p>Set in Source Serif 4, Inter and JetBrains Mono. These pages run no scripts and request nothing from another host.</p>
+</div>
+</footer>
+</body>
+</html>

@@ -4,36 +4,261 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="description" content="One real source, four quoted citations, and what Stemma can and cannot check.">
+<meta name="description" content="A real book from 1842, followed from its title page to four checked quotations.">
 <title>Worked example: Darwin and coral reefs | Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="border-b border-line bg-surface">
-<div class="mx-auto max-w-4xl px-4 py-3">
-<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
-<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html">What Stemma is</a></li><li><a href="principles.html">Principles</a></li><li><a href="install.html">Install and ask</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html" aria-current="page">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<header class="masthead">
+<div class="shell">
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html" aria-current="page">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
-<h1>Worked example: Darwin and coral reefs</h1>
-<p class="lead">One real source and four citations of it, each with a short quotation, kept as record files in the repository.</p>
-<p class="note">The copy of the book and its text are private and are not published. Only records and digests are. A model compared the facts and quotations below with images of the stored pages; <strong>no person has confirmed them</strong>.</p>
-<h2>The source</h2>
-<p><cite>The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836</cite>. Charles Darwin. London: Smith, Elder and Co., 1842.</p>
-<p>The title and year were read from the image of the title page. The text layer of the same page, from unverified character recognition, gives one of the voyage's years wrongly and does not hold the year of publication.</p>
-<h2>What cites it</h2>
-<p>Each sentence is this example's own wording around a quotation. Each quotation was compared, punctuation included, with the image of the cited page.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Citations"><table><thead><tr><th scope="col">Page</th><th scope="col">Quotation</th><th scope="col">Citing sentence</th></tr></thead><tbody><tr><td>88</td><td>The theory most generally received on the formation of atolls, is that they are based on submarine craters</td><td>Darwin opens his fifth chapter with the received view: “The theory most generally received on the formation of atolls, is that they are based on submarine craters”.</td></tr><tr><td>89</td><td>this view inapplicable to the greater number of atolls</td><td>He calls Chamisso’s account earlier and better than the crater theory, yet finds that a difficulty of the same kind makes “this view inapplicable to the greater number of atolls”.</td></tr><tr><td>2</td><td>I have invariably used in this volume the term</td><td>Of the word atoll he writes, “I have invariably used in this volume the term”, and treats it as a synonym for lagoon-island.</td></tr><tr><td>89</td><td>I am far from denying that a reef like a perfectly characterized atoll might not be formed</td><td>He does not rule the crater rim out altogether: “I am far from denying that a reef like a perfectly characterized atoll might not be formed”.</td></tr></tbody></table></div>
-<h2>Page numbers</h2>
-<p><code>source pages</code> proposed two runs of printed numbers in the scan. The second turned out, on its page images, to be a publisher's list of other books bound at the back, numbered on its own. It was left out of the map: a number printed on a page need not number the work. That is why a proposed page map is reviewed.</p>
-<h2>With the private copy</h2>
-<p>On the maintainer's machine on 2026-11-26, all four citations passed <code>source.held</code>, <code>quote.present</code>, <code>locator.extent</code> and <code>source.changed</code>. One quotation matched only after joining a word split across a line end, which the report points out. That run depends on the private store and is not reproduced here. A match is agreement with recognized text: a correct quotation of another sentence on page 2 was reported as a near match, because the recognized text has a stray space after a quotation mark. Even with nothing open, the project is not called checked clean: its report lists checks of cited sources that were not run.</p>
-<h2>What a check says without the private copy</h2>
-<p>Where the stored copy is not present, Stemma cannot compare the citations or quotations with anything, and says so. The page numbers can still be compared with the page map, which is in the records.</p>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run with an empty store, paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY</span>
+<main id="main" tabindex="-1" class="shell page">
+<div class="opening"><h1>Worked example: Darwin and coral reefs</h1>
+<p class="lead">A real book from 1842, followed from its title page to four checked quotations.</p>
+<p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The copy of the book and its full text are not published here; the records about them are.</p>
+<nav class="contents" aria-label="Steps of the worked example"><ul><li><a href="#source">1. The book</a></li><li><a href="#copy">2. The copy</a></li><li><a href="#text">3. Its text</a></li><li><a href="#pages">4. Its page numbers</a></li><li><a href="#citations">5. Four citations</a></li><li><a href="#check">6. The check</a></li><li><a href="#mistakes">7. Planted mistakes</a></li><li><a href="#without">8. Without the copy</a></li><li><a href="#facts">Where the facts come from</a></li><li><a href="#limits">What this does not show</a></li></ul></nav></div>
+<section class="spread" aria-labelledby="whole">
+<h2 id="whole">The whole example at a glance</h2>
+<figure class="descent">
+<div class="descent-head"><p class="descent-title"><cite>The Structure and Distribution of Coral Reefs</cite></p>
+<p>Charles Darwin, 1842. The source record.</p><p class="record"><code>src-darwinreefs1842</code></p></div>
+<ul class="descent-tree" aria-label="What descends from the source record">
+<li><div class="held"><p class="descent-kind">Stored copy</p><p>A PDF, kept privately</p><p class="record"><code>cap-7sskba1cqwz7975wsc1v</code></p></div>
+<ul><li><p class="descent-kind">Its text</p><p>Unverified character recognition</p><p class="record"><code>ext-kb8hzwcvz40x3yyaxnkt</code></p></li></ul></li>
+<li><p class="descent-kind">Cited at page 2</p><blockquote><p>I have invariably used in this volume the term</p></blockquote><p class="record"><code>cit-darwinreefs0003</code></p></li>
+<li><p class="descent-kind">Cited at page 88</p><blockquote><p>The theory most generally received on the formation of atolls, is that they are based on submarine craters</p></blockquote><p class="record"><code>cit-darwinreefs0001</code></p></li>
+<li><p class="descent-kind">Cited at page 89</p><blockquote><p>this view inapplicable to the greater number of atolls</p></blockquote><p class="record"><code>cit-darwinreefs0002</code></p></li>
+<li><p class="descent-kind">Cited at page 89</p><blockquote><p>I am far from denying that a reef like a perfectly characterized atoll might not be formed</p></blockquote><p class="record"><code>cit-darwinreefs0004</code></p></li>
+</ul>
+<figcaption>This site's drawing of the record files in this example; it is not a Stemma screen. An AI model compared the quotations with images of the pages; no person has confirmed them.</figcaption>
+</figure>
+</section>
+<section class="band"><div class="band-head"><h2 id="source">1. The book</h2></div><div class="band-body">
+<p class="work"><cite>The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836</cite>. Charles Darwin. London: Smith, Elder and Co., 1842.</p>
+<p>The first step is a record of the work itself. The title and year were read from the picture of the title page, which matters: the computer-read text of that same page gives one of the voyage's years wrongly and does not hold the year of publication.</p>
+<p>The short label <code>darwin1842</code> is how citations refer to this book. The book is marked as a <em>candidate</em>: nobody has formally accepted it into the project.</p>
+<details class="more"><summary>The record file: <code>src-darwinreefs1842.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;admission&quot;: &quot;candidate&quot;,
+  &quot;bib&quot;: [
+    {
+      &quot;name&quot;: &quot;publisher&quot;,
+      &quot;value&quot;: {
+        &quot;value&quot;: &quot;Smith, Elder and Co.&quot;
+      }
+    },
+    {
+      &quot;name&quot;: &quot;publisher-place&quot;,
+      &quot;value&quot;: {
+        &quot;value&quot;: &quot;London&quot;
+      }
+    }
+  ],
+  &quot;citation_key&quot;: &quot;darwin1842&quot;,
+  &quot;contributions&quot;: [
+    {
+      &quot;as_printed&quot;: {
+        &quot;family&quot;: &quot;Darwin&quot;,
+        &quot;given&quot;: &quot;Charles&quot;
+      },
+      &quot;lid&quot;: &quot;a1&quot;,
+      &quot;role&quot;: &quot;author&quot;
+    }
+  ],
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T00:06:55Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;src-darwinreefs1842&quot;,
+  &quot;intake&quot;: &quot;parsed&quot;,
+  &quot;issued&quot;: {
+    &quot;edtf&quot;: &quot;1842&quot;
+  },
+  &quot;kind&quot;: &quot;source&quot;,
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;title&quot;: {
+    &quot;value&quot;: &quot;The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836&quot;
+  },
+  &quot;type&quot;: &quot;book&quot;
+}</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="copy">2. The copy</h2></div><div class="band-body">
+<p>The copy is a 15.8 MB scan from the Internet Archive (Internet Archive item b29331213). Its record notes the address it came from, when it was obtained, and a fingerprint of the exact file. If the file changed by even one character, the fingerprint would no longer match.</p>
+<p class="record">Address: https://archive.org/download/b29331213/b29331213.pdf</p>
+<p>The file itself stays in a private store outside the project.</p>
+<details class="more"><summary>The record file: <code>cap-7sskba1cqwz7975wsc1v.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;acquired_at&quot;: &quot;2026-11-26T18:34:51-05:00&quot;,
+  &quot;admitted_by&quot;: {
+    &quot;kind&quot;: &quot;model&quot;,
+    &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+  },
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T00:06:55Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;cap-7sskba1cqwz7975wsc1v&quot;,
+  &quot;kind&quot;: &quot;capture&quot;,
+  &quot;media_type&quot;: &quot;application/pdf&quot;,
+  &quot;origin&quot;: &quot;https://archive.org/download/b29331213/b29331213.pdf&quot;,
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;sha256&quot;: &quot;52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9&quot;,
+  &quot;size&quot;: 15775995,
+  &quot;source&quot;: &quot;src-darwinreefs1842&quot;,
+  &quot;source_version&quot;: &quot;Internet Archive item b29331213&quot;
+}</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="text">3. Its text</h2></div><div class="band-body">
+<p>The PDF already contains text, made by a computer reading the page pictures. Stemma saved that text page by page and recorded how it was made. Nobody has proofread it, and the record marks its quality as not assessed. It also notes that 15 of the 258 PDF pages have no text at all.</p>
+<p>Ask Claude for it with a request like <q>Read the text of that copy and work out its page numbers.</q> The record file is long, because it notes where each page's text begins and ends.</p>
+<p class="record">Text record: <code>ext-kb8hzwcvz40x3yyaxnkt</code></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="pages">4. Its page numbers</h2></div><div class="band-body">
+<p>The third page of a PDF is rarely page 3 of the book. Stemma proposed page numbers from the numbers printed on the pages, and found two runs of them.</p>
+<p>Looking at the page pictures showed that the second run belonged to a publisher's list of other books, bound in at the back with its own numbering. It was taken out. A number printed on a page does not always number the work, which is why a proposal is reviewed before it is used.</p>
+<figure class="pagemap">
+<ol aria-label="Pages of the stored PDF, in order"><li style="flex-grow: 19"><p><strong>No printed number given</strong></p><p>PDF pages 0 to 18, counting from 0 (19 pages)</p></li><li class="mapped" style="flex-grow: 213"><p><strong>Printed pages 2 to 214</strong></p><p>PDF pages 19 to 231, counting from 0 (213 pages)</p></li><li style="flex-grow: 26"><p><strong>No printed number given, including a publisher's list that has its own numbers</strong></p><p>PDF pages 232 to 257, counting from 0 (26 pages)</p></li></ol>
+<figcaption>This site's drawing of the example's page map, which covers a PDF of 258 pages. Widths are roughly in proportion.</figcaption>
+</figure>
+<details class="more"><summary>The record file: <code>page-map.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">[
+  {
+    &quot;evidence&quot;: &quot;printed_sequence&quot;,
+    &quot;first_index&quot;: 19,
+    &quot;first_label&quot;: &quot;2&quot;,
+    &quot;last_index&quot;: 231,
+    &quot;style&quot;: &quot;arabic&quot;
+  }
+]</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="citations">5. Four citations</h2></div><div class="band-body">
+<p>Each sentence below is this example's own wording around a short quotation, which is underlined. Each quotation was compared, punctuation included, with the picture of the cited page.</p>
+<ol class="citations"><li><p class="locator">page 88</p><div><p class="sentence">Darwin opens his fifth chapter with the received view: “<span class="quoted">The theory most generally received on the formation of atolls, is that they are based on submarine craters</span>”.</p><p class="record"><code>cit-darwinreefs0001</code></p></div></li><li><p class="locator">page 89</p><div><p class="sentence">He calls Chamisso’s account earlier and better than the crater theory, yet finds that a difficulty of the same kind makes “<span class="quoted">this view inapplicable to the greater number of atolls</span>”.</p><p class="record"><code>cit-darwinreefs0002</code></p></div></li><li><p class="locator">page 2</p><div><p class="sentence">Of the word atoll he writes, “<span class="quoted">I have invariably used in this volume the term</span>”, and treats it as a synonym for lagoon-island.</p><p class="record"><code>cit-darwinreefs0003</code></p></div></li><li><p class="locator">page 89</p><div><p class="sentence">He does not rule the crater rim out altogether: “<span class="quoted">I am far from denying that a reef like a perfectly characterized atoll might not be formed</span>”.</p><p class="record"><code>cit-darwinreefs0004</code></p></div></li></ol>
+<details class="more"><summary>The record file: <code>cit-darwinreefs0001.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T00:35:12Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;cit-darwinreefs0001&quot;,
+  &quot;intake&quot;: &quot;parsed&quot;,
+  &quot;key&quot;: &quot;darwin1842&quot;,
+  &quot;kind&quot;: &quot;citation&quot;,
+  &quot;locator&quot;: {
+    &quot;label&quot;: &quot;page&quot;,
+    &quot;value&quot;: &quot;88&quot;
+  },
+  &quot;quotation&quot;: &quot;The theory most generally received on the formation of atolls, is that they are based on submarine craters&quot;,
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;sentence&quot;: {
+    &quot;sha256&quot;: &quot;8583054abb940457cf486a435f601a0ab4b66fe803480532a4054553b29861ee&quot;,
+    &quot;text&quot;: &quot;Darwin opens his fifth chapter with the received view: “The theory most generally received on the formation of atolls, is that they are based on submarine craters”.&quot;
+  }
+}</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="check">6. The check</h2></div><div class="band-body">
+<p>With the private copy in place, the check compared all four citations with it. For each one: the copy and text are there and unchanged, the quotation is in the text, the page is within the numbered pages, and nothing it relies on has been replaced. Nothing was left open among the checks that ran.</p>
+<p>One quotation matched only after rejoining the word <em>denying</em>, split at the end of a line. The report points that out so you can look.</p>
+<p>The project is still <em>not</em> called checked clean, and the first line of the report says why: three kinds of check do not run. It also notes that nobody has admitted the source.</p>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run on the maintainer's machine, which holds the private copy. Folder names are replaced. It cannot be rebuilt on a machine without the copy.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $STORE</span>
+<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 39 result(s) passed.
+
+For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+<span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
+<span class="dim">[exit 1]</span></pre></figure>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="mistakes">7. Planted mistakes</h2></div><div class="band-body">
+<p>To see whether the checks would notice, two mistakes were made in a throwaway copy of the project: <q>greater</q> was changed to <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
+<p>Both were caught. The changed quotation is shown beside the wording in the copy (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words were found: page 88.</p>
+<details class="more"><summary>What the tool printed for the planted mistakes</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run on a throwaway copy with two planted mistakes, on the machine that holds the private copy.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs-trial --store-dir $STORE</span>
+<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 37 result(s) passed.
+
+1. <span class="v-bad">PROBLEM</span>: A cited page is outside the printed pages mapped in your stored copy.  [locator.extent]
+   Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
+   What to do: Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one).
+   - cit-darwinreefs0001
+       citation file: records/citations/cit-darwinreefs0001.json
+       key: darwin1842
+       locator: page 412
+       source file: records/sources/src-darwinreefs1842.json
+       extent: printed pages 2-214 (mapped in your stored copy)
+       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
+       pages without a label: 45 page(s) of the stored file
+
+2. <span class="v-bad">PROBLEM</span>: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-darwinreefs0002
+       citation file: records/citations/cit-darwinreefs0002.json
+       key: darwin1842
+       cited text: this view inapplicable to the smaller number of atolls
+       match: near
+       profile: quote-fold/0
+       stored text: this view ⏎ inapplicable to the greater number of atolls
+       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
+       found on: printed page 89 (file index 106)
+       text method: ocr, quality unassessed
+
+For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+For information, not a finding: these quotations are in the source, but not on the page the citation gives.
+The quotation check does not test the cited page. Check the page number.
+   - cit-darwinreefs0001: found on printed page 88; the citation gives 412
+
+<span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs-trial/.stemma/reports/check.json
+<span class="dim">[exit 1]</span></pre></figure>
+</details>
+<h3>A correct quotation that was flagged</h3>
+<p>One further try, noted in the example's own notes and not shown here: a correct quotation from page 2 was reported as only a near match, because the computer-read text has a stray space after a quotation mark. A finding means <em>look at the page</em>, not <em>you are wrong</em>.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="without">8. Without the copy</h2></div><div class="band-body">
+<p>Anyone can download the example's records, but not the private copy. On such a machine the check cannot compare the citations or quotations with anything, and it says <em>could not check</em> instead of passing them. It can still test the page numbers, because the page map is part of the records.</p>
+<details class="more"><summary>What the tool printed without the copy</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 8 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 31 result(s) passed.
 
@@ -101,9 +326,22 @@ For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
 Content store looked in: $EMPTY (chosen by --store-dir). It is private and not part of the repository; where its files are absent or changed, nothing about them was checked.
 Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="facts">Where the facts come from</h2></div><div class="band-body">
+<p>Below, a <em>picture of a page</em> means an image drawn from the stored PDF and read by an AI model (claude-sonnet-5-5). No person has read these pages for the example.</p>
+<dl class="entries"><div><dt>Title, author, publisher, place and year</dt><dd>Read from the picture of the title page. The computer-read text of that page gets one voyage year wrong (1882 for 1832) and misses the year of publication.</dd></div><div><dt>The four quotations</dt><dd>Each compared word by word, punctuation included, with the picture of its page: PDF pages 19, 105 and 106, counting from 0.</dd></div><div><dt>Where the copy came from</dt><dd>The web address it was downloaded from, as logged. The time it was obtained is the downloaded file's own date.</dd></div><div><dt>The text</dt><dd>The text already inside the Internet Archive's PDF, made by character recognition that nobody has proofread. Only the pages named here were compared with their pictures.</dd></div><div><dt>The page numbers</dt><dd>The proposal found the expected number on 191 of 213 pages. The Internet Archive's page-number file and the numbering inside the PDF agree on all 213. Pictures of four pages were looked at.</dd></div></dl>
+<p><a href="https://github.com/DocumentDrivenDX/stemma/tree/main/examples/coral-reefs">All the example's files and notes, on GitHub</a></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="limits">What this does not show</h2></div><div class="band-body">
+<p>The checks show that four recorded quotations agree with computer-read text of one copy, and that their page numbers fall within the numbered pages. They do not show that Darwin is quoted fairly, that the sentences around the quotations are right, or that this is the best edition to cite. The authors, title and date were not checked by any script.</p>
+</div></section>
 </main>
-<footer class="border-t border-line">
-<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+<footer class="colophon">
+<div class="shell">
+<p>Stemma is pre-release, free and open source (MIT license), and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</p>
+<p>Set in Source Serif 4, Inter and JetBrains Mono. These pages run no scripts and request nothing from another host.</p>
+</div>
 </footer>
 </body>
 </html>

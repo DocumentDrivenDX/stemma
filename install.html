@@ -5,33 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="description" content="Install the Stemma plugin, then ask Claude in plain words.">
-<title>Install and ask Claude | Stemma</title>
+<title>Get started | Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="border-b border-line bg-surface">
-<div class="mx-auto max-w-4xl px-4 py-3">
-<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
-<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html">What Stemma is</a></li><li><a href="principles.html">Principles</a></li><li><a href="install.html" aria-current="page">Install and ask</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<header class="masthead">
+<div class="shell">
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html" aria-current="page">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
-<h1>Install and ask Claude</h1>
-<p class="lead">Installing the plugin is the only installation there is. The plugin and Claude set up everything else themselves.</p>
-<p>Install it from the DocumentDrivenDX marketplace with Claude Code:</p>
+<main id="main" tabindex="-1" class="shell page">
+<div class="opening"><h1>Get started</h1>
+<p class="lead">Install one plugin, then ask Claude in plain words. There is nothing else for you to set up.</p>
+</div>
+<section class="band"><div class="band-head"><h2>What you need</h2></div><div class="band-body">
+<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs.</p>
+<p class="note">Stemma is pre-release. It has been tried on one Mac with Apple silicon, including installation with the Claude command-line tool (Stemma 0.0.1). The Claude desktop app, a live Claude session using the plugin, Windows and Linux are untested. On Windows, setup needs Git Bash.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2>Install the plugin</h2></div><div class="band-body">
+<p>Type these two commands in a terminal. They add the DocumentDrivenDX catalog of plugins and install Stemma from it.</p>
 <figure class="excerpt"><figcaption>Commands to type in a terminal.</figcaption><pre tabindex="0">claude plugin marketplace add DocumentDrivenDX/plugins
 claude plugin install stemma@documentdrivendx</pre></figure>
-<p class="note">These commands were run against GitHub with the Claude command-line tool on one Mac (Stemma 0.0.1). The Claude desktop app, Windows and Linux are untested.</p>
-<h2>What happens on first use</h2>
-<p>Claude fetches a pinned copy of the Bun runtime from the npm registry, checks it against a digest shipped in the plugin, and keeps it in the plugin's own data directory. It changes no system or shell setting, and Claude's usual permission prompts apply. If setup fails or you decline it, Claude says that nothing was checked, and your writing carries on.</p>
-<h2>What to ask Claude</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Requests"><table><thead><tr><th scope="col">You ask</th><th scope="col">Stemma does</th></tr></thead><tbody><tr><td>&ldquo;Start a Stemma project in this folder.&rdquo;</td><td>Creates the project files and overwrites nothing.</td></tr><tr><td>&ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</td><td>Writes a record of the work. Claude says where each detail came from.</td></tr><tr><td>&ldquo;Keep this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</td><td>Stores the file in a private store outside the project, with its digest, origin and the time you got it.</td></tr><tr><td>&ldquo;Read the text of that copy and work out its page numbers.&rdquo;</td><td>Reads a PDF's own text layer page by page, or takes a text file. It proposes page numbers only where the pages' printed numbers bear them out, for review against the page images.</td></tr><tr><td>&ldquo;Record the citations in this chapter.&rdquo;</td><td>Writes one record for each citation, with its sentence, page and quotation.</td></tr><tr><td>&ldquo;Check the project and explain what is open.&rdquo;</td><td>Runs the checks and explains each finding in plain language, showing a quotation beside the closest stored text when they differ.</td></tr><tr><td>&ldquo;What does that book say on page 89?&rdquo;</td><td>Prints only the pages asked for, up to five, marked as quoted data.</td></tr><tr><td>&ldquo;I have a better scan of this book. Replace the old one.&rdquo;</td><td>Keeps the new copy, retires the old one, and lists what rested on it.</td></tr><tr><td>&ldquo;Is anything missing from my source store?&rdquo;</td><td>Names every stored file that is missing or has changed.</td></tr></tbody></table></div>
-<p class="note">The commands behind these requests are tested. A live Claude session following the plugin's skill has not been tested.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2>The first time you use it</h2></div><div class="band-body">
+<p>Stemma needs a small program called Bun to run. Claude downloads one fixed version, confirms it is the expected file, and keeps it inside the plugin's own folder. Your system settings stay as they are, and Claude asks permission as it usually does.</p>
+<p>If setup fails, or you say no, Claude tells you that nothing was checked. You can keep writing either way.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2>What to ask Claude</h2></div><div class="band-body">
+<dl class="asks"><div><dt>&ldquo;Start a Stemma project in this folder.&rdquo;</dt><dd>Creates the project files and overwrites nothing.</dd></div><div><dt>&ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</dt><dd>Writes a record of the work. Claude says where each detail came from.</dd></div><div><dt>&ldquo;Keep this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</dt><dd>Puts the file in your private store, noting where and when you got it.</dd></div><div><dt>&ldquo;Read the text of that copy and work out its page numbers.&rdquo;</dt><dd>Reads the text inside the PDF, or takes a text file, and proposes page numbers for review where the printed numbers support them.</dd></div><div><dt>&ldquo;Record the citations in this chapter.&rdquo;</dt><dd>Writes one record for each citation, with its sentence, page and quotation.</dd></div><div><dt>&ldquo;Check the project and explain what is open.&rdquo;</dt><dd>Runs the checks and explains each finding. When a quotation differs, you see it beside the closest wording in your copy.</dd></div><div><dt>&ldquo;What does that book say on page 89?&rdquo;</dt><dd>Shows only the pages you ask for, up to five, marked as quoted from the source.</dd></div><div><dt>&ldquo;I have a better scan of this book. Replace the old one.&rdquo;</dt><dd>Keeps the new copy, sets the old one aside, and lists what relied on it.</dd></div><div><dt>&ldquo;Is anything missing from my source store?&rdquo;</dt><dd>Names every stored file that is missing or has changed.</dd></div></dl>
+<p class="note">The tools behind these requests are tested. A live Claude session following the plugin's instructions has not been tested.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2>Before you add material</h2></div><div class="band-body">
+<p><strong>Anything in a project may be sent to the AI model.</strong> Stemma holds back no individual source. If you may not send something to a hosted model, do not put it in the project.</p>
+<p><strong>Back up your private store.</strong> Your copies and their text live outside the project, and Stemma makes no other copy of them.</p>
+<p><a href="how.html#places">Where your material lives</a></p>
+</div></section>
 </main>
-<footer class="border-t border-line">
-<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+<footer class="colophon">
+<div class="shell">
+<p>Stemma is pre-release, free and open source (MIT license), and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</p>
+<p>Set in Source Serif 4, Inter and JetBrains Mono. These pages run no scripts and request nothing from another host.</p>
+</div>
 </footer>
 </body>
 </html>
