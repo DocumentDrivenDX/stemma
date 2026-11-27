@@ -1,12 +1,14 @@
-// The evidence ledger that `build report` writes (CONTRACT-006 J, US-124), run
-// as the bundled command on a copy of the worked example.
+// The evidence ledger that `build report` writes (CONTRACT-006 J, US-124): the
+// worked example's own ledger as committed, and the bundled command run on the
+// small invented project, whose report has sentences of every kind.
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { totalsOf, type Unit } from "../packages/publish/src/evidence.ts";
-import { copyExample, ROOT, temporary } from "./helpers.ts";
+import { ROOT, temporary } from "./helpers.ts";
+import { SMALL_SENTENCE, smallProject } from "./small-project.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
 let copy = "";
@@ -38,16 +40,15 @@ const nameVersion = (version: unknown) => {
   writeFileSync(join(copy, "report/report.json"), `${JSON.stringify({ ...spec, version }, null, 1)}\n`);
 };
 
-/** The second sentence of the worked example's abstract, which holds no quotation and no note. */
-const SENTENCE = "This report argues that the shape of an atoll was never the evidence on which the theory stood, and that Darwin said so.";
+/** A sentence in the middle of the small project's paragraph, which holds no quotation and no note. */
+const SENTENCE = SMALL_SENTENCE;
 const sha = (text: string) => new Bun.CryptoHasher("sha256").update(text).digest("hex");
 const unitOf = (units: Unit[], text: string) => units.find((u) => u.sha256 === sha(text))!;
 
 beforeAll(async () => {
   const work = temporary();
   cli = await bundle(join(work, "plugin/dist"));
-  copy = join(work, "coral-reefs");
-  copyExample(copy);
+  copy = smallProject(join(work, "small"));
 }, 120_000);
 
 describe("the evidence ledger", () => {
@@ -162,16 +163,16 @@ describe("the evidence ledger", () => {
   }, 120_000);
 
   test("US-124-AC5, AC6: a quotation reads as compared only when a person agreed, and a flag outranks that", () => {
-    const quotation = build().quotations.find((q) => q.id === "L-borings")!;
+    const quotation = build().quotations.find((q) => q.id === "one")!;
     expect(quotation.compared).toBe("none_recorded");
     const passage = JSON.parse(read(`records/passages/${quotation.passages[0]}.json`)) as { text: string; anchor: { index: number }[] };
     const review = (outcome: string, actor: string, extra: string[] = []) => done(["review", "add", passage.text, "--scope", "passage",
       "--passage", quotation.passages[0]!, "--pages", String(passage.anchor[0]!.index), "--against", "page image", "--outcome", outcome, "--actor", actor, ...extra]);
-    const compared = () => build().quotations.find((q) => q.id === "L-borings")!.compared;
+    const compared = () => build().quotations.find((q) => q.id === "one")!.compared;
 
     review("agrees", "person:author");
     expect(compared()).toBe("person");
-    expect(ledger().units.filter((u) => u.quotations.includes("L-borings")).map((u) => u.labels.support)).toContain("not_judged");
+    expect(ledger().units.filter((u) => u.quotations.includes("one")).map((u) => u.labels.support)).toContain("not_judged");
     review("flagged", "model:some-model", ["--flag", `${passage.anchor[0]!.index}|a reading|another|a doubt`]);
     expect(compared()).toBe("flagged");
   }, 120_000);

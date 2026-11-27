@@ -23,11 +23,17 @@ const REPORT = {
   quotations: [
     { id: "one", cites: "volume1850", passages: [{ passage: "psg-onepage00001" }] },
     { id: "two", cites: "volume1850", passages: [{ passage: "psg-twopages0001" }] },
+    { id: "note", cites: "volume1850", passages: [{ passage: "psg-footnote0001" }] },
   ],
 };
+
+/** A sentence of the report that holds no quotation and no note, between two that do. */
+export const SMALL_SENTENCE = "This report argues that the shape of a reef was never the evidence for it.";
+
+/** Sentences of each kind: with a quotation, with a citation only, with neither, and in a note's comment. */
 const TEMPLATE = `# A *Report* on a Reef
 
-The reef: {{q:one}}.[^one] Both {{q:two}}.[^two]
+The reef: {{q:one}}.[^one] Both {{q:two}}.[^two] ${SMALL_SENTENCE} The soundings were invented.[^note|An invented comment stands in this note.]
 
 {{bibliography}}
 `;
