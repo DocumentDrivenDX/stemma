@@ -6,7 +6,7 @@
 // paragraph. A match against recognized text shows agreement with that text only.
 import { canonical, type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
 import { result } from "../findings.ts";
-import { type Closest, findClosest, findQuotation, FOLD_WORDS, type Found, QUOTE_PROFILE, renderQuotation, type Within } from "../matching/quote-fold.ts";
+import { type Closest, findClosest, findQuotation, FOLD_WORDS, type Found, QUOTE_PROFILE, renderQuotation, type Span, type Within } from "../matching/quote-fold.ts";
 import { paragraphNumbers, placeOf, SourceTexts, type StreamName, type TextView } from "../matching/texts.ts";
 import { addressText, textAt } from "../passages.ts";
 import type { Evidence, Result } from "../report.ts";
@@ -21,7 +21,7 @@ const meta = (name: string, value: string): Evidence => ({ name, class: "metadat
 const sourceText = (name: string, value: string): Evidence => ({ name, class: "source_text", value });
 
 /** Where to look for a quotation in one stream of one source file. */
-interface Search { view: TextView; stream: StreamName; within?: Within }
+interface Search { view: TextView; stream: StreamName; within?: Within; /** The stretch `within` holds a span to. */ region?: Span }
 
 type Verdict =
   | { outcome: "pass"; evidence: Evidence[] }
@@ -66,7 +66,7 @@ export function compareQuotation(quotation: string, searches: Search[], skipped:
   if (searches.length === 0) return { outcome: "unverifiable", reason: "text_unavailable", evidence: [profile] };
   let closest: { search: Search; span: Closest } | undefined;
   for (const search of searches) {
-    const span = findClosest(search.view.folded(search.stream), quotation, search.within);
+    const span = findClosest(search.view.folded(search.stream), quotation, search.within, search.region);
     if (span && (!closest || span.distance < closest.span.distance)) closest = { search, span };
   }
   const shown = closest ? [
@@ -184,7 +184,7 @@ export function quoteResults(corpus: Corpus, texts = new SourceTexts(corpus)): R
       const now = passage?.kind === "passage" ? textAt(texts, passage) : undefined;
       if (now?.state !== "ok") return [];
       const found = findQuotation(now.view.folded(now.stream), now.text);
-      return found ? [{ view: now.view, stream: now.stream, within: (s) => s.start >= found.start && s.end <= found.end }] : [];
+      return found ? [{ view: now.view, stream: now.stream, within: (s) => s.start >= found.start && s.end <= found.end, region: found }] : [];
     });
     record(note, searches.length === 0
       ? { outcome: "unverifiable", reason: "anchor_not_found", evidence: [meta("profile", QUOTE_PROFILE)] }

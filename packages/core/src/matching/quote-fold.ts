@@ -34,11 +34,12 @@ interface Applied { fold: Fold; at: number; joined?: string }
 export interface Folded {
   original: string;
   text: string;
-  /** For each unit of `text`, the span of `original` it came from. */
-  from: number[];
-  to: number[];
+  /** For each unit of `text`, the span of `original` it came from. Neither ever goes down. */
+  from: Int32Array;
+  to: Int32Array;
   /** Whether a match may start at this unit: it begins a character of the original. */
-  starts: boolean[];
+  starts: Uint8Array;
+  /** In the order of `at`, which never goes down. */
   applied: Applied[];
 }
 
@@ -67,21 +68,36 @@ function joinedWord(original: string, hyphen: number, next: number): string {
 
 /** `stored` text may split words at line ends; a quotation's own hyphens are never joined. */
 export function fold(original: string, side: "stored" | "quotation"): Folded {
-  const out: string[] = [];
-  const from: number[] = [];
-  const to: number[] = [];
-  const starts: boolean[] = [];
+  // A whole project's source text is folded in one run, so the maps are held as
+  // typed arrays, which take a fraction of the memory of arrays of values.
+  const chunks: string[] = [];
+  let out: string[] = [];
+  let capacity = original.length + 16;
+  let from = new Int32Array(capacity);
+  let to = new Int32Array(capacity);
+  let starts = new Uint8Array(capacity);
   const applied: Applied[] = [];
   let length = 0;
   let space: { start: number; end: number; plain: boolean } | undefined;
 
   const push = (text: string, start: number, end: number) => {
-    for (let i = 0; i < text.length; i++) {
-      from.push(start);
-      to.push(end);
-      starts.push(i === 0);
+    if (length + text.length > capacity) {
+      capacity = 2 * (length + text.length);
+      const grown = <T extends Int32Array | Uint8Array>(old: T, made: T): T => { made.set(old.subarray(0, length)); return made; };
+      from = grown(from, new Int32Array(capacity));
+      to = grown(to, new Int32Array(capacity));
+      starts = grown(starts, new Uint8Array(capacity));
     }
+    for (let i = 0; i < text.length; i++) {
+      from[length + i] = start;
+      to[length + i] = end;
+    }
+    if (text.length > 0) starts[length] = 1;
     out.push(text);
+    if (out.length === 4096) {
+      chunks.push(out.join(""));
+      out = [];
+    }
     length += text.length;
   };
   const flush = () => {
@@ -137,7 +153,14 @@ export function fold(original: string, side: "stored" | "quotation"): Folded {
     i = end;
   }
   flush();
-  return { original, text: out.join(""), from, to, starts, applied };
+  chunks.push(out.join(""));
+  const exact = capacity - length > 64;
+  return {
+    original, text: chunks.join(""), applied,
+    from: exact ? from.slice(0, length) : from.subarray(0, length),
+    to: exact ? to.slice(0, length) : to.subarray(0, length),
+    starts: exact ? starts.slice(0, length) : starts.subarray(0, length),
+  };
 }
 
 /** The quotation as it is searched for: folded, without white space at its ends. */
@@ -197,11 +220,25 @@ export function findQuotation(stored: Folded, quotation: string, within: Within 
     if (!within(span)) continue;
     if (stored.original.slice(span.start, span.end) === verbatim) return { ...span, match: "exact", folds: [], joined: [] };
     if (first) continue;
-    const here = stored.applied.filter((a) => a.at >= at && a.at < after);
+    const here = appliedWithin(stored.applied, at, after);
     const folds = new Set<Fold>([...here, ...needle.applied].map((a) => a.fold));
     first = { ...span, match: "normalized", folds: [...folds].sort(), joined: here.flatMap((a) => a.joined ?? []) };
   }
   return first;
+}
+
+/** Those applied from `start` up to `end`, found without reading the rest. */
+function appliedWithin(applied: Applied[], start: number, end: number): Applied[] {
+  let low = 0;
+  let high = applied.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (applied[middle]!.at < start) low = middle + 1;
+    else high = middle;
+  }
+  const out: Applied[] = [];
+  for (let i = low; i < applied.length && applied[i]!.at < end; i++) out.push(applied[i]!);
+  return out;
 }
 
 /** Starting values, to be tuned on pilot sources (SD-007 BR-709). */
@@ -217,23 +254,69 @@ export interface Closest extends Span {
   near: boolean;
 }
 
+interface Candidate { start: number; end: number; distance: number }
+
 /**
- * The stored span closest to the quotation, widened to whole words. It is
- * evidence for a person to compare. It never makes a quotation pass.
+ * Every offset in `hay` from `begin` to `until` where some stretch ending there
+ * is within `limit` edits of the needle, with the fewest edits. This is Myers'
+ * bit-parallel form of the approximate substring search, 32 rows at a time
+ * (Hyyro's blocks), so that text which holds nothing like the needle is passed
+ * over quickly. It gives distances only, not where each stretch starts.
  */
-export function findClosest(stored: Folded, quotation: string, within: Within = anywhere): Closest | undefined {
-  const needle = foldQuotation(quotation).text;
+function endsWithin(needle: string, hay: string, begin: number, until: number, limit: number): { end: number; distance: number }[] {
   const m = needle.length;
-  if (m === 0 || m > CLOSEST_LIMIT) return undefined;
-  const limit = Math.floor(m * CLOSEST_SHARE);
-  const hay = stored.text;
-  // Approximate substring search, keeping only the rows that can still be within the limit.
+  const blocks = Math.ceil(m / 32);
+  const rows = new Map<number, number>();
+  for (let i = 0; i < m; i++) if (!rows.has(needle.charCodeAt(i))) rows.set(needle.charCodeAt(i), rows.size + 1);
+  // Row 0 is for every unit the needle does not hold.
+  const match = new Int32Array((rows.size + 1) * blocks);
+  for (let i = 0; i < m; i++) match[rows.get(needle.charCodeAt(i))! * blocks + (i >> 5)]! |= 1 << (i & 31);
+  const plus = new Int32Array(blocks).fill(-1);
+  const minus = new Int32Array(blocks);
+  const lastRow = 1 << ((m - 1) & 31);
+  const found: { end: number; distance: number }[] = [];
+  let score = m;
+  for (let j = begin; j < until; j++) {
+    const offset = (rows.get(hay.charCodeAt(j)) ?? 0) * blocks;
+    let carry = 0;
+    for (let b = 0; b < blocks; b++) {
+      let equal = match[offset + b]!;
+      const pv = plus[b]!;
+      const mv = minus[b]!;
+      const xv = equal | mv;
+      if (carry < 0) equal |= 1;
+      const xh = (((((equal & pv) >>> 0) + (pv >>> 0)) | 0) ^ pv) | equal;
+      let ph = mv | ~(xh | pv);
+      let mh = pv & xh;
+      const high = b === blocks - 1 ? lastRow : 0x80000000 | 0;
+      const out = (ph & high) !== 0 ? 1 : (mh & high) !== 0 ? -1 : 0;
+      ph <<= 1;
+      mh <<= 1;
+      if (carry < 0) mh |= 1;
+      else if (carry > 0) ph |= 1;
+      plus[b] = mh | ~(xv | ph);
+      minus[b] = ph & xv;
+      carry = out;
+    }
+    score += carry;
+    if (score <= limit) found.push({ end: j + 1, distance: score });
+  }
+  return found;
+}
+
+/**
+ * The same search cell by cell from `begin` to `until`, which also follows where
+ * each stretch starts; `at` is told for each offset where one ends within the
+ * limit. Only the rows that can still be within the limit are kept.
+ */
+function startsWithin(needle: string, hay: string, begin: number, until: number, limit: number, at: (end: number, start: number) => void): void {
+  const m = needle.length;
   const cost = new Int32Array(m + 1);
-  const origin = new Int32Array(m + 1);
+  const origin = new Int32Array(m + 1).fill(begin);
   for (let i = 0; i <= m; i++) cost[i] = i;
   let last = Math.min(m, limit);
-  const candidates: { start: number; end: number; distance: number }[] = [];
-  for (let j = 0; j < hay.length; j++) {
+  for (let j = begin; j < until; j++) {
+    const unit = hay[j];
     let diagonal = cost[0]!;
     let diagonalOrigin = origin[0]!;
     cost[0] = 0;
@@ -242,7 +325,7 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
     for (let i = 1; i <= top; i++) {
       const left = i <= last ? cost[i]! : limit + 1;
       const leftOrigin = origin[i]!;
-      let best = diagonal + (needle[i - 1] === hay[j] ? 0 : 1);
+      let best = diagonal + (needle[i - 1] === unit ? 0 : 1);
       let start = diagonalOrigin;
       if (left + 1 < best) {
         best = left + 1;
@@ -259,26 +342,110 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
     }
     last = top;
     while (last > 0 && cost[last]! > limit) last--;
-    if (last === m && cost[m]! <= limit) candidates.push({ start: origin[m]!, end: j + 1, distance: cost[m]! });
+    if (last === m && cost[m]! <= limit) at(j + 1, origin[m]!);
   }
-  candidates.sort((a, b) => a.distance - b.distance || a.start - b.start || a.end - b.end);
+}
+
+/**
+ * The candidates of one distance at a time, fewest edits first, each with its
+ * start. A start depends only on the text a short way before the end, so it is
+ * worked out there, unless so much would be read again that reading the whole
+ * stretch once costs less.
+ */
+function* byDistance(needle: string, hay: string, begin: number, until: number, limit: number, keep: (end: number) => boolean): Generator<Candidate[]> {
+  const groups: number[][] = Array.from({ length: limit + 1 }, () => []);
+  for (const { end, distance } of endsWithin(needle, hay, begin, until, limit)) if (keep(end)) groups[distance]!.push(end);
+  // No optimal path to a cell within the limit begins further back than this.
+  const reach = needle.length + 2 * limit + 2;
+  let whole: Map<number, number> | undefined;
+  let reread = 0;
+  for (let distance = 0; distance <= limit; distance++) {
+    const ends = groups[distance]!;
+    if (ends.length === 0) continue;
+    const windows: { from: number; to: number; ends: Set<number> }[] = [];
+    for (const end of ends) {
+      const from = Math.max(begin, end - reach);
+      const open = windows.at(-1);
+      if (open && from <= open.to) {
+        open.to = end;
+        open.ends.add(end);
+      } else windows.push({ from, to: end, ends: new Set([end]) });
+    }
+    reread += windows.reduce((n, w) => n + w.to - w.from, 0);
+    const starts = new Map<number, number>();
+    if (!whole && reread > until - begin) {
+      const all = new Map<number, number>();
+      startsWithin(needle, hay, begin, until, limit, (end, start) => all.set(end, start));
+      whole = all;
+    }
+    if (!whole) {
+      for (const w of windows) startsWithin(needle, hay, w.from, w.to, limit, (end, start) => { if (w.ends.has(end)) starts.set(end, start); });
+    }
+    yield ends.map((end) => ({ start: (whole ?? starts).get(end)!, end, distance }))
+      .sort((a, b) => a.start - b.start || a.end - b.end);
+  }
+}
+
+/** The first of `count` places where `test` holds, when it holds at every place after it. */
+function firstWhere(count: number, test: (i: number) => boolean): number {
+  let low = 0;
+  let high = count;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (test(middle)) high = middle;
+    else low = middle + 1;
+  }
+  return low;
+}
+
+/**
+ * The stored span closest to the quotation, widened to whole words. It is
+ * evidence for a person to compare. It never makes a quotation pass.
+ *
+ * `region`, when given, is a stretch of the original that `within` never lets a
+ * span reach outside. Only the text that could give such a span is then read.
+ */
+export function findClosest(stored: Folded, quotation: string, within: Within = anywhere, region?: Span): Closest | undefined {
+  const needle = foldQuotation(quotation).text;
+  const m = needle.length;
+  if (m === 0 || m > CLOSEST_LIMIT) return undefined;
+  const limit = Math.floor(m * CLOSEST_SHARE);
+  const hay = stored.text;
+  let begin = 0;
+  let until = hay.length;
+  let keep: (end: number) => boolean = () => true;
+  if (region) {
+    const first = firstWhere(hay.length, (i) => stored.from[i]! >= region.start);
+    until = firstWhere(hay.length, (i) => stored.to[i]! > region.end);
+    while (until < hay.length && hay[until] === " ") until++;
+    begin = Math.max(0, first - m - 2 * limit - 2);
+    // A span widened from a candidate holds the candidate's last unit that is not a space.
+    keep = (end) => {
+      let at = end - 1;
+      while (at >= 0 && hay[at] === " ") at--;
+      return at >= 0 && stored.from[at]! >= region.start && stored.to[at]! <= region.end;
+    };
+  }
   // The distance that counts is to the whole words shown, not to a stretch that cuts into one.
   let best: Closest | undefined;
   const tried = new Set<string>();
-  for (const candidate of candidates) {
+  for (const candidates of byDistance(needle, hay, begin, until, limit, keep)) {
+    for (const candidate of candidates) {
+      if (tried.size >= WIDENED_CANDIDATES) break;
+      let { start, end } = candidate;
+      while (start < end && hay[start] === " ") start++;
+      while (end > start && hay[end - 1] === " ") end--;
+      while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
+      while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
+      const key = `${start} ${end}`;
+      if (end <= start || tried.has(key)) continue;
+      const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
+      if (!within(span)) continue;
+      tried.add(key);
+      const distance = editDistance(needle, hay.slice(start, end));
+      if (distance <= limit && (!best || distance < best.distance)) best = { ...span, distance, near: distance <= m * NEAR_SHARE };
+    }
     if (tried.size >= WIDENED_CANDIDATES) break;
-    let { start, end } = candidate;
-    while (start < end && hay[start] === " ") start++;
-    while (end > start && hay[end - 1] === " ") end--;
-    while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
-    while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
-    const key = `${start} ${end}`;
-    if (end <= start || tried.has(key)) continue;
-    const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
-    if (!within(span)) continue;
-    tried.add(key);
-    const distance = editDistance(needle, hay.slice(start, end));
-    if (distance <= limit && (!best || distance < best.distance)) best = { ...span, distance, near: distance <= m * NEAR_SHARE };
   }
   return best;
 }
@@ -286,13 +453,15 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
 const WIDENED_CANDIDATES = 40;
 
 function editDistance(a: string, b: string): number {
-  let row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  let row = Int32Array.from({ length: b.length + 1 }, (_, j) => j);
+  let next = new Int32Array(b.length + 1);
   for (let i = 1; i <= a.length; i++) {
-    const next = [i];
+    next[0] = i;
+    const unit = a[i - 1];
     for (let j = 1; j <= b.length; j++) {
-      next[j] = Math.min(row[j]! + 1, next[j - 1]! + 1, row[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+      next[j] = Math.min(row[j]! + 1, next[j - 1]! + 1, row[j - 1]! + (unit === b[j - 1] ? 0 : 1));
     }
-    row = next;
+    [row, next] = [next, row];
   }
   return row[b.length]!;
 }
