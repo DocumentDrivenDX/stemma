@@ -233,6 +233,22 @@ When the author asks for something no command above does, help directly where yo
 can, say that Stemma did not check it, and do not imitate a Stemma command by
 editing record or source files in unchecked ways.
 
+## Tools you use
+
+- **Built-in first.** Where a Stemma command or converter does the job, use it.
+  Otherwise use what the host and the system already provide as standard.
+- **Install nothing on your own.** If a task needs another program or library,
+  say what Stemma cannot do, name the tool and what installing it brings with
+  it, and ask before installing or relying on it, even one already on the
+  machine. If the author declines, do what you can without it and say what is
+  left.
+- **Keep it to that project.** An agreed tool, and any script that calls it,
+  belongs to that project, not to Stemma. Say so in the script or the project's
+  README, with the version used and why. Never present it as something Stemma
+  requires, or carry it into another project without asking again.
+- A recognition tool the author runs on their own pages needs no more than the
+  rules for source text above.
+
 ## Behavior rules
 
 - Never stop, delay, or refuse writing or research work because something is unreviewed, unverified, unsupported, or failing. Never ask the author to verify or approve something before continuing. Report it and carry on.

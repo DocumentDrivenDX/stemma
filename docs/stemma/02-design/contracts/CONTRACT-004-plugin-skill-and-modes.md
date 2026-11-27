@@ -140,8 +140,15 @@ The skill MUST instruct the agent to:
 12. Record drafting and other AI work with `activity record`, offer advice on
     construct use or methodology as advice, and show constructs or methodology
     found in existing work with their passages.
+15. Use a Stemma command or converter where one does the job, and otherwise what
+    the host and system provide as standard. Install no software on its own.
+    Before installing or relying on another tool, say what Stemma cannot do,
+    name the tool and what it brings with it, and ask. Keep an agreed tool and
+    its scripts to that project, record the version and the reason there, and
+    never present it as a Stemma requirement. A recognition tool the author runs
+    on their own pages falls under item 11.
 
-Items 3 to 12 are instructions. Stemma does not enforce them against an agent
+Items 3 to 15 are instructions. Stemma does not enforce them against an agent
 with ordinary file access, and user-facing text MUST NOT say it does.
 
 ### D. Runtime discovery
