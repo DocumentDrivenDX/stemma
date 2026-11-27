@@ -6,9 +6,9 @@ work in progress elsewhere and wait until it reaches `main`.
 
 | # | Iteration | Specs | Needs | State |
 |---|---|---|---|---|
-| 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Takeover session; the manuscript reader is on main, checks do not use it yet |
+| 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Takeover strand; checks read the manuscript on an unmerged branch; draft.marked, claim.inactive, cite.unlinked, quote.self not built |
 | 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | On main; an author's own edit still lapses a review mark (FR-23) |
-| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover session; import codecs on main (0.0.15), no commands, no export after edits or across formats |
+| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover strand; codecs on main but incomplete: no command calls them; export only replays unedited records in the same format |
 | 4 | Citation formatter | ADR-005 | — | On main |
 | 5 | Basic PDF build | FR-83, 39, 35 | 1, 4 | Report build on main; draft, camera-ready and reviewer builds not |
 | 6 | Takeover intake | FR-71, 92 | 3 | Takeover session; Word reader and matcher fixes on main, not yet used by the command line; no records or libraries |
@@ -225,6 +225,12 @@ Before and after were both run on these projects.
   wrong cause. Retry with backoff, keeping the secret, and stop only on an
   unproved answer or a sustained outage.
 - The scale test does not catch scans that compare records by identity.
+- The export's data identity hashes manuscript file digests without their paths,
+  but results can depend on paths, so `graph status` can call an export current
+  after a chapter is renamed. Hash each path with its digest (CONTRACT-005 J);
+  needed before the manuscript checks land.
+- A finding on a manuscript citation with no record has the chapter path as its
+  subject, so no record's states show it.
 - Highlighting on originals refuses scans (hidden recognition text), words split
   by a line-end hyphen and ligatures: 6 of 125 passage segments of the worked
   example were marked. Whether to show labelled estimates is the product
