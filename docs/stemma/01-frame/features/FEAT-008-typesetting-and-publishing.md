@@ -18,7 +18,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 8. Typesetting and publishing
-**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-83, FR-91
+**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-83, FR-91, FR-96
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -94,7 +94,9 @@ unverified.
 
 - **PIL-01** (FR-83, M1). The pilot must typeset a taken-over manuscript from
   the Stemma copy to a basic PDF with Typst, with citations and the bibliography
-  formatted by citeproc-js in Chicago notes and bibliography, labelled
+  formatted by citeproc-js in Chicago notes and bibliography, printing the
+  manuscript's footnotes as footnotes and its endnotes as endnotes (FR-96),
+  labelled
   unverified until the approved example set exists. BLD-01's apparatus and
   OUT-01 and OUT-02 are not part of it.
 - **PIL-03** (FR-83, M1). The pilot must be able to build an unwatermarked basic
@@ -167,8 +169,8 @@ unverified.
 
 #### Footnotes and the finished text
 
-- **FTN-01** (FR-91, P0, M2). A build must generate each footnote that cites a
-  passage from the records: the full citation, the locator, the verbatim
+- **FTN-01** (FR-91, FR-96, P0, M2). A build must generate each footnote or
+  endnote that cites a passage from the records: the full citation, the locator, the verbatim
   quotation copied from the source file, and no tool commentary. The passage
   address is kept in the build record, not printed.
 - **FTN-02** (FR-91, P0, M2). The built text must read as ordinary scholarship:

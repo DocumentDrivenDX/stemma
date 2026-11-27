@@ -583,6 +583,7 @@ the Stemma copy: after takeover, `cite.key`, `source.held`, `quote.present`,
 `quote.page`, `locator.extent`, `number.present`, and `bib.uncited` run from it,
 and none is left `not_implemented` or unread because manuscript files are present
 (FR-73, FR-92). A citation with key `?` fails `cite.key`.
+Each of these reads endnotes as it reads footnotes (FR-96).
 
 **Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
 URI; degrees with a degree sign and a latitude then a longitude hemisphere
@@ -632,10 +633,9 @@ yields is its exact text with only the line-end join, soft-hyphen removal, and
 runs of white space made one space.
 
 **Quotations from a PDF chapter (not built).** In a chapter taken over from a
-PDF, a quotation holding a hyphen that was kept at a line end is compared both
-with and without it. Readings that give different outcomes make the result
-`unverifiable` with `uncertain_hyphen` (CONTRACT-003 I, **Quotations in the
-copy**). The profile is unchanged.
+PDF, a quotation holding a hyphen that was kept at a line end also matches with
+that hyphen removed. A pass that needs the removal says so in its evidence, as
+for the join in source text (CONTRACT-003 I, **Quotations in the copy**).
 
 `quote-fold/0` as built. The ligatures are U+FB00 to U+FB06 as their own
 letters (U+FB05 is long s and t). Curly marks are U+2018, U+2019, U+201C, and

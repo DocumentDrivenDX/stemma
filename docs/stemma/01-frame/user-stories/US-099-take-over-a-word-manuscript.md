@@ -46,6 +46,7 @@ The first pilot takes over one existing chapter. Support for an input is promise
 - [ ] **US-099-AC9** — Given an original reference list with an entry cited nowhere, when takeover runs, then every entry is listed for the bibliography, the uncited one is reported until removed or dismissed, an entry that cannot be bound goes to the author, and a missing list is stated.
 - [ ] **US-099-AC10** — Given a Word manuscript with headings, a table, and comments, when takeover runs, then headings shape the Stemma copy, the table's text is read or kept as unconverted content, and every comment is reported with its text and location.
 - [ ] **US-099-AC11** — Given a project that already holds one taken-over file, when Idris takes over another file of the same manuscript, then its chapters are added and earlier records and choices are unchanged.
+- [ ] **US-099-AC12** — Given a Word manuscript with footnotes and endnotes that hold full references, short forms, and "Ibid.", when takeover runs, then the Stemma copy keeps each as its kind, the references bind alike in both, each "Ibid." refers to the note before it of the same kind, and the report counts each kind.
 
 ## Edge Cases
 
@@ -68,6 +69,7 @@ The first pilot takes over one existing chapter. Support for an input is promise
 | Reference list | US-099-AC9 | Synthetic list of 3 entries; 2 cited | Take over | 3 listed; 1 reported uncited |
 | Structure | US-099-AC10 | Synthetic file with 3 heading levels, 1 table, 2 comments | Take over | Headings kept; table text accounted for; 2 comments listed |
 | Second file | US-099-AC11 | A choice made after file 1 | Take over file 2 | File 2 added; the choice stands |
+| Endnotes | US-099-AC12 | Synthetic file with 3 footnotes and 3 endnotes, "Ibid." in each | Take over | Kinds kept; each "Ibid." bound within its kind |
 
 ## Dependencies
 

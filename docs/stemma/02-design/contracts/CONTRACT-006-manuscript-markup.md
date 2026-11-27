@@ -119,7 +119,9 @@ cross-references, and index entries. No check reads generated Typst or PDF to
 find them.
 
 **Sentences.** A versioned profile, `sentence-split/0`, splits each block's
-plain text. A citation cluster that directly follows sentence-ending
+plain text. **A footnote or an endnote is a note**, and every rule of this
+contract about notes or footnotes applies to both; only their syntax and where a
+build prints them differ. A citation cluster that directly follows sentence-ending
 punctuation belongs to the preceding sentence. A footnote's sentences are
 separate; a note holding only citations belongs to the sentence carrying its
 marker. A sentence's `text` is its plain text with citation clusters and marker
@@ -165,12 +167,12 @@ updated. The record's current source is the one the manuscript key resolves to.
 | Headings, levels 1 to 4; level 1 is the chapter title | `#`, optional `{#sec-id}` | M1 |
 | Block quotes | `>`; optional attribute line directly under the last quoted line | M1 |
 | Ordered and bulleted lists | CommonMark | M1 |
-| Footnotes | `[^label]` with `[^label]: text`; continuation lines indented | M1 |
+| Footnotes | `[^label]` with `[^label]: text`; continuation lines indented. A footnote label does not begin `en-` | M1 |
+| Endnotes | `[^en-label]` with `[^en-label]: text`; continuation lines indented | M1 |
 | Citations, quotations, claim anchors, marks | C | M1 |
 | Language and direction | `[text]{lang="ar" dir="rtl"}`; the same attribute line on a block quote | M1 spans and quotations |
 | Unconverted content | `::: unconverted {id="itm-…"}` … `:::` | M1 |
 | Bibliography | Generated at the end of the book from cited sources plus `bibliography_include` in `stemma.json`; no manuscript syntax | M1 |
-| Endnotes | `[^en-label]` | M2 |
 | Front and back matter | `chapter.matter` | M2 |
 | Alternative interpretations section (FR-26) | `::: alternatives {#alt-id}` … `:::`, holding ordinary blocks and markers | P1 |
 | Figure | `::: figure {#fig-id sha256="<sha256>" media="image/svg+xml" alt="…" width="80%"}`, caption, `:::` | M2 |
@@ -187,6 +189,11 @@ contract. An unresolved ID or cross-reference is reported.
 
 - Takeover does not copy the original reference list into a chapter; it adds
   its entries to `bibliography_include` (CONTRACT-003 F).
+- Takeover writes each footnote as a footnote and each endnote as an endnote
+  (FR-96), with its definition in the chapter file that holds its marker. A note
+  whose marker was not found is kept as a note definition, with an
+  `intake_item`; how a definition without a marker is written is set with the
+  writer.
 - Takeover writes one chapter file per detected chapter and says how it chose
   the divisions. Every citation item it writes carries an `id`.
 - It converts only features in E available at its step. Other content that
