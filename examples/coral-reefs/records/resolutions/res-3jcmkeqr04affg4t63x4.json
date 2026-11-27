@@ -1,0 +1,36 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:49Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Sebastian Steibl",
+      "Nancy Bunbury",
+      "Hillary S. Young",
+      "James C. Russell"
+    ],
+    "issued": "2024",
+    "publisher": "Annual Reviews",
+    "title": "A Renaissance of Atoll Ecology",
+    "venue": "Annual Review of Ecology, Evolution, and Systematics"
+  },
+  "id": "res-3jcmkeqr04affg4t63x4",
+  "identifier": {
+    "scheme": "doi",
+    "value": "10.1146/annurev-ecolsys-102722-013447"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:47:49Z",
+  "query": "10.1146/annurev-ecolsys-102722-013447",
+  "resolver": "crossref",
+  "response": "{\n \"DOI\": \"10.1146/annurev-ecolsys-102722-013447\",\n \"ISSN\": [\n  \"1543-592X\",\n  \"1545-2069\"\n ],\n \"URL\": \"https://doi.org/10.1146/annurev-ecolsys-102722-013447\",\n \"author\": [\n  {\n   \"affiliation\": [\n    {\n     \"name\": \"1School of Biological Sciences, University of Auckland, Auckland, New Zealand; email: sebastian.steibl@auckland.ac.nz\"\n    }\n   ],\n   \"family\": \"Steibl\",\n   \"given\": \"Sebastian\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"first\"\n  },\n  {\n   \"affiliation\": [\n    {\n     \"name\": \"2Seychelles Islands Foundation, Victoria, Mahé, Seychelles\"\n    },\n    {\n     \"name\": \"3Centre for Ecology and Conservation, University of Exeter, Penryn, United Kingdom\"\n    }\n   ],\n   \"family\": \"Bunbury\",\n   \"given\": \"Nancy\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [\n    {\n     \"name\": \"4Department of Ecology, Evolution, and Marine Biology, University of California, Santa Barbara, California, USA\"\n    }\n   ],\n   \"family\": \"Young\",\n   \"given\": \"Hillary S.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [\n    {\n     \"name\": \"1School of Biological Sciences, University of Auckland, Auckland, New Zealand; email: sebastian.steibl@auckland.ac.nz\"\n    }\n   ],\n   \"family\": \"Russell\",\n   \"given\": \"James C.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  }\n ],\n \"container-title\": [\n  \"Annual Review of Ecology, Evolution, and Systematics\"\n ],\n \"issue\": \"1\",\n \"issued\": {\n  \"date-parts\": [\n   [\n    2024,\n    11,\n    4\n   ]\n  ]\n },\n \"page\": \"301-322\",\n \"published\": {\n  \"date-parts\": [\n   [\n    2024,\n    11,\n    4\n   ]\n  ]\n },\n \"publisher\": \"Annual Reviews\",\n \"subtitle\": [],\n \"title\": [\n  \"A Renaissance of Atoll Ecology\"\n ],\n \"type\": \"journal-article\",\n \"volume\": \"55\"\n}",
+  "response_sha256": "526ad32d1fcc551ac821748ebf66f1d88f93c16ad64fff2c6e73ee99ec2e4432",
+  "schema": "stemma.record/0",
+  "source": "src-9y5zh0m86v7n3fkawade",
+  "url": "https://api.crossref.org/works/10.1146%2Fannurev-ecolsys-102722-013447"
+}

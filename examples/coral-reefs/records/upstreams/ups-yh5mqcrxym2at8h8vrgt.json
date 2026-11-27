@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "14ed208a8fc39acaf06b0b470660425653f3627cec5b82977ff3b593ff8c4f54",
+      "size": 750219,
+      "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "13ebe42e3f454986ea8e50ce40368b0b6e198c36bad0f8221ed32fc029bc13c0",
+      "size": 64656,
+      "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:10Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-yh5mqcrxym2at8h8vrgt",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "structuredistribtion00darw"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "structuredistribtion00darw"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:00-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "4a2a7ecdb1d726d796e115c099d3d64f20040dabe6029e773edc54ba8b75ae37",
+  "size": 21098477,
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw.pdf",
+  "version": "Internet Archive item structuredistribtion00darw"
+}

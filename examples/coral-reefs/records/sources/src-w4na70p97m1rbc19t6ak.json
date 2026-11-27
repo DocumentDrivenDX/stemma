@@ -1,0 +1,101 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Scientific Reports"
+      }
+    }
+  ],
+  "citation_key": "blanchon2014",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Blanchon"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Granados-Corea"
+      },
+      "lid": "a2",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Abbey"
+      },
+      "lid": "a3",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Braga"
+      },
+      "lid": "a4",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Braithwaite"
+      },
+      "lid": "a5",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Kennedy"
+      },
+      "lid": "a6",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Spencer"
+      },
+      "lid": "a7",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Webster"
+      },
+      "lid": "a8",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Woodroffe"
+      },
+      "lid": "a9",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-w4na70p97m1rbc19t6ak",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.1038/srep04997"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2014"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Postglacial Fringing-Reef to Barrier-Reef conversion on Tahiti links Darwin’s reef types"
+  },
+  "type": "article-journal"
+}

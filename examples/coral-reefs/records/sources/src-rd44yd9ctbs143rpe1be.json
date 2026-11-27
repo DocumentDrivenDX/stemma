@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "lyell1832",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Lyell",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-rd44yd9ctbs143rpe1be",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "PrinciplesgeoloVol2Lyel"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1832"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Principles of Geology"
+  },
+  "type": "book"
+}

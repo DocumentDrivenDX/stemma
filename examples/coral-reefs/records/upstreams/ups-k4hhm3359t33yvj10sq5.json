@@ -1,0 +1,46 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "4d1e04eb069514ac2b8451e4187a14dc15268b98ed0db6832ba481b01dcd2777",
+      "size": 751612,
+      "url": "https://archive.org/download/PrinciplesgeoloVol2Lyel/PrinciplesgeoloVol2Lyel_djvu.txt"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-k4hhm3359t33yvj10sq5",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "PrinciplesgeoloVol2Lyel"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "PrinciplesgeoloVol2Lyel"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:22-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "55601cf368ac54a02f6db6a34106cda09e7ee647dec0c98b663f1a363c929e3d",
+  "size": 20635710,
+  "source": "src-rd44yd9ctbs143rpe1be",
+  "url": "https://archive.org/download/PrinciplesgeoloVol2Lyel/PrinciplesgeoloVol2Lyel.pdf",
+  "version": "Internet Archive item PrinciplesgeoloVol2Lyel"
+}

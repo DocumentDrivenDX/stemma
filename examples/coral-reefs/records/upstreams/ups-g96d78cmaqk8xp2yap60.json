@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "e4494ccd3d0e792538b38d257699f5c13f8dbfc4cc9ab0fbb69293c88a0c32f6",
+      "size": 1388134,
+      "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "504f6f19c57a0c3db969737f821044a0f33aca2889b4dd2cdac740bdceb45166",
+      "size": 78468,
+      "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:13Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-g96d78cmaqk8xp2yap60",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "atolloffunafutib00roya"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "atolloffunafutib00roya"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:37:04-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "0cdfb61626469b0a28f68a20dde9c9037516e372d07d2099c5bb7880059da261",
+  "size": 46982935,
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya.pdf",
+  "version": "Internet Archive item atolloffunafutib00roya"
+}

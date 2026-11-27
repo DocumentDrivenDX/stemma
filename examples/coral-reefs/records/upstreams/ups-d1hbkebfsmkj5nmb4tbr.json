@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "739b10fb893d3bcb698334f44d1ccdbba81e12db7887d4e5e601e887acca25f0",
+      "size": 1731371,
+      "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "429f36544825000ca02a23c6d0712704ee3328d538f949c19344a537c3bc6b5c",
+      "size": 106299,
+      "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:07Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-d1hbkebfsmkj5nmb4tbr",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "proceedings218331838geol"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "proceedings218331838geol"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:34:48-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "6230bdf0a8d525762023aee7644a2a31274854791c33c95a37623be95b7e18af",
+  "size": 45308434,
+  "source": "src-ymdxbsxjmc5fbmq0t4a0",
+  "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol.pdf",
+  "version": "Internet Archive item proceedings218331838geol"
+}

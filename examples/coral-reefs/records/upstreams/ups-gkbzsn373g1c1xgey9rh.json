@@ -1,0 +1,37 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:20Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-gkbzsn373g1c1xgey9rh",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.1038/srep04997"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "doi",
+        "value": "10.1038/srep04997"
+      },
+      "resolver": "crossref"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:39:07-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "7b8c69e80592b36f846fe783d0055e582f3a5d345b3fbd55a0576114157c9198",
+  "size": 6180343,
+  "source": "src-w4na70p97m1rbc19t6ak",
+  "url": "https://www.nature.com/articles/srep04997.pdf"
+}

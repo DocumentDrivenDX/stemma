@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "agassiz1903",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Agassiz",
+        "given": "Alexander"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:46:59Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-w8s30cm4ecfvt6nmtbr0",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "coralreefsoftrop00agas"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1903"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Coral Reefs of the Tropical Pacific"
+  },
+  "type": "book"
+}

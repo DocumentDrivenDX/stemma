@@ -1,0 +1,37 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-4zdb4p2fr2929cj84qek",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.3133/pp260Y"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "doi",
+        "value": "10.3133/pp260Y"
+      },
+      "resolver": "crossref"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:38:55-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "831a1e9a6ba6d9464e61e89becd4627a2fd93b324e301decfafae43c5076e928",
+  "size": 9306309,
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "url": "https://pubs.usgs.gov/pp/0260y/report.pdf"
+}

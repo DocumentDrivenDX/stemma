@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "e6a4f896ddc8137cf58ab5366f95f274340b6f48ecb8932590636146eb1e4131",
+      "size": 983450,
+      "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "bde5bded62c05907b3f7a1bc88ab9cb9cf1cb60f8635e8b378e0d3de09c0fbc7",
+      "size": 73407,
+      "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:11Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-r77afw3mat9m2x4ape45",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "lifelettersofcha03darw"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "lifelettersofcha03darw"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:11-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "6753bc7818928f0411328bb670db3b942af598a453d02f419d926bd5c8c3a9d0",
+  "size": 24509524,
+  "source": "src-a04mqd3jch9s39zbmpjp",
+  "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw.pdf",
+  "version": "Internet Archive item lifelettersofcha03darw"
+}

@@ -1,0 +1,66 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Annual Review of Ecology, Evolution, and Systematics"
+      }
+    }
+  ],
+  "citation_key": "steibl2024",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Steibl"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Bunbury"
+      },
+      "lid": "a2",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Young"
+      },
+      "lid": "a3",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Russell"
+      },
+      "lid": "a4",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:01Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-9y5zh0m86v7n3fkawade",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.1146/annurev-ecolsys-102722-013447"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2024"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "A Renaissance of Atoll Ecology"
+  },
+  "type": "article-journal"
+}

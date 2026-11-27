@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "9c5e76a0ab49aced0b1ffffb2e2135c596cb690343125cd8ea60fd6299cb317b",
+      "size": 628019,
+      "url": "https://archive.org/download/b29331213/b29331213_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "acd7ce6196aadf2916e05590198451f8376f85749610974a08c0990505c417d0",
+      "size": 43484,
+      "url": "https://archive.org/download/b29331213/b29331213_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:09Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-kbcb4f2s3c2qjwbvf9f9",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "b29331213"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "b29331213"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:34:51-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9",
+  "size": 15775995,
+  "source": "src-darwinreefs1842",
+  "url": "https://archive.org/download/b29331213/b29331213.pdf",
+  "version": "Internet Archive item b29331213"
+}

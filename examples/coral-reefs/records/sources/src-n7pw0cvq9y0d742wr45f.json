@@ -1,0 +1,37 @@
+{
+  "admission": "candidate",
+  "citation_key": "funafuti1904",
+  "contributions": [
+    {
+      "as_printed": {
+        "literal": "Coral Reef Committee of the Royal Society"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-n7pw0cvq9y0d742wr45f",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "atolloffunafutib00roya"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1904"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Atoll of Funafuti"
+  },
+  "type": "report"
+}

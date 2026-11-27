@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "3b6dfe4a0c0b5dd926c1fe527dafa1d51e088787c231c1511cb332a5301295d5",
+      "size": 1996595,
+      "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "f11580d1c902ee9dd9d84872994bef9ce6efcc9adbba0917eaca35cd3d92bcc4",
+      "size": 140847,
+      "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-4hzhzfmd9rpqmvm6dpgp",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "proceedings1018781880roya"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "proceedings1018781880roya"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:30-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "3cd2c1b8805a70c535ce11956650793db5e78cb0400ffc98a82475edb1c948d5",
+  "size": 62265842,
+  "source": "src-eh71qk5hm5zhpwzcz2v7",
+  "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya.pdf",
+  "version": "Internet Archive item proceedings1018781880roya"
+}

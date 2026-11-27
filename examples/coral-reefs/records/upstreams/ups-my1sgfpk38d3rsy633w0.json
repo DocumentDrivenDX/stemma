@@ -1,0 +1,37 @@
+{
+  "created": {
+    "at": "2026-11-27T02:09:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-my1sgfpk38d3rsy633w0",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.1146/annurev-ecolsys-102722-013447"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "doi",
+        "value": "10.1146/annurev-ecolsys-102722-013447"
+      },
+      "resolver": "crossref"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:39:04-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "46b0016f8470210a533020809b750cdc53ed7938750974282636af5cd6ea77af",
+  "size": 2700771,
+  "source": "src-9y5zh0m86v7n3fkawade",
+  "url": "https://researchspace.auckland.ac.nz/server/api/core/bitstreams/22e17708-b24f-409f-9d64-ad33e60e8d9e/content"
+}

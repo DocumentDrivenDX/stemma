@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "d88a0676de063d810c2614db0a2c728ca91813ecd8caa5eddb51c495acc1e78d",
+      "size": 1030830,
+      "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "df41e40d6608280255b6bd8924fe16aee7aa7463102351640c98c0dcff1073f9",
+      "size": 83221,
+      "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:05Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-cwxrfcq0k4d98e5k43zx",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "coralreefsoftrop00agas"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "coralreefsoftrop00agas"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:36:50-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "4f8607a4ca7b99750f7154f38e1c87f67690f855f491599765a1c4f6e53ec4a2",
+  "size": 30450810,
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas.pdf",
+  "version": "Internet Archive item coralreefsoftrop00agas"
+}

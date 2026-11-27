@@ -1,0 +1,28 @@
+{
+  "admission": "candidate",
+  "citation_key": "murray1880",
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-eh71qk5hm5zhpwzcz2v7",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "proceedings1018781880roya"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1880"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Proceedings of the Royal Society of Edinburgh"
+  },
+  "type": "book"
+}

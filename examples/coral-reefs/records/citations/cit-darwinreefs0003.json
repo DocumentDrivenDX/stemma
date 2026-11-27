@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T01:49:33Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0003",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "2"
+  },
+  "passage": "psg-pq7x9hm7n70adgxe36db",
+  "quotation": "I have invariably used in this volume the term",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "6ed796c97f8481514f3ac37e3d984ef229b2966064716849dcf17d796db3e697",
+    "text": "Of the word atoll he writes, “I have invariably used in this volume the term”, and treats it as a synonym for lagoon-island."
+  }
+}

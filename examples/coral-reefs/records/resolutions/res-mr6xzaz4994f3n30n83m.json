@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:05Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Dana, James Dwight, 1813-1895"
+    ],
+    "issued": "1890",
+    "publisher": "New York, Dodd, Mead, and company",
+    "title": "Corals and coral islands"
+  },
+  "id": "res-mr6xzaz4994f3n30n83m",
+  "identifier": {
+    "scheme": "ia",
+    "value": "coralscoralislan1890dana"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:05Z",
+  "query": "coralscoralislan1890dana",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"3235931\",\n \"creator\": \"Dana, James Dwight, 1813-1895\",\n \"date\": \"1890\",\n \"identifier\": \"coralscoralislan1890dana\",\n \"language\": \"eng\",\n \"lccn\": \"04004710 //r87\",\n \"oclc-id\": \"1041303\",\n \"possible-copyright-status\": \"NOT_IN_COPYRIGHT\",\n \"publisher\": \"New York, Dodd, Mead, and company\",\n \"title\": \"Corals and coral islands\",\n \"year\": \"1890\"\n}",
+  "response_sha256": "8a993d1d1ffa0fa55cd3d8c57239aa820cd5dc972fae06c65b927b2ff48b46cf",
+  "schema": "stemma.record/0",
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "url": "https://archive.org/metadata/coralscoralislan1890dana/metadata"
+}

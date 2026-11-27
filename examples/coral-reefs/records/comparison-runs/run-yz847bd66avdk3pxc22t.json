@@ -1,0 +1,869 @@
+{
+  "against": "a fresh conversion of the original with the recorded settings",
+  "created": {
+    "at": "2026-11-27T01:47:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "run-yz847bd66avdk3pxc22t",
+  "independent": false,
+  "kind": "comparison_run",
+  "method": "reconversion",
+  "original_sha256": "8661af767309b1e34bcfde0eec2ced692b557d0447cddece47ea13737bc4b7b0",
+  "pages": [
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 0,
+      "sha256": "8626283825a2af9736041885211c45f45e9a1f2428248c597bed693915332fcc",
+      "words": 3
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 1,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 2,
+      "sha256": "0108cb7c15c968f32822f4ba817d9bebd667f90b738a9a7ca3cf01812e265e4b",
+      "words": 26
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 3,
+      "sha256": "d5e9f3cf71d4c6cdb81b3d90e9b931416c98f11d03a68439647b31589476a78b",
+      "words": 3
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 4,
+      "sha256": "f2d422116b00091d180c21493743b4c7a0b56a4b5d31b7935305a94fff9bb725",
+      "words": 301
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 5,
+      "sha256": "d3900ae98c16f5f616bd8b42edbda3898a16a5cc019f05c3c02468ee13877a50",
+      "words": 457
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 6,
+      "sha256": "bb17b9eab320cff8f65e1e77cf5fc24a3b54dc3525ca23b90109ebef4eddaf7d",
+      "words": 456
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 7,
+      "sha256": "0338b44d94faad3710d996dcc9ad5e1df721aa007e7a4f1a8cd1a58a0c52c3ac",
+      "words": 491
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 8,
+      "sha256": "4feaba560161f1e25e921c02e7f0dc3dc1b73a356c1cedc95aac7923a1243da3",
+      "words": 1
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 9,
+      "sha256": "ea2650881f8a258fb883adaceb675b6a99c6e22321403e854b623e56068cfd49",
+      "words": 429
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 10,
+      "sha256": "8961ca28de98774bc4d6e488b248bf6a4186028ee55163fa8aeb478a6015a5fb",
+      "words": 520
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 11,
+      "sha256": "7692d8223825a29723fa68e2fc48f6a58f85176afafa7ed7ab2227ed8999d856",
+      "words": 466
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 12,
+      "sha256": "819a96038154fc930640292b20ce75f6dc7760627fea42a269a0d3e9661b47df",
+      "words": 389
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 13,
+      "sha256": "61a7ed7c8bad5175354920d2fb0c288cba3744ad7987d9d652339b46521441ad",
+      "words": 458
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 14,
+      "sha256": "dd6e6807ae9cbbc739a8c363cb1bcaa927e58823f016fccf08b54009f3998bb3",
+      "words": 430
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 15,
+      "sha256": "385fad90529923f57c92fa4bc6a2a0890719671c5e074ec5bb343297df5764e8",
+      "words": 345
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 16,
+      "sha256": "585380df27e25cd1ec88f028a6420a0c285e31f2875677bcfd13335d1fb63f87",
+      "words": 438
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 17,
+      "sha256": "e2393e13655f36f2aef9076a1fc677b1369d1cc64db6dc0d9c1794a41f27da0e",
+      "words": 424
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 18,
+      "sha256": "68baa53d9f8f1ec7c1d3ef0f6dc04cb3588265ba9fad007be1e9ffc1848d2dd4",
+      "words": 408
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 19,
+      "sha256": "a19c0594a2a6989cab8e88723037a9a6903c0a774dec1cab96c8aaa636609342",
+      "words": 320
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 20,
+      "sha256": "0fe4fc1759e1b5ca772b2bc547d30ad82211405131bcb6b16eab5b1abafb01e7",
+      "words": 464
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 21,
+      "sha256": "140b57de76d1e39a38a27b7a150cce60b5234eccf5c98eac005462e3cf1d04f5",
+      "words": 362
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 22,
+      "sha256": "e0c98c977c2bd9bca004ab31b16f43d7bec6d0bb101273a92283eb6bf1ee20f4",
+      "words": 463
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 23,
+      "sha256": "7738f2cbdd558537676bb09bf7a73dc52f2ce2b14cbee0a568ebdd72d16511e3",
+      "words": 454
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 24,
+      "sha256": "afbb6e9aa244684d5495afc8b673f828c5bdf9dc74adbc914f10dfd36d2a1455",
+      "words": 481
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 25,
+      "sha256": "fba373bf7cff23a17ed05275a9310c681c0796705654154b0e4b7d280bab0a73",
+      "words": 329
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 26,
+      "sha256": "2a8b57bf4714eefd6b59a24752aaae0501a5361ef0d567807f70a398262103bc",
+      "words": 443
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 27,
+      "sha256": "886e6e8f8d424625d016a14a34570f9c4844ed6084fd5f6eaf92f04eac624619",
+      "words": 455
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 28,
+      "sha256": "c50085450175b0fbb519a8b1a5133ad8ca4096ecd0939dd00060b016facd94c3",
+      "words": 493
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 29,
+      "sha256": "468671ea5757d0633eece271b578854509dec3a9f701a9c4d8926cf54e739907",
+      "words": 456
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 30,
+      "sha256": "60b60627474a86212700903bbda955df0b9dad60d84c6e8cb16708f8bec816c6",
+      "words": 467
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 31,
+      "sha256": "7b44239b0917e7032234a9885af4fd5cd7d0bc0102184f61b70bf1548ba13537",
+      "words": 299
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 32,
+      "sha256": "faa71e08060cecb8384ed3cf250e5bb4e18fb003e66c87549f374619d2a06d20",
+      "words": 1
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 33,
+      "sha256": "6e200e189f2f52a8979b0af4009bc470f3a3992ccd62d5a87b6e9bb3e2ddf081",
+      "words": 25
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 34,
+      "sha256": "216ea883516ff5628b1629cdd7e751d32b782b66be36573707cf4556c5d674d4",
+      "words": 197
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 35,
+      "sha256": "d60eb9bfc26754d39c6bbf6d69fc1637ffe93c4a58f0d884f54f4c392c44ee1b",
+      "words": 193
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 36,
+      "sha256": "bff0834b9d751a4c02be9d2f356bb0ae29b00196a5735594df359c81e50192f0",
+      "words": 205
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 37,
+      "sha256": "f9a95c0358cddd2cebbf0d8e3a2d2f4a41dc3dbb8dc57bae92a73f6201c15d5f",
+      "words": 187
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 38,
+      "sha256": "fe1ee4e7e7e6e168d6c2e496f0ade4a570c7c5020cbe74f42c41c3b02b9cd275",
+      "words": 300
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 39,
+      "sha256": "d4c4f8b086c56c5b5898d25d570e0f19fad48ef5d8b45167c957c14f9ae61b59",
+      "words": 371
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 40,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 41,
+      "sha256": "03c9e3b8bfbec49fb6e3dc116af066cc80081f0820bee77afb4df631fdf14995",
+      "words": 503
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 42,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 43,
+      "sha256": "818b8caace1595c613f33b8d10a13fedd5e242a14191fcc149395d2994f4494e",
+      "words": 503
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 44,
+      "sha256": "f1f1027fa3cb0f4e6252132009318977e00bf5fb1709e96f9c8f87e98b107729",
+      "words": 1
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 45,
+      "sha256": "bfb6e1bb13df1466e03019ce765b31f97195a4d299c62bc124a7b16b82a72e59",
+      "words": 471
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 46,
+      "sha256": "7eba8bbb17fc71fc8bd93966fee60c5272d8bfb839c228d4b9e12168f6963266",
+      "words": 441
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 47,
+      "sha256": "c02bebd813195a6bac2c0836ac8b165fe9660a806b2ef1815142a6ce21369cc5",
+      "words": 253
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 48,
+      "sha256": "b5ddab91f939c89deba7e690b87cc41380cb0908c0bddfb6bd84064bfcecb158",
+      "words": 242
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 49,
+      "sha256": "2ea8b2ad0d54be51222a56a95ef2a8b1caac0d58658f7f83e51873027e464669",
+      "words": 290
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 50,
+      "sha256": "90759b80ef59914714cf61c336b7e12b67a20cd243ecfd363e63aa8dfe265f1e",
+      "words": 252
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 51,
+      "sha256": "abb028a004cc2523a9422078155bad696fffae1334568762396093765e496e10",
+      "words": 271
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 52,
+      "sha256": "74840593bd416d21b1ef84ec1f6281fe197d48d7a96c19487bda9839671fd689",
+      "words": 418
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 53,
+      "sha256": "ed3b332ff4b3d75f9a90cc0a289a8697fd259fba989fbc0f4fc059947db6263f",
+      "words": 523
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 54,
+      "sha256": "726349e61464dd97c2f8dcb65aa9667ee5b731cfc0a334ead444eebb8befdf10",
+      "words": 1
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 55,
+      "sha256": "784b9ca0e762fa9479b2a430e33c54f4e2a19bef21dc857165b70983e95a3210",
+      "words": 423
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 56,
+      "sha256": "f0a8cee15a6b3e88c0454f394f895e51ac4b8b9dae3bfafe6f40cf0b58d1f332",
+      "words": 409
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 57,
+      "sha256": "7bdd68311e931c5add8ab96fe21abcd5b2cb090adea4ca1217c404b375db6b63",
+      "words": 532
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 58,
+      "sha256": "ff4b364d97882e9da68c048662bd8d06905b6ade141113a4ffa08f7f043a06cf",
+      "words": 457
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 59,
+      "sha256": "d0ad03dd904e1e91d9140083f7bcc4beb2aefc33efecd4a1135258687f76c7de",
+      "words": 306
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 60,
+      "sha256": "e5aa793606b7208c5bb2d1ff5d20d5d012a64446911445d7a2db7ef0e2667ae1",
+      "words": 228
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 61,
+      "sha256": "6cb9137de43ffc0e063230094423fb3c3200f08410e233b1cf312aa3eb90a4ae",
+      "words": 373
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 62,
+      "sha256": "1db9b4e7827a1b56f6a9c90cca97f56b5f82a0d5fff2fb7bd8278820a53c5344",
+      "words": 512
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 63,
+      "sha256": "b9c8c95198d711666feb301c41efc5516ad9f2e5aef60f7171adea9c20e8a474",
+      "words": 56
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 64,
+      "sha256": "86d0bfd4251e6d4872db6585a7f44e7ee9889c264dcbbca19a920d12ddf6d41c",
+      "words": 363
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 65,
+      "sha256": "88afd4e8455cf37955586d4223c695c4ee3f16eb7b53fa511260bbd448cc1266",
+      "words": 450
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 66,
+      "sha256": "a9a8f6e3a753dee69366b6b9ae3aeab1c3001baa1ae2553803b3ac89da45bdd2",
+      "words": 456
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 67,
+      "sha256": "a98d7f44af730123445d617bee6bae54575e5409b12436dc9b7937aa3b0fceef",
+      "words": 407
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 68,
+      "sha256": "029a397b4d1ccc26f90e2c5c4791c6c4f67b95f675122cd6f25e77c8525d5ca1",
+      "words": 436
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 69,
+      "sha256": "a4805451b908dcbff55da28650eee04087e47619918c08bd951f7406965800c3",
+      "words": 464
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 70,
+      "sha256": "093b2e269ec9d726aede6b453642cb742c6851ca374aeecce13cdc9b583c670c",
+      "words": 433
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 71,
+      "sha256": "8a2858d292de10cbc736350bf016aa606dd47d0d2e96d5edaeed2a89d8384169",
+      "words": 401
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 72,
+      "sha256": "f5f0c46d48310cf4c945bc66f3c3922a1e99abf1cea740b5d578899893746e2d",
+      "words": 449
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 73,
+      "sha256": "e68d399456fbae235c01db18c32067d9ed9aefa862720ab6b59e359544ebc705",
+      "words": 450
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 74,
+      "sha256": "3ea8b9ca56fd2716b1a0f1637250b055142f421c24a289c62fcca7cb6926d195",
+      "words": 447
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 75,
+      "sha256": "cc40154524164f2e234aca990e2c7020774bfbb22caa9ea6f141457477a58d06",
+      "words": 435
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 76,
+      "sha256": "048d105b7b79c17263b988ce6b607d896bb4ae7216fbaed75e8a627ae3ad24b7",
+      "words": 438
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 77,
+      "sha256": "e6a5264058fae54063d04bc04b72fac96127fd84374602f0cd932c64efc7abcf",
+      "words": 453
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 78,
+      "sha256": "ff0b958af8b662ace352bcb3c137fe47b89d5916566eb47a36eee5591cc164dc",
+      "words": 416
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 79,
+      "sha256": "160afe1113726eb3116f34ba62b484d73ad241e65939e9b2bc73442cb0e5d3a0",
+      "words": 450
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 80,
+      "sha256": "89aa28bd63de189b845be465f6891d1acd45d23a202c78d491aac479de0cff9e",
+      "words": 449
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 81,
+      "sha256": "be7820f22ef60317245079c1b6afa9377d3ef6812e0dea34920f98dc3dd256d9",
+      "words": 425
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 82,
+      "sha256": "d7450801fdca35663e8e994fab4afdffcaafa1a376ddc80b06deb04c29d3b34f",
+      "words": 461
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 83,
+      "sha256": "9269cd4f943bdf59214a4d08c4c78a4388ffa9bf994d6edcc40b253f7765d9c7",
+      "words": 449
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 84,
+      "sha256": "a8cf13de042ddc8fe1aa1663d8720b80a89bad73028e881bfe67c0fe11265dec",
+      "words": 461
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 85,
+      "sha256": "316b7548f5f34a70147af88002eb4cb648bd6e0db3bfdda8cfa217bdf442eefa",
+      "words": 352
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 86,
+      "sha256": "4264d9b9a453686d9c1634379f6907f2a2b70370a258510d78c98fc8079122f6",
+      "words": 391
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 87,
+      "sha256": "5de9d3841db773d2289fdd2569036932376193f150ad1293c79151aefd91c4eb",
+      "words": 467
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 88,
+      "sha256": "df9264ff95e782ed54f7d03854582372cd8e70187ebdf9789629d9e719594fb4",
+      "words": 247
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 89,
+      "sha256": "a4e22c031577529d74b135e8763c36f35e245b9de70fa0bf4187f6620805c198",
+      "words": 451
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 90,
+      "sha256": "7ba4c1de4e030631cf30c93ab857eee7ca49de821dbe8930368ad262eb7100b3",
+      "words": 1
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 91,
+      "sha256": "7e653de476857f48cf794af3096681cef1d59eada5c63a1909f5d7655a7b7275",
+      "words": 337
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 92,
+      "sha256": "19f52c896050232115e7e3c0d9d11be2459a962a481793a1fabc74b0569c9e32",
+      "words": 459
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 93,
+      "sha256": "e1b1730e2bb7f9edd9b3c9cd91e70e16570be10a6305c3e0712df812c074f957",
+      "words": 86
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 94,
+      "sha256": "91928cdbbbf86600c02ded4ae92a76e93b72c15743c37c0787138862cb5cc3e8",
+      "words": 401
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 95,
+      "sha256": "46ca28d869355d275879c6b4a38815e2b2f81b281bfa0249409726108e354975",
+      "words": 397
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 96,
+      "sha256": "c49f9b1a2e3ff34469f30247f5cd53e835d79089cd859ef653bf4501b2de16b2",
+      "words": 456
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 97,
+      "sha256": "2d264da3cf39a76a6a18d2ecc0aaa43796b6b523b10d65c9fc8fa1854692b200",
+      "words": 436
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 98,
+      "sha256": "d7403f401aed988eed06c50b704400b186f7437590f270be4c757e27d432ef38",
+      "words": 198
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 99,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 100,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 101,
+      "sha256": "5ecfa2bb81794839f9b047f837397df55639a7d11398e820ab1a1a19d0a80b2d",
+      "words": 10
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 102,
+      "sha256": "abce95213c2446ef5641e207891b868ec2a736df103c8b4eebefcc9f2d7801ff",
+      "words": 11
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 103,
+      "sha256": "5e6782107baa016d0433a9c784a6c34ee58cb6139c126e3d6657e40f0bdf18dc",
+      "words": 0
+    }
+  ],
+  "run": {
+    "at": "2026-11-27T01:47:42.394Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "text": "txt-8q5sdvm520cwygpgjvn8",
+  "tools": [
+    {
+      "name": "stemma-convert",
+      "version": "1"
+    },
+    {
+      "name": "pdfjs-dist",
+      "version": "6.5.438"
+    }
+  ]
+}

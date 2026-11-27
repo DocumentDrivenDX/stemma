@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "d33de6486eb2e5534bb7dba622a661d15f4ec50de893ba5a0495efbb440f823f",
+      "size": 780113,
+      "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "ae9c16c5d5fa25a2fa8246b42a0c72341a5b83c3f8d397fb1ca50126452fb094",
+      "size": 80135,
+      "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:07Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-v8sqbd0bes4zds5ecemp",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "coralscoralislan1890dana"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "coralscoralislan1890dana"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:47-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "11c3a673d1078d34ca76da4cc97ee21f8f8fcd0e393fb97a2e68b2790357cd1c",
+  "size": 29452960,
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana.pdf",
+  "version": "Internet Archive item coralscoralislan1890dana"
+}

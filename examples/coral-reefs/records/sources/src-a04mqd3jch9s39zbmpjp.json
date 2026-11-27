@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "darwinletters1887",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Francis"
+      },
+      "lid": "a1",
+      "role": "editor"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-a04mqd3jch9s39zbmpjp",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "lifelettersofcha03darw"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1887"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Life and Letters of Charles Darwin, including an Autobiographical Chapter"
+  },
+  "type": "book"
+}

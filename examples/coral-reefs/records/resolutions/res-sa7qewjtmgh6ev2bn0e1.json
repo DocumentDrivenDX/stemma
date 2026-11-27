@@ -1,0 +1,39 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:03Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Lyell, Charles, Sir, 1797-1875",
+      "Deshayes, G. P. (Gérard Paul), 1795-1875",
+      "Clowes, William, 1779-1847, printer",
+      "Bradley, T., engraver",
+      "Gardner, James, publisher and engraver, engraver",
+      "Lee, fl. 1830, engraver",
+      "Oudart, P. L. (Paul Louis), 1796-1860, illustrator",
+      "Burndy Library, donor. DSI"
+    ],
+    "issued": "1830",
+    "publisher": "London : John Murray ...",
+    "title": "Principles of geology : being an attempt to explain the former changes of the earth's surface, by reference to causes now in operation"
+  },
+  "id": "res-sa7qewjtmgh6ev2bn0e1",
+  "identifier": {
+    "scheme": "ia",
+    "value": "PrinciplesgeoloVol2Lyel"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:03Z",
+  "query": "PrinciplesgeoloVol2Lyel",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"39088007100308\",\n \"creator\": [\n  \"Lyell, Charles, Sir, 1797-1875\",\n  \"Deshayes, G. P. (Gérard Paul), 1795-1875\",\n  \"Clowes, William, 1779-1847, printer\",\n  \"Bradley, T., engraver\",\n  \"Gardner, James, publisher and engraver, engraver\",\n  \"Lee, fl. 1830, engraver\",\n  \"Oudart, P. L. (Paul Louis), 1796-1860, illustrator\",\n  \"Burndy Library, donor. DSI\"\n ],\n \"date\": \"1830\",\n \"identifier\": \"PrinciplesgeoloVol2Lyel\",\n \"language\": \"eng\",\n \"lccn\": \"45042424\",\n \"possible-copyright-status\": \"Public domain. The Library considers that this work is no longer under copyright protection\",\n \"publisher\": \"London : John Murray ...\",\n \"title\": \"Principles of geology : being an attempt to explain the former changes of the earth's surface, by reference to causes now in operation\",\n \"volume\": \"v. 2\",\n \"year\": \"1830\"\n}",
+  "response_sha256": "1039ef43406751654ad59c160568257c3e97a55a26d601bace7d307881e57096",
+  "schema": "stemma.record/0",
+  "source": "src-rd44yd9ctbs143rpe1be",
+  "url": "https://archive.org/metadata/PrinciplesgeoloVol2Lyel/metadata"
+}

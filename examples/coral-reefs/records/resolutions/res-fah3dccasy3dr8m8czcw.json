@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:07Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Daly, Reginald Aldworth, 1871-1957"
+    ],
+    "issued": "1915",
+    "publisher": "[Boston] American Academy of Arts and Sciences",
+    "title": "The glacial-control theory of coral reefs"
+  },
+  "id": "res-fah3dccasy3dr8m8czcw",
+  "identifier": {
+    "scheme": "ia",
+    "value": "glacialcontrolth00daly"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:07Z",
+  "query": "glacialcontrolth00daly",
+  "resolver": "internet_archive",
+  "response": "{\n \"creator\": \"Daly, Reginald Aldworth, 1871-1957\",\n \"date\": \"1915\",\n \"identifier\": \"glacialcontrolth00daly\",\n \"language\": \"eng\",\n \"publisher\": \"[Boston] American Academy of Arts and Sciences\",\n \"title\": \"The glacial-control theory of coral reefs\"\n}",
+  "response_sha256": "70cc428b166e6d5bf76f52c18ea76e2f3d184f70839ec23e03d36cb170e0a702",
+  "schema": "stemma.record/0",
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "url": "https://archive.org/metadata/glacialcontrolth00daly/metadata"
+}

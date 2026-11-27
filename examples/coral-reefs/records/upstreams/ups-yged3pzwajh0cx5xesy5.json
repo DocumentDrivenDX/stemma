@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "ba4904110e2ca1ff5d9444cb6ffdefa32d512becb22d54165697f145e67f26cd",
+      "size": 1067497,
+      "url": "https://archive.org/download/cu31924090274410/cu31924090274410_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "72a135074b96526622f3a0b5c3b5c884331ba3040340d111b95e3bba9a7ef983",
+      "size": 94270,
+      "url": "https://archive.org/download/cu31924090274410/cu31924090274410_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-yged3pzwajh0cx5xesy5",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "cu31924090274410"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "cu31924090274410"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:35:39-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "229c65e44829d8d62ea2ad0a8b25d5fc51cc8b34a770b3797c10ebe078c5e44b",
+  "size": 18778094,
+  "source": "src-nmf90sqdz27921jbh6j4",
+  "url": "https://archive.org/download/cu31924090274410/cu31924090274410.pdf",
+  "version": "Internet Archive item cu31924090274410"
+}

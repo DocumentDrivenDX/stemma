@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 745,
+      "index": 19,
+      "page_sha256": "fac75d141c9717293ad80a8d6aab5218e14ccd7551aa98d3b7481c414ad7b893",
+      "start": 699,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:49:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-pq7x9hm7n70adgxe36db",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "2"
+  },
+  "quote": {
+    "exact": "I have\ninvariably used in this volume the term"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-darwinreefs1842",
+  "source_record_sha256": "c37163df88dd21745cc919fab59dab7cd447fdaa64b21fc5a4967613b3b03b02",
+  "text": "txt-bm6whwjm6vv9ce26mgbr"
+}

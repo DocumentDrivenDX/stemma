@@ -1,0 +1,564 @@
+{
+ "captures": [
+  {
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "file": "../.sources/agassiz-1903/coralreefsoftrop00agas.pdf",
+   "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas.pdf",
+   "retrieved_at": "2026-11-26T18:36:50-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "coralreefsoftrop00agas"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "coralreefsoftrop00agas"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      10,
+      14
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item coralreefsoftrop00agas",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas_djvu.txt",
+     "file": "../.sources/agassiz-1903/coralreefsoftrop00agas_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/coralreefsoftrop00agas/coralreefsoftrop00agas_page_numbers.json",
+     "file": "../.sources/agassiz-1903/coralreefsoftrop00agas_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "file": "../.sources/daly-1915/glacialcontrolth00daly.pdf",
+   "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly.pdf",
+   "retrieved_at": "2026-11-26T18:37:12-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "glacialcontrolth00daly"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "glacialcontrolth00daly"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      2
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item glacialcontrolth00daly",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly_djvu.txt",
+     "file": "../.sources/daly-1915/glacialcontrolth00daly_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly_page_numbers.json",
+     "file": "../.sources/daly-1915/glacialcontrolth00daly_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "file": "../.sources/dana-1890/coralscoralislan1890dana.pdf",
+   "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana.pdf",
+   "retrieved_at": "2026-11-26T18:35:47-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "coralscoralislan1890dana"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "coralscoralislan1890dana"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      6,
+      7
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item coralscoralislan1890dana",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana_djvu.txt",
+     "file": "../.sources/dana-1890/coralscoralislan1890dana_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/coralscoralislan1890dana/coralscoralislan1890dana_page_numbers.json",
+     "file": "../.sources/dana-1890/coralscoralislan1890dana_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-ymdxbsxjmc5fbmq0t4a0",
+   "file": "../.sources/darwin-1837/proceedings218331838geol.pdf",
+   "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol.pdf",
+   "retrieved_at": "2026-11-26T18:34:48-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "proceedings218331838geol"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "proceedings218331838geol"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      6
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item proceedings218331838geol",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol_djvu.txt",
+     "file": "../.sources/darwin-1837/proceedings218331838geol_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/proceedings218331838geol/proceedings218331838geol_page_numbers.json",
+     "file": "../.sources/darwin-1837/proceedings218331838geol_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-darwinreefs1842",
+   "file": "../.sources/darwin-1842/b29331213.pdf",
+   "url": "https://archive.org/download/b29331213/b29331213.pdf",
+   "retrieved_at": "2026-11-26T18:34:51-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "b29331213"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "b29331213"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      8
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item b29331213",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/b29331213/b29331213_djvu.txt",
+     "file": "../.sources/darwin-1842/b29331213_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/b29331213/b29331213_page_numbers.json",
+     "file": "../.sources/darwin-1842/b29331213_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "file": "../.sources/darwin-1889/structuredistribtion00darw.pdf",
+   "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw.pdf",
+   "retrieved_at": "2026-11-26T18:35:00-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "structuredistribtion00darw"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "structuredistribtion00darw"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      10
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item structuredistribtion00darw",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw_djvu.txt",
+     "file": "../.sources/darwin-1889/structuredistribtion00darw_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/structuredistribtion00darw/structuredistribtion00darw_page_numbers.json",
+     "file": "../.sources/darwin-1889/structuredistribtion00darw_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "file": "../.sources/darwin-letters-1887/lifelettersofcha03darw.pdf",
+   "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw.pdf",
+   "retrieved_at": "2026-11-26T18:35:11-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "lifelettersofcha03darw"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "lifelettersofcha03darw"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      6
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item lifelettersofcha03darw",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw_djvu.txt",
+     "file": "../.sources/darwin-letters-1887/lifelettersofcha03darw_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/lifelettersofcha03darw/lifelettersofcha03darw_page_numbers.json",
+     "file": "../.sources/darwin-letters-1887/lifelettersofcha03darw_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "file": "../.sources/funafuti-1904/atolloffunafutib00roya.pdf",
+   "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya.pdf",
+   "retrieved_at": "2026-11-26T18:37:04-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "atolloffunafutib00roya"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "atolloffunafutib00roya"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      6
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item atolloffunafutib00roya",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya_djvu.txt",
+     "file": "../.sources/funafuti-1904/atolloffunafutib00roya_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/atolloffunafutib00roya/atolloffunafutib00roya_page_numbers.json",
+     "file": "../.sources/funafuti-1904/atolloffunafutib00roya_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "file": "../.sources/ladd-schlanger-1960/report.pdf",
+   "url": "https://pubs.usgs.gov/pp/0260y/report.pdf",
+   "retrieved_at": "2026-11-26T18:38:55-05:00",
+   "identifiers": [
+    {
+     "scheme": "doi",
+     "value": "10.3133/pp260Y"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "crossref",
+     "identifier": {
+      "scheme": "doi",
+      "value": "10.3133/pp260Y"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      1
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   }
+  },
+  {
+   "source": "src-rd44yd9ctbs143rpe1be",
+   "file": "../.sources/lyell-1832/PrinciplesgeoloVol2Lyel.pdf",
+   "url": "https://archive.org/download/PrinciplesgeoloVol2Lyel/PrinciplesgeoloVol2Lyel.pdf",
+   "retrieved_at": "2026-11-26T18:35:22-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "PrinciplesgeoloVol2Lyel"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "PrinciplesgeoloVol2Lyel"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      10
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item PrinciplesgeoloVol2Lyel",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/PrinciplesgeoloVol2Lyel/PrinciplesgeoloVol2Lyel_djvu.txt",
+     "file": "../.sources/lyell-1832/PrinciplesgeoloVol2Lyel_djvu.txt"
+    }
+   ]
+  },
+  {
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "file": "../.sources/murray-1880/proceedings1018781880roya.pdf",
+   "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya.pdf",
+   "retrieved_at": "2026-11-26T18:35:30-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "proceedings1018781880roya"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "proceedings1018781880roya"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      8
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item proceedings1018781880roya",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya_djvu.txt",
+     "file": "../.sources/murray-1880/proceedings1018781880roya_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/proceedings1018781880roya/proceedings1018781880roya_page_numbers.json",
+     "file": "../.sources/murray-1880/proceedings1018781880roya_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-nmf90sqdz27921jbh6j4",
+   "file": "../.sources/semper-1881/cu31924090274410.pdf",
+   "url": "https://archive.org/download/cu31924090274410/cu31924090274410.pdf",
+   "retrieved_at": "2026-11-26T18:35:39-05:00",
+   "identifiers": [
+    {
+     "scheme": "ia",
+     "value": "cu31924090274410"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "internet_archive",
+     "identifier": {
+      "scheme": "ia",
+      "value": "cu31924090274410"
+     }
+    }
+   ],
+   "convert": {
+    "method": "ocr",
+    "identity": {
+     "title_pages": [
+      8
+     ],
+     "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them"
+    }
+   },
+   "version": "Internet Archive item cu31924090274410",
+   "auxiliary": [
+    {
+     "role": "alternative_text",
+     "url": "https://archive.org/download/cu31924090274410/cu31924090274410_djvu.txt",
+     "file": "../.sources/semper-1881/cu31924090274410_djvu.txt"
+    },
+    {
+     "role": "page_numbers",
+     "url": "https://archive.org/download/cu31924090274410/cu31924090274410_page_numbers.json",
+     "file": "../.sources/semper-1881/cu31924090274410_page_numbers.json"
+    }
+   ]
+  },
+  {
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "file": "../.sources/blanchon-2014/srep04997.pdf",
+   "url": "https://www.nature.com/articles/srep04997.pdf",
+   "retrieved_at": "2026-11-26T18:39:07-05:00",
+   "identifiers": [
+    {
+     "scheme": "doi",
+     "value": "10.1038/srep04997"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "crossref",
+     "identifier": {
+      "scheme": "doi",
+      "value": "10.1038/srep04997"
+     }
+    }
+   ],
+   "convert": {
+    "method": "text_layer",
+    "identity": {
+     "title_pages": [
+      0
+     ],
+     "basis": "First page of the PDF, read by a model (claude-sonnet-5-5); no person has confirmed it"
+    }
+   }
+  },
+  {
+   "source": "src-9y5zh0m86v7n3fkawade",
+   "file": "../.sources/steibl-2024/steibl-2024.pdf",
+   "url": "https://researchspace.auckland.ac.nz/server/api/core/bitstreams/22e17708-b24f-409f-9d64-ad33e60e8d9e/content",
+   "retrieved_at": "2026-11-26T18:39:04-05:00",
+   "identifiers": [
+    {
+     "scheme": "doi",
+     "value": "10.1146/annurev-ecolsys-102722-013447"
+    }
+   ],
+   "lookups": [
+    {
+     "resolver": "crossref",
+     "identifier": {
+      "scheme": "doi",
+      "value": "10.1146/annurev-ecolsys-102722-013447"
+     }
+    }
+   ],
+   "convert": {
+    "method": "text_layer",
+    "identity": {
+     "title_pages": [
+      0
+     ],
+     "basis": "First page of the PDF, read by a model (claude-sonnet-5-5); no person has confirmed it"
+    }
+   }
+  }
+ ]
+}

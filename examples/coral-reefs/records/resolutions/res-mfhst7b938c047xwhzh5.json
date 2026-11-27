@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Agassiz, Alexander, 1835-1910"
+    ],
+    "issued": "1903",
+    "publisher": "Cambridge, Printed for the Museum",
+    "title": "The coral reefs of the tropical Pacific"
+  },
+  "id": "res-mfhst7b938c047xwhzh5",
+  "identifier": {
+    "scheme": "ia",
+    "value": "coralreefsoftrop00agas"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:47:52Z",
+  "query": "coralreefsoftrop00agas",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"39088007195480\",\n \"creator\": \"Agassiz, Alexander, 1835-1910\",\n \"date\": \"1903\",\n \"identifier\": \"coralreefsoftrop00agas\",\n \"language\": \"eng\",\n \"lccn\": \"a  21000010\",\n \"oclc-id\": \"6578658\",\n \"publisher\": \"Cambridge, Printed for the Museum\",\n \"title\": \"The coral reefs of the tropical Pacific\",\n \"volume\": \"text\"\n}",
+  "response_sha256": "ba51cca20b475b26f44670c954aa35755c19f1ecf1fb44fd1ebbc363fc66a7a5",
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "url": "https://archive.org/metadata/coralreefsoftrop00agas/metadata"
+}

@@ -1,0 +1,33 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:13Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Darwin, Charles, 1809-1882",
+      "Bonney, T. G. (Thomas George), 1833-1923"
+    ],
+    "issued": "1889",
+    "publisher": "London : Smith, Elder",
+    "title": "The structure and distribution of coral reefs"
+  },
+  "id": "res-zev96sa3arbryz4fvsvj",
+  "identifier": {
+    "scheme": "ia",
+    "value": "structuredistribtion00darw"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:13Z",
+  "query": "structuredistribtion00darw",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"SRLF_UCIMSC:LAGE-4032900\",\n \"creator\": [\n  \"Darwin, Charles, 1809-1882\",\n  \"Bonney, T. G. (Thomas George), 1833-1923\"\n ],\n \"date\": \"1889\",\n \"identifier\": \"structuredistribtion00darw\",\n \"language\": \"eng\",\n \"possible-copyright-status\": \"NOT_IN_COPYRIGHT\",\n \"publisher\": \"London : Smith, Elder\",\n \"title\": \"The structure and distribution of coral reefs\"\n}",
+  "response_sha256": "e9621a7cdb3e09a06afddb1c6d3dc54cd9240a0e4f3df4c46f34584dcb749d51",
+  "schema": "stemma.record/0",
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "url": "https://archive.org/metadata/structuredistribtion00darw/metadata"
+}

@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Geological Society of London"
+    ],
+    "issued": "1826",
+    "publisher": "London : The Society",
+    "title": "Proceedings of the Geological Society of London"
+  },
+  "id": "res-q2d2t1ptnem7m64ednet",
+  "identifier": {
+    "scheme": "ia",
+    "value": "proceedings218331838geol"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:47:55Z",
+  "query": "proceedings218331838geol",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"39088900125295\",\n \"creator\": \"Geological Society of London\",\n \"date\": \"1826\",\n \"identifier\": \"proceedings218331838geol\",\n \"language\": \"eng\",\n \"lccn\": \"10031322 //r892\",\n \"oclc-id\": \"1200533\",\n \"publisher\": \"London : The Society\",\n \"title\": \"Proceedings of the Geological Society of London\",\n \"volume\": \"v.2 (1833:Nov.-1838:June)\",\n \"year\": \"1826\"\n}",
+  "response_sha256": "7cf4293e3bdd15d44252e7e6839cb5ccd11e5c86133b0552585215e17375793a",
+  "schema": "stemma.record/0",
+  "source": "src-ymdxbsxjmc5fbmq0t4a0",
+  "url": "https://archive.org/metadata/proceedings218331838geol/metadata"
+}

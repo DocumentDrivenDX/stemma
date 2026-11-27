@@ -1,0 +1,38 @@
+{
+  "against": "page images of the original PDF, drawn with macOS PDFKit",
+  "created": {
+    "at": "2026-11-27T01:50:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "flags": [
+    {
+      "index": 248,
+      "note": "The page image prints 333 after a page printed 232, and the text runs on. This looks like a misprint in the original.",
+      "reading": "333"
+    }
+  ],
+  "id": "rvw-g5n1v5m7459p5vqfdk57",
+  "kind": "text_review",
+  "original_sha256": "6230bdf0a8d525762023aee7644a2a31274854791c33c95a37623be95b7e18af",
+  "outcome": "flagged",
+  "pages": [
+    {
+      "index": 333,
+      "sha256": "4c8d5b6c695d265fb63dd73f275a21043a5887b37cb4fea0552ecc7b417c8f88"
+    }
+  ],
+  "reviewed": {
+    "at": "2026-11-27T01:50:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "scope": "page_number",
+  "source": "src-ymdxbsxjmc5fbmq0t4a0",
+  "text": "txt-hcn5vw3frm4256b32xhe"
+}

@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T01:49:31Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0002",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "89"
+  },
+  "passage": "psg-9hfr5905rszj63qby0cm",
+  "quotation": "this view inapplicable to the greater number of atolls",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "ab768b064fba12950c67e8cc320d90b7e20fc0279656368671a794e49a331c35",
+    "text": "He calls Chamisso’s account earlier and better than the crater theory, yet finds that a difficulty of the same kind makes “this view inapplicable to the greater number of atolls”."
+  }
+}

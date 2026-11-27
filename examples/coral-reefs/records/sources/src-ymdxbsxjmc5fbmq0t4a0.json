@@ -1,0 +1,28 @@
+{
+  "admission": "candidate",
+  "citation_key": "geolsoc1838",
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-ymdxbsxjmc5fbmq0t4a0",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "proceedings218331838geol"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1838"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Proceedings of the Geological Society of London"
+  },
+  "type": "book"
+}

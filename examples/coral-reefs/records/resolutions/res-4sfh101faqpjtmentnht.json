@@ -1,0 +1,41 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:02Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Paul Blanchon",
+      "Marian Granados-Corea",
+      "Elizabeth Abbey",
+      "Juan C. Braga",
+      "Colin Braithwaite",
+      "David M. Kennedy",
+      "Tom Spencer",
+      "Jody M. Webster",
+      "Colin D. Woodroffe"
+    ],
+    "issued": "2014",
+    "publisher": "Springer Science and Business Media LLC",
+    "title": "Postglacial Fringing-Reef to Barrier-Reef conversion on Tahiti links Darwin's reef types",
+    "venue": "Scientific Reports"
+  },
+  "id": "res-4sfh101faqpjtmentnht",
+  "identifier": {
+    "scheme": "doi",
+    "value": "10.1038/srep04997"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:02Z",
+  "query": "10.1038/srep04997",
+  "resolver": "crossref",
+  "response": "{\n \"DOI\": \"10.1038/srep04997\",\n \"ISSN\": [\n  \"2045-2322\"\n ],\n \"URL\": \"https://doi.org/10.1038/srep04997\",\n \"author\": [\n  {\n   \"affiliation\": [],\n   \"family\": \"Blanchon\",\n   \"given\": \"Paul\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"first\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Granados-Corea\",\n   \"given\": \"Marian\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Abbey\",\n   \"given\": \"Elizabeth\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Braga\",\n   \"given\": \"Juan C.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Braithwaite\",\n   \"given\": \"Colin\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Kennedy\",\n   \"given\": \"David M.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Spencer\",\n   \"given\": \"Tom\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Webster\",\n   \"given\": \"Jody M.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Woodroffe\",\n   \"given\": \"Colin D.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  }\n ],\n \"container-title\": [\n  \"Scientific Reports\"\n ],\n \"issue\": \"1\",\n \"issued\": {\n  \"date-parts\": [\n   [\n    2014,\n    5,\n    21\n   ]\n  ]\n },\n \"published\": {\n  \"date-parts\": [\n   [\n    2014,\n    5,\n    21\n   ]\n  ]\n },\n \"publisher\": \"Springer Science and Business Media LLC\",\n \"subtitle\": [],\n \"title\": [\n  \"Postglacial Fringing-Reef to Barrier-Reef conversion on Tahiti links Darwin's reef types\"\n ],\n \"type\": \"journal-article\",\n \"volume\": \"4\"\n}",
+  "response_sha256": "da6b385f3285f1513a2fba35e11afc79427234fa6385585f93a4acbdf5880779",
+  "schema": "stemma.record/0",
+  "source": "src-w4na70p97m1rbc19t6ak",
+  "url": "https://api.crossref.org/works/10.1038%2Fsrep04997"
+}

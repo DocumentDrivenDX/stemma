@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "darwin1889",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-48g9pqaf1748q15bbpqs",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "structuredistribtion00darw"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1889"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Structure and Distribution of Coral Reefs"
+  },
+  "type": "book"
+}

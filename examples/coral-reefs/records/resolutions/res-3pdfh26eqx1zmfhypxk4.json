@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:01Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Royal Society (Great Britain). Coral Reef committee"
+    ],
+    "issued": "1904",
+    "publisher": "London, The Royal Society of London",
+    "title": "The atoll of Funafuti; borings into a coral reef and the results, being the report of the Coral Reef Committee of the Royal Society"
+  },
+  "id": "res-3pdfh26eqx1zmfhypxk4",
+  "identifier": {
+    "scheme": "ia",
+    "value": "atolloffunafutib00roya"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:01Z",
+  "query": "atolloffunafutib00roya",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"39088000742262\",\n \"creator\": \"Royal Society (Great Britain). Coral Reef committee\",\n \"date\": \"1904\",\n \"identifier\": \"atolloffunafutib00roya\",\n \"language\": \"eng\",\n \"oclc-id\": \"3643391\",\n \"publisher\": \"London, The Royal Society of London\",\n \"title\": \"The atoll of Funafuti; borings into a coral reef and the results, being the report of the Coral Reef Committee of the Royal Society\"\n}",
+  "response_sha256": "251214ef89a18fcefa0385d9f6d1a903060f32954ed2e89994ff5972ccdae803",
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "url": "https://archive.org/metadata/atolloffunafutib00roya/metadata"
+}

@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T01:49:35Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0004",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "89"
+  },
+  "passage": "psg-3za37mwp9sdbr11m7hy2",
+  "quotation": "I am far from denying that a reef like a perfectly characterized atoll might not be formed",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "be1b242bf827d70d1765f361c5412e99570ac8613d3ef54ebd577d386c4c3929",
+    "text": "He does not rule the crater rim out altogether: “I am far from denying that a reef like a perfectly characterized atoll might not be formed”."
+  }
+}

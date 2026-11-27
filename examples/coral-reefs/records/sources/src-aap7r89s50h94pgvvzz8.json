@@ -1,0 +1,46 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Proceedings of the American Academy of Arts and Sciences"
+      }
+    }
+  ],
+  "citation_key": "daly1915",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Daly",
+        "given": "Reginald A."
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-aap7r89s50h94pgvvzz8",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "glacialcontrolth00daly"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1915"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Glacial-Control Theory of Coral Reefs"
+  },
+  "type": "article-journal"
+}

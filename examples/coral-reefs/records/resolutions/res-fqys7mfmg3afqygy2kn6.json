@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:04Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Darwin, Charles, 1809-1882. n 78095637"
+    ],
+    "issued": "1842",
+    "publisher": "London : Smith, Elder",
+    "title": "The structure and distribution of coral reefs. Being the first part of the Geology of the voyage of the Beagle, under the command of Capt. Fitzroy, R.N. during the years 1832 to 1836"
+  },
+  "id": "res-fqys7mfmg3afqygy2kn6",
+  "identifier": {
+    "scheme": "ia",
+    "value": "b29331213"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:04Z",
+  "query": "b29331213",
+  "resolver": "internet_archive",
+  "response": "{\n \"creator\": \"Darwin, Charles, 1809-1882. n 78095637\",\n \"date\": \"1842\",\n \"identifier\": \"b29331213\",\n \"language\": \"eng\",\n \"publisher\": \"London : Smith, Elder\",\n \"title\": \"The structure and distribution of coral reefs. Being the first part of the Geology of the voyage of the Beagle, under the command of Capt. Fitzroy, R.N. during the years 1832 to 1836\"\n}",
+  "response_sha256": "9d94e313270bcbd7e8956fdb23486c1da5e7e4d171c1d9a1707d4e05e52c8c22",
+  "schema": "stemma.record/0",
+  "source": "src-darwinreefs1842",
+  "url": "https://archive.org/metadata/b29331213/metadata"
+}

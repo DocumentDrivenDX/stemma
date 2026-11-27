@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:09Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Semper, C. (Carl), 1832-1893"
+    ],
+    "issued": "1881",
+    "publisher": "New York, D. Appleton",
+    "title": "Animal life as affected by the natural conditions of existence"
+  },
+  "id": "res-0dwxpqmkh463gvh1qhtv",
+  "identifier": {
+    "scheme": "ia",
+    "value": "cu31924090274410"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:09Z",
+  "query": "cu31924090274410",
+  "resolver": "internet_archive",
+  "response": "{\n \"creator\": \"Semper, C. (Carl), 1832-1893\",\n \"date\": \"1881\",\n \"identifier\": \"cu31924090274410\",\n \"language\": \"eng\",\n \"lccn\": \"17012229\",\n \"publisher\": \"New York, D. Appleton\",\n \"title\": \"Animal life as affected by the natural conditions of existence\"\n}",
+  "response_sha256": "e87a7babe55a65b518e418a3d6e4199fcd1c37ca3c2dfc950dd7ef0f4b4aa12c",
+  "schema": "stemma.record/0",
+  "source": "src-nmf90sqdz27921jbh6j4",
+  "url": "https://archive.org/metadata/cu31924090274410/metadata"
+}

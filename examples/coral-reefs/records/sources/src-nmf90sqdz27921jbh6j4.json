@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "semper1881",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Semper",
+        "given": "Karl"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-nmf90sqdz27921jbh6j4",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "cu31924090274410"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1881"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Animal Life as Affected by the Natural Conditions of Existence"
+  },
+  "type": "book"
+}

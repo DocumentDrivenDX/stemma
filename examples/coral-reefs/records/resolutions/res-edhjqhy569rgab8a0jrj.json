@@ -1,0 +1,33 @@
+{
+  "created": {
+    "at": "2026-11-27T01:48:05Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Darwin, Charles, 1809-1882",
+      "Darwin, Francis, Sir, 1848-1925"
+    ],
+    "issued": "1887",
+    "publisher": "London, John Murray",
+    "title": "The life and letters of Charles Darwin, including an autobiographical chapter"
+  },
+  "id": "res-edhjqhy569rgab8a0jrj",
+  "identifier": {
+    "scheme": "ia",
+    "value": "lifelettersofcha03darw"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:48:05Z",
+  "query": "lifelettersofcha03darw",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"01151327\",\n \"creator\": [\n  \"Darwin, Charles, 1809-1882\",\n  \"Darwin, Francis, Sir, 1848-1925\"\n ],\n \"date\": \"1887\",\n \"identifier\": \"lifelettersofcha03darw\",\n \"language\": \"eng\",\n \"publisher\": \"London, John Murray\",\n \"title\": \"The life and letters of Charles Darwin, including an autobiographical chapter\",\n \"volume\": \"3\"\n}",
+  "response_sha256": "e596da98de3e21e3b663a8616d10d182785a62257b6d08624ccc88507a3b4101",
+  "schema": "stemma.record/0",
+  "source": "src-a04mqd3jch9s39zbmpjp",
+  "url": "https://archive.org/metadata/lifelettersofcha03darw/metadata"
+}

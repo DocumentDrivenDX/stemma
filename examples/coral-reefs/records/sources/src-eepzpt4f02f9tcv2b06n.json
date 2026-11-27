@@ -1,0 +1,38 @@
+{
+  "admission": "candidate",
+  "citation_key": "dana1890",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Dana",
+        "given": "James D."
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-eepzpt4f02f9tcv2b06n",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "coralscoralislan1890dana"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1890"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Corals and Coral Islands"
+  },
+  "type": "book"
+}

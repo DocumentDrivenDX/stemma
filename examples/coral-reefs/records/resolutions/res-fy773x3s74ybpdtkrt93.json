@@ -1,0 +1,32 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:48Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "Royal Society of Edinburgh"
+    ],
+    "issued": "1834",
+    "publisher": "Edinburgh, Royal Society of Edinburgh",
+    "title": "Proceedings of the Royal Society of Edinburgh"
+  },
+  "id": "res-fy773x3s74ybpdtkrt93",
+  "identifier": {
+    "scheme": "ia",
+    "value": "proceedings1018781880roya"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:47:48Z",
+  "query": "proceedings1018781880roya",
+  "resolver": "internet_archive",
+  "response": "{\n \"call_number\": \"39088013034558\",\n \"creator\": \"Royal Society of Edinburgh\",\n \"date\": \"1834\",\n \"identifier\": \"proceedings1018781880roya\",\n \"language\": \"eng\",\n \"lccn\": \"08014543\",\n \"oclc-id\": \"1607960\",\n \"possible-copyright-status\": \"Not in copyright. The BHL knows of no copyright restrictions on this item.\",\n \"publisher\": \"Edinburgh, Royal Society of Edinburgh\",\n \"title\": \"Proceedings of the Royal Society of Edinburgh\",\n \"volume\": \"v.10 (1878-1880)\"\n}",
+  "response_sha256": "b51d985a5a47bda40944e12a8f7ad4f094af2a178b59449f5c932e880981b076",
+  "schema": "stemma.record/0",
+  "source": "src-eh71qk5hm5zhpwzcz2v7",
+  "url": "https://archive.org/metadata/proceedings1018781880roya/metadata"
+}

@@ -1,0 +1,52 @@
+{
+  "auxiliary": [
+    {
+      "role": "alternative_text",
+      "sha256": "45a580487b432628f0be619c63871a0ff1456922630ad4222aaf475bb8ac1ab9",
+      "size": 240592,
+      "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly_djvu.txt"
+    },
+    {
+      "role": "page_numbers",
+      "sha256": "9a0882be6e1e648b9d215dea10a6966f26ab17397bcb47c5689a2517d75e4ba0",
+      "size": 17501,
+      "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly_page_numbers.json"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:06Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-vr0gq19fqzmkgwhcpy0g",
+  "identifiers": [
+    {
+      "scheme": "ia",
+      "value": "glacialcontrolth00daly"
+    }
+  ],
+  "kind": "upstream",
+  "lookups": [
+    {
+      "identifier": {
+        "scheme": "ia",
+        "value": "glacialcontrolth00daly"
+      },
+      "resolver": "internet_archive"
+    }
+  ],
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-26T18:37:12-05:00",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "8661af767309b1e34bcfde0eec2ced692b557d0447cddece47ea13737bc4b7b0",
+  "size": 6454949,
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "url": "https://archive.org/download/glacialcontrolth00daly/glacialcontrolth00daly.pdf",
+  "version": "Internet Archive item glacialcontrolth00daly"
+}

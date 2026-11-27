@@ -1,0 +1,34 @@
+{
+  "created": {
+    "at": "2026-11-27T01:47:49Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "found": {
+    "contributors": [
+      "H. S. Ladd",
+      "S. O. Schlanger"
+    ],
+    "issued": "1960",
+    "publisher": "US Geological Survey",
+    "title": "Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll",
+    "venue": "Professional Paper"
+  },
+  "id": "res-46kv75spym2jjctkst0y",
+  "identifier": {
+    "scheme": "doi",
+    "value": "10.3133/pp260Y"
+  },
+  "kind": "resolution",
+  "outcome": "found",
+  "queried_at": "2026-11-27T01:47:49Z",
+  "query": "10.3133/pp260Y",
+  "resolver": "crossref",
+  "response": "{\n \"DOI\": \"10.3133/pp260y\",\n \"ISSN\": [\n  \"2330-7102\"\n ],\n \"URL\": \"https://doi.org/10.3133/pp260y\",\n \"author\": [\n  {\n   \"affiliation\": [],\n   \"family\": \"Ladd\",\n   \"given\": \"H. S.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"first\"\n  },\n  {\n   \"affiliation\": [],\n   \"family\": \"Schlanger\",\n   \"given\": \"S. O.\",\n   \"role\": [\n    {\n     \"role\": \"author\",\n     \"vocabulary\": \"crossref\"\n    }\n   ],\n   \"sequence\": \"additional\"\n  }\n ],\n \"container-title\": [\n  \"Professional Paper\"\n ],\n \"issued\": {\n  \"date-parts\": [\n   [\n    1960\n   ]\n  ]\n },\n \"page\": \"863-905\",\n \"published\": {\n  \"date-parts\": [\n   [\n    1960\n   ]\n  ]\n },\n \"publisher\": \"US Geological Survey\",\n \"subtitle\": [],\n \"title\": [\n  \"Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll\"\n ],\n \"type\": \"report-component\"\n}",
+  "response_sha256": "9d7f201e73d89f969c88d182ab07bc2b19f9a3ec7b12e6f59d1b2f1f36dd2609",
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "url": "https://api.crossref.org/works/10.3133%2Fpp260Y"
+}

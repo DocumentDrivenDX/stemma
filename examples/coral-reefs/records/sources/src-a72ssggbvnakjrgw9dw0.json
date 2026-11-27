@@ -1,0 +1,46 @@
+{
+  "admission": "candidate",
+  "citation_key": "ladd1960",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Ladd",
+        "given": "Harry S."
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Schlanger",
+        "given": "Seymour O."
+      },
+      "lid": "a2",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T01:47:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-a72ssggbvnakjrgw9dw0",
+  "identifiers": [
+    {
+      "scheme": "doi",
+      "value": "10.3133/pp260Y"
+    }
+  ],
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1960"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Drilling Operations on Eniwetok Atoll"
+  },
+  "type": "report"
+}
