@@ -162,7 +162,7 @@ updated. The record's current source is the one the manuscript key resolves to.
 |---|---|---|
 | Paragraphs, emphasis, strong emphasis, hard line break | CommonMark | M1 |
 | Headings, levels 1 to 4; level 1 is the chapter title | `#`, optional `{#sec-id}` | M1 |
-| Block quotes | `>`; optional attribute line | M1 |
+| Block quotes | `>`; optional attribute line directly under the last quoted line | M1 |
 | Ordered and bulleted lists | CommonMark | M1 |
 | Footnotes | `[^label]` with `[^label]: text`; continuation lines indented | M1 |
 | Citations, quotations, claim anchors, marks | C | M1 |

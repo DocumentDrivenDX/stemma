@@ -235,6 +235,25 @@ author has a recognition tool, use its output with `--method ocr` and name it;
 otherwise the author types the passages (`--method manual`) or the citation stays
 reported as unchecked.
 
+## Editing a manuscript in a shared doc
+
+When the author wants to edit or discuss a manuscript file in a Claude Doc, or
+bring a reviewer's doc edits back, use the `docsync` skill. It is a separate
+DocumentDrivenDX plugin. Do not sync by exporting a doc over the file or by
+copying text across by hand. If the skill is not available, say that shared
+editing needs the docsync plugin (https://github.com/DocumentDrivenDX/docsync),
+install it only if the author asks, and carry on in the file. Nothing else in
+Stemma needs it.
+
+- Before the first doc, tell the author it is a hosted copy of the whole
+  manuscript, quotations included.
+- Editors can change quotations and citations in the doc. Never repair or retype
+  one yourself; show the author each such change in the diff, and capture new
+  evidence by passage address as usual.
+- After edits land, update the affected records and run `check`. Say that
+  `check` reads the records and source files, not the manuscript text, so a
+  quotation or citation changed only in the manuscript is not detected.
+
 ## Checking and verification
 
 Prefer deterministic checks. Where text cannot be proved by script, as with
