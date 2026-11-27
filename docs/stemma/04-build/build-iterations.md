@@ -30,7 +30,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | On main; originals not opened yet (25) |
-| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, original pages (not highlighted) and MCP on main; highlighting on originals and other manuscripts not built |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, original pages and MCP on main; marks on original PDFs on this branch, never on scans or page images; other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Faster export and complete paged search in `stemma browse` on main; export memory over 4 GB; offline page still limited |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
 
@@ -85,6 +85,31 @@ possible and falls back to the text snapshots in the repository.
 - To test: how the supported hosts start the MCP server from the plugin, which
   ships one bundled command line, and how long the localhost server lives.
 - Originals stay out of reviewer exports unless the rights rules allow them.
+### Measured: marks on originals (the worked example, one macOS machine)
+
+All 14 originals are PDFs held in a local cache; nothing was fetched.
+
+- Page text read again equals the source text's page on 5,006 of 5,022 pages.
+  The other 16 are two-column pages the converter reordered. Recognized text
+  matches too, because those source texts were made from the PDFs' own text
+  layers with the same pinned reader.
+- 12 of the 14 originals are scans whose only text is an invisible recognition
+  layer over a page image, so they can take no mark.
+- Of the 125 passage segments, 6 are marked: 5 of 6 on `blanchon2014` and 1 of 2
+  on `steibl2024`. Not marked: 94 recognition layer, 23 a word split by a hyphen
+  at a line end, 1 ligature, 1 a grey initial letter just lighter than the limit.
+  For the segments the report quotes: 6 marked, 91, 22, 1, and 1.
+- The 6 marked segments were looked at in the served page: each box lay on the
+  quoted words.
+- Placing marks took 22 ms for the median page and 240 ms for the slowest, in
+  one process without the cost of starting one.
+
+Open for the product owner: whether to show a recognition layer's positions,
+labelled as estimates (ADR-012 says no); and whether to mark quotations across a
+line-end hyphen and those holding a ligature wholly inside them, which the
+operators place without ambiguity but which are refused for now. The 23 hyphen
+cases include scans, which would stay unmarked.
+
 ## Iteration 26: large projects
 
 Requirement from the product owner: significant projects have thousands of

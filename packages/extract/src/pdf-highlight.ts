@@ -285,7 +285,7 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
       case "setTextRenderingMode":
         state.mode = args[0];
         // Text used as a clipping path changes what everything after it shows.
-        if (state.mode >= 4 && state.mode !== 7) throw new Refused("unknown_drawing");
+        if (state.mode >= 4) throw new Refused("unknown_drawing");
         break;
       case "setFont": {
         const font = page.commonObjs.get(args[0]);
@@ -297,7 +297,6 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
       }
       case "showText":
         show(args[0], order);
-        if (state.mode === 7) throw new Refused("recognition_layer");
         break;
       case "clip": case "eoClip": clipping = true; break;
       case "constructPath": {
@@ -352,6 +351,11 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
   const text = read.lines.map((line) => cleanText(line.text).replace(/\n/g, " ")).join("\n");
   if (sha256(text) !== target.text_sha256) throw new Refused("text_differs");
   if (page.rotate % 360 !== 0) throw new Refused("rotated_page");
+  // Before anything is held against the drawing: the library reorders such text, so it would not agree.
+  for (const [from, to] of target.ranges) {
+    const end = text.indexOf("\n", to - 1);
+    if (RIGHT_TO_LEFT.test(text.slice(text.lastIndexOf("\n", from) + 1, end < 0 ? text.length : end))) throw new Refused("right_to_left");
+  }
 
   const { glyphs, paints } = await drawing(pdfjs, page);
 
@@ -402,11 +406,6 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
       throw new Refused(paints.some((p) => p.image && meet(p.box, glyph.box)) ? "recognition_layer" : "invisible_text");
     }
   }
-  for (const { offset: begins } of chosen) {
-    const start = text.lastIndexOf("\n", begins) + 1;
-    const end = text.indexOf("\n", begins);
-    if (RIGHT_TO_LEFT.test(text.slice(start, end < 0 ? text.length : end))) throw new Refused("right_to_left");
-  }
   for (const { glyph, item } of chosen) {
     if (item.dir === "ttb") throw new Refused("vertical_text");
     if (item.dir !== "ltr") throw new Refused("right_to_left");
@@ -455,8 +454,11 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
       if (!(paint.white && paint.order < first) && meet(paint.box, held)) throw new Refused("covered");
     }
     const overlaps = (other: Rect) => area(intersection(other, held)) > 0.2 * Math.min(area(other), area(held));
-    // A space lies between letters, so it is held against each letter, not against the run it is part of.
-    const covers = (g: Glyph) => (g.space ? run.glyphs.some((q) => area(intersection(g.box, q.core)) > 0.2 * Math.min(area(g.box), area(q.core))) : overlaps(g.core));
+    // A glyph whose shape is not where its width says is held by all its shape reaches. A space lies between
+    // letters, and some fonts give it a shape, so it is held against each letter, not against the run it is part of.
+    const covers = (g: Glyph) => (g.space
+      ? run.glyphs.some((q) => area(intersection(g.box, q.core)) > 0.2 * Math.min(area(g.box), area(q.core)))
+      : overlaps(g.fits ? g.core : g.box));
     if (others.some(covers) || runs.some((o, j) => j > i && overlaps(o.core))) throw new Refused("overlapping_text");
   }
   return runs.map((run) => run.box);

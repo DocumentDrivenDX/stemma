@@ -30,7 +30,7 @@ export const STATES: Record<SourceViewState, string> = {
  * The original page beside one segment's text, which only the served page can
  * show. It is given in, so that the offline page holds none of what draws it.
  */
-export const ShowOriginal = createContext<((text: string, segment: PageSegment) => ReactNode) | undefined>(undefined);
+export const ShowOriginal = createContext<((passage: string, text: string, segment: PageSegment) => ReactNode) | undefined>(undefined);
 
 /** True in the served page, whose data comes from the project's files as they are, not from an export. */
 export const Served = createContext(false);
@@ -149,7 +149,7 @@ function Passage({ passage, link }: { passage: SourceView; link: boolean }) {
       {showOriginal ? passage.segments.map((s) => (
         <div key={`${s.index} ${s.stream}`} className="stemma-pair">
           <div><Page segment={s} /></div>
-          {showOriginal(text.id, s)}
+          {showOriginal(passage.id, text.id, s)}
         </div>
       )) : (
         <>

@@ -348,10 +348,19 @@ What to tell them, once:
   box lists only the best 200 and says when there are more. Neither searches
   source page text beyond what passages quote, the manuscript or research notes.
 - Beside the highlighted text it shows the original: that page of the PDF, or
-  the page image. Only the converted text is highlighted. **The original is not
-  marked**: never say that the words are highlighted on the original, and never
-  take a page shown beside the text as proof that the text is right. Looking at
-  the page is the author's check.
+  the page image. The converted text is always highlighted. **The original is
+  marked only sometimes**, and the page says which: never tell the author that
+  words are highlighted on the original unless their page says so, and never
+  take a page shown beside the text, marked or not, as proof that the text is
+  right. Looking at the page is the author's check.
+- A mark is drawn only on a PDF page whose text, read again, is exactly the
+  source text's page and whose quoted letters are plainly drawn there. Its boxes
+  are positions from the PDF's text layer. Scanned books get none, since their
+  only positions are an invisible recognition layer over the picture; nor do
+  page images, words split by a hyphen at a line end, ligatures, rotated or
+  right-to-left text, or anything covered or unclear. This is expected: pass on
+  the reason the page gives. Do not edit or reconvert source text, move a
+  passage's address, or change a quotation to get a mark.
 
 **Showing originals.** The project holds no originals, so the page can show one
 only from `.stemma/originals/` in the project or from a place named with

@@ -13,6 +13,7 @@ import { join, relative } from "node:path";
 import { TAGS, type TagPair } from "../packages/core/src/browse-proof.ts";
 import { provedBytes, provedPost } from "../packages/explorer/src/proof.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
+import { createHighlighter } from "../packages/server/src/highlighter.ts";
 import { makePdf } from "../tests/pdf.ts";
 import { endMcp, McpHost, stubOpener } from "../tests/mcp-run.ts";
 import { removeTemporaries } from "../tests/helpers.ts";
@@ -228,6 +229,13 @@ async function checkBrowse(): Promise<void> {
   for (const licence of ["pdfjs-dist.txt", "core-js.txt", "openjpeg.txt", "pdfjs-openjpeg.txt", "jbig2.txt", "pdfjs-jbig2.txt"]) {
     if (!existsSync(join(installed, "dist/explorer-licenses", licence))) fail(`the installed plugin lacks dist/explorer-licenses/${licence}`);
   }
+  // The installed copy's process that places marks on an original, with the PDF library inside it (US-123-AC7).
+  const reader2 = createHighlighter([process.execPath, "--no-install", "--no-env-file", "--config=/dev/null", join(installed, "dist/highlight-worker.js")]);
+  const pageWords = "An invented harbour page.";
+  const bytes = readFileSync(scan);
+  const marked = await reader2.place({ sha256: digest, size: bytes.length, page: 1, page_count: 1, text_sha256: new Bun.CryptoHasher("sha256").update(pageWords).digest("hex"), ranges: [[12, 19]] }, async () => ({ bytes, release: () => {} }));
+  reader2.close();
+  if (marked.state !== "boxes" || marked.boxes.length !== 1) fail(`the installed copy placed no mark on an invented original: ${JSON.stringify(marked)}`);
   child.kill("SIGINT");
   const exit = await child.exited;
   clearTimeout(deadline);
@@ -238,7 +246,7 @@ async function checkBrowse(): Promise<void> {
   if (said.includes(secret) || said.includes(code)) fail("the secret or the code was printed");
   if (!said.includes("The one-time link was opened at ")) fail("the command did not say that the link was opened");
   if (Bun.spawnSync(["ps", "-A", "-o", "command="]).stdout.toString().includes(join(installed, "dist/browse-worker.js"))) fail("the process holding the data was left running");
-  console.log(`[exit ${exit}] served the page, a search, the manuscript, a highlighted source view, an invented original from a named folder and the PDF library's parts; the code worked once; neither it nor the secret was printed.`);
+  console.log(`[exit ${exit}] served the page, a search, the manuscript, a highlighted source view, an invented original from a named folder, its mark, and the PDF library's parts; the code worked once; neither it nor the secret was printed.`);
 }
 await checkBrowse();
 

@@ -56,10 +56,11 @@ const written = (dir: string, path: string, bytes: Uint8Array | string) => {
 };
 
 /** The project's files with a source file tied to `tie`. Written again over the same directory, it changes the project. */
-export function writeOriginalsProject(tie: Tie, change: { manifest?: Rec; paged?: boolean; pages?: Project["pages"] } = {}, dir = join(temporary(), "reef")): string {
+export function writeOriginalsProject(tie: Tie, change: { manifest?: Rec; paged?: boolean; pages?: Project["pages"]; records?: Rec[] } = {}, dir = join(temporary(), "reef")): string {
   const made = content(project({
     sources: sources().map((s) => (s.id === LETTER ? { ...s, type: "personal_communication" } : s)),
-    records: [one, two, note, islets, citation(CITATION, one)],
+    records: change.records ?? [one, two, note, islets, citation(CITATION, one)],
+    ...(change.pages ? { pages: change.pages } : {}),
     manifest: { original: { obtained_from: "https://example.invalid/book.pdf", acquired_at: "2026-01-05T09:00:00Z", ...tie }, ...change.manifest },
   }));
   mkdirSync(dir, { recursive: true });

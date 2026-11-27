@@ -219,7 +219,8 @@ describe.skipIf(process.platform === "win32")("the declared MCP server", () => {
       const host = McpHost.start(filled(data), { PATH: "/usr/bin:/bin", HOME: temporary() }, temporary());
       await host.initialize();
       host.child.stdin.write(input);
-      host.child.stdin.flush();
+      // On a busy machine part of the write may still be pending at the kill, and then fails; that is no part of what is tested.
+      void Promise.resolve(host.child.stdin.flush()).catch(() => {});
       await Bun.sleep(400);
       expect(childrenOf(host.child.pid)).toEqual([]);
       await host.end(signal, 5_000);

@@ -1,8 +1,12 @@
 // The original page beside the highlighted text (CONTRACT-005 M, "Originals";
 // US-121). Which page it is comes from the server, from the record alone; the
 // page works out none. Nothing of a file is drawn before its answer has proved
-// itself and its SHA-256 is the one asked for. The original is never marked.
+// itself and its SHA-256 is the one asked for. Boxes over the drawing come only
+// from the server ("Highlighting on originals"): the page matches no text and
+// places nothing. It only checks that each box has something drawn in it, which
+// can remove a highlight and never add one.
 import { useEffect, useRef, useState } from "react";
+import { type Highlight, type HighlightBox, noHighlight } from "../../core/src/highlight.ts";
 import type { OriginalPage } from "../../core/src/original-pages.ts";
 import type { PageSegment } from "../../core/src/source-view.ts";
 import { CannotDraw, drawImage, type PdfEngine, type PdfPages } from "./pdf-engine.ts";
@@ -33,11 +37,43 @@ class NotShown extends Error {
   }
 }
 
-type Shown = { why?: undefined; label: string; draw(canvas: HTMLCanvasElement, width: number, stop: AbortSignal): Promise<void> };
+type Shown = {
+  why?: undefined;
+  label: string;
+  draw(canvas: HTMLCanvasElement, width: number, stop: AbortSignal): Promise<void>;
+  /** Where the server places this passage's words on what is drawn, or why it places none. */
+  highlight(passage: string, index: number): Promise<Highlight>;
+};
 type Found = Shown | { reason: Reason; why: string };
 
 /** The files and PDFs kept at once, so that two pages of one original are not asked for twice. */
 const KEPT = 2;
+
+/**
+ * Whether the drawing has both dark and light pixels in every box, as words on
+ * paper have. A box that has not means that the two readings of the file differ.
+ */
+function drawnIn(canvas: HTMLCanvasElement, boxes: HighlightBox[]): boolean {
+  const context = canvas.getContext("2d");
+  if (!context) return false;
+  return boxes.every((box) => {
+    const left = Math.max(0, Math.floor(box.left * canvas.width));
+    const top = Math.max(0, Math.floor(box.top * canvas.height));
+    const width = Math.min(canvas.width - left, Math.ceil(box.width * canvas.width));
+    const height = Math.min(canvas.height - top, Math.ceil(box.height * canvas.height));
+    if (width < 1 || height < 1) return false;
+    const { data } = context.getImageData(left, top, width, height);
+    let dark = 0;
+    let light = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness = 0.2126 * data[i]! + 0.7152 * data[i + 1]! + 0.0722 * data[i + 2]!;
+      if (brightness < 175) dark++;
+      else if (brightness > 215) light++;
+    }
+    const pixels = width * height;
+    return dark > pixels * 0.01 && light > pixels * 0.2;
+  });
+}
 
 export interface OriginalSource {
   find(text: string, index: number): Promise<Found>;
@@ -104,7 +140,11 @@ export function originalSource(server: Server, read: Read, engine: PdfEngine, lo
   const shown = async (place: Exclude<OriginalPage, { state: "none" }>, index: number): Promise<Shown> => {
     if (place.state === "image") {
       const bytes = await files.get(place.sha256);
-      return { label: `Page image of page index ${index}`, draw: (canvas, width, stop) => drawImage(bytes, place.media_type, canvas, width, stop) };
+      return {
+        label: `Page image of page index ${index}`,
+        draw: (canvas, width, stop) => drawImage(bytes, place.media_type, canvas, width, stop),
+        highlight: async () => noHighlight("page_image"),
+      };
     }
     const pdf = await pdfs.get(place.sha256);
     if (pdf.pageCount !== place.page_count) {
@@ -114,6 +154,12 @@ export function originalSource(server: Server, read: Read, engine: PdfEngine, lo
       label: `Page ${place.page} of ${place.page_count} of the PDF`,
       // Looked up again, since a PDF may have been let go in the meantime.
       draw: async (canvas, width, stop) => (await pdfs.get(place.sha256)).draw(place.page, canvas, width, stop),
+      highlight: async (passage, at) => {
+        const made = await read<Highlight>("/api/original-highlight", { passage, index: at });
+        // Boxes are for one page of one file, and go over a drawing of that and no other.
+        return made.state === "boxes" && (made.sha256 !== place.sha256 || made.page !== place.page || made.page_count !== place.page_count)
+          ? noHighlight("failed") : made;
+      },
     };
   };
 
@@ -158,9 +204,29 @@ function Missing({ reason, why }: { reason: Reason; why: string }) {
 /** How many pixels wide a page is drawn: enough to be read when made larger. */
 const DRAWN_WIDTH = 1800;
 
-function Drawing({ found, name }: { found: Shown; name: string }) {
+function Marking({ marked }: { marked: Highlight | undefined }) {
+  if (!marked) {
+    return <p className="stemma-unmarked" role="status">Asking where the quoted words lie on the original. Nothing is marked on it yet.</p>;
+  }
+  if (marked.state === "boxes") {
+    return (
+      <p className="stemma-marked">
+        <strong>Highlighted on the original.</strong> The boxes are positions from the PDF’s text layer. Stemma read this page again, found its text equal to the source text, and found those letters drawn there, with nothing it checks for over or under them. It cannot tell whether the printed shapes are the letters the text layer names, so read them. Its file’s SHA-256 is the recorded one.
+      </p>
+    );
+  }
+  return (
+    <p className="stemma-unmarked" data-reason={marked.reason}>
+      <strong>The original is not highlighted.</strong> <Text value={marked.why} /> The highlighted words are in the converted text. Its file’s SHA-256 is the recorded one.
+    </p>
+  );
+}
+
+function Drawing({ found, name, passage, index }: { found: Shown; name: string; passage: string; index: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"drawing" | "drawn" | { why: string }>("drawing");
+  const [marked, setMarked] = useState<Highlight>();
   const [large, setLarge] = useState(false);
   useEffect(() => {
     const stop = new AbortController();
@@ -170,27 +236,53 @@ function Drawing({ found, name }: { found: Shown; name: string }) {
     );
     return () => stop.abort();
   }, [found]);
+  useEffect(() => {
+    if (state !== "drawn") return;
+    let current = true;
+    found.highlight(passage, index).then(
+      (made) => current && setMarked(made.state === "boxes" && !drawnIn(canvas.current!, made.boxes) ? noHighlight("pixels_disagree") : made),
+      () => current && setMarked(noHighlight("not_asked")),
+    );
+    return () => {
+      current = false;
+    };
+  }, [found, state, passage, index]);
+  const boxes = state === "drawn" && marked?.state === "boxes" ? marked.boxes : [];
+  // The first box is brought into the sheet's view without moving what is around it.
+  useEffect(() => {
+    const view = sheet.current;
+    const first = view?.querySelector(".stemma-box");
+    if (view && first) view.scrollTop += first.getBoundingClientRect().top - view.getBoundingClientRect().top - view.clientHeight / 3;
+  }, [boxes.length > 0, large]);
   if (typeof state === "object") return <Missing reason="not_drawn" why={state.why} />;
+  const percent = (part: number) => `${part * 100}%`;
   return (
-    <figure className="st:m-0" data-original={state}>
+    <figure className="st:m-0" data-original={state} data-highlight={marked ? (marked.state === "boxes" ? "boxes" : marked.reason) : "asking"}>
       <figcaption>
         <p><strong>Original: {found.label}.</strong> <button type="button" className="stemma-zoom" aria-pressed={large} onClick={() => setLarge(!large)}>Larger</button></p>
-        <p className="stemma-unmarked"><strong>The original is not highlighted.</strong> Nothing is marked on it: the highlighted words are in the converted text. Its file’s SHA-256 is the recorded one.</p>
+        <Marking marked={state === "drawn" ? marked : undefined} />
       </figcaption>
       {state === "drawing" ? <p role="status">Drawing the page.</p> : null}
-      <div className="stemma-sheet" tabIndex={0} role="region" aria-label={`${name}, scrollable`}>
-        <canvas ref={canvas} role="img" aria-label={`${name}: ${found.label}, drawn as it is, with nothing marked on it`} style={{ width: large ? "200%" : "100%" }} />
+      <div ref={sheet} className="stemma-sheet" tabIndex={0} role="region" aria-label={`${name}, scrollable`}>
+        <div className="stemma-leaf" style={{ width: large ? "200%" : "100%" }}>
+          <canvas ref={canvas} role="img" aria-label={`${name}: ${found.label}, drawn as it is, with ${boxes.length > 0 ? "boxes marking the quoted words" : "nothing marked on it"}`} style={{ width: "100%" }} />
+          {/* Laid over the drawing: the drawing itself is never changed. */}
+          {boxes.map((box, i) => (
+            <div key={i} className="stemma-box" aria-hidden="true" style={{ left: percent(box.left), top: percent(box.top), width: percent(box.width), height: percent(box.height) }} />
+          ))}
+        </div>
       </div>
     </figure>
   );
 }
 
 /** The original of the page one segment of a passage lies on. */
-export function Original({ source, text, segment }: { source: OriginalSource; text: string; segment: PageSegment }) {
+export function Original({ source, passage, text, segment }: { source: OriginalSource; passage: string; text: string; segment: PageSegment }) {
   const found = useLoaded<Found>(`${text}/${segment.index}`, () => source.find(text, segment.index), (why) => ({ reason: "failed", why }));
   return (
     <section className="stemma-original" aria-label={`The original of ${segment.place}`}>
-      {!found ? <p role="status">Asking for the original.</p> : found.why !== undefined ? <Missing reason={found.reason} why={found.why} /> : <Drawing found={found} name={`The original of ${segment.place}`} />}
+      {!found ? <p role="status">Asking for the original.</p> : found.why !== undefined ? <Missing reason={found.reason} why={found.why} />
+        : <Drawing key={`${passage}/${segment.index}`} found={found} passage={passage} index={segment.index} name={`The original of ${segment.place}`} />}
       <p className="st:text-slate-600">Only the page’s own content is drawn: no annotation, form field or link, and nothing in the file is run.</p>
     </section>
   );

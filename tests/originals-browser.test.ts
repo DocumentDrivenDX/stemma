@@ -107,7 +107,13 @@ describe.skipIf(!browser)("US-121 the original page beside the highlighted text"
         await drawn(page).nth(pages.length - 1).waitFor({ timeout: 20_000 });
         expect([where, await drawn(page).count()]).toEqual([where, pages.length]);
         expect(await drawn(page).locator("figcaption").allInnerTexts()).toEqual(pages.map((n) => expect.stringContaining(`Original: Page ${n} of 3 of the PDF.`)));
-        for (const caption of await drawn(page).locator("figcaption").allInnerTexts()) expect(caption).toContain("The original is not highlighted. Nothing is marked on it: the highlighted words are in the converted text.");
+        // These pages' words are not all the source text's, and one quotation splits a word, so nothing is marked (US-123).
+        await page.locator('.stemma-original figure[data-highlight="asking"]').first().waitFor({ state: "detached", timeout: 30_000 });
+        for (const caption of await drawn(page).locator("figcaption").allInnerTexts()) {
+          expect(caption).toContain("The original is not highlighted.");
+          expect(caption).toContain("The highlighted words are in the converted text.");
+        }
+        expect(await page.locator(".stemma-box").count()).toBe(0);
         // Beside each: the page's text with the highlight, to its left.
         const pair = page.locator(".stemma-pair").first();
         expect(await pair.locator("mark").count()).toBe(1);

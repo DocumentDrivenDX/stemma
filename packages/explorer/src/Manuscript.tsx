@@ -77,7 +77,7 @@ function Statement({ view }: { view: ManuscriptView }) {
     <p role="note" className="stemma-statement">
       <strong>This is the manuscript as {served ? "Stemma read it from your files" : "the export read it"}, not the printed PDF.</strong>{" "}
       {view.inputs ? <>It is <code><Text value={view.inputs.template} /></code> and <code>{view.inputs.directory}/report.json</code>, assembled again with the project’s records and citation style; <code>report.md</code>, <code>report.pdf</code> and other report directories are not read. </> : null}
-      {served ? "Where the original can be shown, its page is beside the converted text; the original is not highlighted." : "This offline file cannot show originals."} Choose a quotation, a note’s citation, or a bibliography entry to see its source.
+      {served ? "Where the original can be shown, its page is beside the converted text. The quoted words are marked on it only where Stemma can tell where they lie; elsewhere it says why not." : "This offline file cannot show originals."} Choose a quotation, a note’s citation, or a bibliography entry to see its source.
     </p>
   );
 }

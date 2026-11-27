@@ -109,8 +109,10 @@ PDFs and page images stay out of the repository.
   assistant starts it and your browser opens. Every source opens, however large
   the project, and the page follows your edits. Only your computer can reach it,
   through the page it opens. Where you tell it which folder holds your originals,
-  it shows the original PDF page or page image beside the highlighted text. The
-  text is highlighted; the original is not.
+  it shows the original PDF page or page image beside the highlighted text. On a
+  PDF with real text, it also marks the quoted words on the page where it can
+  tell exactly where they lie. Scanned books and page images are shown unmarked,
+  as is any page in doubt, and the page says why.
 - Lets Claude search your records, read a citation or passage in its source, and
   open your browser at one when you ask to see it. These tools only read the
   project your session is open in. Excerpts they give go to the model, marked as

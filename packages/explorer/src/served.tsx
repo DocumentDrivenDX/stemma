@@ -116,7 +116,7 @@ function Ready({ server, loaded, lost, pdf }: { server: Server; loaded: Loaded; 
     const originals = originalSource(server, read, pdf, (error) => lostNow.current(error));
     return {
       read, getView, client, originals, search: { view: (route: SearchRoute) => <SearchView read={read} route={route} />, last: () => typed },
-      showOriginal: (text: string, segment: PageSegment) => <Original source={originals} text={text} segment={segment} />,
+      showOriginal: (passage: string, text: string, segment: PageSegment) => <Original source={originals} passage={passage} text={text} segment={segment} />,
     };
   }, []);
   // What was held of this data's originals is let go with it.
