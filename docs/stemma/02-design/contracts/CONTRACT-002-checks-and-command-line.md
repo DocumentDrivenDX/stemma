@@ -105,7 +105,7 @@ absent (exit 4 if it cannot) and then runs
 | `key rename <source id> <key>` | Rename a citation key, keeping the old one as an alias | M1 |
 | `check [--changed \| --all]` | Run scripted checks; `--changed` (default) covers what changed since the check baseline (below); `--all` covers the project | M1 |
 | `resolve <source id>... [--via crossref\|internet_archive --identifier <value>] --actor <kind>:<name>` | Look up identifiers in a catalogue by its documented interface and save `resolution` records with the responses; without `--via`, make the lookups the source's upstream records list, or, with none listed, look up the identifiers on the source record | M1 |
-| `excerpt (--passage <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text (G) | M1 |
+| `excerpt (--passage <id> \| --citation <id> \| --quotation <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text; with a citation, passage, or report quotation, mark the quotation in it (G) | M1 |
 | `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
 | `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced source file or a record the author rejects. The files stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
 | `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close\|restore_text> [--repeats] …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding. `bind` also takes a source the author names for an author-date item that has no suitable candidate, including a `year_parenthesis` item, for which it writes the citation. `restore_text` puts an occurrence that is not a citation back as the text found and retires its record; it causes no `takeover.removal` finding. Binding a reference-list item also moves every citation linked to that entry to the chosen source, and retires a provisional source nothing else uses, taking it off `bibliography_include`. `--repeats` applies one `bind` or `close` to every open item in an exact-repeat group (CONTRACT-003 F7) as one staged write, with one `round_choice` and recheck for each item; if any item cannot take it, nothing is written and that item is named. `rounds status` also counts `year_parenthesis` items and lists them on request | M1 |
@@ -586,6 +586,39 @@ after it. Quoted text lies between begin and end lines carrying a token that the
 text itself does not hold; JSON output carries the same token and `content_is`.
 A long range, an unlabelled page, or missing text exits 5 and prints no source
 text.
+
+**A quotation in its source.** `--passage`, `--citation <id>`, and
+`--quotation <id>` (a quotation ID of `report/report.json`, CONTRACT-006 I) mark
+the quotation inside the printed text with a begin and an end mark that carry the
+same token. The rules for when it is marked are those of the source view
+(CONTRACT-005 K). The limits above do not change.
+
+- `--passage` prints as before, up to 300 characters on each side, now as one
+  block with the passage marked. JSON keeps its three `parts`; the quoted one has
+  `quoted: true`. A passage that cannot be marked exits 5 and prints no source
+  text.
+- `--citation` and `--quotation` print the source view: the state and why; the
+  cited work and the work it is part of; for a citation, its sentence, key,
+  locator, and recorded quotation; for a report quotation, its listed
+  `corrections`, `keep_hyphens`, join notes, and `checked` note, none of them
+  applied to the source text. Each passage then has, for each page it lies on,
+  that page's text in the passage's stream (main or notes) with the quoted piece
+  marked, the printed label and its status, the recorded quality, and the
+  original. A source with no pages gets at most 300 characters on each side, and
+  the output says text was trimmed. At most 5 distinct pages and 30,000
+  characters of source text: over either, the command exits 5 and prints no
+  source text.
+- The citing sentence, recorded quotation, source text, and review readings lie
+  inside the token's data blocks. Bidirectional and other control characters are
+  printed visibly, as `[U+202E]`.
+- For each file of the original, the command hashes at read time any file of the
+  recorded size in the originals cache or the project and says whether a file
+  with the recorded digest is held. It prints no local path.
+- A state other than `highlighted` prints the state and why, with no source text
+  and exit 1. `retired` is reported only here. An ID that names no readable
+  record or listed quotation exits 5.
+- JSON output holds the views (CONTRACT-005 K) as printed, `held`, the boundary
+  token, and `content_is`.
 
 ### H. Support records
 

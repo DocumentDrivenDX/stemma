@@ -56,6 +56,7 @@ fact.
 | `stemma.graph.json` | `arras.graph` version 1 file with `complete` true when no record type was dropped |
 | `arras-static.json` | arras static configuration naming the two files by relative path, for hosted delivery |
 | `stemma.states.json` | Record states (J), for exported records |
+| `stemma.sourceviews.json` | Source views (K) of exported passages and citations, `author` audience only |
 | `stemma.export.json` | Manifest, schema `stemma.graph-export/0`: `audience`, `scope`, `corpus_digest`, `data_identity` (J), `exporter`, `arras`, `arras_view`, `search_fold`, SHA-256 of each other file (`files`), `counts`, `omissions[]` (type, reason, count), `dropped_links[]` (relationship, reason, count), `states` (computed, not computed, the checks used and those left out with why), `warnings[]` (code, message, records) |
 | `explorer.html` | With `--page`: one self-contained page with the module and graph texts inlined |
 
@@ -120,8 +121,8 @@ application, database, or write path.
 
 **The Stemma host page.** The plugin ships a page template, built with Stemma
 from the host, arras, React, and their styles, with the licenses of that code.
-An export fills three `application/json` script elements: the banner data, the
-module, and the graph. Nothing is bundled on the author's machine. The page's
+An export fills four `application/json` script elements: the banner data, the
+module, the graph, and the source views (K), the last byte for byte as written. Nothing is bundled on the author's machine. The page's
 content security policy is `default-src 'none'; script-src 'sha256-<script>';
 style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action
 'none'; base-uri 'none'`. arras routes in the URL fragment. The host folds the
@@ -179,7 +180,15 @@ Filtering happens before any file is written; the page does no filtering.
   whole with no `record_invalid` problem; otherwise it is omitted and counted
   `unchecked_digest`, or `restricted_digest` as below.
 - The graph holds no page text, part list of a source file, manuscript file,
-  research note, or standing rule. Each is counted.
+  research note, or standing rule. Each is counted. The `author` export's source
+  views (K) do hold the text of pages that exported passages lie on: the
+  `page_text` count is of the parts none of whose text is in the export. No
+  other source text is added.
+- Retired records, and views that would be `retired`, are in no export. `rights`
+  fields filter nothing (CONTRACT-001 G): a source marked in any way has its
+  cited pages in the author export like any other.
+- `stemma.sourceviews.json` is never part of a reviewer package or reviewer
+  export, however it is filtered.
 - A project record can wrongly hold restricted data. For a location whose
   `sensitivity.class` is `restricted`, an export MUST emit its geometry only
   when `release` is `area` and the geometry is a polygon. Otherwise it emits
@@ -191,7 +200,10 @@ Filtering happens before any file is written; the page does no filtering.
   identity cover every record file, that one included (CONTRACT-001 H, a
   proposed exception).
 - `author` is for the author's own machine or private repository. It MAY include
-  passage text.
+  passage text and the text of cited pages (K). Anyone given it can read both.
+  The export runs the coordinate scan over the source text, citing sentences,
+  recorded quotations, and review readings in its source views and warns
+  `coordinates_in_views` with the record IDs; files are written.
 - `reviewer` MUST include only fields on its allow list. It omits source files
   unless the author includes them, and otherwise all source text (passage quotes
   and context, note extracts, manuscript origins that quote sources,
@@ -385,6 +397,104 @@ record with no state is not shown to be clear.
 | `stemma.states.json` (`stemma.states/0`) | `records{id: states[]}` computed by `core`: `unreviewed`, `retired_link`, `support_missing`, `support_stale`, `support_unsupported`, `annotated`, `open_finding` |
 | `stemma.maps.json` (`stemma.maps/0`) | `argument`: `nodes[]` (record ID, kind, label, states), `links[]` (from, to, stance or relation, states). `places`: `assertions[]` (place, location record, geometry or `withheld`, certainty, `uncertainty_m?`, sources), `not_drawn[]` (record ID, reason). Audience filtering (E) applies before writing |
 
+### K. Source views
+
+A **source view** (`stemma.sourceview/0`) answers one question about one ID: a
+citation record, a passage record, or a quotation of an assembled report
+(CONTRACT-006 I). `core` makes it from the corpus alone. It holds no time,
+machine value, local path, or fact about which originals are on a machine. A
+later server returns the same object. A page reads it and computes no state,
+offset, or filtering of its own.
+
+| Field | In | Holds |
+|---|---|---|
+| `schema`, `kind`, `id` | all | `kind` is `citation`, `passage`, or `quotation` |
+| `state`, `why` | all | The state, and in plain words why |
+| `work` | all, when known | `id`, `key?`, `title?`, and `part_of?` with the same three. For a citation or report quotation it is the cited work; for a passage, the passage's source |
+| `locator` | passage, citation | As recorded on that record |
+| `citation` | citation | `key?`, `source?`, `quotation?`, `sentence?` as recorded |
+| `quotation` | report quotation | `cites`, and `note?`, `corrections?`, `italic?`, `keep_hyphens?`, `checked?` as listed. None is applied to source text |
+| `passages` | citation, report quotation | Pointers, in order: `passage`, `join?`, `join_note?`. The passage views are separate; nothing of them is copied |
+| `source_text` | passage | `id`, `method`, `level`, `recognition?`, `note?`, `paged`, `coverage`, `coverage_note?` |
+| `segments` | passage, only when `highlighted` | One for each page or section, in reading order: `index`, `place`, `stream`, `printed_label?`, `label_status`, `label_basis?`; `before`, `quoted`, `after`, already cut; `trimmed_before?`, `trimmed_after?`; `quality` (`method`, `level`, `note?`); `comparisons[]`; `reviews[]` |
+| `original` | passage | From the source file's `original` (CONTRACT-007 C) |
+
+The `quoted` pieces of a passage's segments, joined with line feeds, are exactly
+the passage's `quote.exact`. A page's text is given in each passage view that
+lies on it.
+
+**States.** Segments, and any highlight, exist only for `highlighted`.
+
+| State | Meaning |
+|---|---|
+| `highlighted` | All the conditions below hold |
+| `changed` | A page's text digest or the words at the address no longer match |
+| `no_source_file` | The passage names no source file the project can read as one |
+| `damaged_file` | The source file is damaged or breaks a rule, so its text is not used |
+| `invalid_anchor` | The address is malformed, out of range, not one continuous stretch, names a file of another source, or the passage record breaks a rule |
+| `no_passage` | A citation with no passage, or one naming no readable passage record |
+| `citation_differs` | A citation, or report quotation, that disagrees with its passage |
+| `retired` | The record, the passage, its source file, or its source is retired. Command line only |
+| `not_exported` | Left out of an export by its size cap |
+
+A passage is `highlighted` only when it is not retired and breaks no record rule;
+its source file exists, is not retired, is intact, and its `source` is the
+passage's `source`; its address is one continuous stretch of one stream, with
+each offset in range; every page's digest matches; and the address gives exactly
+`quote.exact`. A citation is `highlighted` only when its passage is, its
+`quotation` equals the passage's words in the rendered form that
+`passage capture` writes (CONTRACT-002 G), its `locator` equals the passage's,
+and its `key` (and `source`, when it has one) names exactly one source in effect
+that is the passage's source or a part of it (`part_of`). A report quotation is
+`highlighted` only when every one of its passages is and `cites` names such a
+source. When a citation's or quotation's state is not `highlighted`, nothing is
+highlighted for it, whatever the passage's own view shows. A citation takes the
+state of a passage that is not highlighted.
+
+**Quality.** A segment's `comparisons` are the comparison runs of that source
+file whose digest for that page still matches: `run`, `method`, `against`,
+`independent`, `agreement_permille`, `words`, `differing_words`. Its `reviews`
+are text reviews, of scope `whole_page`, `page_number`, `quotations`, or
+`passage` (this passage), that list that page and whose page digests all still
+match. A person's review gives `review`, `scope`, `outcome`, `against`, and its
+flags for that page. A model's or software's review is given only when it flags
+that page, and then only as flags, with no outcome. None of these is proof.
+
+**Original.** `form`, `page_count?`, `description?`, `held_at?`,
+`obtained_from?`, `acquired_at?`, `version?`, and `files[]`: `sha256`, `size`,
+`media_type`, `index?` (a page image), and `upstreams[]` (`record`, `url?`,
+`retrieved_at`, `version?`) of the upstream records whose `sha256` equals the
+file's. An upstream's auxiliary addresses are not originals. A file with an
+`index` is given only for the pages the passage lies on;
+`other_page_files` counts the rest. Every address and holding statement passes
+the local-path rules of E.
+
+**Source text bounds.** A part of a paged source is given whole, up to 20,000
+code points on each side of the quoted piece. A part of a source with no pages
+is chapter sized, so it is cut to 1,500 code points on each side. A cut is marked
+`trimmed_before` or `trimmed_after`.
+
+**The file.** `stemma.sourceviews.json` is `{"schema":
+"stemma.sourceviews/0", "views": {<id>: <view>}}`: one view for each exported
+citation and passage, except a `retired` one, counted as `SourceView`
+`retired`. Report quotations are not records and are not in it. It is a derived
+file under J: listed with its digest in the manifest and byte-identical for the
+same data. Its passage views are capped at 8,000,000 bytes in all, as written.
+Those that a highlighted citation points to are kept first, then the rest, each
+in ID order. A view that does not fit is written as `not_exported` with no
+source text, counted as `SourceView` `size_cap`, and warned
+`source_views_cut`; the citation and the command line still reach it. Parts with
+trimmed text are counted as `SourceText` `page_text_trimmed`.
+
+**Showing it.** The host page shows a panel beside the record browser when the
+route is a Citation or Passage record. It renders text nodes only. Each piece of
+text is isolated (`dir="auto"` and `unicode-bidi: isolate`), and bidirectional,
+format, and control characters other than line feed and tab are shown as visible
+code points. The highlight is a `mark` element. An address is a link only when
+its scheme is `http` or `https`, with `rel="noreferrer noopener"`; nothing is
+fetched or preloaded, and the content security policy (D) is unchanged. The panel
+does not open originals.
+
 ## Precedence and Compatibility
 
 - Versioning: the manifest schema, mapping, and port share this contract's
@@ -408,6 +518,7 @@ record with no state is not shown to be clear.
 | Withheld source material found in a reviewer export | Removed from generated files; anything that cannot be removed is a `package.leak` finding and a warning; export written | no | The author checks the named part before sending it |
 | Restricted coordinate found by the scan | Warning with the location; export written | no | The author removes it or accepts the disclosure |
 | Export stale | `graph status` exits 1 | yes | Re-export |
+| Source views exceed the size cap (K) | Export written without the text that does not fit; counted, `source_views_cut` warning | no | Use `excerpt` for those |
 | `--out` names a path git would track, or another refused place (C) | Exit 5; nothing written | no | Use an ignored path |
 | The output directory holds something with an export file's name that no export manifest there lists as its own (C) | Exit 5; nothing written or removed | no | Use another directory, or move it |
 | A restricted location holds more than was released | Geometry left out; `restricted_in_project` warning; export written; exit 1 | no | Move the value to the restricted store |

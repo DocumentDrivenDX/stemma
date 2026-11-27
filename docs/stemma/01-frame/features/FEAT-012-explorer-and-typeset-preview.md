@@ -51,6 +51,7 @@ what is unverified, and says when a preview page differs from print.
 | Area | User question or job | Feature responsibility |
 |------|----------------------|------------------------|
 | Record exploration | What is in my evidence? | Browse and search records |
+| Source view | What does the source say where I cite it? | Show a citation's quotation highlighted in its source text |
 | Connected-graph view | How does it connect? | A larger view, contributed to arras |
 | Typeset pages | What supports this sentence? | Typeset pages with links in both directions |
 | Live preview | How will my edit look? | Typst compiled in the browser |
@@ -82,6 +83,30 @@ N/A — the user stories name the tasks.
 - EXP-04. A record view must show which claims, links, and support records are
   unverified, missing, or stale. It must present a support result as a recorded
   model judgment and never as verification.
+
+#### Source view (FR-64; text prepared for a model also obeys FR-61)
+
+- SRC-01. From a citation record or a passage, the author must be able to see the
+  citing sentence where one is recorded, the cited work and the work it is part
+  of, the quotation in the text of its source page with the printed page label
+  and how that label was established, in the explorer and through the command
+  line. The command line must also take a quotation of an assembled report
+  (CONTRACT-006 I).
+- SRC-02. A quotation must be highlighted only when the passage's address still
+  gives exactly the words the passage copied, from a source file in effect whose
+  source is the passage's source. For a citation, its recorded quotation, locator,
+  and cited work must also agree with the passage. Otherwise nothing is
+  highlighted, and the view says which of these failed or that there is no
+  passage. A highlight that could be wrong must not be shown.
+- SRC-03. The view must say that the words are converted or recognized text and
+  not a reading of the page, and show the recorded method, quality, comparisons,
+  and current reviews as records, never as proof. A model's review may appear
+  only as a flag.
+- SRC-04. The view must name the original as the source file records it (its
+  form, files by digest, addresses it was obtained from, or where it is held) and
+  must not show a local path. Viewing must fetch nothing. The command line says
+  whether a file with the recorded digest is held in the project or its cache.
+  Opening an original is not part of this requirement.
 
 #### Connected-graph view (FR-64)
 
@@ -154,11 +179,16 @@ N/A — the user stories name the tasks.
 - [US-092 — Trace a sentence to its evidence and back](../user-stories/US-092-trace-a-sentence-to-evidence.md)
 - [US-093 — Preview typeset pages while editing](../user-stories/US-093-preview-pages-while-editing.md)
 - [US-094 — Open the explorer as a local browser bundle](../user-stories/US-094-open-explorer-from-local-file.md)
+- [US-116 — See a citation in its source](../user-stories/US-116-see-a-citation-in-its-source.md)
 
 ## Edge Cases and Error Handling
 
 - **Graph too large for the view**: The user can narrow it; omitted content is
   stated.
+- **Cited text changed, missing, or disagreeing**: No highlight; the view names
+  the state (SRC-02).
+- **Source text with bidirectional or control characters**: Each piece of text is
+  isolated from its neighbours and such characters are shown visibly.
 - **Stale explorer data**: When records changed after the explorer data was
   generated and the explorer can tell, it says so; otherwise it shows when the
   data was generated.

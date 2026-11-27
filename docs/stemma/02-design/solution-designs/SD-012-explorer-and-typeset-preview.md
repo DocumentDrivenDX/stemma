@@ -48,6 +48,7 @@ ddx:
 |---|---|---|---|
 | EXP-01, EXP-02, EXP-03 (FR-64) | arras browser over the static client; folded search field | `explorer`, `graph` | P0 |
 | EXP-04 (FR-64) | State shown on record views | `explorer`; computed at export | P0 |
+| SRC-01 to SRC-04 (FR-64; FR-61) | One source view operation; a panel beside the browser; `excerpt` | `core`, `graph`, `explorer`, `cli` | P0 |
 | GRV-01 to GRV-04 (FR-64) | Larger connected view released in arras | arras contribution, `explorer` | P0 |
 | TPG-01 to TPG-04 (FR-65) | Linked pages and a two-way locus map | `explorer`, `publish/convert` | P0 |
 | PRV-01 to PRV-06 (FR-65) | Compile the rebuilt text in the browser | `explorer` preview, `cite`, `publish/convert` | P0 |
@@ -121,6 +122,7 @@ defined by CONTRACT-006 D.
 - **BR-1209** — Record, source, and comment text is rendered as text, and inlined data is encoded so it cannot end its script block. Compiled SVG (Scalable Vector Graphics) is shown as an image with overlay links; no generated markup is injected.
 - **BR-1210** — The connected view ships only from an arras release. It states omissions, opens a record from a node, and has a text list of its nodes and links.
 - **BR-1211** — The reviewer page offers comments on claims, saves them as one CONTRACT-005 E2 file, and says that unsaved or unexported comments can be lost.
+- **BR-1213** — Source text is highlighted only as CONTRACT-005 K allows. The page highlights only what a view cut as `quoted`, only when every view involved says `highlighted`, and never a view loaded for another record.
 - **BR-1212** — Built pages are optional (`built_pages[]`, CONTRACT-005 J): an author export includes them only when a native build exists for the same manuscript inputs. They are a linked rendering made apart from the print PDF, labelled Built with the build identity and watermark state. Otherwise the Built view is unavailable. Built pages never stand in for browser compilation.
 
 ## System Decomposition
@@ -142,10 +144,26 @@ banner, and the template build; `packages/graph` fills the template. The host
 leaves the arras `location` property uncontrolled, and arras's own fragment
 routing works from a local file. arras node pages show states and the support
 notice as ordinary properties (CONTRACT-005 F); no Stemma view sits beside the
-browser, so composing one remains untried. The banner is styled with Tailwind
+browser, so composing one with those properties remains untried. The source panel sits beside the browser and needs neither the `client` nor a controlled `location`. The banner is styled with Tailwind
 without its reset, under a prefix. One style lets arras list badges wrap.
 Not built: the connected view, pages, preview, maps, and comments. Support
 states are not computed, so EXP-04 is partly met.
+
+### Component: Source view (`core`, `graph`, `explorer`, `cli`)
+
+- **Purpose**: A citation or passage shown in its source text.
+- **Responsibilities**: `core` has one operation, `sourceView`, that decides the
+  state, cuts the text, and gathers quality and original (CONTRACT-005 K,
+  BR-1213). It reuses the passage address reader. `graph` writes the views of
+  exported records within the audience and size rules; `cli` serves `excerpt`
+  (CONTRACT-002 G) and alone looks for held originals; `explorer` shows them.
+- **Requirements Addressed**: SRC-01 to SRC-04.
+- **Interfaces**: `stemma.sourceview/0`. The panel takes a getter that returns a
+  promise, so a later server can answer it with the same objects. The host reads
+  the route with the arras `parseExplore` and its `onLocation` call, and leaves
+  `location` uncontrolled, so arras keeps its own fragment routing.
+- **Not built**: opening an original or page image, manuscript occurrences, and
+  report quotations in the explorer.
 
 ### Component: Connected view (arras contribution)
 
@@ -216,6 +234,8 @@ encoding, and its packaged release used an older Typst than the pinned 0.15.1.
 | EXP-01, EXP-02 | Record browser | arras client | Playwright browse, search, back |
 | EXP-03 | Record browser, export | Folded search | Diacritic cases in both record and query |
 | EXP-04 | Record browser | BR-1202 | Seeded stale, missing, and unreviewed states; label text |
+| SRC-01, SRC-02 | Source view | BR-1213 | Every state; pages across a break; notes; characters outside the basic plane; changed page; local-file flow |
+| SRC-03, SRC-04 | Source view | CONTRACT-005 K | Stale and model reviews; hostile text; local paths withheld; no request; excerpt limits |
 | GRV-01 to GRV-04 | Connected view | BR-1210 | 600 synthetic nodes; omission notice; keyboard; dependency inspection |
 | TPG-01 to TPG-04 | Page view | BR-1203, BR-1204 | Both directions across line, page, and footnote splits; unlinked sentence; screen reader by hand |
 | PRV-01, PRV-06 | Preview data, compile | BR-1208 | Edit, rebuild, reload from local file |
