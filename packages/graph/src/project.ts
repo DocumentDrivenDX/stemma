@@ -3,7 +3,7 @@
 // record schema; only the rules the schema cannot express are listed here.
 // Nothing is dropped without being counted.
 import {
-  citationKeys, compareCodePoints, type Corpus, type FieldSpec, idOf, isObject, isRetired, type Json, type JsonObject, KIND_TYPES,
+  citationKeys, compareCodePoints, type Corpus, type FieldSpec, idOf, isLocalPath, isObject, isRetired, type Json, type JsonObject, KIND_TYPES,
   type LoadedFile, REFERENCES, searchFold, TYPES,
 } from "@stemma/records";
 import type { RecordStates } from "@stemma/core";
@@ -22,9 +22,6 @@ export const PATH_FIELDS = new Set([
 const LEGACY_FIELDS = new Set(["ImportBatch.blocks"]);
 /** The list of a source file's parts. The parts and their text are not in the graph. */
 const PART_LISTS = new Set(["SourceText.pages"]);
-/** A value that is a path on someone's machine, in whatever field it was put. */
-const LOCAL_PATH = /^\s*(file:|~[\\/]|[A-Za-z]:[\\/]|\\\\|\/(Users|home|private|tmp|var|Volumes|mnt|media|nix|opt|root|etc|srv)\/)/i;
-
 /**
  * Fields where someone says where something is. There, any value that is as a
  * whole a path on a machine is left out, whichever directory it begins in.
@@ -35,13 +32,8 @@ const LOCATION_FIELDS = new Set([
 ]);
 /** Bibliography fields that name a file. */
 const PATH_BIB_FIELDS = new Set(["file", "local-url", "localfile", "pdf", "path"]);
-/** An absolute POSIX path of two or more segments, a drive or network path, a `~` path or a `file:` address. A URL is none of these. */
-const WHOLE_PATH = /^\s*(file:|~[\w.-]*[\\/]|[A-Za-z]:[\\/]|\\\\|\/(?!\/)[^/\r\n]+\/+[^/\s])/i;
-/** How Stemma writes an origin that is no web address into an upstream's note. */
-const ORIGIN_NOTE = /^Obtained from: /;
-
-const isLocalPath = (value: string, field: string | undefined): boolean =>
-  LOCAL_PATH.test(value) || (field !== undefined && LOCATION_FIELDS.has(field) && WHOLE_PATH.test(field === "Upstream.note" ? value.replace(ORIGIN_NOTE, "") : value));
+const localPath = (value: string, field: string | undefined): boolean =>
+  isLocalPath(value, field !== undefined && LOCATION_FIELDS.has(field));
 
 /** Types the explorer searches. arras searches at most 20 types in one query, taken in declaration order. */
 export const SEARCHED_TYPES = [
@@ -181,7 +173,7 @@ class Walker {
 
   /** A scalar as it goes into the graph, or undefined when it is left out. */
   private scalar(value: Json, counted: string, field?: string): Json | undefined {
-    if (typeof value === "string" && isLocalPath(value, field)) {
+    if (typeof value === "string" && localPath(value, field)) {
       this.omitted.add(counted, "local_path");
       return undefined;
     }
@@ -523,6 +515,6 @@ function agentWords(corpus: Corpus, source: JsonObject): string[] {
     if (!file?.data || file.data.kind !== "agent" || isRetired(file.data) || file.problems.some((p) => p.reason === "record_invalid")) return [];
     const variants = (Array.isArray(file.data.variants) ? file.data.variants : []).filter(isObject).map((v) => String(v.value));
     const name = isObject(file.data.name) ? Object.values(file.data.name).map(String) : [];
-    return [...name, ...variants].filter((w) => !LOCAL_PATH.test(w));
+    return [...name, ...variants].filter((w) => !isLocalPath(w));
   });
 }

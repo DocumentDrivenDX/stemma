@@ -6,3 +6,5 @@ export * from "./search-fold.ts";
 export * from "./sourcefile.ts";
 export { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generated.ts";
 export * from "./validate.ts";
+export * from "./local-path.ts";
+export * from "./visible.ts";
