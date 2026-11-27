@@ -4,7 +4,8 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { docxDocument, inRepository, report } from "../scripts/author-date-report.ts";
+import { fileCoverage, inRepository, report } from "../scripts/author-date-report.ts";
+import { readWord } from "../packages/intake/src/index.ts";
 import { ROOT, temporary, zip } from "./helpers.ts";
 
 const run = (text: string) => `<w:r><w:t xml:space="preserve">${text}</w:t></w:r>`;
@@ -27,19 +28,13 @@ const docx = zip({
 });
 
 describe("author-date developer script", () => {
-  test("reads body, headings, notes, tables, and captions in order, and counts what it does not read", () => {
-    const { document, coverage } = docxDocument("a.docx", docx);
-    expect(document.paragraphs).toEqual([
-      { text: "Rivers", location: "body", headingLevel: 1 },
-      { text: "A claim (Adair 2017).", location: "body" },
-      { text: "See Adair (2017).", location: "footnote", note: "1" },
-      { text: "Beside it.", location: "body" },
-      { text: "(Adair 2017)", location: "table" },
-      { text: "A weir (Adair 2017).", location: "caption" },
-      { text: "References", location: "body", headingLevel: 1 },
-      { text: "Adair, J. 2017. Rivers.", location: "body" },
+  test("reads the file with the Word reader, and counts what it does not convert", () => {
+    const reading = readWord("a.docx", docx);
+    expect(reading.document.paragraphs.map((x) => [x.location, x.text])).toEqual([
+      ["body", "Rivers"], ["body", "A claim (Adair 2017)."], ["footnote", "See Adair (2017)."], ["body", "Beside it."],
+      ["table", "(Adair 2017)"], ["caption", "A weir (Adair 2017)."], ["body", "References"], ["body", "Adair, J. 2017. Rivers."],
     ]);
-    expect(coverage).toMatchObject({ comments: 1, textBoxes: 1, textBoxBracketedYears: 1, trackedDeletions: 1, unreferencedNotes: 0 });
+    expect(fileCoverage(reading)).toMatchObject({ comments: 1, textBoxes: 1, textBoxBracketedYears: 1, trackedDeletions: 1, unreferencedNotes: 0 });
   });
 
   test("the report holds the limits, counts, and items, and is the same on two runs", () => {

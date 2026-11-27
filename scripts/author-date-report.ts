@@ -1,31 +1,22 @@
-// A developer script, not a Stemma command: runs the reference-list reader and
-// the author-date matcher (CONTRACT-003 H) over local DOCX files and writes
-// what they found to a JSON file outside the repository. It reads the inputs and
-// writes only that file. It prints counts only, never the manuscript's text.
+// A developer script, not a Stemma command: runs the Word reader, the
+// reference-list reader and the author-date matcher (CONTRACT-003 F and H) over
+// local DOCX files and writes what they found to a JSON file outside the
+// repository. It reads the inputs and writes only that file. It prints counts
+// only, never the manuscript's text.
 //
 //   ./.tools/bun scripts/author-date-report.ts --out <report.json> <file.docx>...
 //
-// The report holds manuscript text. Never commit it.
-//
-// This is not the FR-71 Word reader. `COVERAGE` states what it does not read.
-import { createHash } from "node:crypto";
+// The report holds manuscript text. Never commit it. `takeover` is the command
+// that writes records; this script writes none.
 import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { type Element, find, localName, textOf, tree } from "../packages/extract/src/markup.ts";
-import { readZip } from "../packages/extract/src/zip.ts";
-import { type AuthorDateResult, type Document, type EntryFlag, type Location, matchAuthorDate, type Paragraph, yearForms } from "../packages/intake/src/index.ts";
+import { type AuthorDateResult, type EntryFlag, matchAuthorDate, readWord, WORD_COVERAGE, type WordItemKind, type WordReading, yearForms } from "../packages/intake/src/index.ts";
 
 export const COVERAGE = [
-  "Read: body text, headings, tables, footnotes, and endnotes, with insertions applied and tracked deletions and moved-from text left out.",
-  "Comments are not read, and their text is not examined. Comment counts are given per file.",
-  "Text boxes and shapes are not read. Their count and the bracketed years in them are given per file, outside the account.",
-  "Headers, footers, document properties, and image descriptions are not read.",
-  "A field's visible result is read as typed text, so citations a reference manager inserted are matched like typed ones. Field codes and embedded reference data are not read.",
-  "Symbol characters, equations, automatic list numbers, and other generated text are left out.",
-  "Hidden text is read as ordinary text.",
-  "Headings are found from paragraph styles and outline levels, and captions from a style named Caption. Other headings and captions are read as body text.",
+  ...WORD_COVERAGE,
+  "Comment text is not examined for citations. Comment counts are given per file.",
+  "A field's visible result is read as typed text, so citations a reference manager inserted are matched like typed ones.",
   "A reference list laid out as a table is not found as entries.",
-  "No Word file saved by a named tool and version has been tested against this script; its Word support is untested.",
 ];
 
 export interface FileCoverage {
@@ -42,122 +33,22 @@ export interface FileCoverage {
   missingNotes: number;
 }
 
-const SKIPPED = new Set(["w:del", "w:movefrom", "w:deltext", "w:instrtext", "w:ppr", "w:rpr", "mc:fallback", "w:txbxcontent"]);
-
-const child = (node: Element | undefined, name: string): Element | undefined =>
-  node?.children.find((c): c is Element => typeof c !== "string" && c.name === name);
-const value = (node: Element | undefined, name: string): string | undefined => child(node, name)?.attrs["w:val"];
-
 const bracketedYears = (text: string): number => (text.match(/\([^()]*\)/g) ?? []).filter((b) => yearForms(b).length > 0).length;
 
-export function docxDocument(file: string, bytes: Uint8Array): { document: Document; coverage: FileCoverage } {
-  const zip = readZip(bytes);
-  const main = zip.text("word/document.xml");
-  if (!main) throw new Error(`${file}: the DOCX has no document part`);
-  const part = (name: string) => {
-    const xml = zip.text(name);
-    return xml ? tree(xml) : undefined;
-  };
-  const root = tree(main);
-
-  const styles = new Map((part("word/styles.xml") ? find(part("word/styles.xml")!, "style") : []).map((s) => [s.attrs["w:styleid"] ?? "", s]));
-  /** The heading level and caption role a style gives, its own or from the style it is based on. */
-  const styled = (id: string | undefined): { level?: number; caption?: boolean } => {
-    for (let at = id, depth = 0; at && depth < 10; depth++) {
-      const style = styles.get(at);
-      const name = value(style, "w:name") ?? at;
-      if (/^caption$/i.test(name)) return { caption: true };
-      const heading = /^heading ?([1-9])$/i.exec(name)?.[1];
-      if (heading) return { level: Number(heading) };
-      if (/^title$/i.test(name)) return { level: 1 };
-      const outline = value(child(style, "w:ppr"), "w:outlinelvl");
-      if (outline !== undefined && Number(outline) < 9) return { level: Number(outline) + 1 };
-      at = value(style, "w:basedon");
-    }
-    return {};
-  };
-
-  const notes = (name: string, element: string) => new Map((part(name) ? find(part(name)!, element) : [])
-    .filter((e) => !e.attrs["w:type"]).map((e) => [e.attrs["w:id"] ?? "", e]));
-  const footnotes = notes("word/footnotes.xml", "footnote");
-  const endnotes = notes("word/endnotes.xml", "endnote");
-  const used = new Set<Element>();
-  let missingNotes = 0;
-  let noteNumber = 0;
-  const paragraphs: Paragraph[] = [];
-  let waiting: { element: Element; location: Location; label: string }[] = [];
-
-  const phrase = (node: Element): string => node.children.map((c) => {
-    // A text box sits inside a run; the paragraph's own text leaves it out.
-    if (typeof c === "string" || SKIPPED.has(c.name)) return "";
-    if (c.name === "w:t") return textOf(c);
-    if (c.name === "w:tab") return " ";
-    if (c.name === "w:br" || c.name === "w:cr") return c.attrs["w:type"] === "page" ? " " : "\n";
-    if (c.name === "w:nobreakhyphen") return "-";
-    if (c.name === "w:footnotereference" || c.name === "w:endnotereference") {
-      const foot = c.name === "w:footnotereference";
-      const note = (foot ? footnotes : endnotes).get(c.attrs["w:id"] ?? "");
-      if (!note) missingNotes++;
-      else {
-        used.add(note);
-        waiting.push({ element: note, location: foot ? "footnote" : "endnote", label: String(++noteNumber) });
-      }
-      return "";
-    }
-    return phrase(c);
-  }).join("");
-
-  const paragraph = (p: Element, location: Location, note?: string) => {
-    const properties = child(p, "w:ppr");
-    const style = styled(value(properties, "w:pstyle"));
-    const outline = value(properties, "w:outlinelvl");
-    const level = outline !== undefined && Number(outline) < 9 ? Number(outline) + 1 : style.level;
-    const at: Location = location === "body" && style.caption ? "caption" : location;
-    const text = phrase(p);
-    if (text.trim()) {
-      paragraphs.push({
-        text, location: at,
-        ...(at === "body" && level !== undefined ? { headingLevel: level } : {}),
-        ...(note ? { note } : {}),
-      });
-    }
-  };
-
-  const walk = (node: Element, location: Location, note?: string) => {
-    for (const c of node.children) {
-      if (typeof c === "string" || SKIPPED.has(c.name)) continue;
-      if (c.name === "w:p") {
-        paragraph(c, location, note);
-        // Each note follows the paragraph that refers to it.
-        if (note === undefined) {
-          for (const next of waiting.splice(0)) walk(next.element, next.location, next.label);
-        }
-      } else walk(c, localName(c.name) === "tbl" ? "table" : location, note);
-    }
-  };
-  walk(root, "body");
-
-  const boxes = find(root, "txbxcontent");
-  // Word writes a text box twice, once as a fallback; count the fallback copy only if it is the only one.
-  const inFallback = new Set(find(root, "fallback").flatMap((f) => find(f, "txbxcontent")));
-  const counted = boxes.filter((b) => !inFallback.has(b)).length > 0 ? boxes.filter((b) => !inFallback.has(b)) : boxes;
-  const comments = part("word/comments.xml");
-  const parts = [root, part("word/footnotes.xml"), part("word/endnotes.xml")].filter((p): p is Element => p !== undefined);
-  const count = (name: string, when: (e: Element) => boolean = () => true) => parts.reduce((n, p) => n + find(p, name).filter(when).length, 0);
+/** What the reading did not convert, as counts. */
+export function fileCoverage(reading: WordReading): FileCoverage {
+  const of = (...kinds: WordItemKind[]) => reading.items.filter((i) => kinds.includes(i.kind));
   return {
-    document: { file, paragraphs },
-    coverage: {
-      comments: comments ? find(comments, "comment").length : 0,
-      textBoxes: counted.length,
-      textBoxBracketedYears: counted.reduce((n, b) => n + find(b, "p").reduce((m, p) => m + bracketedYears(find(p, "t").map(textOf).join("")), 0), 0),
-      headerAndFooterParts: zip.names.filter((n) => /^word\/(?:header|footer)\d*\.xml$/.test(n)).length,
-      fields: count("fldsimple") + count("fldchar", (e) => e.attrs["w:fldchartype"] === "begin"),
-      trackedDeletions: count("del") + count("movefrom"),
-      symbols: count("sym"),
-      equations: count("omath"),
-      unreferencedNotes: [...footnotes.values(), ...endnotes.values()].filter((n) => !used.has(n) && textOf(n).trim()).length,
-      missingNotes,
-    },
+    comments: reading.comments.length,
+    textBoxes: of("text_box").length,
+    textBoxBracketedYears: of("text_box").reduce((n, i) => n + bracketedYears(i.text), 0),
+    headerAndFooterParts: new Set(of("header", "footer").map((i) => i.place.part)).size,
+    fields: reading.fields.length,
+    trackedDeletions: reading.revisions.filter((r) => r.kind === "deletion" || r.kind === "move_from").length,
+    symbols: of("symbol").length,
+    equations: of("equation").length,
+    unreferencedNotes: of("unreferenced_note").length,
+    missingNotes: of("missing_note").length,
   };
 }
 
@@ -179,7 +70,10 @@ export function linkedAside(result: AuthorDateResult) {
 
 /** The report: coverage limits, counts, lists, and each linked, unresolved, and unlinked item. The same inputs give the same text. */
 export function report(inputs: { file: string; bytes: Uint8Array }[]): { text: string; result: AuthorDateResult; coverage: Record<string, FileCoverage> } {
-  const read = inputs.map((i) => ({ ...docxDocument(i.file, i.bytes), sha256: createHash("sha256").update(i.bytes).digest("hex") }));
+  const read = inputs.map((i) => {
+    const reading = readWord(i.file, i.bytes);
+    return { document: reading.document, coverage: fileCoverage(reading), sha256: reading.sha256 };
+  });
   const result = matchAuthorDate(read.map((r) => r.document));
   const documents = new Map(read.map((r) => [r.document.file, r.document]));
   /** The paragraph's text just before a place, to find it by and to check it. */
