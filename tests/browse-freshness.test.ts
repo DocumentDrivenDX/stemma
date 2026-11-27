@@ -13,13 +13,14 @@ import { inputsChanged, mayShowTheSame, readProject, researchFiles, scanInputs }
 import { VERSION } from "../packages/cli/src/context.ts";
 import { Browsing, endRuns, post } from "./browse-run.ts";
 import { copyExample, ROOT, temporary } from "./helpers.ts";
+import { smallProject } from "./small-project.ts";
 
 afterAll(endRuns);
 
-function project(): string {
-  const dir = join(temporary(), "coral");
-  return copyExample(dir);
-}
+/** The small invented project: what is tested with it does not depend on what the worked example says. */
+const project = (): string => smallProject();
+/** The worked example, where a search finds many matches. */
+const example = (): string => copyExample(join(temporary(), "coral"));
 
 const filesOf = (dir: string, under: string) => (readdirSync(join(dir, under), { recursive: true }) as string[]).sort().map((f) => join(dir, under, f)).filter((f) => lstatSync(f).isFile());
 const recordOf = (dir: string, prefix: string) => filesOf(dir, "records").find((f) => f.split("/").at(-1)!.startsWith(prefix))!;
@@ -251,7 +252,7 @@ describe("US-120 search through the built command", () => {
   const ask = { text: "reef", offset: 0, limit: 200 };
 
   test("AC1, AC6: it is signed and proved like every call, bounded, and never older than the files", async () => {
-    const dir = project();
+    const dir = example();
     const one = await Browsing.start(dir);
     // `Browsing.call` fails unless the answer carries its right proof.
     const first = await one.call("/api/search", ask);

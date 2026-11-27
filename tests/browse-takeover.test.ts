@@ -18,7 +18,7 @@ describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () 
     ["with a made-up proof", (): string | undefined => "A".repeat(43)],
   ] as const)("after the page has loaded, answering 200 with plausible data %s, is not believed", async (_, proof) => {
     const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
+    const { context, page } = await watched(browser!, { clock: true });
     let other: Impostor | undefined;
     try {
       await page.goto(pathToFileURL(info.launch_file).href);
@@ -36,7 +36,7 @@ describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () 
 
   test("sending again a real answer with its real proof is not believed", async () => {
     const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
+    const { context, page } = await watched(browser!, { clock: true });
     let other: Impostor | undefined;
     try {
       const genuine: Promise<{ body: string; proof: string }>[] = [];
@@ -45,7 +45,7 @@ describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () 
       });
       await page.goto(pathToFileURL(info.launch_file).href);
       await searchBox(page).waitFor();
-      await Bun.sleep(2500);
+      await page.clock.runFor(2500);
       const secret = (await stored(page)).session["stemma.secret"]!;
       const kept = await genuine[0]!;
       expect(kept.proof).toMatch(/^[A-Za-z0-9_-]{43}$/);
@@ -60,7 +60,7 @@ describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () 
 
   test.each(["/api/session", "/api/boot"])("before the page has any data, taking the port ahead of %s, it gets nothing it can use and shows nothing", async (first) => {
     const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
+    const { context, page } = await watched(browser!, { clock: true });
     let other: Impostor | undefined;
     try {
       let release!: () => void;

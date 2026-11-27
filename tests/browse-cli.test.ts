@@ -9,14 +9,14 @@ import { dirname, join } from "node:path";
 import { browse } from "../packages/cli/src/browse.ts";
 import { alive, Browsing, childrenOf, codeIn, commandOf, endRuns, post, redeem, Run } from "./browse-run.ts";
 import { copyExample, ROOT, temporary } from "./helpers.ts";
+import { smallProject } from "./small-project.ts";
 
 afterAll(endRuns);
 
-/** The worked example, which has source files, citations and a report. */
-function project(): string {
-  const dir = join(temporary(), "coral");
-  return copyExample(dir);
-}
+/** The small invented project, which has a source file, citations and a report. */
+const project = (): string => smallProject();
+/** The worked example, which takes long enough to read to be stopped while it is read. */
+const example = (): string => copyExample(join(temporary(), "coral"));
 
 /** Every file below a directory, links not followed. */
 function filesIn(directory: string): string[] {
@@ -209,7 +209,7 @@ describe("US-119-AC9: how a run ends", () => {
   }, 60_000);
 
   test("a signal while the project is still being read ends both", async () => {
-    const run = await Run.command(["browse", "--no-open", "--project", project()]);
+    const run = await Run.command(["browse", "--no-open", "--project", example()]);
     await run.until(() => childrenOf(run.child.pid).length === 1);
     const [worker] = childrenOf(run.child.pid);
     expect(await run.stop("SIGTERM")).toBe(0);
@@ -227,14 +227,16 @@ describe("US-119-AC9: how a run ends", () => {
   }, 60_000);
 
   test("it stops after the idle time without use, and use keeps it running", async () => {
-    const one = await Browsing.start(project(), ["--idle-minutes", "0.04"]);
+    // 1.2 s without use.
+    const one = await Browsing.start(project(), ["--idle-minutes", "0.02"]);
     const [worker] = childrenOf(one.run.child.pid);
+    // Used every quarter second for 2 s, more than the idle time.
     for (let i = 0; i < 8; i++) {
-      await Bun.sleep(500);
+      await Bun.sleep(250);
       expect((await one.call("/api/status")).status).toBe(200);
     }
     // Refused calls are not use.
-    const keepTrying = setInterval(() => void post(one.info, "/api/status", {}, "wrong").catch(() => {}), 300);
+    const keepTrying = setInterval(() => void post(one.info, "/api/status", {}, "wrong").catch(() => {}), 100);
     try {
       expect(await one.run.ended(8000)).toBe(0);
     } finally {

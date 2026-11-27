@@ -35,7 +35,11 @@ export function impostor(address: string, answer: Answer): Impostor {
   return { asked, stop: () => void server.stop(true) };
 }
 
-/** The page has said it stopped, shows and keeps nothing, and asks no more. */
+/**
+ * The page has said it stopped, shows and keeps nothing, and asks no more. The
+ * page must be on Playwright's clock (`watched(browser!, { clock: true })`): its
+ * clock is moved on 4.5 s, past two of its 2-second polls, at once.
+ */
 export async function givenUp(page: Page, other: Impostor, kept: string[]) {
   await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });
   await takenDown(page);
@@ -43,7 +47,9 @@ export async function givenUp(page: Page, other: Impostor, kept: string[]) {
   expect(await page.title()).toBe("Stemma explorer");
   expect(Object.keys((await stored(page)).session)).toEqual([]);
   const so = other.asked.length;
-  await Bun.sleep(4500);
+  await page.clock.runFor(4500);
+  // Time for a request a timer began to arrive.
+  await Bun.sleep(250);
   expect(other.asked.length).toBe(so);
   // It was sent signatures, never a key.
   expect(other.asked.length).toBeGreaterThan(0);

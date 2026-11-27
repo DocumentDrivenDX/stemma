@@ -10,13 +10,14 @@ import { readProject } from "@stemma/workspace";
 import { VERSION } from "../packages/cli/src/context.ts";
 import { Browsing, childrenOf, endRuns } from "./browse-run.ts";
 import { copyExample, temporary } from "./helpers.ts";
+import { smallProject } from "./small-project.ts";
 
 afterAll(endRuns);
 
-function project(): string {
-  const dir = join(temporary(), "coral");
-  return copyExample(dir);
-}
+/** The small invented project: what is tested here does not depend on what the worked example says. */
+const project = (): string => smallProject();
+/** The worked example, which takes long enough to read again to be asked while it is. */
+const example = (): string => copyExample(join(temporary(), "coral"));
 
 const filesOf = (dir: string, under: string) => (readdirSync(join(dir, under), { recursive: true }) as string[]).sort().map((f) => join(dir, under, f)).filter((f) => lstatSync(f).isFile());
 const recordOf = (dir: string, prefix: string) => filesOf(dir, "records").find((f) => f.split("/").at(-1)!.startsWith(prefix))!;
@@ -128,7 +129,7 @@ describe("US-119-AC4 the served data is never older than the files", () => {
   }, 180_000);
 
   test("while it rebuilds, calls answer index_stale at once and status says rebuilding", async () => {
-    const dir = project();
+    const dir = example();
     const one = await Browsing.start(dir);
     writeFileSync(join(dir, "rules.md"), "# Rules\nZebra.\n");
     const states: string[] = [];

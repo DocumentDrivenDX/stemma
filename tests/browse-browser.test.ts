@@ -12,7 +12,7 @@ import { createSession, listen } from "@stemma/server";
 import { buildServed } from "../packages/explorer/build.ts";
 import { responseProof } from "./browse-http.ts";
 import { Browsing, endRuns, redeem } from "./browse-run.ts";
-import { browser, HOSTILE, launch, notice, project, retitle, searchBox, stored, takenDown, unused, watched } from "./browse-page.ts";
+import { browser, example, HOSTILE, launch, notice, project, retitle, searchBox, stored, takenDown, unused, watched } from "./browse-page.ts";
 
 afterAll(async () => {
   await browser?.close();
@@ -21,7 +21,8 @@ afterAll(async () => {
 
 describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
   test("AC1, AC3, AC4, AC6: from the launch file to the source of a citation, through a change, a reload and the server's end", async () => {
-    const dir = project();
+    // The worked example, end to end; the other tests use the small project.
+    const dir = example();
     const { run, info, code } = await unused(dir);
     const { context, page, seen } = await watched();
     try {
@@ -107,7 +108,7 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
 
   test("AC4: an answer from other data takes the page down, and so does silence once it has gone on too long", async () => {
     const { run, info } = await unused(project());
-    const { context, page } = await watched();
+    const { context, page } = await watched(browser!, { clock: true });
     try {
       await page.goto(pathToFileURL(info.launch_file).href);
       await searchBox(page).waitFor();
@@ -137,6 +138,8 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
         await held;
         await route.continue().catch(() => {});
       });
+      // Past the 8 seconds without a confirmation, on the page's clock.
+      await page.clock.runFor(9000);
       await notice(page, "Checking that this is current").waitFor({ timeout: 20_000 });
       expect(await searchBox(page).isVisible()).toBe(false);
       release();

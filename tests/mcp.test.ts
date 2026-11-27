@@ -15,7 +15,8 @@ import { childrenOf, endRuns } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
 import { endMcp, quotedData, stubOpener } from "./mcp-run.ts";
 import { AUTHOR, ACQUIRED, Book, bundleCli } from "./sources-book.ts";
-import { coral, filesIn, socketsOf, start, treeOf } from "./mcp-project.ts";
+import { filesIn, small, socketsOf, start, treeOf } from "./mcp-project.ts";
+import { SMALL_CITATION } from "./small-project.ts";
 
 bundleCli();
 afterAll(async () => {
@@ -50,7 +51,7 @@ describe("US-122-AC1 and AC2: quiet until asked, and what it says when it cannot
   }, 60_000);
 
   test("in a project, nothing is read or started until a tool needs the data", async () => {
-    const dir = coral();
+    const dir = small();
     const { host, places } = await start(dir);
     await host.initialize();
     await host.request("tools/list");
@@ -70,7 +71,7 @@ describe("US-122-AC1 and AC2: quiet until asked, and what it says when it cannot
     }, 60_000);
 
   test("a session in a subdirectory of the project has that project", async () => {
-    const dir = coral();
+    const dir = small();
     const { host } = await start(join(dir, "report"));
     await host.initialize();
     expect((await host.call("status")).data.project).toBe(dir);
@@ -78,7 +79,7 @@ describe("US-122-AC1 and AC2: quiet until asked, and what it says when it cannot
   }, 60_000);
 
   test("a project that cannot be read gives no data, says why inside the data block, and is read again at the next call", async () => {
-    const dir = coral();
+    const dir = small();
     const settings = readFileSync(join(dir, "stemma.json"), "utf8");
     writeFileSync(join(dir, "stemma.json"), "not JSON");
     const { host } = await start(dir);
@@ -149,13 +150,13 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
   }, 90_000);
 
   test("what the injected text asks for, and every other address, path, name or extra argument, is refused with nothing served or opened", async () => {
-    const dir = coral();
+    const dir = small();
     const opener = stubOpener();
     const { host, places } = await start(dir, ["--opener", opener.program]);
     await host.initialize();
     const bad = [
-      "https://example.invalid/steal", "http://127.0.0.1:1/", "file:///etc/passwd", "javascript:alert(1)", "/etc/passwd", "../stemma.json", "stemma.json", "records/citations/cit-darwinreefs0001.json",
-      "explore/stemma/Citation/cit-darwinreefs0001", "#/explore", "cit-darwinreefs0001&to=//evil", "cit-darwinreefs0001\n", "CIT-DARWINREEFS0001", "__proto__", "constructor", "toString", "-a", "$(touch ran)",
+      "https://example.invalid/steal", "http://127.0.0.1:1/", "file:///etc/passwd", "javascript:alert(1)", "/etc/passwd", "../stemma.json", "stemma.json", `records/citations/${SMALL_CITATION}.json`,
+      `explore/stemma/Citation/${SMALL_CITATION}`, "#/explore", `${SMALL_CITATION}&to=//evil`, `${SMALL_CITATION}\n`, SMALL_CITATION.toUpperCase(), "__proto__", "constructor", "toString", "-a", "$(touch ran)",
     ];
     for (const record of bad) {
       for (const tool of ["open", "source_view"]) {
@@ -165,11 +166,11 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
       }
     }
     const refused: [string, unknown][] = [
-      ["open", { record: "" }], ["open", { record: "x".repeat(129) }], ["open", { record: ["cit-darwinreefs0001"] }], ["open", { record: 1 }],
-      ["open", { address: "https://example.invalid/" }], ["open", { url: "https://example.invalid/" }], ["open", { record: "cit-darwinreefs0001", project: "/tmp" }],
+      ["open", { record: "" }], ["open", { record: "x".repeat(129) }], ["open", { record: [SMALL_CITATION] }], ["open", { record: 1 }],
+      ["open", { address: "https://example.invalid/" }], ["open", { url: "https://example.invalid/" }], ["open", { record: SMALL_CITATION, project: "/tmp" }],
       ["search", { text: "reef", project: "/" }], ["search", { text: "reef", path: "/etc" }], ["search", { text: "" }], ["search", { text: "x".repeat(201) }], ["search", { text: 5 }],
       ["search", { text: "reef", limit: 21 }], ["search", { text: "reef", limit: 0 }], ["search", { text: "reef", offset: -1 }], ["search", { text: "reef", type: 3 }],
-      ["source_view", {}], ["source_view", { record: "cit-darwinreefs0001", originals: "/" }], ["status", { project: "/" }], ["stop", { pid: 1 }],
+      ["source_view", {}], ["source_view", { record: SMALL_CITATION, originals: "/" }], ["status", { project: "/" }], ["stop", { pid: 1 }],
     ];
     for (const [tool, args] of refused) {
       const got = await host.call(tool, args);
@@ -182,7 +183,7 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
   }, 90_000);
 
   test("search takes 200 characters, counted as code points, as its message, its schema and the search itself say", async () => {
-    const { host } = await start(coral());
+    const { host } = await start(small());
     await host.initialize();
     const schema = (await host.request("tools/list")).result.tools.find((t: any) => t.name === "search").inputSchema;
     expect([schema.properties.text.maxLength, SEARCH_LIMITS.chars]).toEqual([200, 200]);
@@ -195,7 +196,7 @@ describe("US-122-AC5 and AC6: hostile arguments and hostile source text", () => 
   }, 60_000);
 
   test("lines that are not requests, and a line too long, are answered with an error and change nothing", async () => {
-    const { host } = await start(coral());
+    const { host } = await start(small());
     await host.initialize();
     for (const [line, code] of [["not json", -32700], ["[]", -32600], ['{"id":1}', -32600], [`{"jsonrpc":"2.0","id":5,"method":"ping","params":{"x":"${"y".repeat(70_000)}"}}`, -32700]] as const) {
       host.send(line);
@@ -293,7 +294,7 @@ describe("what is given for a model", () => {
   });
 
   test("at most one open in five seconds, and thirty in an hour", async () => {
-    const dir = coral();
+    const dir = small();
     const data = join(temporary(), "data");
     let at = 1_000_000;
     let windows = 0;
@@ -339,7 +340,7 @@ describe("a record's route, and a later step of open that fails", () => {
   });
 
   test("a server that the failing call started is stopped; one that was already running stays", async () => {
-    const dir = coral();
+    const dir = small();
     const data = join(temporary(), "data");
     let at = 1_000_000;
     const tools = mcpTools({ project: dir, dataDirectory: data, now: () => at, bounds: { openedMs: 0, idleMinutes: 10_000 }, open: async () => true });
@@ -349,7 +350,7 @@ describe("a record's route, and a later step of open that fails", () => {
     const failing = async () => {
       process.env.TMPDIR = join(dir, "stemma.json");
       try {
-        return await tools.call("open", { record: "cit-darwinreefs0001" });
+        return await tools.call("open", { record: SMALL_CITATION });
       } finally {
         if (was === undefined) delete process.env.TMPDIR;
         else process.env.TMPDIR = was;
@@ -448,7 +449,7 @@ describe("US-122-AC7: the lock", () => {
 
 describe("ending while a call is under way", () => {
   test("a close during open leaves no listener, lock, launch file or window, whenever it comes", async () => {
-    const dir = coral();
+    const dir = small();
     for (const after of [0, 5, 20, 100]) {
       const data = join(temporary(), "data");
       let windows = 0;

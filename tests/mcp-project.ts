@@ -1,4 +1,5 @@
-// Shared by the mcp*.test.ts files: a copy of the worked example, the shipped
+// Shared by the mcp*.test.ts files: the small project, a copy of the worked
+// example, the shipped
 // command started as a host starts it, and what it leaves behind.
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
@@ -7,6 +8,7 @@ import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { alive, shipped } from "./browse-run.ts";
 import { copyExample, temporary } from "./helpers.ts";
 import { McpHost } from "./mcp-run.ts";
+import { smallProject } from "./small-project.ts";
 
 export const filesIn = (directory: string): string[] => (!existsSync(directory) ? [] : readdirSync(directory, { withFileTypes: true }).flatMap((e) => {
   const path = join(directory, e.name);
@@ -14,10 +16,14 @@ export const filesIn = (directory: string): string[] => (!existsSync(directory) 
 }));
 export const treeOf = (directory: string) => filesIn(directory).sort().map((path) => `${path} ${createHash("sha256").update(readFileSync(path)).digest("hex")} ${lstatSync(path).mtimeMs}`);
 
+/** A copy of the worked example. */
 export function coral(): string {
   const dir = join(temporary(), "coral");
   return copyExample(dir);
 }
+
+/** The small invented project, for what does not depend on what the worked example says. */
+export const small = (): string => smallProject();
 
 /** The shipped command as the host starts it: from the plugin's directory, told the session's directory and the data directory. */
 export async function start(session: string | undefined, more: string[] = [], places = fresh()) {

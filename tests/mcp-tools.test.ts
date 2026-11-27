@@ -1,19 +1,22 @@
-// The MCP server's tools on the worked example, through the shipped command line
-// (US-122-AC3, AC4, AC7, AC8). No test opens a browser: a stub stands in for the
-// system's opener.
+// The MCP server's tools through the shipped command line, on the worked example
+// and the small project (US-122-AC3, AC4, AC7, AC8). No test opens a browser: a
+// stub stands in for the system's opener.
 import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { lockPath } from "@stemma/server";
 import { alive, childrenOf, commandOf, endRuns, post, redeem, Run } from "./browse-run.ts";
 import { endMcp, stubOpener } from "./mcp-run.ts";
-import { coral, filesIn, fresh, gone, lsof, socketsOf, start, treeOf } from "./mcp-project.ts";
+import { coral, filesIn, fresh, gone, lsof, small, socketsOf, start, treeOf } from "./mcp-project.ts";
+import { SMALL_CITATION } from "./small-project.ts";
 
 afterAll(async () => {
   await endMcp();
   await endRuns();
 });
 
+// The first test and the one stopped while the project is read use the worked
+// example; the others, which do not depend on what it says, the small project.
 describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
   test("search, source view, status, open and stop; the project is unchanged and no key is in anything the server says", async () => {
     const dir = coral();
@@ -121,7 +124,7 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
   }, 120_000);
 
   test.each(["close", "SIGINT", "SIGTERM", "SIGHUP"] as const)("when the host ends it by %s, the server, its child, the launch file and the lock go", async (how) => {
-    const dir = coral();
+    const dir = small();
     const opener = stubOpener();
     const { host, places } = await start(dir, ["--opener", opener.program]);
     await host.initialize();
@@ -148,7 +151,7 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
   }, 60_000);
 
   test("after the idle time without use the server and the data are let go, and the MCP server goes on", async () => {
-    const dir = coral();
+    const dir = small();
     const opener = stubOpener();
     const { host, places } = await start(dir, ["--opener", opener.program, "--idle-minutes", "0.04"]);
     await host.initialize();
@@ -166,7 +169,7 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
   }, 60_000);
 
   test("if the browser cannot be opened, the link is withdrawn, no file is named, and nothing is left", async () => {
-    const dir = coral();
+    const dir = small();
     const opener = stubOpener(1);
     const { host, places } = await start(dir, ["--opener", opener.program]);
     await host.initialize();
@@ -180,19 +183,19 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
   }, 60_000);
 
   test("records left out of the data are said with each search and source view", async () => {
-    const dir = coral();
+    const dir = small();
     writeFileSync(join(dir, "records/citations/cit-broken000001.json"), "not JSON");
     const { host } = await start(dir);
     await host.initialize();
     const search = await host.call("search", { text: "reef", limit: 1 });
     expect(search.data.project_warnings).toContainEqual({ code: "records_left_out", named: 1 });
     expect(search.text).toContain("say the result is incomplete");
-    expect((await host.call("source_view", { record: "cit-darwinreefs0001" })).data.project_warnings).toContainEqual({ code: "records_left_out", named: 1 });
+    expect((await host.call("source_view", { record: SMALL_CITATION })).data.project_warnings).toContainEqual({ code: "records_left_out", named: 1 });
     await host.end();
   }, 60_000);
 
   test("what changes is not answered from earlier data", async () => {
-    const dir = coral();
+    const dir = small();
     const { host } = await start(dir);
     await host.initialize();
     expect((await host.call("search", { text: "zebrawood" })).data.total).toBe(0);

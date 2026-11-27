@@ -1,5 +1,6 @@
 // Shared by the served explorer's browser tests (browse-*.test.ts): the browser,
-// a copy of the worked example, a run whose code is unused, and a watched page.
+// a small project or a copy of the worked example, a run whose code is unused,
+// and a watched page.
 // Each test file closes the browser itself: a hook registered here would run after
 // only the first file that imports this one.
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -8,6 +9,7 @@ import { type Browser, chromium, type Page } from "@playwright/test";
 import { expect } from "bun:test";
 import { codeIn, Run } from "./browse-run.ts";
 import { copyExample, temporary } from "./helpers.ts";
+import { smallProject } from "./small-project.ts";
 
 export const launch = (args: string[] = []) => chromium.launch({ args }).catch((error: unknown) => {
   if (!String(error).includes("Executable doesn't exist")) throw error;
@@ -16,10 +18,14 @@ export const launch = (args: string[] = []) => chromium.launch({ args }).catch((
 });
 export const browser: Browser | undefined = await launch();
 
-export function project(): string {
+/** A copy of the worked example, which has many source files, citations and a report. */
+export function example(): string {
   const dir = join(temporary(), "coral");
   return copyExample(dir);
 }
+
+/** The small invented project, for what does not depend on what the worked example says. */
+export const project = (): string => smallProject();
 
 export const HOSTILE = "</script><script>window.__ran=1</script><img src=x onerror=\"window.__ran=2\"> [a](https://example.invalid/m) ‮evil";
 
@@ -40,8 +46,15 @@ export async function unused(dir: string) {
   return { run, info, code: codeIn(info.launch_file) };
 }
 
-export async function watched(context = browser!) {
+/**
+ * A page in a context of its own, with what it requests, sends and logs. With
+ * `clock`, the page's timers run on Playwright's clock, which keeps time with
+ * the real one until a test moves it on with `page.clock.runFor`: a test that
+ * waits to see that the page asks nothing more need not wait for it in real time.
+ */
+export async function watched(context = browser!, { clock = false } = {}) {
   const own = await context.newContext({ viewport: { width: 1400, height: 900 } });
+  if (clock) await own.clock.install();
   const page = await own.newPage();
   const seen = { requests: [] as string[], sent: [] as string[], errors: [] as string[], dialogs: [] as string[], notFound: [] as string[] };
   own.on("response", (response) => {
