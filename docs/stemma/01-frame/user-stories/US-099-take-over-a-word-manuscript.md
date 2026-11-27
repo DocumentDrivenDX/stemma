@@ -12,7 +12,7 @@ ddx:
 # US-099: Take over a Word manuscript without changing it
 
 **Feature**: FEAT-015 — Takeover of existing projects
-**Feature Requirements**: INT-01, INT-03, INT-04, INT-05, INT-06, INT-07, INT-08, RND-08, GRF-10
+**Feature Requirements**: INT-01, INT-03, INT-04, INT-05, INT-06, INT-07, INT-08, INT-09, INT-10, RND-08, GRF-10
 **PRD Requirements**: FR-71, FR-73
 **Priority**: P0
 
@@ -44,6 +44,8 @@ The first pilot takes over one existing chapter. Support for an input is promise
 - [ ] **US-099-AC7** — Given a takeover that failed partway, when Idris looks at the project, then no partial import is presented as complete.
 - [ ] **US-099-AC8** — Given a Word manuscript, when takeover completes, then a Stemma copy exists in marked-up Markdown with citation and claim markers, and layout the markup does not define is reported.
 - [ ] **US-099-AC9** — Given an original reference list with an entry cited nowhere, when takeover runs, then every entry is listed for the bibliography, the uncited one is reported until removed or dismissed, an entry that cannot be bound goes to the author, and a missing list is stated.
+- [ ] **US-099-AC10** — Given a Word manuscript with headings, a table, and comments, when takeover runs, then headings shape the Stemma copy, the table's text is read or kept as unconverted content, and every comment is reported with its text and location.
+- [ ] **US-099-AC11** — Given a project that already holds one taken-over file, when Idris takes over another file of the same manuscript, then its chapters are added and earlier records and choices are unchanged.
 
 ## Edge Cases
 
@@ -64,12 +66,14 @@ The first pilot takes over one existing chapter. Support for an input is promise
 | Partial | US-099-AC7 | Truncated file | Take over | Named failure; no complete-looking import |
 | Markdown copy | US-099-AC8 | Synthetic file with footnotes and a text box | Take over | Markdown copy written; text box reported |
 | Reference list | US-099-AC9 | Synthetic list of 3 entries; 2 cited | Take over | 3 listed; 1 reported uncited |
+| Structure | US-099-AC10 | Synthetic file with 3 heading levels, 1 table, 2 comments | Take over | Headings kept; table text accounted for; 2 comments listed |
+| Second file | US-099-AC11 | A choice made after file 1 | Take over file 2 | File 2 added; the choice stands |
 
 ## Dependencies
 
 - **Stories**: None.
 - **Feature Spec**: FEAT-015
-- **Feature Requirements**: INT-01, INT-03, INT-04, INT-05, INT-06, INT-07, INT-08, RND-08, GRF-10
+- **Feature Requirements**: INT-01, INT-03, INT-04, INT-05, INT-06, INT-07, INT-08, INT-09, INT-10, RND-08, GRF-10
 - **PRD Requirements**: FR-71, FR-73
 - **External**: Word and reference-manager tools for real test files. Intake report surfaces belong in a Contract.
 

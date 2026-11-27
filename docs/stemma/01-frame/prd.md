@@ -118,6 +118,7 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
 | Findings without evidence, a reason they matter, and a suggested action | 0 | Report schema test and pilot review |
 | Known error classes caught by the scripted checks | Every class in FR-29 detected on a seeded test set (hypothesis until measured on real files) | Regression suite of seeded errors |
 | Pilot completion | One existing chapter taken over and checked by a pilot author (hypothesis) | Pilot study |
+| Takeover citations linked to the wrong source (FR-92) | 0 | A hand-checked answer list for synthetic files, and a private one for the pilot's chapters |
 | Time on manual citation checking | Reduced against the author's own baseline (hypothesis) | Self-reported before and after |
 | Rebuild from the project files | A clone of the project with the same tool versions gets the same scripted check results (hypothesis) | Release test on each supported system |
 | Support-check accuracy (FR-52) | False-accept and false-reject rates published; no minimum is set until they are known | A labelled set with seeded errors and a pilot-author sample, run by hand because project automation makes no paid model calls (ADR-007) |
@@ -505,10 +506,12 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 ### Subsystem: 15. Takeover of existing projects
 
-- **FR-71** (P0, M1) — Takeover reads a Word manuscript and BibLaTeX, CSL-JSON, and RIS libraries without changing the originals, recovering embedded reference-manager fields where present. Support for an input is promised only after tests on files saved by real tools pass.
+- **FR-71** (P0, M1) — Takeover reads a Word manuscript and BibLaTeX, CSL-JSON, and RIS libraries without changing the originals, recovering embedded reference-manager fields where present. A manuscript may be one Word file or several, such as one for each chapter or appendix, taken over into one project. Takeover reads body text, headings, and tables, reports every Word comment, and drops nothing silently. Support for an input is promised only after tests on files saved by real tools pass.
 - **FR-72** (P0, M1) — Takeover builds full and partial references, quotations, and claims into the graph as unverified. Typed footnotes that cannot be resolved with certainty are reported to the author. Extracted claims take effect at once, marked unreviewed (FR-23): the author reviews them when they like, in batches shown with their original passages, and can edit or retire any one. Review does not verify a claim. The whole original reference list carries forward as sources listed for the bibliography, so an entry that is cited nowhere is reported until the author removes it from the list or dismisses the finding (FR-15).
-- **FR-73** (P0, M1) — The author can work through failing references in rounds that can stop and resume, choosing to remove, repoint, or replace each one. Rounds are never required before other work. Fixes are written to a Stemma copy of the manuscript, in the Markdown of FR-35; original files are never changed. Every choice is rechecked with the records that depend on it. A claim that a removal leaves without a citation is reported.
+- **FR-73** (P0, M1) — The author can work through failing references in rounds that can stop and resume, choosing to remove, repoint, or replace each one. Rounds are never required before other work. Fixes are written to a Stemma copy of the manuscript, in the Markdown of FR-35; original files are never changed. The citation, source, quotation, page, figure, and listed-entry checks of FR-9 and FR-29 read that copy. Every choice is rechecked with the records that depend on it. A claim that a removal leaves without a citation is reported.
 - **FR-82** (P0, M2) — For a taken-over project, Stemma suggests constructs and a research methodology, each with its supporting passages. A suggestion takes effect at once, marked unreviewed, and the author can revise or retire it.
+- **FR-92** (P0, M1) — Takeover reads each reference list or bibliography in the manuscript, keeping every entry as found, and recognizes author-date citations typed as plain text. A fixed rule links a citation to an entry in the same chapter's list only when exactly one entry matches every author named, the year, and any year suffix. Otherwise the citation stays unresolved, with its candidates, for the author; a model's judgment never links one. Every parenthesis that holds a year is linked, reported as unresolved, or listed as left unlinked with its location and the reason. Linking a citation verifies nothing: checking a quotation or page still needs a copy of the cited work in the project.
+- **FR-93** (P0, M1) — The first report on a taken-over manuscript is usable at the size of a book. Findings and open takeover items with one cause, such as one source not held, claims without support, or the same reference entry repeated in several chapters' lists, are shown once with a count, the places affected, and what to do. The author can settle exact repeats of a reference entry with one choice. Takeover merges none by itself, and grouping hides no finding and changes no result.
 
 ## Acceptance Test Sketches
 
@@ -605,6 +608,10 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-72 | Carry the reference list | An original list with one uncited entry | The entry is listed and reported until removed or dismissed |
 | FR-73 | Remove a failing reference | The author removes it and stops | The claim is reported as left without a citation, and the session resumes later |
 | FR-73 | Apply a fix | A repointed reference | The Stemma copy changes; originals keep their hashes |
+| FR-71 | Take over several files | Two synthetic chapter files with headings, a table, and comments | Both are in one project; headings and table text are read; every comment is reported |
+| FR-73 | Check the copy | A taken-over chapter with a wrong quotation and an entry cited only in author-date form | The checks read the copy: the quotation fails, the entry is not reported uncited, and no check is left unrun for want of a reader |
+| FR-92 | Tell look-alikes apart | Invented citations "(Adair 2017)" and "(Adair et al. 2017)" with one solo and one co-authored entry; a citation with no entry; "(1516–1850)" | Each look-alike links to its own entry; the third is reported unresolved; the range is listed as left unlinked; no link is wrong |
+| FR-93 | Read a first report | Forty citations of one source with no copy, and one entry repeated in three chapters' lists | The missing copy is shown once with its count; one choice settles the three repeats |
 | FR-82 | Suggest constructs | A taken-over chapter | Suggestions with passages, in effect and marked unreviewed |
 
 ## Technical Context
@@ -687,6 +694,13 @@ Each requirement carries its priority and, for P0, its delivery step.
     the author may make it public again.
   - Layout in an original that the manuscript markup does not define is reported
     by takeover, not carried over silently (FR-35, FR-71).
+  - A reference list serves the chapters read from its own Word file. An entry
+    in another list or in a library is shown as a candidate and never linked
+    (FR-92).
+  - A parenthesis that takeover leaves unlinked is listed and saved but is not a
+    finding, so it does not affect the checked-clean label (FR-92).
+  - Until the question on tables is answered, citations in tables are listed as
+    left unlinked (FR-92).
 
 ### Dependencies
 
@@ -723,6 +737,8 @@ Windows, desktop apps, and files saved by real tools are untested.
 | Material whose license, permission, or community terms bar hosted processing is added to a project and sent to a model | Medium | High | Say in setup and documentation that any source in a project may be sent; local models are an unsupported experiment; rights flags do not block sending |
 | Coordinates leak through prose or misclassified records into a draft, camera-ready book, or reviewer package; the scan only warns | Medium | High | Warn with the file and place, and state that a package or book can disclose a site; the author acts on the warning |
 | A restricted site nobody marked is treated as public, so maps, exports, and packages disclose its position | Medium | High | State the default where places are recorded; the author marks restricted sites |
+| An author-date rule links a citation to the wrong entry, for example where an entry the reader could not parse is the one meant | Medium | High | Link only on one full match; leave the citation unresolved when an unparsed entry could also fit; check against hand-made answer lists |
+| A citation is read as an ordinary date and left unlinked, and a book is labelled checked clean | Medium | High | List every parenthesis with a year and its reason; state the count and this limit in the intake report; measure in the pilot |
 | Right-to-left quotations, or experimental right-to-left main text, lay out wrongly | Medium | Medium | Test pilot scripts with the footnote-marker case; promise only quotations in left-to-right books |
 | The author loses an original, so a source file can no longer be verified against it | Medium | Medium | The source file keeps the original's hash, description, and where it was obtained; checks of the text still run |
 | A repository with full source texts is published | Medium | High | Say once that anyone who can read the repository can read its source files |
@@ -735,6 +751,23 @@ Windows, desktop apps, and files saved by real tools are untested.
 - [ ] Should Stemma build in a recognition engine for image-only and paper
   originals, and which one runs on all three systems? Until then their text is
   supplied from a tool the author runs or typed; design owner.
+- [ ] Does the pilot's PDF need an author-date citation style? Only Chicago
+  notes and bibliography is guaranteed (FR-38, FR-83), and a manuscript that
+  cites in author-date form would be typeset with notes; product owner with the
+  pilot author.
+- [ ] Must takeover read reference entries that put the year near the end, or
+  will the pilot's authors change them? FR-92's design reads both layouts until
+  answered; product owner with the pilot author.
+- [ ] Should an identical entry in two chapters' lists become one source without
+  a choice? Until answered, nothing merges by itself (FR-93); product owner.
+- [ ] How are citations in tables read, when table layout arrives after the
+  pilot (FR-35)? Design owner.
+- [ ] What do an author's own bracketed working markers, such as a note to
+  verify a statement, mean? Takeover keeps them as text; should it also report
+  them, or treat them as needing a source? Product owner with the pilot author.
+- [ ] Should every check report count the parentheses left unlinked, or should
+  an unsettled one affect the checked-clean label? Until answered, only the
+  intake report and `rounds status` show them; product owner.
 - [x] Which PDF text-extraction library do the checks use? Answered by the
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a
@@ -759,6 +792,12 @@ Windows, desktop apps, and files saved by real tools are untested.
 - A pilot takes over an existing chapter, works through its references, gets the
   same scripted results after stopping and resuming, and builds a basic PDF of
   it whose label matches its report.
+- On pilot chapters chosen to exercise different citation problems, the originals
+  keep their hashes; every parenthesis with a year is linked, unresolved, or
+  listed with a reason; a hand-checked answer list shows no citation linked to
+  the wrong source; a cited work missing from its chapter's list is reported
+  unresolved; two takeovers into empty projects give the same check results; and
+  the intake report lists every comment, table, and other unconverted content.
 - The support check's false-accept and false-reject rates are published.
 - A new project completes setup, research, notes, drafting, verification, and a
   camera-ready build.

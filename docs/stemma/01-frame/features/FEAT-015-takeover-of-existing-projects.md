@@ -17,14 +17,16 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 15. Takeover of existing projects
-**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82
+**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82, FR-92, FR-93
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 Takeover brings an existing manuscript and its reference libraries into Stemma
 without changing the originals (FR-71). It builds what it finds into the
-evidence graph as unverified (FR-72) and lets the author resolve failing
+evidence graph as unverified (FR-72), links author-date citations to the
+manuscript's reference lists by fixed rules (FR-92), keeps its first report
+usable (FR-93), and lets the author resolve failing
 references in rounds, writing fixes to a Stemma copy (FR-73). With the checks and
 a basic PDF (FR-83, FEAT-008), it is the first pilot. In M2 it also suggests
 constructs and methodology (FR-82).
@@ -42,7 +44,8 @@ losing a decision.
 
 - **Current situation**: Authors have manuscripts with embedded
   reference-manager fields, typed footnotes, short forms, and separate
-  libraries. Checking a large book by hand can take manual library look-ups for
+  libraries. Some cite only in plain typed author-date form, with a reference
+  list in each chapter and no reference-manager data at all. Checking a large book by hand can take manual library look-ups for
   hundreds of entries.
 - **Pain points**: Adopting a new method means starting over. A tool that
   guesses what a short form means can attach a claim to the wrong source.
@@ -56,6 +59,9 @@ losing a decision.
 |------|----------------------|------------------------|
 | Intake | What did Stemma read from my files? | Non-destructive reading with a stated support level per input |
 | Unverified graph | What does my manuscript rest on? | References, quotations, and claims as unverified records |
+| Author-date citations | Which entry does each citation mean? | Reference lists, citation recognition, rule-based linking, and an account of every parenthesis with a year |
+| Stemma copy | Do checks see what I cite? | Markers that keep each citation as typed, and checks that read them |
+| First report | Where do I start? | Grouped findings and one choice for exact repeats |
 | Resolution rounds | What do I do about each failure? | Author choices, rechecks, and resumable progress |
 | Suggestions (M2) | What concepts and method does my work already use? | Suggestions with supporting passages, unreviewed until the author looks |
 
@@ -70,6 +76,11 @@ These objects differ:
 | Full or partial reference | A recovered reference with all, or only some, identifying data |
 | Round | One working pass through failing references |
 | Choice | The author's decision to remove, repoint, or replace one reference |
+| Reference list | A list of works under a references or bibliography heading in a Word file |
+| Linked citation | An author-date citation that a fixed rule matched to exactly one list entry; not a verified one |
+| Unresolved citation | Text read as a citation that no entry, or more than one, matches; it stays open |
+| Left unlinked | A parenthesis with a year that takeover did not read as a citation, listed with its reason |
+| Exact repeat | Reference entries whose text as found is identical |
 
 ## Task Model
 
@@ -81,7 +92,9 @@ N/A — the user stories name the tasks.
 
 #### Intake (FR-71)
 
-- INT-01. Takeover must read a Word manuscript.
+- INT-01. Takeover must read a Word manuscript, including its body text,
+  headings, and tables. Word heading styles must guide the structure of the
+  Stemma copy.
 - INT-02. Takeover must read BibLaTeX libraries, CSL-JSON (Citation Style
   Language data) libraries, and RIS (a tagged reference format) libraries.
 - INT-03. Takeover must leave every original unchanged.
@@ -96,6 +109,10 @@ N/A — the user stories name the tasks.
   as data and never as instructions.
 - INT-08. A damaged or unreadable input must produce a named failure and must not
   leave a partial import presented as complete.
+- INT-09. A manuscript may be several Word files, such as one for each chapter
+  or appendix. Taking over a further file into the same project must add to it
+  and must keep earlier records and choices.
+- INT-10. Takeover must report every Word comment with its text and location.
 
 #### Unverified graph (FR-72)
 
@@ -124,6 +141,48 @@ N/A — the user stories name the tasks.
   reported until the author removes it or dismisses the finding (FR-15). An
   entry it cannot bind with certainty must go to the author, and the report must
   say when no list was found.
+
+#### Reference lists and author-date citations (FR-92)
+
+- ADC-01. Takeover must find each reference list or bibliography section by its
+  heading.
+- ADC-02. For each entry it must read the authors, the year, and any year
+  suffix, whether the year follows the authors or stands near the end of the
+  entry, and must keep the entry as found. An entry it cannot read must be
+  listed.
+- ADC-03. Takeover must find author-date citations in body text and notes,
+  including groups separated by semicolons, several years for one author, and
+  narrative forms such as "Smith (1999)".
+- ADC-04. Lead-ins such as "cf.", "see", and "based on" must be kept as
+  prefixes, and page numbers and page ranges as typed page locators.
+- ADC-05. A citation must be matched first against its own chapter's list, on
+  every author named, the year, and any suffix. A form with "et al." and a form
+  naming one author are different citations.
+- ADC-06. Takeover must link a citation only when exactly one entry matches.
+  Otherwise it must report it as unresolved, with the candidates, for the
+  author. A model's judgment must never link a citation.
+- ADC-07. A range of dates must not become a citation.
+- ADC-08. Every parenthesis that holds a year must be linked, reported as
+  unresolved, or listed as left unlinked with its location and the reason. The
+  list must stay in the project files.
+
+#### Stemma copy and checks (FR-73, FR-92)
+
+- CPY-01. The Stemma copy must write each citation read from author-date text as
+  a citation marker with its page locator and prefix, and the project must keep
+  each one's original text and position.
+- CPY-02. The citation-key, held-source, quotation, page, figure, and
+  uncited-entry checks must read the Stemma copy. A listed entry that a linked
+  citation names must not be reported as uncited.
+
+#### First report (FR-93)
+
+- RPT-01. The takeover report and the first check report must show findings and
+  open takeover items that share a cause once, with a count, the places affected,
+  and a next step.
+- RPT-02. The author must be able to settle every exact repeat of a reference
+  entry with one choice. Takeover must not merge repeats by itself.
+- RPT-03. Grouping must not hide a finding or change a result.
 
 #### Resolution rounds (FR-73)
 
@@ -160,7 +219,10 @@ N/A — the user stories name the tasks.
   the same tool versions differ in 0 scripted check results. Stopping and
   resuming changes 0 scripted results for unchanged records.
 - **Recovery accuracy**: On each supported input's seeded real-file test set,
-  takeover reports 0 uncertain footnotes as resolved to a wrong source.
+  takeover reports 0 uncertain footnotes as resolved to a wrong source. On a
+  hand-checked answer list, it links 0 author-date citations to a wrong entry.
+- **Accounting**: 100% of the parentheses that hold a year in a seeded
+  manuscript are linked, unresolved, or listed with a reason.
 - **Security**: A seeded hostile input causes 0 executed code, 0 writes outside
   the project, and 0 actions taken from instructions in its text.
 - **Offline**: Intake and rechecks that use saved data run with no network.
@@ -176,6 +238,8 @@ N/A — the user stories name the tasks.
 - [US-102 — Remove, repoint, or replace a failing reference](../user-stories/US-102-remove-repoint-or-replace.md)
 - [US-103 — Stop and resume resolution rounds](../user-stories/US-103-stop-and-resume-rounds.md)
 - [US-106 — Review suggested constructs and methodology](../user-stories/US-106-review-suggested-constructs.md)
+- [US-113 — Link author-date citations to the chapter's reference list](../user-stories/US-113-link-author-date-citations.md)
+- [US-114 — Work through a usable first report](../user-stories/US-114-use-the-first-report.md)
 
 ## Edge Cases and Error Handling
 
@@ -191,6 +255,14 @@ N/A — the user stories name the tasks.
   does not apply it silently.
 - **Manuscript with no footnotes or fields**: Takeover reports what it found,
   including that it found no references; this is not a pass.
+- **Chapter with no reference list**: Its author-date citations are unresolved,
+  and the report says no list was found.
+- **Solo and co-authored works by one name in one year**: Each citation form
+  matches only an entry with those authors.
+- **An unread entry that could be the one cited**: The citation stays
+  unresolved even when another entry matches.
+- **Citation inside a table**: Until the open question is answered, it is listed
+  as left unlinked with that reason.
 
 ## Success Metrics
 
@@ -203,6 +275,17 @@ N/A — the user stories name the tasks.
   CONTRACT-006 (ADR-009).
 - **Risk**: after a reference is removed, the claim it supported can stand
   without a source in a finished book; the report is the only warning.
+- The pilot build order is: Word reader; reference-list reader; author-date
+  recognition and linking; Stemma copy and its reader; checks that read the
+  copy; usable first report. Later steps depend on earlier ones.
+- Reading is not verifying: linking a citation says which entry it names.
+  Checking its quotation or page still needs a copy of the cited work.
+- The repository is public. Tests copy the patterns found in real manuscripts
+  using invented text. Runs on an author's own chapters, and their answer lists,
+  stay private and are not committed.
+- Pilot acceptance starts with a few chapters chosen to exercise different
+  problems: a cited work missing from its list, a second reference-entry layout,
+  and look-alike citations.
 - Delivery step M1. Takeover uses record files and a disposable index; it does
   not wait for the graph engine or explorer.
 - Library round trips are FEAT-003 behavior (FR-13). Governing records for a
@@ -220,6 +303,11 @@ N/A — the user stories name the tasks.
   footnotes it resolved 9 of 10 resolvable ibid. and short forms with none
   wrong. It did not notice German "a.a.O." forms or author-date citations. The
   same agent wrote fixtures and code.
+- **Unverified**: A throwaway script, not Stemma, was run on one private set of
+  drafts that cite in author-date form. Matching only the first author's family
+  name and the first year against each file's own list, it found exactly one
+  entry for most of the parts it could read as author and year. No match was
+  checked for correctness, and narrative and other forms were not counted.
 - **Unverified**: Field formats for other reference managers come from research
   reading and were not tested.
 
@@ -230,7 +318,8 @@ N/A — the user stories name the tasks.
   FEAT-010 provides the takeover mode; FEAT-011 stores the records.
 - **External services**: The tools that save the authors' manuscripts and
   libraries. Record, report, and command surfaces belong in Contracts.
-- **PRD requirements**: FR-71, FR-72, FR-73 (P0, M1); FR-82 (P0, M2).
+- **PRD requirements**: FR-71, FR-72, FR-73, FR-92, FR-93 (P0, M1); FR-82
+  (P0, M2).
 
 ## Out of Scope
 
@@ -245,4 +334,9 @@ N/A — the user stories name the tasks.
 
 - [ ] Which producing tools and versions must the pilot's inputs cover? Blocks
   INT-05 test sets; product owner with the pilot author.
+- [ ] Are the pilot author's current files structured like the earlier copies the
+  author-date rules were drawn from? Product owner with the pilot author.
+- [ ] The PRD's open questions on tables, the second reference-entry layout,
+  repeated entries, working markers, left-unlinked parentheses, and the pilot
+  PDF's citation style apply to this feature.
 

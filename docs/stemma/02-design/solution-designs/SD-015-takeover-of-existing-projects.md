@@ -35,10 +35,23 @@ ddx:
 
 ## Scope
 
-- Covers Word intake, the Stemma copy, the unverified graph, and resolution rounds (FR-71 to FR-73), then construct and methodology suggestions (FR-82).
+- Covers Word intake, the Stemma copy, the unverified graph, and resolution rounds (FR-71 to FR-73), reference lists and author-date linking (FR-92), the usable first report (FR-93), then construct and methodology suggestions (FR-82).
 - **Pilot (M1)**: everything except suggestions (**M2**). The pilot's basic PDF is SD-008.
 - Depends on SD-003 (library codecs, source records), SD-005 (review service), SD-007 (checks, annotations), and the CONTRACT-006 reader and edits. SD-002 captures sources. A project must be initialized first, which the takeover mode does when needed (SD-001).
 - CONTRACT-003 owns intake behavior and reports; CONTRACT-006 F owns takeover output and edits; CONTRACT-002 owns commands.
+
+## Build Order
+
+Each step depends on the ones before it. All are in the pilot.
+
+| Order | Step | Requirements | Design status |
+|---|---|---|---|
+| 1 | Word reader | FR-71 | Designed; not built |
+| 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Designed here; untested |
+| 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Designed here; untested |
+| 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Designed; not built |
+| 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | Designed; no version reads the copy yet |
+| 6 | Usable first report | FR-93 | Designed here; usability unmeasured |
 
 ## Requirements Mapping
 
@@ -49,6 +62,11 @@ ddx:
 | INT-01, INT-03, INT-04, INT-07, INT-08 (FR-71) | Bounded read-only Word reader; staged import | Word reader, Import coordinator | P0 / M1 pilot |
 | INT-02 (FR-71) | BibLaTeX, CSL-JSON, RIS intake | SD-003 codecs, Import coordinator | P0 / M1 pilot |
 | INT-05, INT-06 (FR-71) | Support levels and nothing dropped silently | Intake report | P0 / M1 pilot |
+| INT-09, INT-10 (FR-71) | Several files in one project; every comment reported | Word reader, Import coordinator | P0 / M1 pilot |
+| ADC-01, ADC-02 (FR-92) | Reference lists read in two entry layouts, kept as found | Reference-list reader | P0 / M1 pilot |
+| ADC-03 to ADC-08 (FR-92) | Rule-based recognition, one-match linking, full account | Author-date matcher | P0 / M1 pilot |
+| CPY-01, CPY-02 (FR-73, FR-92) | Markers that keep the typed text; checks over the copy | Manuscript writer, SD-007 engine | P0 / M1 pilot |
+| RPT-01 to RPT-03 (FR-93) | Grouped report; one choice for exact repeats | Intake report, SD-007 report, Rounds | P0 / M1 pilot |
 | GRF-01 to GRF-07 (FR-72) | Records with origins; deterministic binding only | Graph builder, Reference resolver | P0 / M1 pilot |
 | GRF-08 to GRF-10 (FR-72) | Unreviewed claims in effect, optional batch review, reference-list carry-forward | Graph builder, SD-005 review service | P0 / M1 pilot |
 | RND-01 to RND-04, RND-06, RND-07, RND-09 (FR-73) | Computed worklist and atomic choices | Rounds | P0 / M1 pilot |
@@ -126,6 +144,15 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1510** — Ibid.: `ibid.` or `Ibid.` binds only when the immediately preceding note in document order holds exactly one citation, that citation is bound, and the note has no unread reference-like text. A stated locator is taken from this note; otherwise the locator stays absent (assumption).
 - **BR-1511** — Everything else, including `a.a.O.`, `ebd.`, `op. cit.`, cross-note references, and any note the reader cannot classify, becomes an ambiguous or unclassified intake item with candidates where found. Model judgment never binds.
 
+**Reference lists and author-date citations** (the profile is CONTRACT-003 H)
+
+- **BR-1521** — List reading: every paragraph of a detected list is an entry, read or unread, kept as found and carried forward by BR-1520. A list serves only the chapters of its own file.
+- **BR-1522** — One match: an author-date citation links only when exactly one read entry in its chapter's list has the same authors, year, and suffix, and no unread entry could be the one meant. `et al.` forms and single-author forms never match each other's entries. Other lists and libraries supply candidates only. This is an exception to BR-1511 for author-date forms: the matched thing is a list entry, and the source follows from that entry's own binding.
+- **BR-1523** — Account: every bracketed year outside a list ends as linked, unresolved, or left unlinked with a reason. An unknown shape is left unlinked, never skipped. The intake check that the counts add up fails the import if they do not.
+- **BR-1524** — Whole brackets: a parenthesis becomes markup only when every part is a citation form, so the writer never has to split the author's text. Otherwise it stays as typed and is listed.
+- **BR-1525** — Following a binding: when the author binds a list entry to another source, its linked citations move with it in the same write.
+- **BR-1526** — Exact repeats: open reference-entry items with identical `as_found` strings form a group, computed on each call. Intake merges none. One author choice may apply to the group, atomically, with a choice record for each item. A repeat added later is open until the author includes it.
+
 **Claims and quotations**
 
 - **BR-1512** — Claims: each body or note sentence that carries a citation yields one claim, unreviewed and in effect, whose text is the sentence, with its origin, and a claim span in the copy (assumption). No confidence, reason, or evidence is invented, so each is reported incomplete and without support until those exist. A model may add rewordings or further claims, also unreviewed.
@@ -133,13 +160,13 @@ Shapes are CONTRACT-001. There is no round or session entity.
 
 **Rounds**
 
-- **BR-1514** — Worklist: open findings on citations, quotations, and listed entries from a current check, plus intake items without an applicable choice. It is recomputed on each call and is never required before other work.
+- **BR-1514** — Worklist: open findings on citations, quotations, and listed entries from a current check, plus intake items without an applicable choice, except `year_parenthesis` items, which are counted and listed on request. It is recomputed on each call and is never required before other work.
 - **BR-1515** — One choice, one write: the effect on records and manuscript is staged, rechecked on the staged graph, and committed together with its `round_choice` and recheck. An interrupted choice is completed or rolled back at the next command.
-- **BR-1516** — Actions: `remove` takes the occurrence out of the text and retires its record. `repoint` binds it to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place, recording both (assumption on the line between the last two). `bind` settles an intake item by binding it to one of its candidates; `close` settles one that needs no citation and changes no finding (CONTRACT-002 B).
+- **BR-1516** — Actions: `remove` takes the occurrence out of the text and retires its record. `repoint` binds it to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place, recording both (assumption on the line between the last two). `bind` settles an intake item by binding it to one of its candidates; `close` settles one that needs no citation and changes no finding. `restore_text` returns to plain text an occurrence that was wrongly read as a citation (CONTRACT-002 B).
 - **BR-1517** — The command takes the author's action and target. It records no annotation, edits no result, and captures no source.
 - **BR-1518** — Removal visibility: a claim left without a citation is reported by `takeover.removal` on every later check and build until it is cited again, rewritten, retired, or dismissed.
 - **BR-1519** — Reruns: identical bytes write nothing unless the author passes `--again` (CONTRACT-002 B). A changed original becomes an `original_changed` item and is not applied. No rerun overwrites a choice or an edit in the Stemma copy; a rerun with `--again` follows the same rule (assumption).
-- **BR-1520** — Reference list: every entry of a reference list or bibliography section found in the manuscript is bound by the BR-1507 and BR-1508 rules or becomes a provisional source with an intake item, and is added to `bibliography_include` (CONTRACT-003 F). The list is not copied into the chapter files. The report states the count or that no list was found; how a list is detected is a rule to test on real files.
+- **BR-1520** — Reference list: every entry of a reference list or bibliography section found in the manuscript is bound by the BR-1507 and BR-1508 rules or becomes a provisional source with an intake item, and is added to `bibliography_include` (CONTRACT-003 F). The list is not copied into the chapter files. The report states the count or that no list was found; lists are detected by CONTRACT-003 H, a rule to test on real files.
 
 BR numbers for this feature start at 1501 so that designs written in parallel cannot collide.
 
@@ -171,22 +198,34 @@ These starting caps meet CONTRACT-003 G. They are design assumptions to test aga
 - **Requirements Addressed**: GRF-04, GRF-05, GRF-06.
 - **Owned by TDs**: US-101.
 
+### Component: Reference-list reader (`packages/intake`) — M1
+- **Purpose**: Find each file's lists and read entries.
+- **Responsibilities**: BR-1520, BR-1521.
+- **Requirements Addressed**: ADC-01, ADC-02, GRF-10.
+- **Owned by TDs**: US-113.
+
+### Component: Author-date matcher (`packages/intake`) — M1
+- **Purpose**: Find bracketed years, read citation forms, link or explain each.
+- **Responsibilities**: BR-1522 to BR-1524. Pure functions over the reader's neutral document and the list entries, so that the profile can be tested without Word files.
+- **Requirements Addressed**: ADC-03 to ADC-08.
+- **Owned by TDs**: US-113.
+
 ### Component: Graph builder and import coordinator (`packages/intake` using `core` ports) — M1
 - **Purpose**: Create records, intake items, the report, and record the originals' digests.
-- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519.
-- **Requirements Addressed**: INT-02, INT-03, INT-05, GRF-01 to GRF-03, GRF-07, GRF-08.
+- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519; the intake report's groups.
+- **Requirements Addressed**: INT-02, INT-03, INT-05, INT-09, INT-10, GRF-01 to GRF-03, GRF-07, GRF-08, RPT-01, RPT-03.
 - **Interfaces**: `takeover` and `import` (CONTRACT-002 B); outputs per CONTRACT-003 F.
 
 ### Component: Manuscript writer (`packages/manuscript`) — M1
 - **Purpose**: Write chapter files and apply span edits.
 - **Responsibilities**: Chapter division with its stated basis, escaping, markers, unconverted blocks. Output must parse under the same reader that checks use, or the import fails.
-- **Requirements Addressed**: RND-08, INT-06.
+- **Requirements Addressed**: RND-08, INT-06, CPY-01.
 - **Interfaces**: CONTRACT-006 C, E, F; `ManuscriptRepository` port.
 
 ### Component: Rounds (`packages/core`) — M1
 - **Purpose**: List remaining work and apply choices.
-- **Responsibilities**: BR-1514 to BR-1518; uses SD-007 engine for rechecks.
-- **Requirements Addressed**: RND-01 to RND-04, RND-06, RND-07, RND-09.
+- **Responsibilities**: BR-1514 to BR-1518, BR-1525, BR-1526; uses SD-007 engine for rechecks.
+- **Requirements Addressed**: RND-01 to RND-04, RND-06, RND-07, RND-09, RPT-02.
 - **Interfaces**: `rounds status`, `rounds choose`.
 - **Owned by TDs**: US-102, US-103.
 
@@ -203,6 +242,9 @@ graph TD
     Mode["takeover mode"] --> CLI["command line"]
     CLI --> Coord["import coordinator"]
     Coord --> Word["Word reader"]
+    Coord --> Lists["reference-list reader"]
+    Coord --> Dates["author-date matcher"]
+    Dates --> Lists
     Coord --> Codecs["library codecs, SD-003"]
     Coord --> Resolve["reference resolver"]
     Coord --> Writer["manuscript writer"]
@@ -233,6 +275,16 @@ graph TD
 | INT-06 | Word reader, writer | BR-1502 | Seeded text box, comment, unknown element, deleted text |
 | INT-07 | Word reader | Limits; text as data | Hostile fixtures: path escape, expansion, XML entities, instruction text |
 | INT-08 | Coordinator | BR-1501 | Corrupt, encrypted, and interrupted imports leave no records |
+| INT-09 | Coordinator | BR-1519 | Second file after a choice; the choice stands |
+| INT-10 | Word reader | BR-1502 | Seeded comments all listed with text and position |
+| ADC-01, ADC-02 | Reference-list reader | BR-1521 | Invented lists in both layouts, with an unread entry and a file with no list |
+| ADC-03, ADC-04, ADC-07 | Author-date matcher | CONTRACT-003 H forms | One invented case per form, lead-in, locator, and date range |
+| ADC-05, ADC-06 | Author-date matcher | BR-1522 | Hand-made answer list with solo and co-authored look-alikes, a missing entry, and an unread one: zero wrong links; two runs identical |
+| ADC-08 | Author-date matcher | BR-1523, BR-1524 | Seeded count equals linked plus unresolved plus left unlinked |
+| CPY-01 | Manuscript writer | CONTRACT-006 F | Round trip through the reader keeps items; records keep text and position |
+| CPY-02 | SD-007 engine | CONTRACT-002 C | After takeover no listed check is unrun for want of a reader; a cited entry is not uncited |
+| RPT-01, RPT-03 | Intake report, SD-007 report | CONTRACT-002 C | Grouped and flat views hold the same findings |
+| RPT-02 | Rounds | BR-1525, BR-1526 | One choice over three repeats; an injected failure writes nothing |
 | GRF-01 to GRF-03 | Graph builder | Origins on every record | Fixture inventory against created records |
 | GRF-04, GRF-05 | Reference resolver | BR-1507 to BR-1511 | Seeded footnote set with zero wrong bindings; two runs bind identically |
 | GRF-06 | Graph builder | BR-1506 | Partial reference keeps absent fields |
@@ -254,15 +306,18 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 
 ### Gaps
 
-- [ ] **Undetected references are never checked.** Author-date citations in body text, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text. No check covers them. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
+- [ ] **Some references are never checked.** Author-date citations in brackets that hold a year are now accounted for (BR-1523): unresolved ones are open findings, but left-unlinked ones are only listed. Citations with no bracketed year, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text with no listing or check beyond the notes. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
 - [ ] **Takeover starts with a long report.** Every extracted claim is unreviewed, incomplete, and unsupported at first. Grouping and clear next steps must keep the report usable; the pilot must measure it.
-- [ ] How a reference list is detected in a Word file is untested.
+- [ ] How a reference list is detected in a Word file is untested, as is the whole author-date profile.
+- [ ] Citations in tables are listed, not read, until the markup can carry them (PRD open question).
+- [ ] Whether check reports should count left-unlinked parentheses is open (PRD).
+- [ ] The pilot PDF formats Chicago notes; a manuscript that cites in author-date form may need another style (PRD open question; SD-008).
 - [ ] The producing tools and versions the pilot must cover are open (FEAT-015).
 
 ## Concern Alignment
 
 - **Concerns used**: `security-owasp`, `citation-integrity`, `deterministic-checks`, `honest-assurance`, `hexagonal-architecture`, `plain-file-graph`, `rights-and-permissions`, `cross-platform`, `testing`.
-- **Constraints honored**: Legacy values preserved; originals never written; tests use synthetic or openly licensed files, and real-tool files must meet that rule.
+- **Constraints honored**: Legacy values preserved; originals never written; tests use synthetic or openly licensed files, and real-tool files must meet that rule. Author-date tests copy real patterns with invented text; an author's chapters and their answer lists are never committed.
 - **ADRs referenced**: ADR-002, ADR-009; ADR-007 for local and release-tag tests.
 - **Departures**: None.
 
@@ -278,6 +333,8 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 |---|---|---|---|
 | Real Word, Zotero, Mendeley, or EndNote files differ from fixtures | H | H | Get real saved files first; label each variant untested until passed |
 | A rule binds a footnote to the wrong source | M | H | One-candidate rules; seeded set; show the rule used |
+| A rule links an author-date citation to the wrong entry | M | H | One full match; unread entries block a link; hand-checked answer list |
+| Real reference lists use layouts the reader cannot parse | H | H | Keep and list unread entries; citations that could name them stay unresolved; measure on pilot chapters |
 | German, author-date, or non-Latin notes go unrecognized | H | H | Report counts and limits; author review |
 | Markup cannot carry the pilot chapter's structure | M | H | Unconverted blocks and lost-style report; revise CONTRACT-006 |
 | Hundreds of incomplete and unsupported findings on extracted claims overwhelm the author | H | H | Group by cause; optional batch review; measure in the pilot |
