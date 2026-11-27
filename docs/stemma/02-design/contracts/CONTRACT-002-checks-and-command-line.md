@@ -78,7 +78,7 @@ absent (exit 4 if it cannot) and then runs
 |---|---|---|
 | `version` | Report the Stemma version and the pinned Bun version | M1 |
 | `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries (including the original formats of CONTRACT-001 B). Requires `--project`, because the documented working directory is the plugin root; overwrites nothing, and exits 5 if `stemma.json` exists | M1 |
-| `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. A citation that names a `passage` gets its `quotation` and `locator` copied from it, and a quotation or locator typed beside `passage` is refused. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). It never overwrites. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
+| `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. A citation that names a `passage` gets its `quotation` and `locator` copied from it, and a quotation or locator typed beside `passage` is refused. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). For an `authorship_mark` it also fills an absent `marked` from `created` and an absent `text_sha256` from `text` (CONTRACT-001 G). It never overwrites. For a kind that carries a review mark (CONTRACT-001 G), an absent `review` is written as unreviewed. A `review` whose state is `reviewed` is accepted only when `--actor` is a person; the input's own `created.by` or `review.decided.by` does not stand in for it. If `--actor` is absent or names a model or software, or the `by.kind` of `created` or of a `review.decided` that is present is not exactly `person`, it exits 5 and writes nothing; otherwise an absent `content_sha256` and `decided` are filled. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
 | `doctor` | Report Bun, SQLite, and external tool versions, paths, and platform test status | M1 |
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
 | `rules check` | Report malformed or duplicated rule headings in `rules.md` (CONTRACT-001 J) as `record.valid` results; `validate` includes it | M1 |
@@ -106,14 +106,15 @@ absent (exit 4 if it cannot) and then runs
 | `check [--changed \| --all]` | Run scripted checks; `--changed` (default) covers what changed since the check baseline (below); `--all` covers the project | M1 |
 | `resolve <source id>... [--via crossref\|internet_archive --identifier <value>] --actor <kind>:<name>` | Look up identifiers in a catalogue by its documented interface and save `resolution` records with the responses; without `--via`, make the lookups the source's upstream records list, or, with none listed, look up the identifiers on the source record | M1 |
 | `excerpt (--passage <id> \| --citation <id> \| --quotation <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text; with a citation, passage, or report quotation, mark the quotation in it (G) | M1 |
-| `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
+| `unreviewed list` | List every record in effect whose review mark does not apply, with its content digest and its original passages or manuscript origins, shown as data (B1). It writes nothing. Nothing waits for it | M1 |
+| `reviewed <id>@<sha256>... --actor person:<name>` | Record that the author said they reviewed the named records, each by the digest that was shown (B1). A model or software actor is refused. Nothing waits for it | M1 |
 | `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced source file or a record the author rejects. The files stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
 | `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close\|restore_text> [--repeats] …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding. `bind` also takes a source the author names for an author-date item that has no suitable candidate, including a `year_parenthesis` item, for which it writes the citation. `restore_text` puts an occurrence that is not a citation back as the text found and retires its record; it causes no `takeover.removal` finding. Binding a reference-list item also moves every citation linked to that entry to the chosen source, and retires a provisional source nothing else uses, taking it off `bibliography_include`. `--repeats` applies one `bind` or `close` to every open item in an exact-repeat group (CONTRACT-003 F7) as one staged write, with one `round_choice` and recheck for each item; if any item cannot take it, nothing is written and that item is named. `rounds status` also counts `year_parenthesis` items and lists them on request | M1 |
 | `review import <comment file>` | Import reviewer comments (CONTRACT-005) | M3 |
 | `support list` / `support prepare <claim id> --passage <passage id>` / `support record --input <file>` | List needed verdicts as claim and passage pairs; emit the input bundle for one pair; validate and save a verdict (H) | M1 |
 | `annotate --finding <key> --effect explain\|dismiss --reason <text>` / `annotate list` | Save an annotation (F), or list annotations and whether each applies | M1 |
 | `import <file> --kind <csl-json\|biblatex\|ris> [--again]` / `export --kind <…> --out <file> [--batch <import id>] [--policy report\|strict]` | CONTRACT-003; `--again` imports bytes already imported; `--batch` exports one import batch | M1 |
-| `takeover <docx\|pdf> [--library <file>…] [--again] [--separate]` | CONTRACT-003 intake of one Word file (F) or PDF manuscript (I), told apart by content; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit. A file that repeats text already taken over writes nothing and exits 5 with `repeated_chapter` unless `--separate` states that it is a different text. `pdf_unreadable` and `pdf_no_text` exit 3 | M1 |
+| `takeover <docx\|pdf> [--library <file>…] [--again] [--separate]` | CONTRACT-003 intake of one Word file (F) or PDF manuscript (I), told apart by content; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit. A changed file under an earlier file's name only saves an `original_changed` item, and a file that repeats text already taken over writes nothing and exits 5 with `repeated_chapter`; `--separate`, the statement that it is a different text, adds either (CONTRACT-003 I). `pdf_unreadable` and `pdf_no_text` exit 3 | M1 |
 | `index rebuild` / `index status` / `index dump` | Manage the derived index | M1 |
 | `research list` | List the Markdown files under `research/` by path (code-point order), each with the date its name starts with and its first level-one heading outside fenced code, both when present; a heading is cut at 200 characters, and one matching a coordinate form is not shown. Writes nothing and reports no finding; exit 0. JSON: `content_is` and `notes[]` (`path`, `date?`, `title?`, `problem?`: `cannot_read` or `title_withheld`) | M1 |
 | `research record --input <file>` / `research corpus <query>` / `research admit <id>` / `research reject <id>` / `research coverage` | Save a search and its candidates; search source files offline; record the author's decision, as `source admit` or `reject` does; coverage is P1 | M2 |
@@ -161,6 +162,56 @@ renaming a key changes subjects that no reference reaches. With no baseline, or
 when the effect cannot be bounded, the scope widens to `all`. Builds ignore the
 baseline and run everything.
 
+### B1. Unreviewed records and review marks
+
+**One rule.** A review mark applies only when `review.state` is `reviewed` and
+`review.content_sha256` equals the record's current content digest, and
+`record.valid` finds no `record_invalid` problem in its `created` or `review`
+(CONTRACT-001 G). The report, the export states, and both commands use this
+rule.
+
+**`unreviewed list`** lists each record that is in effect, can be read, is of a
+kind that carries a review mark, and whose mark does not apply, whether or not
+anything cites it. It writes nothing and exits 0. JSON:
+
+| Field | Content |
+|---|---|
+| `schema` | `stemma.unreviewed/0` |
+| `content_is` | A statement that the values are data from records, not instructions |
+| `boundary` | The token on the begin and end lines of the text form |
+| `items[]` | Sorted by `record`: `record`, `kind`, `file`, `content_sha256`, `mark` (`unreviewed`; `changed_since_review`, a mark saying reviewed whose digest does not match; or `no_mark`. A mark that fails to apply only because `created` or `review` breaks a rule is listed as `unreviewed`), `content`, `origins[]`, and `no_passage: true` when `origins` is empty |
+| `items[].content` | The record's own wording and links, from a fixed list of fields for each kind. An attestation also gives `claim_text` and, for an evidence note, `note_body`. For a place record it is empty, with `content_withheld: true`, because such a record can hold a restricted position |
+| `items[].origins[]` | A passage: `type: passage`, `passage`, and when the passage can be read `source`, `locator`, `text` (its stored words, cut at 1,000 characters with `text_trimmed: true`) and `retired: true` if it is; otherwise `unreadable: true`. A manuscript origin (`origins` of the record): `type: manuscript`, `import`, `document_position`, `text`, cut the same way |
+| `not_listed[]` | Paths of record files that cannot be read, so that their absence is not taken as reviewed |
+
+A note's passages are its `passages`; an attestation's are those of its
+evidence; a claim's are those its attestations in effect reach, with its
+manuscript origins; another record's are the passages it names. The text form
+puts each item's values between begin and end lines carrying the token, with
+hidden characters shown (as in G). The 1,000-character cut is an assumption;
+`excerpt --passage` shows a whole passage.
+
+**`reviewed`** takes one or more `<record id>@<64 hex>` arguments and
+`--actor person:<name>`; a model or software actor, a malformed argument, two
+digests for one record, an ID that names no readable record, a retired record,
+a record of a kind that carries no review mark, an ID that two records hold, or
+a file that rewriting would change exits 5 and writes nothing. A digest that differs from the record's
+current one is stale: that record is left unmarked and reported with
+`stale_input`, the others are marked, and the command exits 5. It does not print
+the current digest; `unreviewed list` shows the record as it is now. A mark is
+`state: reviewed`, `content_sha256`, `decided` (time and the person), and, when
+the command names more than one record, one `batch` token that they share.
+Nothing else in the record changes. JSON gives `marked[]` (`record`,
+`content_sha256`), `stale[]` (`record`, `code`), `batch?`, and the
+`record.valid` results of the files written. With nothing stale it exits 0, or
+1 if a written record has a record finding. The output says that a mark records
+what the author said and is not proof of who wrote it or that the record is
+right.
+
+No command edits a record, so the part of FR-23 that keeps a mark through the
+author's own edit is not built: an edit made by hand reads as unreviewed until
+the record is marked again (CONTRACT-001 G).
+
 ### C. Outcomes and check identifiers
 
 A scripted result is `pass`, `fail`, or `unverifiable`. `unverifiable` means the
@@ -190,7 +241,7 @@ reviewed or not.
 | `id.resolves` | FR-29 | A saved lookup says the identifier is not found or names another work | no saved lookup for it |
 | `number.present` | FR-29 | A figure in a cited sentence is not in the cited source's text | several citations or ambiguous separators, or no usable text |
 | `construct.credit` | FR-29 | Text credits a construct to a party other than a registered originator | attribution not detectable |
-| `claim.complete` | FR-21 | A claim reaches no note, or lacks a confidence level or a reason | none |
+| `claim.complete` | FR-21 | A claim reaches no note, or lacks a confidence level or a reason | no note is reached and a record that could lead to one cannot be read |
 | `construct.complete` | FR-22 | A construct lacks a definition or ownership, or a borrowed one lacks its source | none |
 | `claim.inactive` | FR-53 | A claim span points at a retired claim | no manuscript |
 | `cite.unlinked` | FR-53 | A citation lies in no claim span; the author can link it | no manuscript |
@@ -218,10 +269,10 @@ support record is present and resolved", never as verification of support.
 **`source.held`** (assumptions). It emits one result for each citation record
 that names exactly one source (a key naming none is `cite.key`'s finding). It
 passes only when the source has a non-retired source file with text and none of
-its non-retired source files is damaged. While `manuscript/` holds files this
-version cannot read, it is `not_implemented`. A pass says nothing about whether
-the text is a faithful reading of the original; its evidence states the method
-and the review coverage.
+its non-retired source files is damaged. With a manuscript, it emits one result
+for each citation item there instead (see "Reading the manuscript"). A pass says
+nothing about whether the text is a faithful reading of the original; its
+evidence states the method and the review coverage.
 
 **Structure checks.** `source.pages` emits a result for every non-retired source
 file, `source.labels` for every paged one with a labelled page, and
@@ -309,9 +360,24 @@ not those the passage was selected under, except that details only added since,
 as the record's `changes` show, are not reported (FR-94). It emits one result for each non-retired note, claim, passage, or
 citation that reaches a source or source file. Reason codes are
 `depends_on_retired`, `text_changed`, `source_details_changed`, and
-`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed. While `manuscript/` holds files
-this version cannot read, citations are left out and the check is also
-`not_implemented`.
+`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed.
+
+**`claim.complete`** (assumptions beyond SD-005 BR-508). It emits one result for
+each claim record in effect, the thesis included. It passes when the claim has a
+`confidence` of `low`, `medium`, or `high`, a `reason` that is not blank, and an
+attestation in effect for it whose evidence is a note in effect. An
+attestation or note with a `record_invalid` problem does not count, as the graph
+export leaves it out. The
+attestation's stance does not matter, and review plays no part. A passage
+cited directly is not a note. Otherwise it is `fail` with `claim_incomplete`,
+and the evidence names each missing part (`note`, `confidence`, `reason`) and
+each attestation of the claim that does not count, with why. When no note is
+reached and either an attestation file cannot be read (it could be this claim's)
+or the evidence of one of the claim's attestations that has no
+`record_invalid` problem cannot be read, the result is
+`unverifiable` with `record_unreadable`; the evidence still names a missing
+confidence or reason. The finding may be explained or dismissed like any other.
+It reads records only, so it also runs when manuscript files are present.
 
 **`locator.extent`** (assumptions beyond SD-007 BR-715). It emits one result for
 each citation record with a locator that names exactly one source. A value is a
@@ -328,8 +394,7 @@ no matching extent or map, is `no_extent`. A range that runs backwards, mixes
 styles, or abbreviates its end, and forms such as `41ff.`, are
 `unparsable_locator`. A partial source file's labels cover only its pages, and
 the finding says so. `quote.present`, `quote.page`, and `locator.extent` emit
-nothing for a citation whose key names no single source (`cite.key` reports it),
-and are `not_implemented` while manuscript files are present.
+nothing for a citation whose key names no single source (`cite.key` reports it).
 
 **Every result that did not pass is explained.** Each `fail` or `unverifiable`
 result MUST say in plain language what is wrong or was not covered, show its
@@ -369,11 +434,16 @@ verified. A report with scope `changed` carries no label.
 
 **Unreviewed items.** The label reflects checks only. Records that the
 manuscript reaches (a linked claim, its evidence, relations, constructs, and
-methods, a cited source, or the plan or profile in use) and that are
-unreviewed, and cited sources that are not admitted, are listed in
+methods, a cited source, or the plan or profile in use) and whose review mark
+does not apply (B1), and cited sources that are not admitted, are listed in
 `body.unreviewed[]` and counted in `body.summary`. They are not findings, are
 never open, and do not affect the label. "Unverified" means only that something
-has not yet been checked; it is not open by itself.
+has not yet been checked; it is not open by itself. As built, citation records,
+or with a manuscript its claim spans and the citation items in them, reach
+claims, each claim's attestations in effect, and
+the notes in effect that are their evidence. Relations, constructs, methods,
+plans, and profiles are not yet followed; `unreviewed list` lists every record,
+reached or not.
 
 **Disclosure risks.** A report with a `restricted.leak` or `coordinate.stray` finding, or whose scan
 could not run because the restricted store is absent, MUST say on screen and in
@@ -392,22 +462,88 @@ like any finding (assumption). CRLF line endings from a checkout alone do not
 make a file non-canonical. An unreadable or newer-version file is
 `unverifiable`.
 
-**Citation items without a manuscript reader.** The manuscript is authoritative
-(CONTRACT-006 D). When `manuscript/` holds no `.md` file, `cite.key` and
+**Citation items without a manuscript.** A project **has a manuscript** when
+`manuscript/` holds at least one `.md` file. Without one, `cite.key` and
 `bib.uncited` read the non-retired `citation` records; a record's `key`, or its
 `source` when it has no key, names the source. With no citation record either,
-each listed entry is `unverifiable` (`no_manuscript`). While a version cannot
-read manuscript files that are present, no citation record stands in for them:
-`bib.uncited` is `unverifiable` (`manuscript_not_read`) and `cite.key` is
-`not_implemented`. `cite.key` is `unverifiable` (`source_unreadable`) when a key
-matches no source and some source record cannot be read; `bib.uncited`
-likewise (`citation_unreadable`) for unread citation records (assumptions).
+each listed entry is `unverifiable` (`no_manuscript`). `cite.key` is
+`unverifiable` (`source_unreadable`) when a key matches no source and some
+source record cannot be read; `bib.uncited` likewise (`citation_unreadable`) for
+unread citation records (assumptions).
+
+**Reading the manuscript.** With a manuscript, `cite.key`, `source.held`,
+`quote.present`, `quote.page`, `locator.extent`, `number.present`,
+`bib.uncited`, and `source.changed` read it through the one reader of
+CONTRACT-006 D. The manuscript says what is cited, quoted, and located now. A
+citation record's `key`, `sentence`, `quotation`, and `locator` are then history:
+none is checked, and a record that no occurrence names is not a citation.
+`quote.present` still compares passages and note extracts, and a passage a
+citation record names still counts as used. `body.inputs.manuscript` lists every
+file under `manuscript/` with its digest, and `body.inputs.profiles` names
+`sentence-split/0` when a chapter was read.
+
+The rules below fill what CONTRACT-006 leaves open (assumptions).
+
+- **Subject and place.** A result about an occurrence has as `subject` the
+  citation record ID it carries, or else the chapter file's path. Its evidence
+  names the file, line, and column, and the citing sentence. A subject holds no
+  line number, so that an edit elsewhere does not change the finding key.
+- **Locus.** The CONTRACT-006 D locus. Where one chapter holds the same sentence
+  twice, the ordinal counts equal citations through both, so that no two share a
+  key. A quotation's result adds the quotation's digest and its ordinal among
+  equal ones, so that changed words are a new finding.
+- **Annotations** bind the citing sentence and, where one is named, the source
+  (F), never the citation record.
+- **Quotations.** `quote.present` emits one result for each quotation whose
+  citation names exactly one source, and `unverifiable`
+  (`unattributed_quotation`) for one that cannot be attributed. For one
+  attributed to a key that names no single source it emits nothing (`cite.key`
+  reports it). A double quotation mark with no partner is `unverifiable`
+  (`unpaired_quote_mark`), one result for each line that holds one, because what
+  it quotes was not read. `quote.page` reads each attributed quotation whose
+  citation has a page, folio, chapter, or paragraph locator.
+- **Keys.** A citation with key `?` fails `cite.key` (`key_unbound`) and shows the
+  text found at takeover when its record holds it. No other check reads it.
+- **Figures.** `number.present` reads each sentence that has a citation, apart
+  from its quotations and locators, and apart from the sentences of a block
+  quotation, whose figures are quoted words. Citations that name one source count
+  once. A sentence that cites more than one source is `several_citations` for
+  each source.
+- **Bibliography.** An entry is cited when a citation item names it. When it is
+  not found cited and a chapter file could not be read, `bib.uncited` is
+  `unverifiable` (`manuscript_unreadable`).
+- **What a citation rests on.** `source.changed` follows the source the key names
+  (a retired source that held the key, when none in effect does) and the claims
+  of the claim spans around the citation. For an occurrence with a record, it
+  also follows the record's `passage` while that passage belongs to a source the
+  key names; otherwise the retired source files rule above applies from the
+  record's creation. An occurrence with no record has no time from which to apply
+  that rule. When its source has a retired source file and nothing else changed,
+  the result is `unverifiable` (`retired_text_not_followed`) as coverage; the
+  quotation, page, and locator checks still read the current text.
+- **Files that cannot be read.** `record.valid` reports each chapter file the
+  reader refuses as `unverifiable` with the reader's code
+  (`manuscript_unsupported`, `manuscript_syntax`, or `manuscript_duplicate_id`),
+  its line and column, and no manuscript text. No other check reads that file;
+  the other files are still checked. `check` writes its report and exits 3
+  (CONTRACT-006, Error Semantics). A file under `manuscript/` that is not a
+  `.md` file is a coverage result (`manuscript_file_unread`).
+- **References.** `record.valid` fails (`reference_dangling`) for a citation `id`
+  or claim span ID that names no record of that kind. A record that cannot be
+  read has its own finding.
+- **Unreviewed items** are those the manuscript's citations and claim spans
+  reach.
+
+`claim.inactive`, `cite.unlinked`, `draft.marked`, and `quote.self` are not
+built and stay `not_implemented` where they apply. The report does not yet list
+the `.not-quote` passages (CONTRACT-006 C), and `validate` reads record files
+only.
 
 **Checks over a taken-over copy.** A version that provides `takeover` MUST read
 the Stemma copy: after takeover, `cite.key`, `source.held`, `quote.present`,
 `quote.page`, `locator.extent`, `number.present`, and `bib.uncited` run from it,
-and none is left `not_implemented` or `manuscript_not_read` because manuscript
-files are present (FR-73, FR-92). A citation with key `?` fails `cite.key`.
+and none is left `not_implemented` or unread because manuscript files are present
+(FR-73, FR-92). A citation with key `?` fails `cite.key`.
 
 **Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
 URI; degrees with a degree sign and a latitude then a longitude hemisphere
@@ -455,6 +591,12 @@ them, and separately in its notes stream. A quotation that spans a page break
 matches and is reported with every page it lies on. The quotation a passage
 yields is its exact text with only the line-end join, soft-hyphen removal, and
 runs of white space made one space.
+
+**Quotations from a PDF chapter (not built).** In a chapter taken over from a
+PDF, a quotation holding a hyphen that was kept at a line end is compared both
+with and without it. Readings that give different outcomes make the result
+`unverifiable` with `uncertain_hyphen` (CONTRACT-003 I, **Quotations in the
+copy**). The profile is unchanged.
 
 `quote-fold/0` as built. The ligatures are U+FB00 to U+FB06 as their own
 letters (U+FB05 is long s and t). Curly marks are U+2018, U+2019, U+201C, and
@@ -670,6 +812,7 @@ commands, MUST NOT treat it as a reason to refuse or stop work.
 | Report cannot be written | Exit 70; the build is reported as failed | yes | Fix the output path |
 | No network or a refused request during `resolve` or `ingest` | No record written; dependants stay `unverifiable` or use the cached record and report its date | yes | Run again online |
 | Support input stale | `support record` saves nothing and exits 5 with `stale_input` | yes | Prepare again and rerun the verdict |
+| A digest given to `reviewed` is stale | That record is left unmarked and listed with `stale_input`; the others are marked; exit 5 | yes | Run `unreviewed list` and look at the record as it is now |
 | Typst or font missing | Exit 4; no output | yes | The plugin's setup obtains the pinned tool |
 | Another Stemma command is writing | Exit 3 with `busy` | yes | Wait |
 
@@ -730,7 +873,7 @@ exits 1, and labels the build `open_findings`.
 | `meta.*`, `id.resolves`, `number.present` | Tests over synthetic sources and saved responses on one macOS system; the worked example uses real catalogue responses | Other catalogues; works whose title pages convert badly |
 | `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, `graph export` for the `author` audience without `--chapter`, `graph status`, `browse` (its evidence and limits are in CONTRACT-005), and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. `annotate` and annotations are built; `annotate list` is not, and nothing is redacted. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, `graph export` for the `author` audience without `--chapter`, `graph status`, `browse` (its evidence and limits are in CONTRACT-005), `unreviewed list`, `reviewed`, and `check` with `record.valid`, `claim.complete`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. `annotate` and annotations are built; `annotate list` is not, and nothing is redacted. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
 
 ## Schema Basis
 

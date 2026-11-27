@@ -25,6 +25,8 @@ export interface QuotationSpec {
 }
 export interface ReportSpec {
   manuscript: string;
+  /** The author's name for this version of the report. Authorship marks apply to the version they name. */
+  version?: string;
   quotations: QuotationSpec[];
   verification?: { preamble?: string[] };
 }
@@ -270,6 +272,9 @@ export interface Built {
 }
 
 export function buildReport(corpus: Corpus, spec: ReportSpec, manuscript: string, include: string[] = []): Built {
+  if (spec.version !== undefined && (typeof spec.version !== "string" || spec.version.trim() === "")) {
+    throw new ReportError('"version" in report.json is a string that is not blank, or is left out');
+  }
   const texts = new SourceTexts(corpus);
   const passages = new Map<string, Rendered>();
   for (const q of spec.quotations) {

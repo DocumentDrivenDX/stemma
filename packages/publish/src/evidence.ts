@@ -47,9 +47,13 @@ const sentencesOf = (text: string, whole: Range[] = []): Range[] => splitSentenc
 
 interface Mark { wording: Set<string>; by: Set<string> }
 
-/** Authorship records by the digest of each sentence they hold. */
-function marksOf(corpus: Corpus): Map<string, Mark> {
+interface Marks { bySentence: Map<string, Mark>; applied: number; otherVersions: number }
+
+/** Authorship records of one report version, by the digest of each sentence they hold. */
+function marksOf(corpus: Corpus, version: string | undefined): Marks {
   const marks = new Map<string, Mark>();
+  let applied = 0;
+  let otherVersions = 0;
   for (const { data } of corpus.records) {
     if (data?.kind !== "authorship_mark" || isRetired(data)) continue;
     const { text, authorship, marked } = data;
@@ -57,6 +61,12 @@ function marksOf(corpus: Corpus): Map<string, Mark> {
     if (typeof text !== "string" || typeof authorship !== "string" || data.text_sha256 !== digestOf(text)) continue;
     const by = isObject(marked) && isObject(marked.by) ? String(marked.by.kind) : "";
     if (!["human_written", "edited", "ai_drafted"].includes(authorship) || !["person", "model", "software"].includes(by)) continue;
+    // A mark never carries to another version, even over an unchanged sentence.
+    if (version === undefined || data.version !== version) {
+      otherVersions++;
+      continue;
+    }
+    applied++;
     for (const paragraph of text.split("\n\n")) {
       for (const r of sentencesOf(paragraph)) {
         const digest = digestOf(paragraph.slice(r.start, r.end));
@@ -67,7 +77,7 @@ function marksOf(corpus: Corpus): Map<string, Mark> {
       }
     }
   }
-  return marks;
+  return { bySentence: marks, applied, otherVersions };
 }
 
 /** What current text reviews record about one passage against its original. */
@@ -120,7 +130,7 @@ function flatten(segments: Segment[], quotations: Map<string, Rendered>) {
 export function evidenceLedger(input: LedgerInput): string {
   const { corpus, assembly, quotations } = input;
   const texts = new Map(activeTexts(corpus));
-  const marks = marksOf(corpus);
+  const marks = marksOf(corpus, input.spec.version);
   const compared = new Map<string, Compared>([...quotations].map(([id, q]) => [
     id, weakest(q.spec.passages.map((p) => comparedOf(corpus, texts, corpus.byId.get(p.passage)!.data!))),
   ]));
@@ -154,7 +164,7 @@ export function evidenceLedger(input: LedgerInput): string {
       const digest = digestOf(sentence);
       const count = (seen.get(digest) ?? 0) + 1;
       seen.set(digest, count);
-      const mark = marks.get(digest);
+      const mark = marks.bySentence.get(digest);
       units.push({
         id: `u-${digest.slice(0, 16)}-${count}`,
         place: comment === undefined ? "body" : "comment",
@@ -196,12 +206,21 @@ export function evidenceLedger(input: LedgerInput): string {
     subjects: Object.entries(input.outputs).map(([path, text]) => ({ path, sha256: sha256(text) })),
     inputs: { spec_sha256: input.inputs.spec_sha256, template_sha256: input.inputs.template_sha256 },
     profiles: { sentences: SENTENCE_PROFILE },
+    authorship: { version: input.spec.version ?? null, marks_applied: marks.applied, marks_of_other_versions: marks.otherVersions },
     covers: "Each sentence of the report's body paragraphs and note comments. It counts what is recorded. It is not a measure of truth and gives no score.",
     not_covered: [
       "headings", "formatted citations and the bibliography", "the quotations that notes give before their citations",
       "text between single quotation marks, which is not read as a quotation", "whether any source supports any sentence",
     ],
-    checks: { label: input.checks.label, open: open.length, open_by_check: byCheck, not_implemented: input.checks.not_run.map((n) => n.check) },
+    checks: {
+      label: input.checks.label, open: open.length, unreviewed: input.checks.summary.unreviewed,
+      dismissed: input.checks.summary.dismissed, confirmed: input.checks.summary.confirmed,
+      could_not_check: input.checks.summary.could_not_check, open_by_check: byCheck,
+      // As `summary.dismissed` counts them (CONTRACT-002 C). The reasons stay in the project.
+      dismissals: input.checks.results.filter((r) => !r.open && r.annotations.some((a) => a.effect === "dismiss"))
+        .map((r) => ({ check: r.check, annotations: r.annotations.filter((a) => a.effect === "dismiss").map((a) => a.id) })),
+      not_implemented: input.checks.not_run.map((n) => n.check),
+    },
     quotations: [...quotations].map(([id, q]) => ({
       id, source: String(corpus.byId.get(q.spec.passages[0]!.passage)!.data!.source),
       passages: q.spec.passages.map((p) => p.passage), compared: compared.get(id)!,
@@ -219,11 +238,18 @@ export function evidenceLedger(input: LedgerInput): string {
 
 /** The ledger's totals in plain words, for the build's output. */
 export function ledgerWords(ledger: string): string {
-  const { totals, checks } = JSON.parse(ledger) as { totals: Totals; checks: { open: number; not_implemented: string[] } };
+  const { totals, checks, authorship } = JSON.parse(ledger) as {
+    totals: Totals;
+    checks: { open: number; unreviewed: number; dismissed: number; not_implemented: string[] };
+    authorship: { version: string | null; marks_applied: number; marks_of_other_versions: number };
+  };
   const n = (label: string, value: string) => totals.labels[label]?.[value] ?? 0;
   return [
     `Evidence ledger: ${totals.units} sentences. ${n("basis", "quotation")} hold a quotation copied by script, ${n("basis", "cited")} a citation only, ${n("basis", "uncited")} neither.`,
     `No writer is recorded for ${n("wording", "unrecorded")}. Support is not judged for any. ${n("typed_quotation", "yes")} hold typed quotation marks.`,
-    `Checks over the project: ${checks.open} open, ${checks.not_implemented.length} not implemented.`,
+    authorship.version === null
+      ? `report.json names no version, so no authorship mark applies (${authorship.marks_of_other_versions} in the project).`
+      : `Authorship marks for version ${JSON.stringify(authorship.version)}: ${authorship.marks_applied} apply; ${authorship.marks_of_other_versions} for other versions were not used.`,
+    `Checks over the project: ${checks.open} open, ${checks.dismissed} dismissed, ${checks.unreviewed} unreviewed records, ${checks.not_implemented.length} not implemented.`,
   ].join("\n");
 }

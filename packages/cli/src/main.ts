@@ -21,6 +21,7 @@ import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
 import { buildReportCommand, citeFormat } from "./publish.ts";
 import { browse } from "./browse.ts";
+import { reviewed, unreviewedList } from "./reviewed.ts";
 import { mcp } from "./mcp.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
@@ -73,6 +74,10 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   excerpt --source <id> --pages <printed pages> | --passage <id> | --citation <id> | --quotation <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
+  unreviewed list
+             records whose review mark does not apply, with their passages; writes nothing
+  reviewed <id@sha256>... --actor person:<name>
+             record that the author said they reviewed these, as listed; a mark is not proof
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
   graph export --audience author [--page] [--out <dir>]
@@ -92,7 +97,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 
 /** Commands CONTRACT-002 B names that this version does not have yet. */
 const NOT_YET = new Set([
-  "migrate", "key", "unreviewed", "reviewed", "rounds",
+  "migrate", "key", "rounds",
   "support", "import", "export", "takeover", "index", "setup", "log", "activity",
   "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "disclosure", "scan", "map",
 ]);
@@ -130,7 +135,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"], "cite format": ["input"], "build report": ["check", "pdf"],
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages", "citation", "quotation"], retire: ["actor", "reason", "replaced-by"],
-  annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
+  annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"], "unreviewed list": [], reviewed: ["actor"],
   check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes", "originals"], mcp: ["idle-minutes", "opener"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
@@ -196,7 +201,7 @@ function retire(options: Options, ids: string[]): number {
   for (const record of plan) writeProjectFile(root, record.path, record.text);
   const after = openCorpus(root);
   const retired = new Set(plan.map((r) => r.path));
-  const affected = dependants(after).filter((d) => d.walk.changes.some((c) => retired.has(c.record.path))).map((d) => d.file.path);
+  const affected = dependants(after).filter((d) => d.walk.changes.some((c) => retired.has(c.record.path))).map((d) => (d.file ? d.path : d.use!.where[0]!.value));
   const head = [
     `Retired ${plan.map((r) => r.id).join(", ")}. The files stay.`,
     affected.length === 0 ? "No passage, note, claim or citation rests on what was retired." : "These rest on what was retired, and `check` lists each under source.changed:",
@@ -309,6 +314,8 @@ function check(options: Options): number {
     process.stderr.write(`A check failed to run. This is a Stemma defect and no result may be read as a pass.\n${errors.join("\n")}\n`);
     return 70;
   }
+  // The report is written, but part of the manuscript could not be read (CONTRACT-006, Error Semantics).
+  if (body.results.some((r) => r.check === "record.valid" && r.outcome === "unverifiable" && r.open && r.reason_code?.startsWith("manuscript_"))) return 3;
   return body.label === "checked_clean" ? 0 : 1;
 }
 
@@ -332,6 +339,8 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "ingest": only(0); return ingest(options, check);
     case "excerpt": only(0); return excerpt(options);
     case "retire": return retire(options, rest);
+    case "unreviewed list": only(0); return unreviewedList(options);
+    case "reviewed": return reviewed(options, rest);
     case "annotate": only(0); return annotateCommand(options);
     case "resolve": return resolveCommand(options, rest);
     case "coverage": only(1); return coverage(options, rest[0]);
@@ -363,7 +372,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
   }
 }
 
-const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "cite", "build", "graph"]);
+const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "cite", "build", "graph", "unreviewed"]);
 const NOT_YET_SUB = new Set(["source admit", "source reject", "record show", "record search", "record trace", "review import", "review comment", "review baseline", "review needed", "research record", "research corpus", "research admit", "research reject", "research coverage", "build draft", "build camera-ready", "build reviewer"]);
 
 export async function main(argv: string[]): Promise<number> {

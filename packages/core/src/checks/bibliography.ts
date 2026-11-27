@@ -1,11 +1,12 @@
-// cite.key and bib.uncited over citation records. When manuscript files exist
-// they are authoritative and this version cannot read them (CONTRACT-002 C).
-import { citationKeys, type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
+// cite.key and bib.uncited over what the project cites: its manuscript files
+// when it has them, and otherwise its citation records (CONTRACT-002 C).
+import { citationKeys, type Corpus, idOf, type JsonObject, type LoadedFile } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
 import { sourceBinding } from "./changed.ts";
 import { activeRecords, grouped, once } from "../corpus-index.ts";
-import { itemOf, subjectOf } from "./records.ts";
+import { cited, manuscriptOf } from "./cited.ts";
+import { subjectOf } from "./records.ts";
 
 export const hasManuscript = (corpus: Corpus): boolean => corpus.manuscript.some((f) => f.path.endsWith(".md"));
 
@@ -17,11 +18,14 @@ const unreadableIn = (corpus: Corpus, directory: string): boolean => once(corpus
 
 interface Resolution { citation: LoadedFile; key?: string; matches: LoadedFile[] }
 
+/** The sources in effect that hold each key, aliases included. */
+export const sourcesByKey = (corpus: Corpus): Map<string, LoadedFile[]> =>
+  once(corpus, "sources by key", () => grouped(active(corpus, "source"), (s) => citationKeys(s.data!)));
+
 /** Each citation with the sources in effect that it names. The list is made once and shared. */
 export const resolveCitations = (corpus: Corpus): Resolution[] => once(corpus, "resolved citations", () => {
-  const sources = active(corpus, "source");
-  const byKey = grouped(sources, (s) => citationKeys(s.data!));
-  const byId = grouped<unknown, LoadedFile>(sources, (s) => [idOf(s)]);
+  const byKey = sourcesByKey(corpus);
+  const byId = grouped<unknown, LoadedFile>(active(corpus, "source"), (s) => [idOf(s)]);
   return active(corpus, "citation").map((citation) => {
     const { key, source } = citation.data as JsonObject;
     if (typeof key === "string") return { citation, key, matches: byKey.get(key) ?? [] };
@@ -40,28 +44,32 @@ export function listedSources(corpus: Corpus): LoadedFile[] {
 }
 
 export function citeKeyResults(corpus: Corpus): Result[] {
-  if (hasManuscript(corpus)) return [];
   const allSources = corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "source");
-  return resolveCitations(corpus).map(({ citation, key, matches }) => {
-    const data = citation.data!;
-    const subject = subjectOf(citation);
-    const evidence: Evidence[] = [{ name: "citation_file", class: "location", value: citation.path }];
+  return cited(corpus).uses.map((use) => {
+    const { key, matches, sentence } = use;
+    // What a record says of itself. A chapter file's citation says it in its place there.
+    const data: JsonObject = use.written ? {} : use.record!.data!;
+    const evidence: Evidence[] = [...use.where];
     if (key !== undefined) evidence.push({ name: "key", class: "manuscript", value: key });
     for (const [name, field] of [["chapter", "chapter"], ["document_position", "document_position"]] as const) {
       if (typeof data[field] === "string") evidence.push({ name, class: "location", value: data[field] });
     }
-    if (isObject(data.locator)) {
-      evidence.push({ name: "locator", class: "manuscript", value: `${String(data.locator.label)} ${String(data.locator.value)}` });
+    if (use.locator) {
+      evidence.push({ name: "locator", class: "manuscript", value: `${String(use.locator.label)} ${String(use.locator.value)}` });
     }
     const only = matches.length === 1 ? idOf(matches[0]!) : undefined;
-    const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-      ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
-    if (sentence) evidence.push({ name: "sentence", class: "manuscript", value: sentence.text });
+    if (sentence && !use.written) evidence.push({ name: "sentence", class: "manuscript", value: sentence.text });
     const common = {
-      check: "cite.key", subject, locus: idOf(citation) ?? citation.path, evidence, item: itemOf(citation),
-      ...(sentence ? { sentence } : {}), ...(only ? { source: only } : {}),
+      check: "cite.key", subject: use.subject, locus: use.locus, evidence,
+      ...(use.item ? { item: use.item } : {}), ...(sentence ? { sentence } : {}), ...(only ? { source: only } : {}),
     };
     if (only) return result({ ...common, outcome: "pass" });
+    // `?` is a reference takeover could not tie to a source (CONTRACT-006 C).
+    if (use.written && key === "?") {
+      const found = use.record?.data?.as_found;
+      if (typeof found === "string") evidence.push({ name: "as_found", class: "manuscript", value: found });
+      return result({ ...common, outcome: "fail", reason: "key_unbound" });
+    }
     if (matches.length > 1) {
       for (const match of matches) evidence.push({ name: "held_by", class: "location", value: match.path });
       return result({ ...common, outcome: "fail", reason: "key_ambiguous" });
@@ -83,7 +91,8 @@ export function citeKeyResults(corpus: Corpus): Result[] {
 }
 
 export function uncitedResults(corpus: Corpus): Result[] {
-  const cited = new Set(resolveCitations(corpus).flatMap((r) => (r.matches.length === 1 ? [idOf(r.matches[0]!)] : [])));
+  const written = hasManuscript(corpus);
+  const named = new Set(cited(corpus).uses.flatMap((u) => (u.matches.length === 1 ? [idOf(u.matches[0]!)] : [])));
   return listedSources(corpus).map((source) => {
     const id = idOf(source)!;
     const key = source.data!.citation_key;
@@ -94,11 +103,11 @@ export function uncitedResults(corpus: Corpus): Result[] {
       check: "bib.uncited", subject: subjectOf(source), source: id, locus: "bibliography_include", evidence,
       item: { record: id, content_sha256: binding },
     };
-    const cannot = hasManuscript(corpus) ? "manuscript_not_read"
-      : cited.has(id) ? undefined
+    const cannot = named.has(id) ? undefined
+      : written ? (manuscriptOf(corpus).problems.length > 0 ? "manuscript_unreadable" : undefined)
       : unreadableIn(corpus, "citations") ? "citation_unreadable"
       : active(corpus, "citation").length === 0 ? "no_manuscript" : undefined;
     if (cannot) return result({ ...common, outcome: "unverifiable", reason: cannot });
-    return cited.has(id) ? result({ ...common, outcome: "pass" }) : result({ ...common, outcome: "fail", reason: "not_cited" });
+    return named.has(id) ? result({ ...common, outcome: "pass" }) : result({ ...common, outcome: "fail", reason: "not_cited" });
   });
 }

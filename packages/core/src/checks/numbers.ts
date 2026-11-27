@@ -1,12 +1,11 @@
 // number.present (CONTRACT-002 C; SD-007 BR-719): a figure written in digits in
 // a cited sentence, outside its quotation and locator, is in the cited source's
 // text. A pass shows presence only, not what the figure counts.
-import { type Corpus, idOf, isObject } from "@stemma/records";
+import { type Corpus, idOf } from "@stemma/records";
 import { result } from "../findings.ts";
 import { SourceTexts } from "../matching/texts.ts";
 import type { Evidence, Result } from "../report.ts";
-import { hasManuscript, resolveCitations } from "./bibliography.ts";
-import { itemOf, subjectOf } from "./records.ts";
+import { cited, type CitingSentence, type Use } from "./cited.ts";
 
 const FIGURE = /(?<![\p{L}\p{N}.,])\d+(?:[.,]\d+)*(?:\s?%)?/gu;
 
@@ -32,37 +31,50 @@ const present = (text: string, figure: string): boolean => {
   return new RegExp(`(?<![\\d]|\\d[.,])${bare}(?![\\d]|[.,]\\d)${percent}`, "iu").test(text);
 };
 
-export const figureCitations = (corpus: Corpus) => (hasManuscript(corpus) ? [] : resolveCitations(corpus)).flatMap((r) => {
-  const data = r.citation.data!;
-  const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" ? data.sentence.text : undefined;
-  const figures = sentence
-    ? figuresIn(sentence, typeof data.quotation === "string" ? data.quotation : undefined, isObject(data.locator) ? String(data.locator.value) : undefined) : [];
-  return figures.length > 0 ? [{ ...r, figures, sentence: data.sentence as { text: string; sha256: string } }] : [];
-});
+/** The sentence's figures, leaving out its quotations and each locator written out in it. */
+function figuresOf({ text, quotation, locators }: CitingSentence): string[] {
+  return locators.reduce((left, locator) => {
+    const without = new Set(figuresIn(text, quotation, locator));
+    return left.filter((f) => without.has(f));
+  }, figuresIn(text, quotation));
+}
+
+interface Cite { use: Use; figures: string[]; several: boolean }
+
+/** Each source a sentence with figures cites, once: citations of one source are one. */
+function figureCitations(corpus: Corpus): Cite[] {
+  return cited(corpus).sentences.flatMap((sentence) => {
+    const figures = figuresOf(sentence);
+    if (figures.length === 0) return [];
+    const seen = new Set<unknown>();
+    return sentence.uses.flatMap((use) => {
+      if (use.matches.length !== 1) return [];
+      if (seen.has(idOf(use.matches[0]!))) return [];
+      seen.add(idOf(use.matches[0]!));
+      return [{ use, figures, several: sentence.several }];
+    });
+  });
+}
 
 export function numberResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
-  const citing = new Map<unknown, number>();
-  for (const { citation } of hasManuscript(corpus) ? [] : resolveCitations(corpus)) {
-    const { sentence } = citation.data!;
-    if (isObject(sentence)) citing.set(sentence.sha256, (citing.get(sentence.sha256) ?? 0) + 1);
-  }
-  return figureCitations(corpus).flatMap(({ citation, key, matches, figures, sentence }) => {
-    if (matches.length !== 1) return [];
-    const source = idOf(matches[0]!)!;
-    const several = (citing.get(sentence.sha256) ?? 0) > 1;
+  return figureCitations(corpus).map(({ use, figures, several }) => {
+    const source = idOf(use.matches[0]!)!;
     const { views, unusable } = texts.of(source);
     const missing = figures.filter((f) => !views.some((v) => present(v.streams.main.text, f) || present(v.streams.notes.text, f)));
     const outcome = several || views.length === 0 || (missing.length > 0 && unusable > 0) ? "unverifiable" : missing.length > 0 ? "fail" : "pass";
     const reason = several ? "several_citations" : outcome === "unverifiable" ? "text_unavailable" : outcome === "fail" ? "figure_absent" : undefined;
     const evidence: Evidence[] = [
-      { name: "citation_file", class: "location", value: citation.path },
-      { name: "key", class: "metadata", value: key ?? String(matches[0]!.data!.citation_key ?? source) },
+      ...use.where,
+      { name: "key", class: "metadata", value: use.key ?? String(use.matches[0]!.data!.citation_key ?? source) },
       { name: "figures", class: "manuscript", value: figures.join(", ") },
       ...(outcome === "fail" ? [{ name: "not_found", class: "manuscript" as const, value: missing.join(", ") }] : []),
       ...views.map((v): Evidence => ({ name: "source_text", class: "location", value: v.loaded.manifest.path })),
     ];
     // A sentence with several citations shows nothing wrong: which holds the figure is simply not told.
     if (several) evidence.push({ name: "coverage", class: "metadata", value: "figures in sentences that cite more than one source were not attributed to one" });
-    return [result({ check: "number.present", outcome, ...(reason ? { reason } : {}), subject: subjectOf(citation), locus: `${idOf(citation)}#figures`, source, evidence, item: itemOf(citation), sentence, coverage: several })];
+    return result({
+      check: "number.present", outcome, ...(reason ? { reason } : {}), subject: use.subject, locus: `${use.locus}#figures`, source, evidence,
+      ...(use.item ? { item: use.item } : {}), ...(use.sentence ? { sentence: use.sentence } : {}), coverage: several,
+    });
   });
 }

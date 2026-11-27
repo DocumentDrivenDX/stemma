@@ -29,7 +29,7 @@ feature's requirements; the PRD ranks each requirement.
 | FEAT-006 | Composition | Outline, chapter specifications, drafting from claims, rival readings | P0 | product owner | Subsystem 6: FR-24 to FR-28 | 2026-11-26 |
 | FEAT-007 | Verification and reports | Scripted checks, explained findings, claim-support records, annotations, the checked-clean label | P0 | product owner | Subsystem 7: FR-29 to FR-34, FR-52 to FR-54, FR-74 | 2026-11-26 |
 | FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91 | 2026-11-26 |
-| FEAT-009 | Evolution, audit, review | Changelog, errata, audits, AI-use disclosure, evidence ledger, reviewer package and reviewer comments | P0 | product owner | Subsystem 9: FR-41 to FR-47, FR-79 | 2026-11-26 |
+| FEAT-009 | Evolution, audit, review | Changelog, errata, audits, AI-use disclosure, evidence ledger, reviewer package and reviewer comments | P0 | product owner | Subsystem 9: FR-41 to FR-47, FR-79, FR-96 | 2026-11-27 |
 | FEAT-010 | Plugin, skill, and distribution | One skill with modes, command line shipped inside the plugin, self-setup of the pinned Bun, tools on three systems, desktop install on macOS and Windows, marketplace install, install tests | P0 | product owner | Subsystem 10: FR-48 to FR-51, FR-75, FR-77, FR-78 | 2026-11-26 |
 | FEAT-011 | Evidence graph and graph engine | Record files as the graph; arras-compatible TypeScript and SQLite engine, reads first | P0 | product owner | Subsystem 11: FR-62, FR-63 | 2026-11-26 |
 | FEAT-012 | Explorer and typeset preview | arras-based explorer, larger graph view contributed to arras, linked pages, in-browser Typst preview rebuilt and reloaded after edits | P0 | product owner | Subsystem 12: FR-64, FR-65, FR-76 | 2026-11-26 |
@@ -65,7 +65,7 @@ None recorded.
 | FEAT-009 | FEAT-007, FEAT-008 | Required | Disclosure and packages use check and build records |
 | FEAT-009 | FEAT-012 | Required | The reviewer package holds an offline explorer file |
 | FEAT-009 | FEAT-001 | Required | Disclosure uses standing rules; registers hold history |
-| FEAT-009 | FEAT-006 | Optional | The disclosure reads authorship marks when they exist (FR-27) |
+| FEAT-009 | FEAT-006 | Optional | The disclosure and the evidence ledger read authorship marks when they exist (FR-27, FR-96) |
 | FEAT-009 | FEAT-013 | Required | Packaging applies the restricted-location rules (FR-68) |
 | FEAT-012 | FEAT-008, FEAT-011 | Required | The explorer shows the graph and typeset pages |
 | FEAT-013 | FEAT-005, FEAT-011, FEAT-012 | Required | Maps project claims and places inside the explorer |
@@ -95,7 +95,7 @@ Boundaries:
 
 | Step | Scope | Features that contribute |
 |------|-------|--------------------------|
-| M1 | Checks, takeover, and a basic PDF: the first pilot | FEAT-002, FEAT-003 (including FR-15), FEAT-005, FEAT-007, FEAT-010, FEAT-011, FEAT-015, FEAT-001 standing rules, and FEAT-008 FR-83, the FR-35 working copy, and the FR-39 reports of those builds |
+| M1 | Checks, takeover, and a basic PDF: the first pilot | FEAT-002, FEAT-003 (including FR-15), FEAT-005, FEAT-007, FEAT-010, FEAT-011, FEAT-015, FEAT-001 standing rules, and FEAT-008 FR-83, the FR-35 working copy, and the FR-39 reports of those builds; also the FEAT-009 evidence ledger (FR-96) |
 | M2 | New project to camera-ready PDF | FEAT-001, FEAT-004, FEAT-006, FEAT-008, FEAT-009, FEAT-014, FEAT-005 constructs and claim relations, FEAT-015 FR-82 |
 | M3 | Explorer and maps | FEAT-012, FEAT-013, and the FEAT-009 reviewer package with comments |
 

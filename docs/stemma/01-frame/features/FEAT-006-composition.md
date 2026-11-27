@@ -110,6 +110,8 @@ wrote what, and is asked where their own interpretation matters.
   human-written, or edited.
 - **AUTH-02** (FR-27). Marks must be kept per version, so an earlier version's
   marks remain readable after later edits. Unmarked text must show as unmarked.
+  For an assembled report, a version is the one its `report.json` names, and a
+  mark applies sentence by sentence to that version only (CONTRACT-006 J).
 
 ### Non-Functional Requirements
 
@@ -183,5 +185,7 @@ wrote what, and is asked where their own interpretation matters.
 
 - [ ] Where in a chapter's progress do checkpoints fall? Blocks FR-28 design;
   product owner.
-- [ ] At what unit are authorship marks made, and what counts as a version?
-  Blocks FR-27 design; design owner.
+- [ ] What counts as a version of a book manuscript for authorship marks?
+  Blocks FR-27 design for chapters; design owner. For assembled reports it is
+  settled: the owner chose the version `report.json` names, with sentence
+  matching (2026-11-27, CONTRACT-006 J).

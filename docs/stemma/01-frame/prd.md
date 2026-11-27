@@ -475,7 +475,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-45** (P0, M2) — The system generates an AI-use disclosure that states which models and rules were used, what the AI did, what remains unreviewed, how many findings are open, and which annotations explain or dismiss findings. It states that support verdicts were not rerun at build and that review marks and annotations are not forgery-proof. The disclosure is separate from the book's research methodology.
 - **FR-46** (P0, M3) — A reviewer package holds the PDF, an offline explorer file, the check report, and the AI-use disclosure. It holds no source files unless the author asks to include them; source text quoted as evidence in the report is kept to short excerpts, and each result stays visible. How short has not been set. Rights fields change nothing in it. Structured restricted coordinates are left out of every item. Longer source text that cannot be removed from what is packaged, such as in the PDF, and stray restricted coordinates, such as one typed in prose, are reported with a warning. The package is still produced, so it can disclose a restricted site's position. Without the source files, a reviewer cannot rerun the checks.
 - **FR-79** (P0, M3) — In the reviewer package's offline explorer, a reviewer attaches comments to claims and saves them to a file that the author imports. Importing changes no claim, check result, or annotation.
-- **FR-96** (P1, M1 for the report of CONTRACT-006 I) — A report build writes an evidence ledger: for each sentence of the report's body and note comments, who is recorded as having written its words, what source evidence is tied to it, how far that evidence was compared with originals, and whether anyone judged that it supports the sentence, with totals that can be recomputed from the sentences. It also names every open check. Anything unrecorded is shown as unrecorded and never assumed human-written. It gives counts, never a probability or score of hallucination, and is meant for another tool, such as Innsigle, to sign.
+- **FR-96** (P1, M1 for the report of CONTRACT-006 I) — A report build writes an evidence ledger: for each sentence of the report's body and note comments, who is recorded as having written its words, what source evidence is tied to it, how far that evidence was compared with originals, and whether anyone judged that it supports the sentence, with totals that can be recomputed from the sentences. A record of who wrote a sentence counts only for the report version it was made for. The ledger also names every open check and every dismissed result, and counts the unreviewed records. Anything unrecorded is shown as unrecorded and never assumed human-written. It gives counts, never a probability or score of hallucination, and is meant for another tool, such as Innsigle, to sign.
 - **FR-47** (P1) — When the thesis, a construct, the methodology, or evidence changes, a check lists the chapters, claims, and registers that need re-review.
 
 ### Subsystem: 10. Plugin, skill, and distribution
@@ -597,7 +597,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-45 | Generate disclosure | A project with one dismissal and unreviewed items | The annotation, the unreviewed counts, and both stated limits appear |
 | FR-46 | Package for review | A project with source files, a restricted coordinate typed in prose, and a failing quotation | The package holds the four items, no source file, short evidence excerpts, and a coordinate warning |
 | FR-79 | Comment and import | A reviewer comments on a claim and saves the file | The author imports it; the comment is tied to the claim |
-| FR-96 | Ledger of a report | A report with a quoted sentence, a cited sentence, an uncited one, a quotation typed by hand, and one sentence a person marked as theirs | Each sentence has its labels; only the marked one has a recorded writer; no support is shown as judged; the totals equal a recount |
+| FR-96 | Ledger of a report | A report with a quoted sentence, a cited sentence, an uncited one, a quotation typed by hand, and one sentence a person marked as theirs | Each sentence has its labels; only the marked one has a recorded writer, and none has once the report names another version; no support is shown as judged; the totals equal a recount |
 | FR-48 | Use a mode | A takeover request | One skill routes it to takeover |
 | FR-49 | Run without an AI; command line first | A command-line check and build through the plugin's launcher; one interface function and its command | Same scripted results as in the agent; the command does what the interface does, with the same result |
 | FR-50 | Install from the marketplace | A clean profile and the DocumentDrivenDX marketplace | Installing the plugin delivers the command line, and it loads in a local Code tab session |
@@ -794,6 +794,20 @@ Windows, desktop apps, and files saved by real tools are untested.
   which support labels can be lifted. Product owner.
 - [ ] May a chapter taken over from PDF later move to its Word file, keeping the
   author's choices? Not designed; product owner.
+- [ ] How is a revised manuscript file recognized and taken further? Until
+  answered, a changed file under an earlier file's name is reported and not
+  applied, so two chapters in files of one name need the author to say they
+  differ; a revision under a new name is refused as repeated text with no saved
+  item; one that repeats too little is added as a further chapter; and no
+  revision is ever applied (FR-71, FR-95). Product owner with the pilot author.
+- [ ] A quotation from a PDF chapter that holds a hyphen kept at a line end is
+  neither passed nor failed when keeping and removing it differ, so a correct
+  compound stays open until a person dismisses it. Should it instead pass and
+  say which reading matched, as the join in source text does, accepting that a
+  wrong quotation can then pass? Product owner.
+- [ ] Do the pilot's PDF files use endnotes? Endnotes are not recognized from a
+  PDF, so citations in them get no note handling (FR-95). Product owner with the
+  pilot author.
 - [x] Which PDF text-extraction library do the checks use? Answered by the
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a

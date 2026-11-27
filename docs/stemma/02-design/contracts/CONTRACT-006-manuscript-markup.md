@@ -18,7 +18,7 @@ ddx:
 **Contract ID**: CONTRACT-006
 **Type**: schema (text format) and library
 **Version**: 0 (provisional in every part; see Proof Status)
-**Related**: ADR-005, ADR-009, FR-14, FR-25, FR-29, FR-35 to FR-39, FR-65, FR-72, FR-73, FR-83, FR-92
+**Related**: ADR-005, ADR-009, FR-14, FR-25, FR-29, FR-35 to FR-39, FR-65, FR-72, FR-73, FR-83, FR-92, FR-96
 
 ## Purpose
 
@@ -136,7 +136,8 @@ rules are design assumptions.
 
 **Locus.** A finding's locus is the citation `id` when present; otherwise
 chapter ID, sentence digest, key, locator, and the occurrence's ordinal among
-equal ones in that sentence. Edits elsewhere do not change it.
+equal ones in that sentence. Edits elsewhere do not change it. CONTRACT-002 C,
+"Reading the manuscript", settles repeated sentences and quotation results.
 
 | Check | Reads |
 |---|---|
@@ -274,7 +275,10 @@ project's records by `build report` (CONTRACT-002 B). Its directory holds:
   optional `join` string and `join_note`), and optional `note` (the passage is a
   note on its page: the locator gains `n`), `corrections` (`was`, `now`, `by`,
   `basis`; each must match exactly once), `italic`, `keep_hyphens`, and
-  `checked`), and `verification.preamble`.
+  `checked`), `verification.preamble`, and an optional `version`: the name the
+  author gives this version of the report, a string that is not blank. The
+  ledger of J applies only the authorship marks made for it. A `version` of any
+  other kind stops the build and writes nothing.
 - The template: paragraphs separated by blank lines. `{{q:<id>}}` is replaced by
   the quotation in curly double quotation marks; `[^<id>,<id>…]` is a note citing
   those quotations; `[^<ids>|<comment>]` adds the author's comment, which may hold
@@ -317,8 +321,9 @@ sentence or source text.
 | `subjects[]` | `path` (relative to the ledger) and `sha256` of `report.md` and `report.typ` |
 | `inputs` | `sha256` of `report.json` and of the template |
 | `profiles.sentences` | `sentence-split/0` (D) |
+| `authorship` | `version` (the report's, or `null`), `marks_applied` (the number of mark records that apply to this version), and `marks_of_other_versions` (the number that would apply but name another version, or all of them when the report names none) |
 | `covers`, `not_covered[]` | What units are, and what has none |
-| `checks` | `label`, `open`, `open_by_check`, and `not_implemented[]` from one run over the whole project (CONTRACT-002 C). Not tied to single sentences |
+| `checks` | From one run over the whole project (CONTRACT-002 C): `label`; the counts `open`, `unreviewed` (records), `dismissed`, `confirmed`, and `could_not_check`; `open_by_check`; `dismissals[]`, one for each result that is not open because annotations dismiss it, with `check` and `annotations` (their IDs; the reasons stay in the project and in `check`'s report); and `not_implemented[]`. Not tied to single sentences. The label is never given without these counts |
 | `quotations[]` | `id`, `source`, `passages[]`, `compared`, `corrections` (`person`, `other` counts), and `stated_check` (the entry has `checked` free text, which is not read) |
 | `units[]` | `id`, `place` (`body`, or `comment` with `note`), `block` (paragraph number from 1), `sentence` (from 1 in its paragraph or comment), `sha256`, `labels`, `chars`, `quotations[]` |
 | `totals` | `units` (their number), `chars` (the sum of each `chars` key), `labels` (for each label name, the number of units with each value) |
@@ -334,7 +339,7 @@ quotations' marks.
 
 | Label | Values |
 |---|---|
-| `wording` | `human_written`, `edited`, `ai_drafted`, or `unrecorded`: from `authorship_mark` records in effect whose `text`, split by the sentence profile, holds a sentence with this digest and whose `text_sha256` is the digest of its normalized `text`. No such mark, or marks that disagree, give `unrecorded`. It describes the words outside script-copied quotations |
+| `wording` | `human_written`, `edited`, `ai_drafted`, or `unrecorded`: from `authorship_mark` records in effect whose `version` is exactly the report's, whose `text`, split by the sentence profile, holds a sentence with this digest, and whose `text_sha256` is the digest of its normalized `text`. No such mark, or such marks that disagree, give `unrecorded`; so does every sentence when the report names no version. It describes the words outside script-copied quotations |
 | `declared_by` | Who made those marks (`marked.by.kind`): `person`, `model`, `software`, `mixed` for several kinds, or `none` |
 | `basis` | `quotation` (holds a script-copied quotation), else `cited` (a note of the sentence cites a passage), else `uncited` |
 | `typed_quotation` | `yes` when matched double quotation marks outside script-copied quotations enclose words, else `no`. Single quotation marks are not read |
@@ -351,7 +356,22 @@ takes the weakest of its pages. A model's review can only be a flag
 `report.json` shows as `none_recorded`, with `stated_check` true. A review says
 what its writer said; it is not proof.
 
-A mark's `chapter` is optional, since a report has no chapter records.
+For an assembled report the unit of an authorship mark is the sentence, and a
+version is what `report.json` names (I). A mark of a longer text applies to each
+of its sentences. A mark never carries to another version, even for a sentence
+that has not changed: the author marks each version. Marks of earlier versions
+stay in the project, unchanged. Rebuilding an earlier version's ledger also
+needs that version's template and records, which the repository history holds.
+CONTRACT-001 G owns the mark record.
+
+`ledger`, `subjects`, `units`, and `totals` follow `evidence-ledger/1`, which
+Innsigle's CONTRACT-001 (version 1.3, `docs/helix/02-design/contracts/` in
+[Innsigle](https://github.com/DocumentDrivenDX/innsigle)) owns. As used here,
+`schema`, each label name and value, and each `chars` key match
+`^[a-z0-9][a-z0-9_./-]{0,63}$`; each unit `id` is unique; each character count
+is a whole number that is not negative; and `totals` equals a recount of the
+units. A new label or value MUST keep these rules. The other fields are
+Stemma's.
 
 The ledger is a record of what is recorded, not a measure of truth: it gives no
 score, and `uncited` wording may be sound argument while a quoted sentence's
@@ -415,10 +435,12 @@ containing raw HTML, expecting `manuscript_unsupported`.
 
 | Element | Evidence | Not shown |
 |---|---|---|
-| Markup, reader, sentence and quotation rules, edits, takeover output | None. Design only | All, including whether authors tolerate the syntax |
+| Reader, sentence and quotation rules, and the checks that read them | Tests over invented text on one macOS system | Real manuscripts, Linux, Windows, whether authors tolerate the syntax |
+| Edits and takeover output | None. Design only | All |
 | citeproc-js to Typst | A feasibility test with 10 records and a 14-note sequence passed 12 of 14 Chicago rows, byte-identical across runs, one macOS system; expected strings were not checked against the manual | This markup, the output format, note-number agreement |
 | Typst features | Feasibility tests: footnote markers after Arabic or Hebrew quotations needed a direction-mark helper; indexes and per-chapter endnotes worked with the packages in-dexter 0.7.2 and deixis 0.2.0; TIFF and EPS were rejected; bleed wrote no BleedBox; fixed timestamps gave identical bytes | Conversion from this markup; right-to-left quotations at book length |
 | Sentence links | 43 test sentences linked both ways, with hanging punctuation off and nested links flattened | Converter-generated links |
+| Evidence ledger (J) | Tests over the worked example and invented text on one macOS system; one ledger signed and checked by an Innsigle build that is not released | A released Innsigle, a real author's marks, Linux, Windows |
 | Browser Typst | Not tried | All of H |
 
 ## Schema Basis

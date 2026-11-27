@@ -29,6 +29,7 @@ ddx:
 
 ## Scope
 
+- M1: the evidence ledger of an assembled report (P1).
 - M2: chapter audit and disclosure (P0). M3: reviewer package and comments (P0),
   which depend on SD-012. P1: changelog, errata, re-review list, fresh-eyes
   review.
@@ -49,6 +50,7 @@ ddx:
 | HST-04 (FR-47) | Re-review list from recorded links since a review baseline | `core`, `graph` | P1 |
 | REV-01 to REV-03, REV-05 (FR-43) | Two-stage audit; saved findings; rival readings as unreviewed claims | `audit` mode, `core` | P0 |
 | REV-04 (FR-44) | Review in a separate context | `audit` mode | P1 |
+| LED-01 to LED-04 (FR-96) | Deterministic per-sentence ledger written with the report | `publish` evidence ledger | P1 |
 | REL-01 to REL-03 (FR-45) | Deterministic disclosure from records | `core` disclosure | P0 |
 | REL-04 to REL-08, REL-12 (FR-46) | Staged packaging with filtering, redaction, and scan | `publish` Packager, `graph`, `core` | P0 |
 | COM-01, COM-02 (FR-79) | Comment capture and file save | `explorer` (SD-012) | P0 |
@@ -124,7 +126,18 @@ are CONTRACT-001 kinds. Builds and packages are outputs, not records.
 - **BR-912** — A camera-ready or reviewer build without a dated changelog entry for its version reports `changelog.missing`; a draft does not. An undated entry does not count. Errata are not rewritten; a reversal is a new entry.
 - **BR-913** — The re-review list follows recorded links from items whose digest differs from the review baseline, in fixed order, and says that only recorded links were followed.
 
+- **BR-914** — The evidence ledger is built from the same assembly as `report.md`, so its sentences are the report's. It follows CONTRACT-006 J, calls no model, stops no build, and holds no sentence or source text.
+- **BR-915** — Only authorship marks of the version `report.json` names apply, matched sentence by sentence. Anything unrecorded or in disagreement reads `unrecorded`. The ledger counts the marks it did not apply for their version.
+- **BR-916** — The ledger gives the check label only with the counts and dismissed results of CONTRACT-006 J, and gives no score.
+
 ## System Decomposition
+
+### Component: Evidence ledger (`packages/publish`, M1)
+
+- **Purpose**: Say what is recorded behind each sentence of a report.
+- **Responsibilities**: BR-914 to BR-916.
+- **Requirements Addressed**: LED-01 to LED-04.
+- **Interfaces**: `build report` (CONTRACT-002), which passes the report assembly and one `check` run; sentence splitting from `manuscript`; `authorship_mark` and `text_review` records (CONTRACT-001 G); output CONTRACT-006 J, which another tool such as Innsigle may sign.
 
 ### Component: History (`packages/core`, P1)
 
@@ -195,6 +208,9 @@ N/A — uses the Architecture's choices.
 | REV-01 to REV-03 | Audit | BR-901 to BR-903 | Stage-order and no-write fixtures; model behaviour in a live session |
 | REV-04 | Audit | BR-904 | Host without a second context reports no fresh-eyes result (live) |
 | REV-05 | Audit | BR-901 | Saved rival reading is unreviewed and linked |
+| LED-01, LED-03 | Evidence ledger | BR-914 | Worked example: labels, a typed quotation, a comment sentence; totals equal a recount |
+| LED-02 | Evidence ledger | BR-915 | No mark, one, a paragraph mark, disagreement, another version, an edited sentence |
+| LED-04 | Evidence ledger | BR-914, BR-916 | A dismissed result stays listed; no text in the file |
 | REL-01 | Disclosure | BR-905 | Seeded activity, unreviewed items, and annotation appear |
 | REL-02, REL-03 | Disclosure | BR-905, BR-906 | Fixed statements, gaps, ended annotation, byte-equal repeat |
 | REL-04 | Packager | BR-908 | Package lists four items |

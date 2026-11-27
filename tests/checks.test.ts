@@ -67,8 +67,8 @@ describe("label", () => {
 
   test("record kinds whose extra rules are not checked keep the label open", () => {
     const content = readProject(fixture("clean"));
-    const claim = { schema: "stemma.record/0", id: "clm-aaaaaaaa", kind: "claim", created: { at: "2026-01-05T09:58:00Z", by: { kind: "person", name: "a" } } };
-    content.records.push({ path: "records/claims/clm-aaaaaaaa.json", bytes: new TextEncoder().encode(canonical(claim)) });
+    const inference = { schema: "stemma.record/0", id: "inf-aaaaaaaa", kind: "inference", created: { at: "2026-01-05T09:58:00Z", by: { kind: "person", name: "a" } } };
+    content.records.push({ path: "records/inferences/inf-aaaaaaaa.json", bytes: new TextEncoder().encode(canonical(inference)) });
     const { body } = runChecks(loadCorpus(content), {});
     expect(body.not_run).toContainEqual({ check: "record.valid", reason: "not_implemented" });
     expect(body.label).toBe("open_findings");

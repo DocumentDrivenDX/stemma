@@ -1,10 +1,14 @@
 // One run over one parsed corpus, and the single label rule (CONTRACT-002 C).
 import { type Corpus, compareCodePoints, corpusDigest, idOf, sha256 } from "@stemma/records";
+import { SENTENCE_PROFILE } from "@stemma/manuscript";
 import { annotate } from "./annotations.ts";
 import { binaryResults } from "./checks/binaries.ts";
-import { active, citeKeyResults, resolveCitations, uncitedResults } from "./checks/bibliography.ts";
+import { active, citeKeyResults, hasManuscript, uncitedResults } from "./checks/bibliography.ts";
+import { cited, manuscriptOf, positionOf } from "./checks/cited.ts";
+import { manuscriptFileResults } from "./checks/manuscript-files.ts";
 import { coordinateResults } from "./checks/coordinates.ts";
 import { changedResults } from "./checks/changed.ts";
+import { claimResults } from "./checks/claims.ts";
 import { heldResults } from "./checks/held.ts";
 import { locatorResults } from "./checks/locators.ts";
 import { identifierResults, resolverResults, sourceMetaResults } from "./checks/metadata.ts";
@@ -17,6 +21,7 @@ import { SourceTexts } from "./matching/texts.ts";
 import { coverageOf } from "./verification.ts";
 import { fileResults, rulesResults } from "./checks/records.ts";
 import { result, sortResults } from "./findings.ts";
+import { claimReach, isReviewed } from "./review.ts";
 import type { NotRun, ReportBody, Result, Summary, Unreviewed } from "./report.ts";
 import { QUOTE_PROFILE } from "./matching/quote-fold.ts";
 
@@ -47,16 +52,24 @@ export function unreviewedItems(corpus: Corpus): Unreviewed[] {
   // The first claim in effect with each ID.
   const claimsById = new Map([...active(corpus, "claim")].reverse().map((c) => [idOf(c) as unknown, c]));
   const listed = new Map<string, Set<string>>();
-  for (const { citation, matches } of resolveCitations(corpus)) {
-    const location = idOf(citation) ?? citation.path;
+  // What the manuscript or the citation records reach: each citation, and in a chapter each claim span.
+  const reaches = cited(corpus).uses.map((use) => ({
+    location: use.written && use.subject === use.path ? use.where[0]!.value : use.locus, matches: use.matches, claims: use.claims,
+  }));
+  if (hasManuscript(corpus)) {
+    reaches.push(...manuscriptOf(corpus).chapters.flatMap((chapter) => chapter.claims.map((span) => ({
+      location: positionOf(chapter.path, span).value, matches: [], claims: span.ids,
+    }))));
+  }
+  for (const { location, matches, claims } of reaches) {
     for (const source of matches) {
       if (source.data!.admission !== "admitted") add(idOf(source)!, "source", "not_admitted", location);
     }
-    const claims = citation.data!.claims;
-    for (const id of Array.isArray(claims) ? claims : []) {
+    for (const id of claims) {
       const claim = claimsById.get(id);
-      const review = claim?.data!.review as { state?: string } | undefined;
-      if (claim && review?.state !== "reviewed") add(String(id), "claim", "unreviewed", location);
+      for (const record of claim ? claimReach(corpus, claim) : []) {
+        if (!isReviewed(record)) add(idOf(record)!, String(record.data!.kind), "unreviewed", location);
+      }
     }
   }
   return [...reached.values()].sort((a, b) => compareCodePoints(a.record, b.record));
@@ -74,7 +87,7 @@ export interface CheckContext {
 
 /** The checks this version runs. The check reference on the website is generated from this. */
 export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckContext) => Result[]> = {
-  "record.valid": recordResults,
+  "record.valid": (c) => [...recordResults(c), ...manuscriptFileResults(c)],
   "project.binary": binaryResults,
   "source.held": (c, x) => heldResults(c, x.texts),
   "source.pages": pageResults,
@@ -91,6 +104,7 @@ export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckC
   "meta.resolver": (c, x) => resolverResults(c, x.texts),
   "id.resolves": (c, x) => identifierResults(c, x.texts),
   "number.present": (c, x) => numberResults(c, x.texts),
+  "claim.complete": claimResults,
   "coordinate.stray": coordinateResults,
 };
 
@@ -125,7 +139,10 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>): { body
       research: corpus.research
         .map((f) => ({ path: f.path, sha256: f.bytes ? sha256(f.bytes) : "unreadable" }))
         .sort((a, b) => compareCodePoints(a.path, b.path)),
-      profiles: results.some((r) => r.check === "quote.present") ? [QUOTE_PROFILE] : [],
+      profiles: [
+        ...(results.some((r) => r.check === "quote.present") ? [QUOTE_PROFILE] : []),
+        ...(hasManuscript(corpus) && manuscriptOf(corpus).chapters.length > 0 ? [SENTENCE_PROFILE] : []),
+      ],
     },
     tools,
     results,

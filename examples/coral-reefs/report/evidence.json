@@ -18,6 +18,11 @@
  "profiles": {
   "sentences": "sentence-split/0"
  },
+ "authorship": {
+  "version": null,
+  "marks_applied": 0,
+  "marks_of_other_versions": 0
+ },
  "covers": "Each sentence of the report's body paragraphs and note comments. It counts what is recorded. It is not a measure of truth and gives no score.",
  "not_covered": [
   "headings",
@@ -29,7 +34,12 @@
  "checks": {
   "label": "checked_clean",
   "open": 0,
+  "unreviewed": 1,
+  "dismissed": 0,
+  "confirmed": 0,
+  "could_not_check": 0,
   "open_by_check": {},
+  "dismissals": [],
   "not_implemented": []
  },
  "quotations": [

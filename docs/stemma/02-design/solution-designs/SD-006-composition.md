@@ -115,7 +115,7 @@ reviewed per chapter, and the outline for order and scope (assumption).
 - **BR-608** — After drafting, the agent runs `check --changed` and reports results as returned. Composition clears no change flag and certifies no support.
 - **BR-609** — Each drafting action records model, model version, prompt version, voice profile, and target chapter for the disclosure (SD-009).
 - **BR-610** — A checkpoint asks for the author's input and never halts drafting or a build; only recorded author input counts as an answer, and unanswered ones are reported. The setting may turn every checkpoint off.
-- **BR-611** — An authorship mark applies to the exact text it was made on. Changed or unmarked text shows as unmarked, never as human-written by default. Earlier versions keep their marks.
+- **BR-611** — An authorship mark applies to the exact text it was made on. Changed or unmarked text shows as unmarked, never as human-written by default. Earlier versions keep their marks, and a mark applies to no other version. For assembled reports CONTRACT-006 J gives the unit (the sentence) and the version (the one `report.json` names).
 - **BR-612** — A counter-argument section follows BR-606 and BR-607. With no opposing evidence it argues without attributing anything and names no invented scholar. Removing it leaves a valid chapter. It is separate from the audit's rival-readings pass (SD-009).
 
 ## System Decomposition
@@ -217,7 +217,7 @@ N/A — uses the Architecture's choices.
 ## Open Questions
 
 - [ ] Where in a chapter's progress do checkpoints fall? Product owner. Blocks FR-28 design.
-- [ ] At what unit are authorship marks made, and what counts as a version? Design owner. Blocks FR-27 design.
+- [ ] What counts as a version of a book manuscript for authorship marks? Design owner. Blocks FR-27 design for chapters. Assembled reports are settled by CONTRACT-006 J.
 
 ## Schema Basis
 

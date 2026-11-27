@@ -304,7 +304,8 @@ unchanged and its tool versions match the current ones.
 moment it is written until it is retired; nothing waits for approval. Records
 that carry `review` are marked `unreviewed` or `reviewed`. The mark `reviewed`
 applies while `review.content_sha256` equals the record's current content
-digest. The author's own edits keep a record reviewed: a writer that applies an
+digest, and never while the record's `created` or `review` breaks a rule of
+this contract. The author's own edits keep a record reviewed: a writer that applies an
 edit whose `changed.by.kind` is `person` to a reviewed record updates
 `review.content_sha256` in the same write. An edit by a `model` or `software`
 actor sets `review.state` to `unreviewed`; the record stays in effect. A
@@ -333,8 +334,14 @@ person said and is not verification or proof.
 **Other feature records.** `plan` and `voice_profile` carry `review` as above.
 `checkpoint_input` records an author's answer at a checkpoint; an unanswered
 checkpoint stops nothing. `given.by.kind` MUST be `person`. An
-`authorship_mark` applies to the exact `text` it holds; changed or unmarked text
-is unmarked, never assumed human-written. An `ai_activity` is written for AI
+`authorship_mark` applies to the exact `text` it holds, in the `version` it
+names; changed or unmarked text is unmarked, never assumed human-written. Its
+`chapter` is optional, since an assembled report has no chapter records.
+`text_sha256` MUST be the SHA-256 of `text` normalized as E defines; otherwise
+`record.valid` reports it and the mark applies to nothing. `marked` says who
+declared the mark and when. A mark is a declaration, not proof of authorship.
+How a report's
+evidence ledger reads marks is CONTRACT-006 J. An `ai_activity` is written for AI
 work that record stamps cannot show, such as drafting prose; the disclosure
 reads it and is only as complete as these records. Examples of the author's
 writing behind a profile change are saved as `voice_example` records, so they
@@ -357,8 +364,9 @@ D); those record fields are never updated.
 
 **PDF manuscripts.** Takeover of a PDF (CONTRACT-003 I) uses these records
 unchanged, with one addition to the record schema that is made with the code that
-writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`. Until then the
-schema does not accept it.
+writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`, and the batch
+gains a field listing the words in which a line-end hyphen was kept (CONTRACT-003
+I). Until then the schema accepts neither.
 
 **Takeover rounds.** `intake_item` and `round_choice` records are never edited.
 There is no round or session record: remaining work is computed from failing
