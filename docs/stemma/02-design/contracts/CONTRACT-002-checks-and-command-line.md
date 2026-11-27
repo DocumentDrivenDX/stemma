@@ -77,7 +77,7 @@ absent (exit 4 if it cannot) and then runs
 | Command | Effect | Step |
 |---|---|---|
 | `version` | Report the Stemma version and the pinned Bun version | M1 |
-| `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries. Requires `--project`, because the documented working directory is the plugin root; overwrites nothing, and exits 5 if `stemma.json` exists | M1 |
+| `init` | Create `stemma.json`, `rules.md`, directories, `.gitattributes`, ignore entries (including the original formats of CONTRACT-001 B). Requires `--project`, because the documented working directory is the plugin root; overwrites nothing, and exits 5 if `stemma.json` exists | M1 |
 | `record add <kind> --input <file\|-> [--actor <kind>:<name>]` | Add one record from a JSON object of its fields. A citation that names a `passage` gets its `quotation` and `locator` copied from it, and a quotation or locator typed beside `passage` is refused. Fills an absent `id`, `schema`, `kind`, `created` (then `--actor` is required), `admission` (`candidate`), `intake` (`parsed`, assumption), and a citation's sentence digest (normalizing that text). It never overwrites. A record that breaks a rule is still written, with its findings; input that is not usable JSON, an unsafe ID, or a number the canonical form would change exits 5 | M1 |
 | `doctor` | Report Bun, SQLite, and external tool versions, paths, and platform test status | M1 |
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
@@ -160,6 +160,7 @@ reviewed or not.
 | Check ID | Requirement | `fail` when | Typical `unverifiable` |
 |---|---|---|---|
 | `record.valid` | FR-62 | CONTRACT-001 error | unreadable file |
+| `project.binary` | FR-84, FR-85 | A file outside `records/` and `sources/` that git tracks or would add is binary (a NUL byte in its first 8000 bytes, or a PDF or ZIP signature). Without git, every file outside hidden, `build/`, and `node_modules/` directories is read. A binary under `records/` or `sources/` is `record.valid`'s. One result for each file; one pass when there is none | none |
 | `source.held` | FR-9 | A cited source has no non-retired source file holding text (`no_source_file`, `no_text`) | an unreadable or damaged source file |
 | `source.pages` | FR-87 | A source file's part is missing, edited without sealing, unlisted, out of sequence, or its pages do not run `0` to the original's page count minus one | a part cannot be read |
 | `source.labels` | FR-87 | A printed label repeats, goes backwards, or advances further than the pages do, or a folio differs from its page's label | none |

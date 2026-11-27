@@ -368,6 +368,22 @@
     ]
   },
   {
+    "id": "project.binary",
+    "summary": "The repository must hold no binary file, such as a Word, PDF or image file. It reads the files git tracks or would add.",
+    "limits": "A file that git ignores is not read. A file already removed stays in git history, which this does not read.",
+    "findings": [
+      {
+        "reason": "binary_file",
+        "message": "A binary file is in the repository, or would be added to it. A project holds text; originals and other binary files stay outside.",
+        "why": "git cannot show what changed in a binary, keeps every version for good, and nothing in it can be searched, checked or cited.",
+        "suggestions": [
+          "Keep the file where the author holds it, outside the repository. To read or cite it, convert it with `source convert`: the Markdown in sources/ is tied to the original by its hash. For a format Stemma does not convert, note what it is, its hash and where it is held.",
+          "Moving the file out is the author's decision. A file already committed stays in git history until the history is rewritten."
+        ]
+      }
+    ]
+  },
+  {
     "id": "quote.page",
     "summary": "Where a citation gives a quotation and a locator, the quoted words must be on that page, or in that chapter or paragraph.",
     "limits": "It relies on the page labels in the source files. Where a part has no label, it reports that it could not check.",

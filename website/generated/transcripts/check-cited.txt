@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/cited
 OPEN FINDINGS: 1 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 11 result(s) passed.
+Checked the whole project: 12 result(s) passed.
 
 1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
    Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.

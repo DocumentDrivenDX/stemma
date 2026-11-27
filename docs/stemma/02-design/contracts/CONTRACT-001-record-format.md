@@ -77,7 +77,14 @@ DocumentDrivenDX schema format) core `0.10.0` document using the `umf.ddd`
 
 Binaries and paper originals are not part of a project. Text captured from them
 is in source files, tied to each original by hash and size or by description
-(CONTRACT-007 C).
+(CONTRACT-007 C). This covers every binary file, the author's own drafts and
+material brought in from elsewhere included: it stays where the author holds it,
+and what is read or cited is converted to source files. `init` adds ignore
+entries, in any letter case, for the document, ebook, slide, spreadsheet, and
+archive formats `pdf`, `doc`, `docx`, `odt`, `rtf`, `pages`, `epub`, `mobi`,
+`ppt`, `pptx`, `key`, `xls`, `xlsx`, `numbers`, and `zip`. `project.binary`
+(CONTRACT-002 C) reports a binary file that git tracks or would add. How figures
+for a typeset book are held is not decided yet (FEAT-008).
 
 Takeover and later fixes write only to `manuscript/` and records. Original
 files are never changed.

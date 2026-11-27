@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/coral-reefs
 OPEN FINDINGS: 8 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 5291 result(s) passed.
+Checked the whole project: 5292 result(s) passed.
 
 1. PROBLEM: An identifier resolves to a work with a different title.  [id.resolves]
    Why it matters: An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.

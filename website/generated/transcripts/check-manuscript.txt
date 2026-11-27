@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/manuscript
 OPEN FINDINGS: 0 problem(s), 2 could not be checked, 9 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 7 result(s) passed.
+Checked the whole project: 8 result(s) passed.
 
 1. COULD NOT CHECK: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
    Why it matters: The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.

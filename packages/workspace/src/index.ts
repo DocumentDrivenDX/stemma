@@ -1,7 +1,11 @@
 // Filesystem adapter for one project directory. It never follows a symbolic
 // link out of the project, and replaces files through a temporary file.
 import { randomBytes } from "node:crypto";
-import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import {
+  appendFileSync, closeSync, existsSync, lstatSync, mkdirSync, openSync, readdirSync, readFileSync, readSync, realpathSync,
+  renameSync, rmSync, writeFileSync,
+} from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { canonical, PROJECT_FORMAT, PROJECT_SCHEMA, type ProjectContent, type SourceFile } from "@stemma/records";
 
@@ -47,6 +51,49 @@ function listFiles(root: string, directory: string): SourceFile[] {
   });
 }
 
+/** The start of a file is enough to tell: git also takes a NUL byte there to mean binary. */
+function isBinary(path: string): boolean {
+  let handle: number | undefined;
+  try {
+    if (!lstatSync(path).isFile()) return false;
+    handle = openSync(path, "r");
+    const head = Buffer.alloc(8000);
+    const length = readSync(handle, head, 0, head.length, 0);
+    const start = head.toString("latin1", 0, 5);
+    return head.subarray(0, length).includes(0) || start === "%PDF-" || start.startsWith("PK\u0003\u0004");
+  } catch {
+    return false;
+  } finally {
+    if (handle !== undefined) closeSync(handle);
+  }
+}
+
+const UNTRACKED_DIRECTORIES = new Set(["build", "node_modules"]);
+
+function walk(root: string, directory = ""): string[] {
+  let entries;
+  try {
+    entries = readdirSync(join(root, directory), { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return entries.filter((e) => !e.name.startsWith(".")).flatMap((e) => {
+    const path = directory ? `${directory}/${e.name}` : e.name;
+    if (e.isDirectory()) return UNTRACKED_DIRECTORIES.has(e.name) ? [] : walk(root, path);
+    return e.isFile() ? [path] : [];
+  });
+}
+
+/**
+ * The files git tracks or would add under the project. Without git, every file
+ * outside hidden and build directories.
+ */
+function repositoryFiles(root: string): string[] {
+  const git = spawnSync("git", ["-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+    { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  return git.status === 0 ? [...new Set(git.stdout.split("\0").filter(Boolean))] : walk(root);
+}
+
 export function readProject(root: string): ProjectContent {
   const content: ProjectContent = {
     settings: sourceFile(root, "stemma.json"),
@@ -54,6 +101,8 @@ export function readProject(root: string): ProjectContent {
     sources: listFiles(root, "sources"),
     manuscript: listFiles(root, "manuscript"),
     research: listFiles(root, "research"),
+    // Those under records/ and sources/ are already reported as misplaced.
+    binaries: repositoryFiles(root).filter((path) => !/^(records|sources)\//.test(path) && isBinary(join(root, path))).sort(),
   };
   if (existsSync(join(root, "rules.md"))) content.rules = sourceFile(root, "rules.md");
   return content;
@@ -115,7 +164,10 @@ for example "RULE-001 Spell the town as the charter does".
 `;
 
 const ATTRIBUTES = ["stemma.json", "rules.md", "records/**", "manuscript/**", "sources/**", "research/**/*.md"].map((p) => `${p} text eol=lf`);
-const IGNORED = [".stemma/", "build/"];
+/** Originals in these formats stay out of git even when they are put in the project folder. */
+const ORIGINAL_FORMATS = ["pdf", "doc", "docx", "odt", "rtf", "pages", "epub", "mobi", "ppt", "pptx", "key", "xls", "xlsx", "numbers", "zip"];
+const anyCase = (extension: string) => [...extension].map((c) => `[${c}${c.toUpperCase()}]`).join("");
+const IGNORED = [".stemma/", "build/", ...ORIGINAL_FORMATS.map((e) => `*.${anyCase(e)}`)];
 
 function addLines(root: string, path: string, lines: string[]): boolean {
   const full = safeTarget(root, path);

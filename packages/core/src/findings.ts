@@ -67,6 +67,11 @@ export const TEMPLATES = {
   "record.valid:check_error": explain(
     "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
     ["Report the defect together with the Stemma version."]),
+  "project.binary:binary_file": explain(
+    "A binary file is in the repository, or would be added to it. A project holds text; originals and other binary files stay outside.",
+    "git cannot show what changed in a binary, keeps every version for good, and nothing in it can be searched, checked or cited.",
+    ["Keep the file where the author holds it, outside the repository. To read or cite it, convert it with `source convert`: the Markdown in sources/ is tied to the original by its hash. For a format Stemma does not convert, note what it is, its hash and where it is held.",
+      "Moving the file out is the author's decision. A file already committed stays in git history until the history is rewritten."]),
   "cite.key:key_unknown": explain(
     "A citation uses a key that no source record holds.", KEY_WHY,
     ["Correct the key in the citation, or add a source record with that key (or add it to the right source's key_aliases)."],
