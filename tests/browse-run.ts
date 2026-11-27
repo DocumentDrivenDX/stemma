@@ -4,13 +4,12 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { bundle } from "../scripts/build.ts";
 import { newNonce, requestMac, responseProof } from "./browse-http.ts";
-import { temporary, within } from "./helpers.ts";
+import { builtCli, temporary, within } from "./helpers.ts";
 
 let built: Promise<string> | undefined;
 /** The command line as it is shipped, built once for the test file. */
-export const shipped = (): Promise<string> => (built ??= bundle(temporary()));
+export const shipped = (): Promise<string> => (built ??= builtCli());
 
 const live = new Set<Run>();
 export async function endRuns(): Promise<void> {

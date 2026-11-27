@@ -65,6 +65,20 @@ export function copyTree(from: string, to: string, leave: string[] = []): string
 export const copyExample = (to: string, leave = [".stemma", "build", "report/build", "report/report.pdf"]): string =>
   copyTree(join(ROOT, "examples/coral-reefs"), to, leave);
 
+/**
+ * The command line as built for the tests. `./scripts/dev.sh check` builds dist/
+ * just before the tests and names it in STEMMA_TEST_DIST, so that every test file
+ * uses that one build; run any other way, a file builds its own into `to`. Either
+ * way it is the build as shipped. No test changes it: one that needs a changed
+ * build changes a copy.
+ */
+export async function builtCli(to = join(temporary(), "dist")): Promise<string> {
+  const given = process.env.STEMMA_TEST_DIST;
+  if (given) return join(given, "stemma.js");
+  const { bundle } = await import("../scripts/build.ts");
+  return bundle(to);
+}
+
 export function fixture(name: string, parent = temporary()): string {
   const dir = join(parent, name);
   cpSync(join(ROOT, "fixtures", name), dir, { recursive: true });

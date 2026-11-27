@@ -5,10 +5,9 @@ import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { constants, deflateRawSync, deflateSync } from "node:zlib";
 import { LIMITS } from "@stemma/core";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { readInOwnProcess } from "../packages/cli/src/pdf-reading.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary } from "./helpers.ts";
 import { rawPdf, stream } from "./highlight-pdf.ts";
 import { makePdf } from "./pdf.ts";
 
@@ -41,7 +40,7 @@ let bounded = "";
 /** The shipped build's one statement of the bound. */
 let shippedBound: string[] = [];
 beforeAll(async () => {
-  cli = await bundle(join(temporary(), "dist"));
+  cli = await builtCli(join(temporary(), "dist"));
   const bound = /pdf_memory_bytes: [^,\n]+/g;
   shippedBound = readFileSync(cli, "utf8").match(bound) ?? [];
   const rebound = (bytes: number) => {

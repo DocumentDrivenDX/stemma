@@ -61,6 +61,8 @@ case "${1:-check}" in
     # A worker for each processor core, and the files that took longest last time
     # first, by the times kept in .tools/. Many tests run several commands in turn,
     # so they get longer than the 5-second default when workers share the machine.
+    # The tests use that build rather than each making its own.
+    export STEMMA_TEST_DIST="$root/dist"
     status=0
     run test ./tests --preload ./tests/cleanup.ts --parallel --timeout=30000 \
       --timings=.tools/test-timings.json --update-timings || status=$?

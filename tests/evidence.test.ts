@@ -4,10 +4,9 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { totalsOf, type Unit } from "../packages/publish/src/evidence.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { builtCli, ROOT, temporary } from "./helpers.ts";
 import { SMALL_SENTENCE, smallProject } from "./small-project.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
@@ -47,7 +46,7 @@ const unitOf = (units: Unit[], text: string) => units.find((u) => u.sha256 === s
 
 beforeAll(async () => {
   const work = temporary();
-  cli = await bundle(join(work, "plugin/dist"));
+  cli = await builtCli(join(work, "plugin/dist"));
   copy = smallProject(join(work, "small"));
 }, 120_000);
 

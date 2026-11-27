@@ -5,13 +5,12 @@ import { mkdirSync, readdirSync, readFileSync, symlinkSync, writeFileSync, exist
 import { dirname, join } from "node:path";
 import type { CheckReport, Result } from "@stemma/core";
 import { canonical } from "@stemma/records";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { fixture, temporary } from "./helpers.ts";
+import { builtCli, fixture, temporary } from "./helpers.ts";
 
 let cli = "";
 beforeAll(async () => {
-  cli = await bundle(join(temporary(), "dist"));
+  cli = await builtCli(join(temporary(), "dist"));
 });
 
 function stemma(args: string[], flags: readonly string[] = ISOLATION_FLAGS, stdin?: string) {

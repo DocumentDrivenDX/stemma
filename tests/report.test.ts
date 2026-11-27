@@ -4,9 +4,8 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { copyExample, ROOT, temporary } from "./helpers.ts";
+import { builtCli, copyExample, ROOT, temporary } from "./helpers.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
 const REPORT = join(EXAMPLE, "report");
@@ -17,7 +16,7 @@ const run = (...args: string[]) => Bun.spawnSync([process.execPath, ...ISOLATION
 
 beforeAll(async () => {
   const work = temporary();
-  cli = await bundle(join(work, "plugin/dist"));
+  cli = await builtCli(join(work, "plugin/dist"));
   copy = join(work, "coral-reefs");
   copyExample(copy);
 }, 120_000);

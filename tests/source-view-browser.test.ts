@@ -10,8 +10,8 @@ import { type Browser, chromium, type Page } from "@playwright/test";
 import { exportGraph } from "@stemma/graph";
 import { normalizeSentence, sha256 } from "@stemma/records";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { bundle, writeExplorer } from "../scripts/build.ts";
-import { copyExample, temporary } from "./helpers.ts";
+import { writeExplorer } from "../scripts/build.ts";
+import { builtCli, copyExample, temporary } from "./helpers.ts";
 import { anchorOf, AT, citation, corpusOf, PAGES, passage, standard, VOLUME } from "./source-view-fixture.ts";
 
 let browser: Browser | undefined;
@@ -65,7 +65,7 @@ describe.skipIf(!browser)("the worked example's source panel, as the built comma
 
   beforeAll(async () => {
     const work = temporary();
-    const cli = await bundle(join(work, "dist"));
+    const cli = await builtCli(join(work, "dist"));
     const dir = join(work, "coral-reefs");
     copyExample(dir, ["build", "report/build"]);
     const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, "graph", "export", "--audience", "author", "--page", "--project", dir],

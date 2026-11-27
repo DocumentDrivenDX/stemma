@@ -2,18 +2,17 @@
 // B, C and its error table; US-094), and the page it makes for the worked
 // example, opened from a local file.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type Browser, chromium } from "@playwright/test";
 import { canonical } from "@stemma/records";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { copyExample, ROOT, temporary } from "./helpers.ts";
+import { builtCli, copyExample, ROOT, temporary } from "./helpers.ts";
 
 let built = "";
 beforeAll(async () => {
-  built = await bundle(temporary());
+  built = await builtCli(temporary());
 }, 60_000);
 
 /** git with no configuration from the caller. */
@@ -239,8 +238,10 @@ describe("graph export", () => {
   });
 
   test("a built copy without its page template says so and writes nothing", async () => {
-    const copy = temporary();
-    const script = await bundle(copy);
+    // A copy of the build made for these tests.
+    const copy = join(temporary(), "dist");
+    cpSync(dirname(built), copy, { recursive: true });
+    const script = join(copy, "stemma.js");
     rmSync(join(copy, "explorer.template.html"));
     const dir = project();
     const done = cli(["graph", "export", "--audience", "author", "--page", "--project", dir], script);
