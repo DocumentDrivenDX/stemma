@@ -48,6 +48,13 @@ describe("no run-time packages", () => {
     expect(outside).toEqual([["pdfjs-dist", "6.5.438"]]);
   });
 
+  test("what the explorer page is built from is pinned exactly, and is needed only when Stemma is built", () => {
+    const { devDependencies } = JSON.parse(read("package.json"));
+    expect(["@documentdrivendx/arras-ui", "react", "react-dom", "@types/react"].map((name) => [name, devDependencies[name]])).toEqual([
+      ["@documentdrivendx/arras-ui", "0.8.1"], ["react", "19.3.1"], ["react-dom", "19.3.1"], ["@types/react", "19.3.0"],
+    ]);
+  });
+
   test("the bundle imports only what is built into Bun", async () => {
     const path = await bundle(temporary());
     expect(unresolvedImports(readFileSync(path, "utf8"))).toEqual([]);
