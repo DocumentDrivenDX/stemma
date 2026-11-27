@@ -42,6 +42,7 @@ and the obligations the agent has toward the command line and the records.
 |---|---|
 | `.claude-plugin/plugin.json` | Plugin manifest; the marketplace file belongs to the DocumentDrivenDX/plugins repository |
 | `skills/stemma/SKILL.md` | The only public skill |
+| `dist/mcp-tools.json` | The names, descriptions, and argument schemas of the MCP tools, read by the command line and the launcher. Present in a release tree |
 | `skills/stemma/modes/<mode>.md` | Instructions loaded for a mode |
 | `skills/stemma/prompts/support/<version>.md` | Versioned claim-support prompt; a released version is never edited |
 | `scripts/stemma.sh` | The launcher: sets up the pinned Bun in the plugin data directory and runs the command line |
@@ -50,6 +51,11 @@ and the obligations the agent has toward the command line and the records.
 | `templates/` | Files `init` copies into a project |
 
 - The plugin MUST NOT add other public skills.
+- The manifest MUST declare exactly one MCP server, `stemma`, which starts the
+  command `mcp` through `scripts/stemma.sh` with the plugin root and data
+  directory the host fills in, and nothing else (CONTRACT-005 N). It MUST do
+  nothing until a tool is called. The skill MUST work without it, through the
+  command line, in a host that does not load it.
 - The bundle MUST NOT be committed to the Stemma repository. A release MUST be
   published as the built release tree at `plugins/stemma` in the
   DocumentDrivenDX/plugins marketplace repository (SD-010). Different content
@@ -244,7 +250,8 @@ project without network access.
 - Whether a host asks the author before a command runs depends on its
   permission settings. A review mark, annotation, or confirmation gains no
   assurance from that prompt.
-- A Model Context Protocol server is not part of this version.
+- The MCP server adds tools, not a second skill. Which hosts load it is a host
+  observation like any other (F).
 
 ## Proof Status
 

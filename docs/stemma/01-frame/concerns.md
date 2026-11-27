@@ -57,9 +57,10 @@ Considered and not selected:
   graph engine design if its schema becomes a long-lived interface.
 - `i18n-icu`: the requirements cover multilingual sources, not a translated
   interface. Reconsider when a pilot needs one.
-- `mcp-server`: ADR-012 decides that the explorer may expose itself over the
-  Model Context Protocol (a protocol for connecting tools to AI hosts), in a later
-  stage. Select the concern when that stage is designed.
+- `mcp-server`: ADR-012 has the explorer expose itself over the Model Context
+  Protocol (a protocol for connecting tools to AI hosts) as a child process of the
+  author's session with read-only tools (CONTRACT-005 N). The concern's practices
+  assume a deployed, operated server; reconsider for a remote transport.
 - `frontend-architecture`: its server-state practices assume a backend the
   offline explorer lacks.
 

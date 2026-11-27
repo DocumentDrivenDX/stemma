@@ -38,9 +38,9 @@ for browsing without a server.
 
 Delivery is in stages. The server (`stemma browse`, CONTRACT-005 M) comes first,
 then search beyond the arras limits (M, "Search"), then originals shown
-unhighlighted beside the text (M, "Originals"). Highlighting on originals and MCP
-are later stages, each specified before it is built. None of them is built by
-this decision alone.
+unhighlighted beside the text (M, "Originals"), then MCP (N, "Agents over MCP"
+below). Highlighting on originals is a later stage, specified before it is
+built. None of them is built by this decision alone.
 
 ## Originals in the page
 
@@ -83,7 +83,26 @@ second form), but a broad search is not a bare lookup. So there is no index:
 nothing derived is written to disk or can be stale. This is not the FEAT-011
 engine, and it would be reconsidered for a project many times that size.
 
-## Why We Chose This
+## Agents over MCP
+
+The plugin declares one MCP server that the host starts over standard input and
+output, through the plugin's one launcher, and CONTRACT-005 N states its rules.
+
+- **The host starts it in every session**, so it does nothing until a tool is
+  called, and its launcher never fetches Bun for it. Without Bun the launcher
+  itself answers, in a few lines of shell, that setup has not run. A server that
+  merely failed to start would show an error in every such session and tell the
+  agent nothing.
+- **The project is the session's**, which the host gives the process. A tool
+  argument could be chosen by text the agent has read.
+- **The secret never enters the agent's context.** `open` launches the browser
+  itself and returns an address that opens nothing.
+- **The tools read.** `stop` is added so that the agent can end a server the
+  author thinks another program reached. It changes nothing in the project.
+- **One server for a project**, so that an author is not left with several pages
+  and ports. A second one is refused, not joined: joining would need a key
+  passed between processes.
+
 
 ### Over a larger offline file only
 Every byte an export shows is loaded by the page, so some cap always cuts text,
@@ -140,9 +159,18 @@ answers from data older than the record files; a request path that reaches the
 file system; any outbound request; a second implementation of arras behaviour
 beyond the search result's shape; a search that cuts results without saying so.
 
+### MCP: a small protocol module over the official SDK
+
+The server offers five tools over standard input and output: four request kinds
+and one framing rule. Stemma writes that module itself. The evidence and the
+size of the alternative are in CONTRACT-005, "Proof Status". This is reconsidered
+if Stemma needs a remote transport, resources, or another part of the protocol
+that is more than this.
+
 ## Concern Impact
 
 - **Override / deviation**: ADR-008's override of the `react-vite` backend routes
   still holds: the server has a fixed set of routes, no REST resource model, and
-  no history routing. The `mcp-server` concern becomes relevant when the MCP
-  stage is designed.
+  no history routing. The `mcp-server` concern is not selected: its practices
+  assume a server that is deployed and operated. This one is a child of the
+  author's session, offers read-only tools, and has its rules in CONTRACT-005 N.

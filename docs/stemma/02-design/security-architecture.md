@@ -73,6 +73,7 @@ Boundary IDs match the [threat model](../01-frame/threat-model.md).
 | B7 Tools and releases | Machine | Third-party code runs with author's rights | Pins, digests, lockfile, no runtime download, release audit |
 | B8 Collaborator input | Records, rules, agent behavior | Others' text becomes project content | Validation; comment import writes only comment records. `rules.md` is followed by the agent, so the author reviews changes to it |
 | B9 Requests to the local server | Everything an author export holds, and recorded originals the author's places hold | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, calls signed with a per-run secret got by a one-time code and each accepted once, answers proved to the page, neither key sent by the page, no cookie and no cross-origin permission, bounded requests, fixed routes |
+| B10 MCP tool calls and results | Search results and bounded source views of the project; the power to open the author's browser at the local server | The host and its agent send arguments, which text the agent read can choose; results enter the model's context | CONTRACT-005 N: idle until asked; the session's project only; no path or address argument; read-only tools; record IDs only looked up; bounded, marked results with coordinate forms withheld; no key or launch file in any result; one server for a project |
 
 ## Control Mapping
 
@@ -236,5 +237,6 @@ the system they ran on; none is required to continue.
 | Browser: hostile strings and SVG, network denied | SEC-011, SEC-023 | M3 |
 | Seeded long source text in every package part | SEC-017, SEC-018 | M3 |
 | Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files, another program on the port, changed and repeated messages | SEC-034 to SEC-037 | With the server |
+| MCP: quiet starts with and without Bun and a project, hostile arguments and messages, hostile source text, keys searched for in output and files, the lock, and the installed round trip | SEC-040 to SEC-042 | With MCP |
 | Originals: unknown digest, links, swapped, changed, and oversize files, changed answers, and a PDF with script, links, a form, and an attachment | SEC-038, SEC-039 | With originals |
 | Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

@@ -187,7 +187,15 @@ partly met.
 - **Responsibilities**: `server` owns the HTTP rules of CONTRACT-005 M, the launch file and browser opener, the use of the input scan, and the rebuild states; it knows nothing of records. `workspace` makes the stat scan, listing the inputs as `readProject` does. `graph` makes the served data with the export's own function, with no size cap and no page. A child process, composed in `cli`, builds it, loads it into arras's static loader, and answers with arras's static client. `explorer` has a second entry for the served page: it gets the secret, forwards the `ArrasClient` reads, asks for source and manuscript views when shown, and polls for changes. BR-1215, BR-1216.
 - **Requirements Addressed**: SRV-01 to SRV-07.
 - **Interfaces**: CONTRACT-005 M; `stemma.sourceview/0` and `stemma.manuscript/0` unchanged. The record browser, source panel, and manuscript view are the offline page's components.
-- **Not built**: originals, MCP, and a SQLite index (`GraphStore`).
+- **Not built**: a SQLite index (`GraphStore`). MCP is the component below.
+
+### Component: MCP server (`server`, `cli`, the launcher)
+
+- **Purpose**: An agent searches the records and shows one to the author.
+- **Responsibilities**: `server` owns the protocol over standard input and output, which knows nothing of records; the shaping, bounding, withholding, and marking of results, made in the snapshot's process so that coordinate forms are looked for in whole texts; the project's server lock; and one-time codes after the first. `cli` composes the five tools with the same snapshots, listener, launch file, and opener as `browse`. The launcher answers without the pinned Bun. `explorer` takes a record to go to with the code.
+- **Requirements Addressed**: SRV-12, SRV-13.
+- **Interfaces**: CONTRACT-005 N.
+- **Not built**: tools for report quotations or originals, and any tool that writes.
 
 ### Component: Served search (`graph`, `server`, `explorer`)
 

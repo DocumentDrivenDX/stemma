@@ -238,6 +238,15 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   just computed and matches may be given, under the same proofs as every answer.
   No recorded address is fetched, nothing in a file is run, and the server's
   policy is not loosened.
+- SRV-12. The plugin must offer the agent, over MCP, read-only tools to search
+  records, get a bounded source view, report the server's state, open the
+  author's browser at a record, and stop the served explorer. The project must be
+  the session's and no tool may take a path or address. Until a tool is called
+  the MCP server must download, write, and listen on nothing, in any session,
+  with or without the pinned runtime or a project.
+- SRV-13. No tool result, output, log, or process argument may hold the secret or
+  a one-time code. Text from records and sources in a result must be marked as
+  quoted data, bounded, and withheld where it holds a recognized coordinate form.
 
 ### Non-Functional Requirements
 
@@ -268,6 +277,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 - [US-118 — Read the report and open its sources](../user-stories/US-118-read-the-report-and-open-its-sources.md)
 - [US-119 — Browse through the local server](../user-stories/US-119-browse-through-the-local-server.md)
 - [US-121 — See the original page beside the highlighted text](../user-stories/US-121-see-the-original-page.md)
+- [US-122 — Ask the assistant to show a record](../user-stories/US-122-ask-to-see-a-record.md)
 
 ## Edge Cases and Error Handling
 
@@ -330,8 +340,8 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
-- Opening or highlighting an original or page image, and an MCP surface: later
-  stages of ADR-012, not yet specified.
+- Highlighting on an original or page image: a later stage of ADR-012, not yet
+  specified.
 - Searching source page text, manuscript files, or research notes.
 - Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).

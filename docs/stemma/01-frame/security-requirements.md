@@ -82,6 +82,19 @@ Each item states its acceptance criterion.
   with the content security policy of CONTRACT-005 M, rule 11, unchanged. It
   never uses the browser's PDF viewer, and shows no page that CONTRACT-007 C does
   not establish.
+- **SEC-040**: The MCP server downloads, writes, listens, reads no project
+  file, and starts no lasting process until a tool is called; its launcher never
+  fetches the runtime for it; and only protocol messages reach its standard
+  output (CONTRACT-005 N).
+- **SEC-041**: No MCP tool takes a project, path, file, or address; each only
+  reads the session's project, rejects what it does not name, and opens only the
+  local server at a record found in the snapshot, within a rate limit. No result,
+  output, log, process argument, or lock holds the secret or a code, and no
+  result names a launch file.
+- **SEC-042**: Text from records and sources in an MCP result is inside a marked
+  block of quoted data that the data cannot end, bounded, within what the author
+  export holds, and withheld where it holds a recognized coordinate form. Nothing
+  claims that the marking controls a model.
 - **SEC-002**: Every user-facing text about review marks, annotations, text
   reviews, comparisons, restriction marks, and support verdicts, including the disclosure, calls them
   records and not proof of who acted or verification of support.
@@ -248,6 +261,9 @@ controls cover only its instructions and its own commands.
 | SEC-036 | Loopback only, fixed routes, bounds, no outbound request | G: CONTRACT-005 M; TM-D-010, TM-I-016, TM-E-008 | High | Socket, path, size, time, and header tests |
 | SEC-037 | Page and server prove themselves; the author is told of a first opener | G: CONTRACT-005 M, ADR-012; TM-S-008, TM-I-018 | High | A program on the port, changed, moved, and repeated answers and requests, and both code notices |
 | SEC-038 | Only recorded originals, from named places, as hashed | G: CONTRACT-005 M; TM-I-019, TM-D-011 | High | Unknown digest, paths, links, swapped, changed, oversize, and unsupported files |
+| SEC-040 | The MCP server is idle until asked | G: CONTRACT-005 N, ADR-012; TM-E-010 | High | Quiet starts with and without Bun and a project |
+| SEC-041 | Read-only MCP tools; no key or path in or out | G: CONTRACT-005 N; TM-E-010, TM-I-021, TM-S-010 | High | Hostile arguments, output and file searches, lock tests |
+| SEC-042 | Source text through MCP is marked and bounded | G: CONTRACT-005 N; TM-E-011, TM-I-022 | High | Seeded instructions, hidden characters, coordinates |
 | SEC-039 | Originals drawn inert, after their proof | G: CONTRACT-005 M, ADR-012; TM-E-009, TM-D-011 | High | A PDF with script, links, a form, and an attachment; changed answers; the policy |
 
 ## Compliance Requirements

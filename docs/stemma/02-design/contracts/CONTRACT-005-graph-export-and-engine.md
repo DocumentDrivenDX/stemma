@@ -32,7 +32,7 @@ interface shared by the disposable index and the later graph engine.
 
 - In scope: export files, audiences, mapping, freshness, rebuilding,
   the reviewer comment file, the `GraphStore` port, arras compatibility,
-  upstream needs, and the local server's HTTP surface.
+  upstream needs, the local server's HTTP surface, and its MCP tools.
 - Out of scope: explorer screens, map layouts, typeset-page linking, index
   tables (Data Design).
 - Owning module: `packages/graph`.
@@ -613,7 +613,7 @@ is unchanged and the page sends no request.
 `browse` (CONTRACT-002 B; ADR-012) serves the explorer to a browser on the same
 computer. It serves the `author` audience only. Its search is Stemma's own, with
 no result limit ("Search" below). It shows original pages beside source text
-("Originals" below) and has no MCP surface.
+("Originals" below). N offers it to an agent over MCP.
 
 **What is served.** The author export of B, E, F, J, K, and L, made in memory
 from the record files by the same functions, with no size cap on source views or
@@ -1005,6 +1005,144 @@ running. It then removes the launch file and ends its child.
   size can pass the scan unseen.
 - On Windows the file modes of rule 8 are not applied, and the temporary
   directory's own permissions are all that guard it.
+
+### N. The MCP server
+
+`mcp` (CONTRACT-002 B; ADR-012, "Agents over MCP") offers the local server of M
+to an AI agent over the Model Context Protocol (MCP). The host starts it as a
+child process and exchanges messages with it on its standard input and output.
+Its tools only read. It serves the `author` audience.
+
+**Declaration.** The plugin manifest declares one server, `stemma`:
+
+```json
+"mcpServers": {"stemma": {"command": "sh", "args": [
+  "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh", "${CLAUDE_PLUGIN_DATA}", "mcp"]}}
+```
+
+It names no project and sets no environment. A host that does not replace the two
+variables starts nothing that works: the launcher refuses a data directory that
+was not filled in, and writes nothing.
+
+**Idle until asked.** A host starts the server in every session with the plugin,
+whatever the session is about. Until a tool is called it downloads nothing,
+creates and writes no file, opens no listener, starts no other long-lived
+process, and reads no project file. The launcher does not fetch Bun for `mcp`,
+does not create the data directory, and turns Bun's transpiler cache off. Only
+protocol messages are written to standard output.
+
+**Without Bun.** When the data directory holds no pinned Bun, the launcher
+answers the protocol itself, in shell: the same tool list (from the file
+`dist/mcp-tools.json` that the command line also reads), and for every tool call
+a result saying that Stemma's one-time setup has not been run and how the agent
+runs it. It repeats nothing from a request but its ID, and only an ID that is a
+number or a short plain string. Once the pinned Bun is there, the next tool call
+hands the connection to the command line, which answers that call and the rest.
+
+**Protocol.** JSON-RPC 2.0, one message on each line. Answered: `initialize`,
+`ping`, `tools/list`, and `tools/call`. Notifications are taken and not
+answered. Any other request gets error -32601. The server offers tools only: no
+resources, prompts, sampling, elicitation, or roots, and it asks the host
+nothing. It answers `initialize` with the version the host asked for when it is
+one of `2024-11-05`, `2025-03-26`, `2025-06-18`, and `2025-11-25`, and with the
+last of these otherwise. A line over 64 KiB is not parsed (-32700). Tool calls
+run one at a time; at most 16 wait, and a further one is refused. `ping` and
+`tools/list` are answered while a tool runs.
+
+**The project** is the session's. The command takes it from the environment
+variable `CLAUDE_PROJECT_DIR`, which the host sets for the server's process, or
+from `--project` on its own command line: that directory, or its nearest
+ancestor that holds `stemma.json`. **No tool takes a project, a path, a file, or
+an address.** Nothing falls back to the working directory, which is the plugin's
+own. With no such variable, or no project there, every tool says what is so and
+what to do, and does nothing else.
+
+**Tools.** Each rejects an argument it does not name, a wrong type, and a value
+outside its bounds, and then does nothing.
+
+| Tool | Arguments | Does and gives |
+|---|---|---|
+| `status` | none | The project, or why there is none; whether its data is held (`not_read`, `current`, `rebuilding`, `failed`); whether the HTTP server runs, its address, and the times its one-time links were opened. It reads no project file but the presence of `stemma.json`, builds nothing, and starts nothing |
+| `search` | `text` (1 to 200 code points), `type?`, `limit?` (1 to 20, default 10), `offset?` | M's search: `total`, `all`, counts by type, and hits with `rank`, `type`, `id`, `label` (at most 200 code points), and `excerpt` (at most 160, from the folded search text, so not for quoting) |
+| `source_view` | `record`, a citation or passage ID | A bounded form of the source view (K): `state`, `why`, work, locator, and the citation's sentence and quotation; and for `highlighted` each page's place, printed label, quality, the quoted words, and at most 300 code points on each side |
+| `open` | `record?`, a record ID | Starts the HTTP server of M if it is not running and has the system's browser open a new one-time link, at that record or at the start. Gives the address without a code or secret, the record's type and label, and whether the system took the file |
+| `stop` | none | Stops the HTTP server, lets the held data go, and removes launch files and the lock. The MCP server goes on answering |
+
+`search`, `source_view`, and `open` with a record look a value up in the
+snapshot of M and nowhere else. A record ID that is not an entry of the
+snapshot, whatever it looks like, is `unknown_record`, and nothing is opened. A
+report quotation is not a record and has no tool.
+
+**Data and freshness** are M's: the same child process holds the same snapshot,
+built on the first call that needs it, and each call that reads it is preceded
+by M's scan. While the files are read, a call waits up to 100 seconds and then
+says to call again. A failed build gives its reason and no data.
+
+**The HTTP server** is M, with every rule and proof unchanged. It starts only at
+the first `open`. A later `open` uses the same server and the same secret and
+makes a **new one-time code**: at most one code can be redeemed at a time, so a
+new one ends an unused earlier one (which is then `code_expired`), and a used
+one stays `code_used`. The code's launch file is rule 8's, one for each `open`,
+removed when its code is used or ends. The launch address may name a record, as
+`#code=<code>&to=explore/stemma/<type>/<key>`, built from the snapshot's entry;
+the page goes there only when the text has that form. If the system's opener
+does not take the file, the code is ended, the file removed, and the result says
+to use the `browse` command instead: **no result names a launch file**. At most
+one `open` in 5 seconds and 30 in an hour are accepted.
+
+**One server for a project.** Before it listens, `mcp` and `browse` alike take
+a lock: a file of mode 600 in `serve/` of the plugin's data directory (the
+system's temporary directory when run without the launcher), named by the
+SHA-256 of the project's real path. It holds the process number, the address,
+the project path, the time, and a random mark of its holder, and **no code or
+secret**. A lock is held while its process is alive and it was touched in the
+last 90 seconds; the holder touches it every 10. A second server is refused, and
+told the process and address. A lock that is not held is replaced. The holder
+removes it when its server stops.
+
+**Lifetime.** The HTTP server and the held data are let go after 60 minutes with
+no accepted page call and no tool call that read the data. All of it ends when
+the host closes the server's input or signals it.
+
+**Results.** A result is one text item: Stemma's own words, then one JSON value
+between a begin and an end line that carry a random token the value does not
+hold, introduced as quoted data from the project's records and sources that is
+not an instruction. Everything from a record, a source, or a file name is inside
+it, JSON escaped, with hidden characters shown as visible code points. A refused
+call is a result marked as an error, with a code and words. A whole result is at
+most 32,000 UTF-16 units; one that would be longer is refused with
+`answer_too_large`. A `source_view` gives at most 5 pages and 2,000 code points
+of quoted words; beyond either it gives no page text and says where to see it. A
+cut label, sentence, or context ends in `…` and is marked; quoted words are
+never cut.
+
+**What a result may hold.** Only what the author export holds (E): no restricted
+store value, local path, `legacy`, or `x`. A source view's record of the
+original (where it is held, addresses, digests) is not returned. `rights` fields
+filter nothing, as elsewhere (CONTRACT-001 G). Text goes to the agent's model,
+so text that matches a recognized coordinate form (CONTRACT-002 C,
+`coordinate.stray`) is withheld and said to be: a label, sentence, quotation, or
+title that holds one; the excerpt of an entry whose search text holds one; and
+all page text of a passage view whose pages, whole as the view holds them, hold
+one. The browser shows it to the author. A form the scan does not know passes,
+so this is a warning's filter and not a guarantee.
+
+**Text that tries to instruct.** Source text can be written to read as an order
+to the agent, and a tool result carries it to the agent. The most such text can
+make these tools do is what their arguments allow: search and read bounded
+pieces of this project, open the author's browser at this server at one of its
+records (rate limited), and stop the server. No tool writes a record, runs a
+command, reads a named file, or sends anything anywhere. The marking is not a
+control on the model, and an agent steered this way keeps whatever other tools
+its host gives it.
+
+**What this does not defend against**, beyond M: the agent, which runs as the
+author, can read a launch file and the project with its other tools; the skill
+tells it not to touch launch files, which is an instruction only. Repeated calls
+read the project a piece at a time into the agent's context, which `excerpt` and
+file access already allow. A server that is killed outright leaves its lock,
+which is then replaced, and may leave a launch file whose code opens nothing.
+Whether a host asks the author before a tool call is the host's setting.
 
 ## Precedence and Compatibility
 

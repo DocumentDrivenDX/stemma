@@ -134,6 +134,11 @@ An **observation** is one result for a host and operating system: passed, failed
 - **BR-1010** — Platform neutrality: scripts are TypeScript run by Bun. The bundle builds paths with platform functions, passes subprocess arguments as lists, sorts by code point, and depends on no shell or locale. Record normalization is SD-011's.
 - **BR-1011** — Observed claims only: a listing or manifest validation never yields "passed". "Passed" requires that the installed skill is loadable and the delivered command line ran.
 - **BR-1012** — Persona isolation: no persona value reaches the check engine's findings or label rule. `core` takes no persona input for either.
+- **BR-1013** — MCP declaration: the manifest declares the one MCP server of
+  CONTRACT-005 N, started by the launcher. For `mcp` the launcher fetches and
+  writes nothing, and without the pinned Bun answers the protocol itself, from
+  the tool list the release tree ships. A package test holds the declaration, and
+  the install check runs the declared command from the installed copy.
 
 ## System Decomposition
 

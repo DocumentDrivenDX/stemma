@@ -74,7 +74,7 @@ host, any static host the author chooses, and the publisher.
 | C9 Build | Citation formatting, image conversion, Typst, packaging | Processes untrusted content |
 | C10 Explorer and exports | Graph export, offline page, reviewer package, comment file | Leaves the machine |
 | C11 Distribution and toolchain | Plugin, release package, Bun, Typst, libraries, fonts | Runs with the author's rights |
-| C12 Local server | `browse`: a loopback HTTP listener and a child process holding the author export | Trusted code; every request untrusted until it passes CONTRACT-005 M |
+| C12 Local server | `browse` and `mcp`: a loopback HTTP listener and a child process holding the author export; MCP tools over standard input and output | Trusted code; every HTTP request untrusted until it passes CONTRACT-005 M; every tool argument untrusted (N) |
 
 ### Data Flows
 
@@ -145,7 +145,7 @@ modules, or the product owner for accepted risks.
 | C9 | n4 | TM-T-006 | TM-R-003 | TM-I-004, 006 | TM-D-007 | TM-E-004, 005 |
 | C10 | TM-S-005 | TM-T-008 | TM-R-003 | TM-I-006 to 008, 012 | TM-D-004 | TM-E-006 |
 | C11 | TM-S-004 | TM-T-007, 009 | TM-R-004 | TM-I-013 | TM-D-006 | TM-E-007 |
-| C12 | TM-S-008 | n5 | n1 | TM-I-016 to 018 | TM-D-010 | TM-E-008 |
+| C12 | TM-S-008, 010 | n5 | n1 | TM-I-016 to 018, 021, 022 | TM-D-010, 012 | TM-E-008, 010, 011 |
 
 - n1: no separate actions or identities of its own; attribution falls under
   TM-R-001.
@@ -170,6 +170,7 @@ modules, or the product owner for accepted risks.
 | TM-S-007 | A wrong or spoofed resolver or search response is saved as authoritative metadata | 2 | 1 | 2 | `workspace` | SEC-008; saved with source and date |
 | TM-S-008 | Another local program, of any user: after the server stops, it takes the same port, and a still-open page sends it the secret or shows its invented records as current | 4 | 2 | 8 | `server`, `explorer` | SEC-037: requests are signed and the code and secret are never sent; the page uses no answer without a proof bound to its request, and on one drops the secret and its data. It receives the bodies of calls under way. Not covered: TM-S-009 |
 | TM-S-009 | Another local program holds the port when the browser asks for the page itself (a reload or restore after the server stopped, or a launch file left behind), and serves its own page; it may also leave a service worker for that address, which a later run on the same port would meet | 4 | 1 | 4 | Author (accepted) | None in the page, whose script comes from the port. The stopped notice says to close the tab without reloading it; the launch file is removed when the command ends |
+| TM-S-010 | Another program writes or replaces the server lock, so that a second server is refused, or points the author or agent to an address that is not Stemma | 2 | 2 | 4 | `server` | SEC-041: the lock holds no key and is in the plugin's data directory with mode 600; an address in it is only shown, never opened or signed to. Only a program running as the author can write it |
 
 ### Tampering
 
@@ -221,6 +222,8 @@ modules, or the product owner for accepted risks.
 | TM-I-016 | Hostile web page in the author's browser reads the local server: a cross-origin fetch or form post, DNS rebinding to 127.0.0.1, framing, or guessing paths | 4 | 3 | 12 | `server` | SEC-034, SEC-036: exact Host and Origin, no cross-origin permission, JSON and custom header, secret header, no cookie, framing refused |
 | TM-I-017 | Another local port: a page or program on another loopback port reaches the server, or receives its cookie or secret | 4 | 2 | 8 | `server`, `explorer` | SEC-034: origin includes the port; no cookie (cookies are shared between ports); the secret is in per-origin session storage |
 | TM-I-019 | The local server is made to give a file that is not a recorded original: a request naming a path, a link placed where originals are looked for, or a file swapped for another after it was checked | 4 | 2 | 8 | `server` | SEC-038: a request names only a digest a source file records; no link is followed; the bytes sent are the bytes hashed |
+| TM-I-021 | The secret or a one-time code enters the conversation, and so the model provider and the transcript, through a tool result, the server's output, or a launch file the agent is told of | 5 | 2 | 10 | `server`, `skills/stemma` | SEC-041: results hold neither and name no launch file; `open` launches the browser itself. An agent can still read the temporary directory; the skill tells it not to |
+| TM-I-022 | MCP results send restricted positions, local paths, or much source text to the model | 4 | 3 | 12 | `server` | SEC-042: only author-export text, bounded per call, recognized coordinates and held-at places withheld. Unrecognized coordinate forms pass, and repeated calls read much text, as `excerpt` and file access already can (TM-I-001, TM-I-002) |
 | TM-I-020 | An original shown shows what the source text and the export leave out, such as a download stamp naming a person or a restricted position | 2 | 2 | 4 | Author (accepted) | Shown only through the local server on the author's computer; no export or package holds it; stated in CONTRACT-005 M |
 | TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested. Neither is sent (SEC-037). A process running as the author that redeems the code first gets in; the author's page and the command's output then say that the link was opened first, which tells of it and does not prevent it |
 
@@ -239,6 +242,7 @@ modules, or the product owner for accepted risks.
 | TM-D-009 | The index is corrupt or stale | 1 | 2 | 2 | `graph` | Rebuilt from records |
 | TM-D-011 | A hostile or very large original takes the memory or time of the server or the page | 2 | 2 | 4 | `server`, `explorer` | SEC-039: size limit before reading, two originals held at once, bounded canvas, image pixels, and drawing time |
 | TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds, including a search's work and answer size (CONTRACT-005 M, rule 13). Another user can still use up the connection limit while it connects; the author loses browsing, not data |
+| TM-D-012 | An MCP server slows or breaks every session with the plugin, or steered calls make it build, open windows, or answer without end | 2 | 2 | 4 | `cli`, `server` | SEC-040: nothing is done until asked; calls run one at a time with a short queue and bounded lines and results; `open` is rate limited. Building a large project's data takes the memory CONTRACT-005 records |
 
 ### Elevation of Privilege
 
@@ -252,6 +256,8 @@ modules, or the product owner for accepted risks.
 | TM-E-006 | Record, comment, resolver, or SVG content runs script in the explorer, including by breaking out of inlined data. In-browser Typst may need a looser policy | 4 | 3 | 12 | `explorer` | SEC-011 |
 | TM-E-007 | A malicious dependency, install script, or update runs with the author's rights | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
 | TM-E-009 | A hostile PDF or image shown in the served page exploits pdf.js or the browser's image decoders, or its scripts, links, forms, or attachments act | 5 | 2 | 10 | `explorer` | SEC-039: only files whose digest a source file records; pinned pdf.js drawing a canvas from bytes, no scripting, XFA, evaluation, WebAssembly, annotation or link layer, or attachment; policy unchanged. A flaw in a parser or decoder is not contained beyond the page's policy |
+| TM-E-010 | A tool argument, possibly written by text the agent read, makes the MCP server open an address, read a file, choose another project, write, or run something; or the server acts in a session unasked | 5 | 2 | 10 | `server`, `cli` | SEC-040, SEC-041: five fixed tools; no path, address, or project argument; a record ID only looked up; the opener is given only the launch file the server made |
+| TM-E-011 | **Injection through MCP**: record or source text in a tool result poses as an instruction, and the agent obeys it with its other tools (TM-S-001, TM-E-001). Expected, not hypothetical | 5 | 3 | 15 | `server`, `skills/stemma`; the author for host permissions | SEC-042, SEC-009: marked, JSON-escaped, bounded quoted data; the tools themselves can only read this project, open this server, and stop it. Nothing contains a steered agent |
 | TM-E-008 | A crafted request reads a file outside the served set or makes the local server run something | 5 | 1 | 5 | `server` | SEC-036: fixed routes, assets held in memory, a record ID only looked up in the snapshot; arras runs queries over memory only |
 
 ## Risk Assessment
@@ -268,6 +274,7 @@ not day counts. No owner risk tolerance is recorded.
 | TM-I-007 | Long source text in a reviewer package | 4 | 4 | 16 | High |
 | TM-I-003 | Injection-driven exfiltration | 5 | 3 | 15 | High |
 | TM-E-001 | Injection-driven commands and edits | 5 | 3 | 15 | High |
+| TM-E-011 | Injection through MCP tool results | 5 | 3 | 15 | High |
 
 Medium (10-14): TM-S-001, TM-S-002, TM-T-001, TM-T-002, TM-T-006, TM-T-007,
 TM-I-002, TM-I-004, TM-I-005, TM-I-006, TM-I-014, TM-D-002, TM-E-002 to
@@ -326,17 +333,6 @@ TM-E-004, TM-E-006, TM-E-007.
 - **Corrective**: fix and re-release; rebuild derived data; restore from the
   author's backups. Removing material from git history or from recipients is
   manual, and material sent to a model cannot be recalled by Stemma.
-
-## Local server stages not yet built
-
-ADR-012's later stages add threats that are analysed here before they are built
-and have no control yet:
-
-- **Injection through MCP** (an MCP surface): record and source text returned to
-  an agent can pose as instructions (TM-S-001, TM-E-001), and a tool argument
-  can try to name an address or a file. The plan is read-only tools, results
-  marked as quoted data and bounded, record IDs only, and no tool that takes a
-  path or address. There is no MCP surface now.
 
 ## Assumptions and Dependencies
 
