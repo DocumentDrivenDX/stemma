@@ -29,9 +29,9 @@ work in progress elsewhere and wait until it reaches `main`.
 | 21 | Connected-graph view | FR-64 (ADR-008) | upstream arras | Needs an arras contribution |
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
-| 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Next after 11 |
+| 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Built; in final review |
 | 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs 24 and 26 |
-| 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Requested; measuring |
+| 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Requested; measured, not fixed |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover session accepted it, specs first |
 
 ## Iteration 24: see a citation inline with its source
@@ -130,6 +130,36 @@ PDF-only manuscript intake out of scope; this requirement reverses that.
 - Tests use invented manuscripts. Acceptance also runs on the product owner's
   real manuscripts, read where they are; nothing from them enters the
   repository.
+### Measured (synthetic data, one macOS machine, headless Chromium)
+
+With source views, at 500 / 2,000 / 5,000 sources (about 5 passages, 2 notes and
+1.5 citations each; 79,020 entries at 5,000):
+
+| Measure | 500 | 2,000 | 5,000 |
+|---|---|---|---|
+| Export time | 7 s | 41 s | 213 s |
+| Export peak memory | 3.3 GB | 11.8 GB | 21.3 GB |
+| Page file | 22 MB | 67 MB | 155 MB |
+| Page load | 0.4 s | 1.2 s | 3.6 s |
+| Search (with a 0.25 s typing delay) | about 0.3 s at all sizes | | |
+
+- The 8 MB source-view cap leaves 23,285 of 25,000 passage views without text
+  at 5,000 sources. The offline page cannot serve a large project's sources.
+- Export time and memory are dominated by computing record states; the likely
+  cause, inferred, is `coverageOf` rescanning records. Quotations that match
+  nothing make it much slower.
+- Paging all search results needs an arras change: its interface asks for 50
+  and has no next page. Returning more from a replacement client works without
+  a fork (1,900 and 26,781 hits rendered). It also limits queries to 6 words and
+  200 characters. A replacement client can lift the 20-type, 50-per-type and
+  100-link limits; the list of searched types is Stemma's own.
+
+### Order of work
+
+1. Make the export's time and memory grow in proportion to the project.
+2. Serve reads and search from a SQLite index through a replacement client in
+   the localhost server, which also serves source views on demand.
+3. Take search paging, query limits and exact link totals to arras.
 
 ## Not completable by an agent alone
 
