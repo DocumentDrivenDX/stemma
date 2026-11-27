@@ -30,7 +30,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | On main; originals not opened yet (25) |
-| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, originals with highlighting where positions are certain (scans unmarked) and MCP on main; other manuscripts not built |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, originals with highlighting where positions are certain and labelled estimates on scans, and MCP on main; other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Faster export and complete paged search in `stemma browse` on main; export memory over 4 GB; offline page still limited |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
 
@@ -66,7 +66,8 @@ possible and falls back to the text snapshots in the repository.
   be absent from the repository and from a fresh clone.
 - Highlighting on an original needs text positions. A PDF text layer can give
   them; a scan with no word positions cannot. Then show the page unhighlighted
-  beside the highlighted snapshot text, and never guess a region.
+  beside the highlighted snapshot text, and never guess a region. (Since
+  changed for scans: see "Measured: estimates on scans".)
 - Never highlight text whose anchor no longer matches. A citation with no
   recorded quotation or page opens the source and highlights nothing.
 - Decided by the product owner: the browser may run a server on localhost and
@@ -107,11 +108,47 @@ All 14 originals are PDFs held in a local cache; nothing was fetched.
 - Placing marks took 22 ms for the median page and 240 ms for the slowest, in
   one process without the cost of starting one.
 
-Open for the product owner: whether to show a recognition layer's positions,
-labelled as estimates (ADR-012 says no); and whether to mark quotations across a
-line-end hyphen and those holding a ligature wholly inside them, which the
-operators place without ambiguity but which are refused for now. The 23 hyphen
-cases include scans, which would stay unmarked.
+Decided since by the product owner: scanned pages should show approximate
+highlights where possible, by a method to be refined (ADR-012). Still open:
+whether to highlight, on pages that are not scans, quotations across a line-end
+hyphen and those holding a ligature wholly inside them, which the operators place
+without ambiguity but which are refused for now.
+
+### Measured: estimates on scans (the same example and machine)
+
+- Before: 6 highlighted, 0 estimated, 119 unmarked (94 recognition layer, 23
+  line-end hyphen, 1 ligature, 1 grey letter). After: 6 highlighted, the same
+  ones; 117 estimated, all by `ocr_layer_offsets`; 2 unmarked, the ligature and
+  the grey letter, both on pages that are not scans. All 117 passed the page's
+  pixel check in headless Chromium. The first form of that check, the one for
+  highlights, wants near-white paper and failed tinted pages.
+- No segment is on a page with no text layer, so none is left unmarked for that.
+  The example's source text came from the PDFs' own layers.
+- `ocr_layer_match` never runs on this example unaided. With the offsets
+  withheld it chose the same boxes for 115 of the 117 and refused 2 as too short;
+  its checks of the surrounding words, numbers, and denials refused none.
+- With letters of the quoted and surrounding words changed at random, lost, or
+  added, at 3, 7, 10, 14, 20, and 35 in 100, it chose the same lines for 84, 50,
+  37, 26, 5, and 0, marked no other line, and refused the rest. Before the checks
+  of numbers and denials it chose 115, 112, 112, 88, 18, and 0, so those checks
+  cost much on damaged text. This test often adds the digit 1: it changed the
+  digits of 29 quotations at 3 in 100. Without added digits, damage changed a
+  count of denials in 8 and of `nt` in 12 of the 117 at 3 in 100. This is made-up
+  damage, not another recognition engine's.
+- The reader decodes none of the example's scan images (data of none), so it
+  learns of no mask on them. All 117 pages are still read as scans.
+- Searched for 457 times on pages that do not hold them, quotations from other
+  pages were placed 0 times.
+- Looked at by eye: all 117, as drawn by the served page's pdf.js with its
+  boxes. Each lay on the quoted lines, from the first quoted words to the last,
+  footnotes, two-column pages, and line-end hyphens included. No mark on other
+  lines was seen. Often an edge cut through or left out part of the last letter.
+- Placing took at most about 0.35 s a page, in one process without the cost of
+  starting one.
+- Limits: the boxes are the recognition layer's, so their edges can cut through
+  or miss part of a letter, and a layer shifted onto other printed words would
+  not be detected. Not tried on scans from other tools, such as skewed layers or
+  columns the layer orders differently from the source text.
 
 ## Iteration 26: large projects
 
@@ -232,10 +269,11 @@ Before and after were both run on these projects.
   a denser book may be refused.
 - A finding on a manuscript citation with no record has the chapter path as its
   subject, so no record's states show it.
-- Highlighting on originals refuses scans (hidden recognition text), words split
-  by a line-end hyphen and ligatures: 6 of 125 passage segments of the worked
-  example were marked. Whether to show labelled estimates is the product
-  owner's decision.
+- Estimates on scans (iteration 25, "Measured: estimates on scans") use only the
+  recognition layer's positions. Open refinements: a check of the boxes against
+  the image beyond blank places; scans from other tools, measured; image-only
+  pages, which would need a recognition engine. On pages that are not scans,
+  quotations split by a line-end hyphen or holding a ligature are still unmarked.
 
 ## Not completable by an agent alone
 

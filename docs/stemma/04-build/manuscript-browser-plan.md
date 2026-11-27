@@ -70,6 +70,10 @@ The bundle keeps no unresolved import.
 with the same pinned pdf.js, and only when that page's text equals the snapshot
 part.
 
+**Since D.** The product owner decided that scanned pages show approximate,
+labelled estimates (CONTRACT-005 M, "Estimates on scans"; ADR-012). This
+replaces "never guess a region" below for scans only. Highlighting is unchanged.
+
 ## Stage A: export that scales
 
 Profile record-state computation on the synthetic large project and make export

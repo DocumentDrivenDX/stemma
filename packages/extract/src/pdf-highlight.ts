@@ -1,17 +1,23 @@
 // Where the quoted words lie on a page of a PDF (CONTRACT-005 M, "Highlighting
 // on originals"). A box drawn on the wrong words is the worst failure here, so
-// every doubt gives no box and says why.
+// every doubt gives no highlight and says why.
 //
 // The one page is read again with the pinned pdf.js. Its text must be exactly
 // the source file's part. Positions are then worked out from the page's drawing
 // operators, as pdf.js's canvas does, and held against pdf.js's text content,
 // which it computes separately. Anything the operators do that is not known
 // here refuses the page. Nothing is run, recognized, drawn, or fetched.
+//
+// Where that gives no highlight and the page is a scan with invisible
+// recognition text, the place may be estimated from that text ("Estimates on
+// scans"; pdf-estimate.ts). An estimate is its own kind of answer and loosens
+// nothing a highlight is held to.
 import { join } from "node:path";
 import { sha256 } from "@stemma/records";
-import { type Highlight, type HighlightTarget, noHighlight, type NoHighlightReason } from "../../core/src/highlight.ts";
+import { type Highlight, type HighlightBox, type HighlightTarget, noHighlight, type NoHighlightReason } from "../../core/src/highlight.ts";
 import { assetDirectory } from "./index.ts";
 import { cleanText } from "./model.ts";
+import { estimatePlace, type LayerGlyph, type LayerRect, RIGHT_TO_LEFT } from "./pdf-estimate.ts";
 import { type RawItem, readPageItems } from "./pdf-lines.ts";
 
 export const HIGHLIGHT_BOUNDS = { operators: 300_000, glyphs: 100_000, boxes: 500 };
@@ -25,6 +31,10 @@ const LEAST_SIZE = 4;
 /** The lightest fill, as a part of white, in which words count as seen on white paper. */
 const DARKEST_SEEN = 0.6;
 const WHITE = 0.97;
+/** For an estimate: the least part of the page that images cover, and of its glyphs that are not seen, for it to be read as a scan. */
+const SCAN = { images: 0.5, unseen: 0.5 };
+/** The most a baseline may slope on the page as shown for boxes along lines, as a part of its run. */
+const LEVEL = 0.09;
 
 type Matrix = [number, number, number, number, number, number];
 interface Rect { x0: number; y0: number; x1: number; y1: number }
@@ -102,6 +112,8 @@ interface Glyph {
   span: number;
   size: number;
   upright: boolean;
+  /** The way its baseline runs on the page. */
+  toward: [number, number];
   /** It makes no mark: white space with no outline. */
   blank: boolean;
   /** Its text is white space only. Some fonts give a space a shape. */
@@ -119,7 +131,23 @@ interface Glyph {
   symbols: boolean;
 }
 
-interface Paint { box: Rect; order: number; white: boolean; image: boolean }
+interface Paint {
+  box: Rect; order: number; white: boolean; image: boolean;
+  /** For an image: what an estimate needs to tell whether it can be a scan's picture of the page. */
+  picture?: Picture;
+}
+
+interface Picture {
+  /** A one-bit shape, painted only where it is set. */
+  stencil: boolean;
+  /** Drawn transparent or blended. */
+  faint: boolean;
+  /** The image as the library holds it, or its name there. */
+  held?: unknown;
+}
+
+/** How the pinned library marks a decoded image that has transparency, as one with a soft, explicit, or colour-key mask has. */
+const WITH_ALPHA = 3;
 
 /**
  * Fonts whose shapes are signs, whatever letters the file's text gives them. The
@@ -237,7 +265,10 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
     state.x = state.lineX += x;
     state.y = state.lineY += y;
   };
-  const image = (order: number) => paints.push({ box: intersection(around(state.ctm, 0, 0, 1, 1), state.clip), order, white: false, image: true });
+  const image = (order: number, stencil: boolean, held?: unknown) => paints.push({
+    box: intersection(around(state.ctm, 0, 0, 1, 1), state.clip), order, white: false, image: true,
+    picture: { stencil, faint: state.fillAlpha < 1 || !state.normalBlend, held },
+  });
 
   const show = (items: any[], order: number) => {
     const { font, size } = state;
@@ -270,6 +301,7 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
         box: at(Math.min(0, outline?.x0 ?? 0), Math.min(-BOX.down, outline?.y0 ?? 0), Math.max(ems, outline?.x1 ?? 0), Math.max(BOX.up, outline?.y1 ?? 0)),
         core: at(0, -CORE.down, ems, CORE.up),
         x: px, y: py, advance: width * h * whole[0], span: Math.abs(width * h) * Math.hypot(whole[0], whole[1]), size: size * whole[3], upright: upright(whole) && h > 0 && state.direction > 0,
+        toward: [whole[0] * Math.sign(h), whole[1] * Math.sign(h)],
         blank: !outline && !glyph.accent && /^\s*$/u.test(String(glyph.unicode ?? "")),
         space: /^\s*$/u.test(String(glyph.unicode ?? "")),
         order, mode: state.mode, fill: state.fill, fillAlpha: state.fillAlpha, normalBlend: state.normalBlend,
@@ -378,8 +410,11 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
         break;
       }
       case "shadingFill": paints.push({ box: state.clip, order, white: false, image: false }); break;
-      case "paintImageXObject": case "paintInlineImageXObject": case "paintImageMaskXObject": case "paintSolidColorImageMask":
-        image(order);
+      case "paintImageXObject": case "paintInlineImageXObject":
+        image(order, false, args?.[0]);
+        break;
+      case "paintImageMaskXObject": case "paintSolidColorImageMask":
+        image(order, true);
         break;
       default:
         throw new Refused("unknown_drawing");
@@ -391,31 +426,47 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
 /** A string's characters as they count here: those of the page's lines that are not white space. */
 const marks = (text: string): string[] => [...cleanText(text.replace(/[\f\0]/g, " "))].filter((c) => !/\s/u.test(c));
 
-const RIGHT_TO_LEFT = /[֐-ࣿ‏‫‮⁧יִ-﷿ﹰ-ﻼ\u{10800}-\u{10fff}\u{1e800}-\u{1efff}]/u;
 /** One glyph that stands for several letters: the presentation ligatures. */
 const LIGATURE = /[ﬀ-ﭏ]/u;
 
 interface Placed { glyph: Glyph; item: RawItem; offset: number }
 
-async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Rect[]> {
-  const content = await page.getTextContent({ disableNormalization: true });
-  const read = readPageItems(content.items as RawItem[]);
-  // The part's text: every line that holds ink, as the converter writes them.
-  const text = read.lines.map((line) => cleanText(line.text).replace(/\n/g, " ")).join("\n");
-  if (sha256(text) !== target.text_sha256) throw new Refused("text_differs");
-  if (page.rotate % 360 !== 0) throw new Refused("rotated_page");
-  // Before anything is held against the drawing: the library reorders such text, so it would not agree.
-  for (const [from, to] of target.ranges) {
-    const end = text.indexOf("\n", to - 1);
-    if (RIGHT_TO_LEFT.test(text.slice(text.lastIndexOf("\n", from) + 1, end < 0 ? text.length : end))) throw new Refused("right_to_left");
-  }
+/** What is read of the page once, however many times it is asked for. */
+interface PageRead {
+  content(): Promise<{ read: ReturnType<typeof readPageItems>; text: string }>;
+  drawing(): ReturnType<typeof drawing>;
+}
 
-  const { glyphs, paints } = await drawing(pdfjs, page);
+function pageRead(pdfjs: any, page: any): PageRead {
+  let content: ReturnType<PageRead["content"]> | undefined;
+  let drawn: ReturnType<PageRead["drawing"]> | undefined;
+  return {
+    content: () => (content ??= page.getTextContent({ disableNormalization: true }).then((got: { items: RawItem[] }) => {
+      const read = readPageItems(got.items);
+      // The part's text: every line that holds ink, as the converter writes them.
+      return { read, text: read.lines.map((line) => cleanText(line.text).replace(/\n/g, " ")).join("\n") };
+    })) as ReturnType<PageRead["content"]>,
+    drawing: () => (drawn ??= drawing(pdfjs, page)),
+  };
+}
 
-  const [vx0, vy0, vx1, vy1] = page.view as number[];
-  const view = { x0: vx0!, y0: vy0!, x1: vx1!, y1: vy1! };
-  // The library's text content leaves out glyphs that begin off the page, by this rule of its own.
-  const onPage = glyphs.filter((g) => !(g.x + g.span < view.x0 || g.x > view.x1 || g.y < view.y0 || g.y > view.y1));
+const viewOfPage = (page: any): Rect => {
+  const [x0, y0, x1, y1] = page.view as number[];
+  return { x0: x0!, y0: y0!, x1: x1!, y1: y1! };
+};
+
+/** The library's text content leaves out glyphs that begin off the page, by this rule of its own. */
+const beginsOnPage = (g: Glyph, view: Rect): boolean => !(g.x + g.span < view.x0 || g.x > view.x1 || g.y < view.y0 || g.y > view.y1);
+
+/**
+ * The glyphs at the target's offsets in the page's text, which must be the
+ * target's text: each character drawn is held against the text content, in
+ * order, so that every quoted character has its glyph.
+ */
+function quotedGlyphs(
+  { read, text }: Awaited<ReturnType<PageRead["content"]>>, glyphs: Glyph[], view: Rect, target: HighlightTarget,
+): (Placed & { at: number })[] {
+  const onPage = glyphs.filter((g) => beginsOnPage(g, view));
 
   // Every character the operators draw there, in order, against every character of the text content.
   const drawn = onPage.flatMap((glyph) => marks(glyph.unicode).map((character) => ({ character, glyph })));
@@ -451,6 +502,23 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
     chosen.push({ glyph: found.glyph, item: found.item, offset: begins, at });
   }
   if (chosen.length === 0) throw new Refused("unclear_positions");
+  return chosen;
+}
+
+async function place(page: any, target: HighlightTarget, once: PageRead): Promise<Rect[]> {
+  const content = await once.content();
+  const { text } = content;
+  if (sha256(text) !== target.text_sha256) throw new Refused("text_differs");
+  if (page.rotate % 360 !== 0) throw new Refused("rotated_page");
+  // Before anything is held against the drawing: the library reorders such text, so it would not agree.
+  for (const [from, to] of target.ranges) {
+    const end = text.indexOf("\n", to - 1);
+    if (RIGHT_TO_LEFT.test(text.slice(text.lastIndexOf("\n", from) + 1, end < 0 ? text.length : end))) throw new Refused("right_to_left");
+  }
+
+  const { glyphs, paints } = await once.drawing();
+  const view = viewOfPage(page);
+  const chosen = quotedGlyphs(content, glyphs, view, target);
   const wanted = new Set(chosen.map((c) => c.glyph));
 
   // How the words are drawn, the most telling reason first.
@@ -521,9 +589,131 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
   return runs.map((run) => run.box);
 }
 
+/** The page as it is drawn, from its top left corner, in the units of its viewport at scale 1. */
+function onViewport(viewport: any, box: Rect): LayerRect {
+  const [ax, ay] = viewport.convertToViewportPoint(box.x0, box.y0) as [number, number];
+  const [bx, by] = viewport.convertToViewportPoint(box.x1, box.y1) as [number, number];
+  return { left: Math.min(ax, bx), top: Math.min(ay, by), right: Math.max(ax, bx), bottom: Math.max(ay, by) };
+}
+
+function fractions(viewport: any, rects: LayerRect[]): HighlightBox[] {
+  const part = (n: number) => Math.round(Math.min(1, Math.max(0, n)) * 1e6) / 1e6;
+  return rects.map((r) => {
+    const left = part(r.left / viewport.width);
+    const top = part(r.top / viewport.height);
+    return { left, top, width: part(r.right / viewport.width - left), height: part(r.bottom / viewport.height - top) };
+  });
+}
+
+/** The part of the page that lies in any of the boxes, counted over the centres of a grid of 200 by 200 cells. */
+function shareOfPage(boxes: Rect[], view: Rect): number {
+  const cells = 200;
+  const wide = cells + 1;
+  // Where each box's cells begin and end, summed afterwards, so that any number of boxes costs little each.
+  const edges = new Int32Array(wide * wide);
+  const cell = (at: number, from: number, to: number) => Math.min(cells, Math.max(0, Math.ceil(((at - from) / (to - from)) * cells - 0.5)));
+  for (const box of boxes) {
+    const [left, right] = [cell(box.x0, view.x0, view.x1), cell(box.x1, view.x0, view.x1)];
+    const [low, high] = [cell(box.y0, view.y0, view.y1), cell(box.y1, view.y0, view.y1)];
+    if (left >= right || low >= high) continue;
+    edges[low * wide + left]!++;
+    edges[low * wide + right]!--;
+    edges[high * wide + left]!--;
+    edges[high * wide + right]!++;
+  }
+  const above = new Int32Array(wide);
+  let held = 0;
+  for (let row = 0; row < cells; row++) {
+    let along = 0;
+    for (let column = 0; column < cells; column++) {
+      above[column]! += edges[row * wide + column]!;
+      along += above[column]!;
+      if (along > 0) held++;
+    }
+  }
+  return held / (cells * cells);
+}
+
+/** Whether the library says that this image lets what is under it through. It says nothing of one it did not decode here. */
+async function seeThrough(page: any, held: unknown): Promise<boolean> {
+  const data = typeof held !== "string" ? held : await new Promise((resolve) => (held.startsWith("g_") ? page.commonObjs : page.objs).get(held, resolve));
+  return (data as { kind?: number } | null | undefined)?.kind === WITH_ALPHA;
+}
+
 /**
- * The boxes on the page the target names, from the bytes given, or why there are
- * none. The bytes must already be known to have the target's digest.
+ * The images that can be a scan's picture of its page. One that is drawn
+ * transparent or blended, or that the library says has a mask, as a watermark
+ * may, is none. A one-bit shape counts as a part of the picture, but hides
+ * nothing, since it paints only where it is set.
+ */
+async function pictures(page: any, paints: Paint[]): Promise<(Paint & { solid: boolean })[]> {
+  const known = new Map<unknown, boolean>();
+  const found: (Paint & { solid: boolean })[] = [];
+  for (const paint of paints) {
+    const picture = paint.picture;
+    if (!picture || picture.faint) continue;
+    if (!picture.stencil && !known.has(picture.held)) known.set(picture.held, await seeThrough(page, picture.held));
+    if (picture.stencil || !known.get(picture.held)) found.push({ ...paint, solid: !picture.stencil });
+  }
+  return found;
+}
+
+/**
+ * An estimate on a scan, where no highlight was placed for the reason given; or
+ * that reason, where the page is not a scan whose text is invisible. Only the
+ * invisible text over the page's images is read, so that a visible stamp on a
+ * scan, or the words of a page that is not one, are never estimated.
+ */
+async function estimate(page: any, target: HighlightTarget, once: PageRead, why: NoHighlightReason): Promise<Highlight> {
+  // The library reorders such text, so its order here says little.
+  if (why === "right_to_left" || why === "page_count") return noHighlight(why);
+  const [content, { glyphs, paints }] = [await once.content(), await once.drawing()];
+  const view = viewOfPage(page);
+  const images = await pictures(page, paints);
+  // Strips and layers of a scan count together, each part of the page once; a picture beside the text of an ordinary page does not make it a scan.
+  if (shareOfPage(images.map((p) => p.box), view) < SCAN.images) return noHighlight(why);
+  if (content.text.trim() === "") return noHighlight("no_text_layer");
+
+  const shown = glyphs.filter((g) => !g.space && beginsOnPage(g, view));
+  /** Not seen: drawn invisibly, or drawn before a solid image that covers it. */
+  const unseen = (g: Glyph) => g.mode === 3 || images.some((p) => p.solid && p.order > g.order && inside(g.core, p.box, 0.5));
+  const behind = shown.filter((g) => unseen(g) && images.some((p) => meet(p.box, g.box)));
+  if (behind.length === 0 || behind.length < SCAN.unseen * shown.length) return noHighlight(why);
+
+  const viewport = page.getViewport({ scale: 1 });
+  const layer = new Map<Glyph, LayerGlyph>(behind.map((glyph) => {
+    const [x0, y0] = viewport.convertToViewportPoint(glyph.x, glyph.y) as [number, number];
+    const [x1, y1] = viewport.convertToViewportPoint(glyph.x + glyph.toward[0], glyph.y + glyph.toward[1]) as [number, number];
+    return [glyph, { text: glyph.unicode, ...onViewport(viewport, glyph.box), level: x1 > x0 && Math.abs(y1 - y0) <= (x1 - x0) * LEVEL }];
+  }));
+
+  // The recorded offsets, where the page's text is the source text's and each of its characters has its glyph.
+  let exact: LayerGlyph[] | undefined;
+  if (target.ranges.length > 0 && sha256(content.text) === target.text_sha256) {
+    try {
+      const chosen = quotedGlyphs(content, glyphs, view, target).filter((c) => !c.glyph.space);
+      // Quoted words that are seen are not part of a scan's recognition text.
+      if (chosen.some((c) => !layer.has(c.glyph))) return noHighlight(why);
+      exact = chosen.map((c) => layer.get(c.glyph)!);
+    } catch (error) {
+      if (!(error instanceof Refused)) throw error;
+    }
+  }
+  const made = estimatePlace([...layer.values()], { ...(exact ? { exact } : {}), ...(target.words ? { words: target.words } : {}) });
+  if ("refused" in made) return noHighlight(made.refused);
+  if (made.rects.length > HIGHLIGHT_BOUNDS.boxes) return noHighlight("too_much");
+  const boxes = fractions(viewport, made.rects.map((r) => ({
+    left: Math.max(0, r.left), top: Math.max(0, r.top), right: Math.min(viewport.width, r.right), bottom: Math.min(viewport.height, r.bottom),
+  })));
+  // A box partly off the page is cut to it. One with nothing left lies on no part of the picture.
+  if (boxes.some((box) => !(box.width > 0 && box.height > 0))) return noHighlight("scan_off_page");
+  return { state: "estimate", method: made.method, sha256: target.sha256, page: target.page, page_count: target.page_count, boxes };
+}
+
+/**
+ * The boxes on the page the target names, from the bytes given, as a highlight or
+ * as an estimate on a scan, or why there are none. The bytes must already be
+ * known to have the target's digest.
  */
 export async function locateOnPage(bytes: Uint8Array, target: HighlightTarget, assets = assetDirectory()): Promise<Highlight> {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
@@ -544,20 +734,27 @@ export async function locateOnPage(bytes: Uint8Array, target: HighlightTarget, a
     const document = await task.promise;
     if (document.numPages !== target.page_count || target.page < 1 || target.page > document.numPages) return noHighlight("page_count");
     const page = await document.getPage(target.page);
-    const rects = await place(pdfjs, page, target);
-    // As the page is drawn, from its top left corner.
-    const viewport = page.getViewport({ scale: 1 });
-    const part = (n: number) => Math.round(Math.min(1, Math.max(0, n)) * 1e6) / 1e6;
-    return {
-      state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count,
-      boxes: rects.map((r) => {
-        const [ax, ay] = viewport.convertToViewportPoint(r.x0, r.y0) as [number, number];
-        const [bx, by] = viewport.convertToViewportPoint(r.x1, r.y1) as [number, number];
-        const left = part(Math.min(ax, bx) / viewport.width);
-        const top = part(Math.min(ay, by) / viewport.height);
-        return { left, top, width: part(Math.max(ax, bx) / viewport.width - left), height: part(Math.max(ay, by) / viewport.height - top) };
-      }),
-    };
+    const once = pageRead(pdfjs, page);
+    let why: NoHighlightReason | undefined = target.refused;
+    if (!why) {
+      try {
+        const rects = await place(page, target, once);
+        const viewport = page.getViewport({ scale: 1 });
+        return {
+          state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count,
+          boxes: fractions(viewport, rects.map((r) => onViewport(viewport, r))),
+        };
+      } catch (error) {
+        if (!(error instanceof Refused)) throw error;
+        why = error.reason;
+      }
+    }
+    try {
+      return await estimate(page, target, once, why);
+    } catch (error) {
+      // A page whose drawing is not understood keeps the reason it already has.
+      return noHighlight(why ?? (error instanceof Refused ? error.reason : "unreadable"));
+    }
   } catch (error) {
     return noHighlight(error instanceof Refused ? error.reason : "unreadable");
   } finally {

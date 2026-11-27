@@ -11,7 +11,7 @@ import { sha256, streamsOf } from "@stemma/records";
 import { answersOf, createHighlighter, createSession, HIGHLIGHT_LIMITS, listen, type LoadedOriginal, type Verdict } from "@stemma/server";
 import { post, redeem } from "./browse-run.ts";
 import { HIGHLIGHT_BOUNDS, locateOnPage } from "../packages/extract/src/pdf-highlight.ts";
-import { NO_HIGHLIGHT, noHighlight, type Highlight, type HighlightTarget } from "../packages/core/src/highlight.ts";
+import { NO_HIGHLIGHT, noHighlight, type Highlight, type HighlightTarget, type NoHighlightReason } from "../packages/core/src/highlight.ts";
 import { line, pageText, placed, type Raw, rawPdf, stream, targetFor } from "./highlight-pdf.ts";
 import { temporary } from "./helpers.ts";
 import { corpusOf, standard } from "./source-view-fixture.ts";
@@ -33,13 +33,13 @@ const around = (before: string, after = "", more: Partial<Raw> = {}): Raw => ({ 
 const reason = async (raw: Raw, quote = QUOTE, more: Partial<HighlightTarget> = {}): Promise<string> => {
   const made = await placed(raw, quote, more);
   if (made.state === "none") expect(made.why).toBe(NO_HIGHLIGHT[made.reason]);
-  return made.state === "boxes" ? "boxes" : made.reason;
+  return made.state === "none" ? made.reason : made.state;
 };
 
 describe("US-123-AC1 boxes on plainly drawn words", () => {
   test("one box on one line, within the line, between the words before and after", async () => {
     const made = await placed(plain, QUOTE);
-    if (made.state !== "boxes") throw new Error(made.why);
+    if (made.state !== "boxes") throw new Error(JSON.stringify(made));
     expect([made.page, made.page_count, made.boxes.length]).toEqual([1, 1, 1]);
     const [box] = made.boxes;
     // Helvetica's widths at 24 units: "The tide " is 3,891 thousandths, and "table was kept" 6,392.
@@ -52,7 +52,7 @@ describe("US-123-AC1 boxes on plainly drawn words", () => {
   test("two lines give two boxes; paint that is white and under the words, dark paint elsewhere, and a graphics state that changes nothing are allowed", async () => {
     const raw: Raw = { ...STATES, content: `1 g 0 0 600 800 re f 0 g\n40 100 200 40 re f\n/Full gs\n${line("The tide table was", 700)}\n${line("kept by the clerk.", 660)}` };
     const made = await placed(raw, "table was\nkept by");
-    expect(made.state === "boxes" ? made.boxes.length : made.reason).toBe(2);
+    expect(made.state === "boxes" ? made.boxes.length : made).toBe(2);
   });
 
   test("a rectangle that clips around the words, and a form that holds them, keep them seen", async () => {
@@ -152,9 +152,12 @@ describe("US-123-AC3 geometry that is not plain gives no box", () => {
 describe("US-123-AC4 words that may not be seen where the text layer places them", () => {
   test("invisible text, a scan's recognition layer, and text only stroked", async () => {
     expect(await reason(around("3 Tr"))).toBe("invisible_text");
-    expect(await reason(around(`${draw("600 0 0 800 0 0")} BT 3 Tr ET`, "", IMAGE))).toBe("recognition_layer");
+    // A scan's recognition layer gets no highlight, only an estimate (highlight-estimate.test.ts).
+    expect(await reason(around(`${draw("600 0 0 800 0 0")} BT 3 Tr ET`, "", IMAGE))).toBe("estimate");
     // The layer under the picture of the page, as well as over it.
-    expect(await reason(around("3 Tr", draw("600 0 0 800 0 0"), IMAGE))).toBe("recognition_layer");
+    expect(await reason(around("3 Tr", draw("600 0 0 800 0 0"), IMAGE))).toBe("estimate");
+    // Over a picture of only a part of the page, it is not read as a scan.
+    expect(await reason(around(`${draw("500 0 0 100 40 660")} BT 3 Tr ET`, "", IMAGE))).toBe("recognition_layer");
     expect(await reason(around("1 Tr"))).toBe("hidden_text");
     expect(await reason(around("2 Tr"))).toBe("hidden_text");
     // Text used to clip what follows is not read further.
@@ -338,7 +341,8 @@ describe("US-123 what the record says to look for", () => {
     expect(await answer(real, { passage: one.id, index: 0 })).toBe("no_segment");
     expect(await answer(real, { passage: "psg-nothing00000", index: 1 })).toBe("no_segment");
     expect(await answer(real, { passage: "__proto__", index: 1 })).toBe("no_segment");
-    expect(await answer(real, { passage: two.id, index: 0 })).toBe("hyphen_split");
+    // No highlight can be placed, but the page is still read, as it may be a scan.
+    expect(await answer(real, { passage: two.id, index: 0 })).toMatchObject({ refused: "hyphen_split", page: 1, words: { quoted: made[two.id]!.segments[0]!.quoted } });
     expect(await answer({ [textId]: { ...tie, form: "page_images", files: [0, 1, 2].map((index) => ({ sha256: "c".repeat(64), size: 1, media_type: "image/png", index })) } }, { passage: one.id, index: 1 })).toBe("page_image");
     expect(await answer({ [textId]: { ...tie, page_count: undefined } }, { passage: one.id, index: 1 })).toBe("no_pdf_page");
     for (const body of [{ passage: one.id }, { passage: one.id, index: -1 }, { passage: 3, index: 1 }, { passage: one.id, index: 1, sha256: "a" }]) {
@@ -352,11 +356,12 @@ describe("US-123-AC6 the server's call", () => {
     const target: HighlightTarget = { sha256: "e".repeat(64), size: 5, page: 1, page_count: 1, text_sha256: "0".repeat(64), ranges: [[0, 1]] };
     let verdict: Verdict = { state: "current", data_identity: "d", process: { ask: async (route: string) => ({ status: 200, body: JSON.stringify({ data_identity: "d", result: route === "highlight-target" ? { target } : null }) }) } as never };
     let placedCalls = 0;
+    let read: NoHighlightReason = "covered";
     let closed = 0;
     const session = createSession(() => {});
     const server = await listen({
       assets: { html: "", js: "", css: "" }, session, check: async () => verdict, originals: { read: async () => ({ refused: "original_not_held" }) }, originalLimits: { bytes: 4 },
-      highlighter: { place: async () => (placedCalls++, noHighlight("covered")), close: () => void closed++ },
+      highlighter: { place: async () => (placedCalls++, noHighlight(read)), close: () => void closed++ },
     });
     try {
       const secret = (await redeem(server, session.code)).json.secret as string;
@@ -368,9 +373,17 @@ describe("US-123-AC6 the server's call", () => {
       expect(placedCalls).toBe(0);
       target.size = 3;
       expect((await post(server, "/api/original-highlight", body, secret)).json).toEqual({ data_identity: "d", result: noHighlight("covered") });
+      // A passage no highlight can mark keeps that reason where the page cannot be read at all.
+      target.refused = "hyphen_split";
+      for (const [unread, told] of [["not_held", "hyphen_split"], ["changed", "hyphen_split"], ["page_count", "hyphen_split"], ["unreadable", "hyphen_split"], ["busy", "busy"], ["too_slow", "too_slow"], ["scan_weak_match", "scan_weak_match"]] as const) {
+        read = unread;
+        expect([unread, (await post(server, "/api/original-highlight", body, secret)).json.result]).toEqual([unread, noHighlight(told)]);
+      }
+      target.size = 5;
+      expect((await post(server, "/api/original-highlight", body, secret)).json.result).toEqual(noHighlight("hyphen_split"));
       verdict = { state: "rebuilding" };
       expect((await post(server, "/api/original-highlight", body, secret)).json.error.code).toBe("index_stale");
-      expect(placedCalls).toBe(1);
+      expect(placedCalls).toBe(8);
     } finally {
       await server.close();
     }

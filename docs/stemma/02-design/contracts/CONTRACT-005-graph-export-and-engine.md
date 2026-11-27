@@ -675,7 +675,7 @@ for by a digest the snapshot records, in places the command was given
 | `POST /api/manuscript` | `{}` | The manuscript view |
 | `POST /api/original-page` | `{"text", "index"}`, a source file ID and a part's index | Which page of which original the part is, or why none is established ("Originals") |
 | `POST /original` | `{"sha256"}` | The bytes of the original with that digest, or why they cannot be given ("Originals") |
-| `POST /api/original-highlight` | `{"passage", "index"}`, a passage ID and a part's index, and nothing else | Boxes to draw on that page of the original, or why none is drawn ("Highlighting on originals") |
+| `POST /api/original-highlight` | `{"passage", "index"}`, a passage ID and a part's index, and nothing else | Boxes to draw on that page of the original, as a highlight or as an estimate on a scan, or why none is drawn ("Highlighting on originals") |
 | `POST /pdfjs-data` | `{"name"}` | A character map or standard font of the pinned pdf.js, looked up by name among those held in memory |
 
 Each answer made from the snapshot is `{"data_identity", "result"}`. The
@@ -832,7 +832,8 @@ hold all.
 served page shows that page of the original: a page of a PDF, drawn by the pinned
 pdf.js, or the page image. This is so wherever a source view is shown: the record
 panel, and a manuscript quotation, note citation, and bibliography entry (L). The
-original is marked only as "Highlighting on originals" allows. Otherwise it is
+original is marked only as "Highlighting on originals" and "Estimates on scans"
+allow. Otherwise it is
 **not highlighted**, and the page says so beside it, with why: the highlight is
 then in the converted text only. When the original cannot be shown, the page says
 which of these is so and why, and the text stays: the offline file; a physical
@@ -896,9 +897,12 @@ too large; or it could not be drawn.
   person, or a restricted position. It is shown on the author's computer only,
   and no export holds it.
 
-**Highlighting on originals.** A box on an original is a claim that the quoted
-words are there. A wrong one is the worst failure this page can have, so every
-doubt draws nothing, and the page says why. The text beside it stays highlighted.
+**Highlighting on originals.** A highlight on an original is a claim that the
+quoted words are there. A wrong one is the worst failure this page can have, so
+every doubt draws no highlight, and the page says why. On a scanned page an
+**estimate** may be shown instead ("Estimates on scans"): a different answer,
+drawn differently, that claims no such thing. The text beside it stays
+highlighted.
 
 - **Who decides.** Only the server decides. The page matches no text, reads no
   text layer, and works out no position: it draws the boxes the server gives, or
@@ -918,11 +922,11 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   text is those lines in the order the file gives them. The part's text is every
   line of every block of the source file's part, in file order, with annotation
   tags removed, the words and note markers inside them kept, and escapes decoded.
-  The two must be equal, character for character. Nothing is folded, trimmed,
-  reordered, or matched approximately, so an edited or corrected part, a
-  transcription that differs, and a page whose columns the converter reordered
-  get no box. The quoted words are then found by their recorded offsets in the
-  part, never by search.
+  The two must be equal, character for character. For a highlight, nothing is
+  folded, trimmed, reordered, or matched approximately, so an edited or corrected
+  part, a transcription that differs, and a page whose columns the converter
+  reordered get none. A highlight's quoted words are found by their recorded
+  offsets in the part, never by search.
 - **Positions.** Boxes come from the page's drawing operators, not from the text
   layer's word list. Every non-space character of the page's text must come, in
   order, from a glyph the operators draw: the two sequences must be equal for the
@@ -962,38 +966,122 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   rounded corners, its whole rectangle counts. The width is the stated one, also
   where pdf.js cuts it down. An annotation that pdf.js itself cannot read is not
   detected.
-- **Unclear geometry.** No box is given for a rotated page; rotated, skewed, or
+- **Unclear geometry.** No highlight is given for a rotated page; rotated, skewed, or
   mirrored text; vertical text; right-to-left text on a quoted line; a quoted
   ligature (one glyph for several characters); a quotation that joins, begins, or
   ends at a word split by a hyphen at a line end, a page break included; or a
   quoted glyph with no width.
-- **A scan with a recognition layer gets no box.** Such a page shows an image, and
-  its text is drawn invisibly over it (rendering mode 3). The positions are the
+- **A scan gets no highlight.** Such a page shows an image, and its text is drawn
+  invisibly over it (rendering mode 3), or under it. The positions are the
   recognition engine's estimate of where words are in that image. Nothing the
   server can check ties them to the image: the layer may be shifted, scaled, or
   made for another rendering of the scan, and its glyph widths are not those of
   the printed letters. Equal text shows only that the layer says what the source
-  file says. So the page says that the only positions are a recognition layer's,
-  and marks nothing. Showing them, labelled as such, is not done.
+  file says. So at most an estimate is shown.
+- **Estimates on scans.** The product owner requires that scanned pages show
+  approximate highlights where possible, by a method that can be refined. Where
+  no highlight is placed, whatever the reason (a quotation split by a hyphen
+  included, so its page is read too), the same process looks for an estimate:
+  - *Which pages.* Images must cover at least half the page. The part covered is
+    that of their union, counted over the centers of a grid of 200 by 200 cells.
+    At least half of the page's glyphs (white space and glyphs off the page
+    aside) must be unseen: drawn in rendering mode 3, or before a solid image
+    that covers them. Only unseen glyphs that meet a counted image are read, so a
+    visible stamp is left out. An image drawn transparent or blended is not
+    counted, nor one that the pinned pdf.js decodes as having transparency, as
+    with a soft, explicit, or color-key mask, since a watermark may be any of
+    these. A one-bit stencil counts toward the half but hides nothing, since it
+    paints only where it is set. Any other page keeps its reason, as does one
+    whose drawing the server does not know. A page read as a scan with no text
+    layer gets `no_text_layer`: nothing is recognized.
+  - *What this cannot tell.* The reader decodes no image that needs a WebAssembly
+    decoder, as the worked example's scan images do, and learns of no mask on
+    one, so such an image counts as solid. A page made by another means, with
+    mostly invisible text over large images, is read as a scan too. So the words
+    shown say only that the text is not seen on a page read as a scan.
+  - *`ocr_layer_offsets`.* Where the page's text read again equals the source
+    text's part, and every character has its glyph as for a highlight, the
+    quoted glyphs are those at the recorded offsets. If any of them is seen, no
+    estimate is made.
+  - *`ocr_layer_match`.* Otherwise the quoted words, as the passage's source view
+    holds them, are looked for in the unseen glyphs, in the order drawn. Both
+    are reduced to letters and digits after Unicode compatibility decomposition,
+    in lower case, with combining marks dropped, so line breaks, hyphens at line
+    ends, ligatures, spacing, punctuation, and accents count for nothing. The
+    words must have at least 20 such characters (`scan_short`). A place is a
+    stretch of the layer; one is good enough when it agrees with at least 85 of
+    every 100 of them, counting characters changed, added, or lost. Without one,
+    the answer is `scan_weak_match`.
+  - *Rivals.* Every place that is good enough is a rival, however much better
+    another is, since the cleanest copy of the words need not be the quoted one.
+    So is a place that needs more edits than the best by less than the larger of
+    2 and 6% of the quotation's length. Places lying mostly on one another count
+    once. More than 8 rivals give `scan_ambiguous`.
+  - *The words around.* Of the 80 characters before the quotation and the 80
+    after, a side counts when it has at least 20. Where a side counts, each
+    rival's surroundings are compared with it, and the place taken must agree at
+    least 70 in 100, whether it is the only rival or one of several; among
+    several, also by 20 in 100 more than any other. A lone rival that disagrees
+    gives `scan_context`; any other failure, or a place taken that is not good
+    enough, gives `scan_ambiguous`. Where no side counts, only a lone rival is
+    taken.
+  - *Numbers and denials.* The place taken must hold the quotation's digits, the
+    same and in order, and as many of each of the letter groups `no`, `never`,
+    `neither`, `without`, and `nt` (as in "didn't"); else `scan_differs`. They are
+    counted as letters, not words, so a wrong letter elsewhere can refuse a place
+    that is right.
+  - *Boxes.* One for each stretch of chosen glyphs along one line of the page as
+    shown, from the layer's glyphs. For both methods, a quoted glyph whose
+    baseline rises or falls by more than 9 in 100 of its run (about 5 degrees),
+    or runs backward, gives `rotated_text`, and right-to-left text on a quoted
+    line gives `right_to_left`. A box partly off the page is cut to it; one with
+    nothing left gives `scan_off_page`.
+  - *A reason kept.* For a passage no highlight can mark (a line-end hyphen, or
+    text laid out again), the page is read only for an estimate. A page that is
+    not read as a scan keeps that reason, and so does one that cannot be read at
+    all: not held, changed, too large, another page count, or unreadable. A
+    passing failure, as `busy` or `too_slow`, is told as it is. Such a page that
+    is not a scan still costs one reading, since only reading it shows that.
+  - *The answer* is `state` `estimate` with `method`, one of the two names above,
+    and is otherwise as `boxes`. Another way to estimate is another `method`, in
+    the estimator alone.
+  - *What it is not.* No check of the quotation, and no statement that the page
+    says the words. No check, finding, report, or export reads it.
 - **What the page checks.** Before it marks anything, the page checks in its own
-  drawing that each box holds both dark and light pixels. A box that does not is a
-  disagreement between the two drawings, and then no box is drawn. This check can
-  only remove a highlight.
+  drawing that each box of a highlight holds both dark and light pixels. A scan's
+  paper may be dim or tinted, so for an estimate each box must hold pixels much
+  darker than its own paper (by 60 of 255 from its 90th percentile of
+  brightness, more than 2 in 100 of them) and paper around them (more than 20 in
+  100, within 30 of that percentile), each brightness taken to the nearest of 0
+  to 255. A box that fails is a disagreement, and then no box is drawn. So it is,
+  before any pixel is read, when the boxes together hold more than 3 times the
+  drawing's pixels. These checks can only remove a mark, and cannot tell which
+  words are under a box.
 - **What the page says.** With boxes, it says that they are positions from the
   PDF's text layer, that the server read the page again, found its text equal to
   the source text, and found glyphs drawn there that the file's text layer names
   as those letters, with nothing detected over or under them, and that it cannot
-  tell whether the printed shapes are those letters. Without, it says that the original is not highlighted, and why.
-  The answer is `state` `boxes` (`sha256`, `page`, `page_count`, and `boxes`,
-  each `left`, `top`, `width`, and `height` as fractions of the page as drawn) or
-  `none` (`reason` and `why`). `why` holds fixed words, and no path or text from
-  the file.
+  tell whether the printed shapes are those letters. With an estimate, it says in
+  words that this is an approximate highlight, an estimated place on a page read
+  as a scan; how it was derived; that nothing checks that the boxes lie on the printed
+  words or that the page says them; and to read the page. Its boxes are dashed
+  outlines with no tint, outside the area they mark, so that it differs by shape
+  and words as well as color; the drawing's text alternative says that they
+  estimate. Without either, it says that the original is not highlighted, and
+  why. The answer is `state` `boxes` (`sha256`, `page`, `page_count`, and
+  `boxes`, each `left`, `top`, `width`, and `height` as fractions of the page as
+  drawn), `estimate`, or `none` (`reason` and `why`). `why` holds fixed words,
+  and no path or text from the file.
 - **Bounds.** The page is read in a process of its own, which gets the file's
   bytes and the target, gets no secret, opens no listener, makes no outbound
   request, and writes nothing. It is ended when it has answered, and after 20
   seconds. One runs at a time; at most 8 requests wait, and a further one gets
   `none` with `reason` `busy`. A page with more than 300,000 operators or 100,000
-  glyphs, or a highlight of more than 500 boxes, gets no box. Its memory is
+  glyphs, or a mark of more than 500 boxes, gets no box. A match looks for at
+  most 4,000 characters, and the product of that number and the layer's is at
+  most 80 million. The words looked for are the view's quoted text and at most
+  400 units of text on each side, which the server takes from its snapshot's
+  source view; a view without text gives none. Its memory is
   bounded: a few megabytes of PDF can unpack to gigabytes in under a second, and
   pdf.js unpacks them without yielding. A thread of its own, started before the
   page is read, looks at the process's resident memory every 5 ms and kills the
