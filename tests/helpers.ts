@@ -1,7 +1,7 @@
 import { cpSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { deflateRawSync } from "node:zlib";
+import { crc32, deflateRawSync } from "node:zlib";
 
 export const ROOT = join(import.meta.dir, "..");
 
@@ -35,12 +35,14 @@ export function zip(entries: Record<string, string>, stated?: number): Uint8Arra
     const local = Buffer.alloc(30);
     local.writeUInt32LE(0x04034b50, 0);
     local.writeUInt16LE(method, 8);
+    local.writeUInt32LE(crc32(raw) >>> 0, 14);
     local.writeUInt32LE(packed.length, 18);
     local.writeUInt32LE(raw.length, 22);
     local.writeUInt16LE(Buffer.byteLength(name), 26);
     const entry = Buffer.alloc(46);
     entry.writeUInt32LE(0x02014b50, 0);
     entry.writeUInt16LE(method, 10);
+    entry.writeUInt32LE(crc32(raw) >>> 0, 16);
     entry.writeUInt32LE(packed.length, 20);
     entry.writeUInt32LE(stated ?? raw.length, 24);
     entry.writeUInt16LE(Buffer.byteLength(name), 28);
