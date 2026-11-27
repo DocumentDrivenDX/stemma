@@ -49,12 +49,36 @@ reader steps P1 to P5 are below.
 
 | Order | Step | Requirements | Design status |
 |---|---|---|---|
-| 1 | Word reader | FR-71 | Reading built (CONTRACT-003 F); embedded reference data detected, not decoded; no command uses it; no real saved file tested |
+| 1 | Word reader | FR-71 | Reading built (CONTRACT-003 F) and used by `takeover`; embedded reference data detected, not decoded; no real saved file tested |
 | 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Built over a neutral document; some real entries go unread (CONTRACT-003, Proof Status) |
 | 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Built over a neutral document; some real citations are missed (CONTRACT-003, Proof Status) |
-| 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Reader built; nothing writes the copy |
-| 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | `check` reads the copy (CONTRACT-002 C, "Reading the manuscript"); tested on invented text. No takeover writes a copy yet |
-| 6 | Usable first report | FR-93 | Designed here; usability unmeasured |
+| 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Reader built; takeover writes one chapter for each Word file and reads it back before saving. Span edits are not built |
+| 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | `check` reads the copy that takeover writes (CONTRACT-002 C, "Reading the manuscript"); tested on invented text |
+| 6 | Usable first report | FR-93 | Takeover report and `check` list open causes and group takeover items; usability on a real chapter unmeasured. No one-choice settlement of repeats (needs rounds) |
+
+### Takeover of a Word chapter as built
+
+Steps 1 to 6 are joined by `takeover <file.docx>` for a chapter that cites in
+author-date form. These choices fill what this design had left open
+(assumptions; CONTRACT-003 F and CONTRACT-006 F state the output).
+
+- **Coordinator.** A pure planner in `intake` takes the project's files and the
+  original's bytes and returns every file to write. It lays those files over the
+  project, validates them as one graph, and reads the chapter back with the
+  manuscript reader; any difference from the text and citations meant stops the
+  import with nothing written.
+- **Write.** Files are staged under `.stemma/staging/`, a journal names the
+  renames, and the next command finishes an interrupted write. A lock file
+  admits one takeover at a time. Other writing commands do not take it yet.
+- **Reference list.** With no library read, BR-1507 and BR-1508 have nothing to
+  bind to, so each entry makes one provisional source and one intake item. A
+  key is the first author's family name folded to letters and digits, then the
+  year and suffix (`entry<n>` for an unread entry), made unique in the project.
+- **Not built.** `--library` and `--again` exit 2. Footnote binding (BR-1507 to
+  BR-1511), embedded-field decoding, library intake, chapter division inside a
+  file, PDF, and rounds are later steps. An author can settle an unresolved
+  citation now only by editing its key in the chapter file; its intake item
+  stays open.
 
 ### PDF reader build plan (FR-95)
 
@@ -426,7 +450,11 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 - [ ] **Sentence places.** A taken-over sentence keeps its line places only if the import coordinator carries them into its origin; the origin's `document_position` form for PDF is page and line, to be fixed at P5.
 - [ ] **Some references are never checked.** Author-date citations in brackets that hold a year are now accounted for (BR-1523): unresolved ones are open findings, but left-unlinked ones are only listed. Citations with no bracketed year, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text with no listing or check beyond the notes. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
 - [ ] **Takeover starts with a long report.** Every extracted claim is unreviewed, incomplete, and unsupported at first. Grouping and clear next steps must keep the report usable; the pilot must measure it.
-- [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status), which has its own rough Word conversion. The Word reader does not feed the profile yet.
+- [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status). That trial used the script's earlier, rougher Word conversion; the script and `takeover` now use the Word reader, which has not been run on those drafts. No file saved by real Word has been taken over.
+- [ ] **A typed full reference can look like a citation.** In a footnote such as `Author, Title (Place, 1850)`, the brackets read as a citation form, so takeover replaces them with an unresolved marker and the sentence gets a claim. It links nothing wrongly, but the author must undo it by hand until footnote binding or `restore_text` exists.
+- [ ] **Candidates from other chapters.** Takeover reads only the new file's reference lists, so entries of earlier chapters and of libraries are not offered as candidates (CONTRACT-003 H).
+- [ ] **The first `check` report is long.** On a synthetic chapter with 200 footnotes, 1,400 citations, and a 1,000-entry list, the text report ran to about 32,000 lines. Its summary of causes at the top is short; the lines below list every result. Takeover took 4 s and `check` 2 s on one macOS machine.
+- [ ] **Unattributed quotations.** Each is an open finding. How many a real chapter holds is unmeasured; takeover prints the count.
 - [ ] The Word reader does not decode embedded reference data (INT-04). Each Zotero, Mendeley, EndNote, or other citation field is detected and returned raw, so INT-04 is not met.
 - [ ] Citations in tables are listed, not read, until the markup can carry them (PRD open question).
 - [ ] Whether check reports should count left-unlinked parentheses is open (PRD).

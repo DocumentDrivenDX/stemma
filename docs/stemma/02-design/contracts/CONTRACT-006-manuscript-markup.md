@@ -191,11 +191,20 @@ contract. An unresolved ID or cross-reference is reported.
   its entries to `bibliography_include` (CONTRACT-003 F).
 - Takeover writes each footnote as a footnote and each endnote as an endnote
   (FR-96), with its definition in the chapter file that holds its marker. A note
-  whose marker was not found is kept as a note definition, with an
-  `intake_item`; how a definition without a marker is written is set with the
-  writer.
+  that no marker can point at, because only a table or a reference list refers
+  to it, is not written as a definition, which would be unreadable without a
+  marker: its text goes into an `unconverted` block with an `intake_item`, and
+  no citation in it is marked (CONTRACT-003 H reason `in_table`). A note that no
+  paragraph refers to is a reader item (CONTRACT-003 F) with its own
+  `intake_item`.
 - Takeover writes one chapter file per detected chapter and says how it chose
-  the divisions. Every citation item it writes carries an `id`.
+  the divisions. As built it detects none: one Word file is one chapter, titled
+  by its first level-1 heading or else the file's name. Every citation item it
+  writes carries an `id`. It reads the written file back and writes nothing if a
+  block's text, a citation, or a claim span differs from what was meant.
+- As built, a run of table paragraphs is one `unconverted` block with a line for
+  each row. Character formatting, lists, block quotations, and captions' role
+  are not carried; headings below level 4 are written as level 4.
 - It converts only features in E available at its step. Other content that
   carries text goes into an `unconverted` block holding the extracted text, with
   an `intake_item`; content without text is reported with its position. Nothing
@@ -443,7 +452,8 @@ containing raw HTML, expecting `manuscript_unsupported`.
 | Element | Evidence | Not shown |
 |---|---|---|
 | Reader, sentence and quotation rules, and the checks that read them, over footnotes and endnotes | Tests over invented text on one macOS system | Real manuscripts, Linux, Windows, whether authors tolerate the syntax |
-| Edits and takeover output | None. Design only | All |
+| Edits | None. Design only | All |
+| Takeover output | Written for Word files and read back by the reader; tests over invented files and seeded markup-like text on one macOS system | Real manuscripts; Linux, Windows |
 | citeproc-js to Typst | A feasibility test with 10 records and a 14-note sequence passed 12 of 14 Chicago rows, byte-identical across runs, one macOS system; expected strings were not checked against the manual | This markup, the output format, note-number agreement |
 | Typst features | Feasibility tests: footnote markers after Arabic or Hebrew quotations needed a direction-mark helper; indexes and per-chapter endnotes worked with the packages in-dexter 0.7.2 and deixis 0.2.0; TIFF and EPS were rejected; bleed wrote no BleedBox; fixed timestamps gave identical bytes | Conversion from this markup; right-to-left quotations at book length |
 | Sentence links | 43 test sentences linked both ways, with hanging punctuation off and nested links flattened | Converter-generated links |

@@ -57,8 +57,9 @@ export function tidy(text: string, offsets: number[]): { text: string; offsets: 
   const last = Math.max(0, ...offsets);
   let from = 0;
   let to = flat.length;
-  while (from < Math.min(to, first) && (!keep[from] || /[ \n]/.test(flat[from]!))) from++;
-  while (to > Math.max(from, last) && (!keep[to - 1] || /[ \n]/.test(flat[to - 1]!))) to--;
+  // Every kind of space counts at the ends: the reader's trimming takes non-breaking spaces too.
+  while (from < Math.min(to, first) && (!keep[from] || /\s/.test(flat[from]!))) from++;
+  while (to > Math.max(from, last) && (!keep[to - 1] || /\s/.test(flat[to - 1]!))) to--;
   const moved: number[] = [];
   let out = "";
   for (let i = 0; i <= flat.length; i++) {
@@ -169,11 +170,14 @@ export function writeChapter(chapter: OutChapter, newClaimId: () => string): Wri
       if (to > done) markup += escaped(text, done, to, heading);
       done = Math.max(done, to);
     };
+    /** `!` before a bracket would be read as an image. Text alone never writes it escaped. */
+    const beforeBracket = () => {
+      if (done > 0 && text[done - 1] === "!" && markup.endsWith("!")) markup = `${markup.slice(0, -1)}\\!`;
+    };
     const event = (n: number) => {
       const e = out.events[n]!;
       upTo(e.at);
-      // `!` before a bracket would be read as an image.
-      if (markup.endsWith("!") && !markup.endsWith("\\!")) markup = `${markup.slice(0, -1)}\\!`;
+      beforeBracket();
       markup += "cluster" in e ? writeCluster(e.cluster) : `[^${e.marker}]`;
       // `[^1]:` at the start of a line would be read as a note's definition.
       if ("marker" in e && text[e.at] === ":" && done === e.at) {
@@ -184,7 +188,7 @@ export function writeChapter(chapter: OutChapter, newClaimId: () => string): Wri
     for (const span of spans) {
       while (next < out.events.length && next < span.first) event(next++);
       upTo(span.start);
-      if (markup.endsWith("!") && !markup.endsWith("\\!")) markup = `${markup.slice(0, -1)}\\!`;
+      beforeBracket();
       markup += "[";
       while (next <= span.last) event(next++);
       upTo(span.end);

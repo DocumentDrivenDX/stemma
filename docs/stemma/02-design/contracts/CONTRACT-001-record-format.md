@@ -368,6 +368,13 @@ writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`, and the batch
 gains a field listing the words in which a line-end hyphen was kept (CONTRACT-003
 I). Until then the schema accepts neither.
 
+**Takeover batches and chapters.** `ImportBatch.separate` is `true` when the
+author said at takeover that the file is a different text from those already
+taken over (CONTRACT-003 I). Each record takeover makes, the chapter included,
+names its batch in `created.import`; the repeated-text comparison finds a
+batch's chapters by it. A chapter's `manuscript_path`, when set, MUST be
+`manuscript/<chapter id>.md`.
+
 **Takeover rounds.** `intake_item` and `round_choice` records are never edited.
 There is no round or session record: remaining work is computed from failing
 results and intake items that have no applicable choice, so stopping and

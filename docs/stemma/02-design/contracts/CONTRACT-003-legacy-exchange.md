@@ -306,6 +306,36 @@ tests on files saved by real tools pass.
   that does not open and close in order. Entity references other than XML's
   five and character references are not well-formed here.
 
+**Takeover of a Word file as built.** `takeover` uses this reader and H. What
+follows states what it writes where this contract leaves room, and where it
+does less (assumptions, tested on invented files only).
+
+- **Records.** One `import_batch`; one `chapter`; for each reference-list entry
+  one `source` (`candidate`; `parsed` with author family names and year, or
+  `raw` when unread; no title) with one `intake_item`, listed in
+  `bibliography_include`; one `citation` for each item of a linked or
+  unresolved bracket; one unreviewed `claim` for each sentence with a citation,
+  except a sentence that is only citations; and `intake_item` records. No
+  `agent`, `note`, `passage`, or `attestation` is made, and a quotation is held
+  on its citation record and in the chapter, not as a record of its own.
+- **Intake item reasons.** `ambiguous_reference`: `list_entry`,
+  `list_entry_unread`, and `citation_` followed by an H reason.
+  `unclassified_note`: `note_without_author_date`, for a note with no linked or
+  unresolved citation. `unread_content`: `table`, `note_not_in_text`,
+  `comment`, `reference_field` (each reference-manager field, not decoded), and
+  otherwise the reader's item kind. `year_parenthesis`: an H reason for text
+  left unlinked. `original_changed`: `original_changed`, whose `as_found`
+  states the new file's SHA-256 and size.
+- **Counted and not copied.** Reported content with no text, and document
+  properties and custom data, which can hold names and local paths, are counted
+  in the batch's `losses` and the report; they get no intake item.
+- **Not done.** Items 2, 6, and 9: no embedded data is decoded and no typed
+  note, short form, or "ibid." is bound. Item 10 `--again` is not built.
+  Entries of other files' lists are not offered as candidates (H).
+- **Report.** The counts of item 7 and H, the groups and exact repeats, linked
+  citations to look at, quotations tied and not tied to a citation, what the
+  chapter does not carry, and the reader's and takeover's limits.
+
 ### G. Untrusted input limits
 
 All codecs MUST treat input as hostile: refuse archive entries with absolute or
@@ -921,7 +951,8 @@ edits one title and expects every other value to stay equal.
 |---|---|---|
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
-| Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
+| Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits |
+| Word takeover | Tests over invented files built by the same agent: records, the chapter read back by the manuscript reader, `check` over the result, reruns, changed and repeated files, refusals, and an interrupted write finished by the next command. A throwaway fuzz run planned 12,000 random small chapters without a read-back difference, after it found two writer faults that are now fixed. One synthetic chapter with 200 footnotes and a 1,000-entry list took 4 s on one macOS machine | Any file saved by a real tool; any real manuscript; whether the report is usable; atomic writes on other file systems; Linux, Windows |
 | PDF manuscript intake (I) | A probe of the pinned PDF library on one invented file showed that invisible, white, struck-through, and switched-off-layer text arrives unmarked; off-page text did not arrive; rendering modes, comment and form annotations, and attachment names are available apart from the text. The source converter's rules that I reuses have their own synthetic tests | Every rule, number, and guard of I: no reader is built, and neither the file comparison nor the quotation rule exists. A run of the matcher on invented text, not on a PDF, linked a name holding U+FB03 whether the ligature was in the entry or in the citation. Any PDF from a real producer: PDF manuscript support is untested |
 | Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`. A run of `author-date/1` on the same drafts found no wrong link among those it added, but leaving later authors of unknown surname length unread lost correct links, mostly for ordinary names; `author-date/2`, which keeps each form instead, restored those links on the same drafts, and a check of the changed links found none wrong; most longer forms it kept were a middle name before the surname, and two authors with a separator missing between them can read as one, which that run did not find in the entries holding longer forms | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 

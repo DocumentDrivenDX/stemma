@@ -340,7 +340,18 @@ describe("a staged write happens whole or not at all (BR-1501)", () => {
 });
 
 describe("the writer's text reads back as it was (CONTRACT-006 B)", () => {
-  const pieces = [..."ab C.d, 12) -#>+=|~:*_`[]{}<>@^&!\\\"'“”()/?\n", "amp;", "![", "[^1]", ":::", "1. ", " . ", "  ", "<!--", "&#38;", "{#sec-x}"];
+  const pieces = [..."ab C.d, 12) -#>+=|~:*_`[]{}<>@^&!\\\"'“”()/?\n", "amp;", "![", "[^1]", ":::", "1. ", " . ", "  ", "<!--", "&#38;", "{#sec-x}", "\u00a0", "\u3000", "\\!"];
+
+  test("after a typed backslash, a `!` before a marker is not an image, and a heading may end in a non-breaking space", () => {
+    for (const [text, level] of [["a\\!", undefined], ["A heading \u00a0", 2]] as const) {
+      const tidied = tidy(text, [3]);
+      const written = writeChapter({
+        blocks: [{ kind: "text", text: tidied.text, ...(level ? { level } : {}), events: [{ at: tidied.offsets[0]!, cluster: [{ key: "k", id: "cit-00000000000000000001" }] }] }], notes: [],
+      }, () => "clm-00000000000000000001");
+      const read = readManuscript([{ path: "manuscript/chp-00000000000000000001.md", bytes: new TextEncoder().encode(written.text) }]);
+      expect([read.problems, verifyChapter(read.chapters[0]!, written)]).toEqual([[], []]);
+    }
+  });
 
   test("over 3,000 seeded blocks of markup-like text with citations and notes", () => {
     let seed = 7;

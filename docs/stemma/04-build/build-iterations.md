@@ -8,12 +8,12 @@ work in progress elsewhere and wait until it reaches `main`.
 |---|---|---|---|---|
 | 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Takeover strand; checks read the manuscript on an unmerged branch; draft.marked, claim.inactive, cite.unlinked, quote.self not built |
 | 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | On main; an author's own edit still lapses a review mark (FR-23) |
-| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover strand; codecs on main but incomplete: no command calls them; export only replays unedited records in the same format |
+| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover strand; codecs on main but incomplete: no command calls them, takeover included; export only replays unedited records in the same format |
 | 4 | Citation formatter | ADR-005 | — | On main |
 | 5 | Basic PDF build | FR-83, 39, 35 | 1, 4 | Report build on main; draft, camera-ready and reviewer builds not |
-| 6 | Takeover intake | FR-71, 92 | 3 | Takeover session; Word reader and matcher fixes on main, not yet used by the command line; no records or libraries |
-| 7 | Unverified graph and Stemma copy | FR-72, 73 | 1, 6 | Takeover session; after 1 and 6 |
-| 8 | Rounds and first report | FR-73, 93 | 7 | Takeover session; after 7 |
+| 6 | Takeover intake | FR-71, 92 | 3 | `takeover` reads a Word chapter and writes records; no libraries, footnote binding, embedded-field decoding, or `--again`; no file saved by real Word tested |
+| 7 | Unverified graph and Stemma copy | FR-72, 73 | 1, 6 | Built for a Word chapter that cites in author-date form; span edits not built; invented files only |
+| 8 | Rounds and first report | FR-73, 93 | 7 | Grouped first report built; `rounds` not built; report unmeasured on a real chapter |
 | 9 | Claim support records | FR-52 to 54 | 1, 2 | Held |
 | 10 | Runtime hardening and in-agent check trigger | FR-31, 75, 78 | — | Open; hosted runs stay advisory (ADR-007) |
 | 11 | Graph export and record browser | FR-62, 64 | — | On main; search limits remain (iteration 26) |
