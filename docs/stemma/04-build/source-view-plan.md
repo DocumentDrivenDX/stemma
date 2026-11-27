@@ -4,6 +4,54 @@ Requirement: [build iterations](build-iterations.md), iteration 24. The same
 operation later serves the localhost server and MCP (iteration 25) and large
 projects (iteration 26).
 
+## Review amendments (binding; they override the text below)
+
+1. **Inputs.** `sourceView` takes a citation record, a passage, or a report
+   quotation ID (`report/report.json`, CONTRACT-006 I); iteration 25 adds
+   manuscript occurrences through the same shape. It returns an ordered list of
+   passage segments (a quotation may `join` several). `corrections`,
+   `keep_hyphens` and notes are listed, never applied to highlighted source
+   text. Name both the cited work and the work it is `part_of`.
+2. **When to highlight.** Only if the anchor gives exactly `quote.exact`, the
+   source file is not retired, and its source is the passage's source. For a
+   citation, also: its `quotation` equals the rendered passage text, its locator
+   equals the passage's, and its key resolves to that source or the work it is
+   part of; otherwise state `citation_differs`. Distinct states replace
+   `damaged`: no source file, damaged file, invalid anchor, changed. Show the
+   page label's `label_status`.
+3. **Held originals** are not in the export (it must stay byte-identical across
+   machines). The command line computes it at read time by hashing the file.
+4. **The original** comes from `source_text.original` (CONTRACT-007 C): form,
+   files, per-page images by index, physical holding, `obtained_from`; upstream
+   records match by `sha256`, and auxiliary URLs are not originals. All
+   addresses and holdings pass the local-path filter.
+5. **Quality.** Show page front matter `level`, `method`, `note`; per-part
+   comparison-run agreement; a review only while its page digests match; model
+   reviews as flags only.
+6. **Disclosure.** Amend CONTRACT-005 E to allow cited page text in author
+   exports; fix the `page_text` omission count; run the restricted-coordinate
+   scan over exported page text and warn; omit retired records (the `retired`
+   state is command line only); never put this file in a reviewer package;
+   say that `rights` filters nothing (CONTRACT-001 G). For unpaged sources,
+   whose parts are chapter sized, export a bounded context window and say that
+   text was trimmed.
+7. **Hostile text.** Isolate each segment (`dir="auto"`,
+   `unicode-bidi: isolate`) and show bidi and other control characters visibly.
+8. **Shape for the server.** One per-ID response, `stemma.sourceview/0`, which
+   the server will return unchanged. Citation views point to passage views, not
+   copies. The panel takes a getter that can become asynchronous. Segments are
+   pre-cut in `core` (no offsets for the page to slice). Give the offline file
+   a measured size cap with omission counts.
+9. **Integration.** Add the file to `FILES`, the known lists in
+   `exportOwnFiles` and `exportStaleness`, and a `PLACEHOLDERS` entry. Use
+   `GraphBrowser`'s `location`/`onLocation` or the exported `parseExplore`,
+   without breaking its own hash routing; do not hand-parse the hash.
+10. **Command line.** No `source show`. Extend `excerpt` with `--citation <id>`
+    and `--quotation <id>`, and mark the quotation in `--passage` output, under
+    CONTRACT-002 G's limits unchanged: over the limit it exits 5 and prints no
+    source text. Two-page, notes-stream and retired cases need synthetic
+    fixtures.
+
 ## One operation in `core`
 
 `sourceView(corpus, id)` takes a citation or passage ID and returns data only:
@@ -27,7 +75,7 @@ highlight comes from offsets.
 
 ## Agent and command line
 
-- `source show <citation id|passage id> [--format text|json]`. Text output
+- `excerpt --citation|--passage|--quotation <id> [--format text|json]`. Text output
   marks quoted source data with the `excerpt` boundary token and marks the
   quotation inside it. It prints at most the cited pages, under `excerpt`'s page
   and character limits; over the limit, it prints the quotation with context
@@ -60,7 +108,7 @@ highlight comes from offsets.
 
 FEAT-012: new requirements SRC-01 to SRC-04 (view from a citation or passage;
 highlight only on a verified anchor; say the text is converted or recognized;
-reach the recorded original) and a user story. CONTRACT-002: `source show`.
+reach the recorded original) and a user story. CONTRACT-002 G: the `excerpt` additions.
 CONTRACT-005: the new derived file. SD-012 and CONTRACT-004 where affected.
 
 ## Tests
@@ -74,6 +122,6 @@ on the worked example.
 
 ## Done when
 
-All local checks pass, and from the worked example's page and from `source show`
+All local checks pass, and from the worked example's page and from `excerpt`
 an author sees a citation's sentence, its quotation highlighted in its page
 text, the printed page and the recorded quality.
