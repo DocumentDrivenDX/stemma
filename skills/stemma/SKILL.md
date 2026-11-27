@@ -3,8 +3,10 @@ name: stemma
 description: |
   Stemma skill, the single public entrypoint for researching and writing
   academically rigorous research reports and books with a checkable chain from
-  each original source to each citation. Engage on prompts to start a report or
-  book project; capture a source from a library or the author's own file and
+  each original source to each citation, technical research included:
+  documentation for a named version, release notes, papers and engineering
+  write-ups. Engage on prompts to start a report or book project; research a
+  technical subject; capture a source from a library or the author's own file and
   convert it to Markdown in the project; read PDF, EPUB, HTML, DOCX, Markdown,
   Project Gutenberg or plain text and its page numbers or chapters; find and
   capture quotations with their pages; record the citations in a manuscript;
@@ -19,6 +21,9 @@ argument-hint: "[intent or scope]"
 # Stemma
 
 Stemma helps an author create an academically rigorous research report or book.
+Technical research is a first use: its sources are documentation for a named
+version, release notes, papers and engineering write-ups, beside books and
+articles in any field.
 It keeps an unbroken chain from original source to citation to supported thesis:
 upstream record (hashes) → converted source files (digests, converter version) →
 passage address and digest → citation → claim → sentence in the output →
@@ -543,6 +548,21 @@ which. Record in the source file's `identity` the values read from the copy, wit
 read. Give source records the identifiers a catalogue knows (`doi`, `ia`) and
 list their lookups. Never change a record only to make a check pass: if the copy
 or a catalogue disagrees, show the author both values.
+
+**Technical sources.** For documentation, release notes and anything else that
+changes, capture the version the author names and record it (`--source-version`,
+or `version` in a plan); never guess one.
+
+- **Code is not kept line for line.** Converting an HTML page turns preformatted
+  text (`<pre>`) into an ordinary paragraph: its line breaks and indentation are
+  collapsed into single spaces. Never present such a passage or quotation as an
+  exact code listing, command output or configuration file; tell the author, who
+  can check the original.
+- **Paragraph numbers on a web page.** A page with no pages or numbered chapters
+  is cited by a paragraph number counted over the whole captured page, menus,
+  sidebars and footers included. It is not printed on the page, and another
+  capture may count differently. Say so, and help a reader find the place by the
+  quoted words.
 
 **Image-only and paper sources.** Stemma has no recognition engine. If the
 author has a recognition tool, use its output with `--method ocr` and name it;
