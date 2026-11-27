@@ -72,9 +72,9 @@ Full report: $PROJECTS/clean/.stemma/reports/check.json
 <p>Fixed order: outcome and check, what is wrong, why it matters, what to do, evidence. The example is filled from a real JSON report.</p>
 <article class="finding" aria-label="meta.resolver unverifiable">
 <p class="finding-id"><span class="status status-unverifiable">unverifiable</span> <code>meta.resolver</code> <code>no_lookup</code></p>
-<p class="message">The source's details have not been compared with any catalogue: no lookup is saved.</p>
-<dl><div><dt>Why it matters</dt><dd>A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.</dd></div><div><dt>What to do</dt><dd>Give the source's upstream record an identifier to look up, or run `resolve &lt;source id&gt; --via crossref|internet_archive --identifier &lt;value&gt;`. Some works are in neither catalogue.</dd></div></dl>
-<ul class="evidence" aria-label="Evidence"><li>src-fixture0harbour01</li><li>source file: records/sources/src-fixture0harbour01.json</li><li>key: hartwell1998</li></ul>
+<p class="message">The source's details have not been compared with any catalogue: no lookup that found the work is saved.</p>
+<dl><div><dt>Why it matters</dt><dd>A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.</dd></div><div><dt>What to do</dt><dd>Nothing needs doing. `resolve` compares the source once an identifier is known; some works are in no catalogue it reads.</dd></div></dl>
+<ul class="evidence" aria-label="Evidence"><li>src-fixture0harbour01</li><li>source file: records/sources/src-fixture0harbour01.json</li><li>key: hartwell1998</li><li>coverage: not compared with a catalogue: no lookup that found the work is saved</li></ul>
 </article>
 <h3>Figure</h3>
 <p>A screenshot or drawing has alternative text, a caption that says how it was made, and the same content available as text. A rendered page is never presented as a terminal window or as a Stemma screen.</p>
