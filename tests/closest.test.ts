@@ -42,10 +42,10 @@ function plain(stored: Folded, quotation: string, within: Within): Closest | und
     let { start, end } = candidate;
     while (start < end && hay[start] === " ") start++;
     while (end > start && hay[end - 1] === " ") end--;
-    while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
-    while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
+    while (start > 0 && (insideWord(hay, start) || !stored.starts(start))) start--;
+    while (end < hay.length && (insideWord(hay, end) || !stored.starts(end))) end++;
     if (end <= start || tried.has(`${start} ${end}`)) continue;
-    const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
+    const span = { start: stored.from(start), end: stored.to(end - 1) };
     if (!within(span)) continue;
     tried.add(`${start} ${end}`);
     const distance = distances(needle, hay.slice(start, end));

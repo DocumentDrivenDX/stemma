@@ -34,13 +34,13 @@ interface Applied { fold: Fold; at: number; joined?: string }
 export interface Folded {
   original: string;
   text: string;
-  /** For each unit of `text`, the span of `original` it came from. Neither ever goes down. */
-  from: Int32Array;
-  to: Int32Array;
+  /** For each unit of `text`, where the span of `original` it came from begins and ends. Neither ever goes down. */
+  from(at: number): number;
+  to(at: number): number;
   /** Whether a match may start at this unit: it begins a character of the original. */
-  starts: Uint8Array;
-  /** In the order of `at`, which never goes down. */
-  applied: Applied[];
+  starts(at: number): boolean;
+  /** What was allowed at the units from `start` up to `end`, in order. */
+  appliedIn(start: number, end: number): Applied[];
 }
 
 const LETTER = /\p{L}/u;
@@ -66,33 +66,92 @@ function joinedWord(original: string, hyphen: number, next: number): string {
   return `${before}-|${after}`.replaceAll(SOFT_HYPHEN, "");
 }
 
+/**
+ * Where each folded unit came from. A whole project's source text is folded in
+ * one run, so this is not held unit by unit. Most units each stand for one unit
+ * of the original, in step with the unit before, so only the places where that
+ * changes are held.
+ */
+class Origins {
+  /** From each of these units on, until the next, a unit begins `shift` further on in the original. */
+  private readonly breaks: number[] = [0];
+  private readonly shifts: number[] = [0];
+  /** The units whose span of the original is not one unit long. */
+  private readonly widths = new Map<number, number>();
+  /** The units that do not begin a character of the original. */
+  private readonly inner = new Set<number>();
+  length = 0;
+
+  push(count: number, start: number, end: number): void {
+    for (let i = 0; i < count; i++) {
+      const at = this.length++;
+      if (start - at !== this.shifts[this.shifts.length - 1]) {
+        this.breaks.push(at);
+        this.shifts.push(start - at);
+      }
+      if (end - start !== 1) this.widths.set(at, end - start);
+      if (i > 0) this.inner.add(at);
+    }
+  }
+
+  from(at: number): number {
+    let low = 0;
+    let high = this.breaks.length - 1;
+    while (low < high) {
+      const middle = (low + high + 1) >> 1;
+      if (this.breaks[middle]! <= at) low = middle;
+      else high = middle - 1;
+    }
+    return at + this.shifts[low]!;
+  }
+
+  to(at: number): number {
+    return this.from(at) + (this.widths.get(at) ?? 1);
+  }
+
+  starts(at: number): boolean {
+    return at >= 0 && at < this.length && !this.inner.has(at);
+  }
+}
+
+/**
+ * What was allowed, and at which folded unit. Nearly every line of a stored text
+ * has an entry, so they are two lists and not an object each.
+ */
+class Allowed {
+  /** The folded unit of each entry, which never goes down. */
+  private readonly at: number[] = [];
+  private readonly folds: Fold[] = [];
+  private readonly joined = new Map<number, string>();
+
+  add(fold: Fold, at: number, joined?: string): void {
+    if (joined !== undefined) this.joined.set(this.at.length, joined);
+    this.at.push(at);
+    this.folds.push(fold);
+  }
+
+  /** Those from `start` up to `end`, found without reading the rest. */
+  within(start: number, end: number): Applied[] {
+    const out: Applied[] = [];
+    for (let i = firstWhere(this.at.length, (k) => this.at[k]! >= start); i < this.at.length && this.at[i]! < end; i++) {
+      const joined = this.joined.get(i);
+      out.push({ fold: this.folds[i]!, at: this.at[i]!, ...(joined === undefined ? {} : { joined }) });
+    }
+    return out;
+  }
+}
+
 /** `stored` text may split words at line ends; a quotation's own hyphens are never joined. */
 export function fold(original: string, side: "stored" | "quotation"): Folded {
-  // A whole project's source text is folded in one run, so the maps are held as
-  // typed arrays, which take a fraction of the memory of arrays of values.
   const chunks: string[] = [];
   let out: string[] = [];
-  let capacity = original.length + 16;
-  let from = new Int32Array(capacity);
-  let to = new Int32Array(capacity);
-  let starts = new Uint8Array(capacity);
-  const applied: Applied[] = [];
+  const origins = new Origins();
+  const allowed = new Allowed();
   let length = 0;
   let space: { start: number; end: number; plain: boolean } | undefined;
 
   const push = (text: string, start: number, end: number) => {
-    if (length + text.length > capacity) {
-      capacity = 2 * (length + text.length);
-      const grown = <T extends Int32Array | Uint8Array>(old: T, made: T): T => { made.set(old.subarray(0, length)); return made; };
-      from = grown(from, new Int32Array(capacity));
-      to = grown(to, new Int32Array(capacity));
-      starts = grown(starts, new Uint8Array(capacity));
-    }
-    for (let i = 0; i < text.length; i++) {
-      from[length + i] = start;
-      to[length + i] = end;
-    }
-    if (text.length > 0) starts[length] = 1;
+    origins.push(text.length, start, end);
     out.push(text);
     if (out.length === 4096) {
       chunks.push(out.join(""));
@@ -102,7 +161,7 @@ export function fold(original: string, side: "stored" | "quotation"): Folded {
   };
   const flush = () => {
     if (!space) return;
-    if (!space.plain) applied.push({ fold: "white_space", at: length });
+    if (!space.plain) allowed.add("white_space", length);
     push(" ", space.start, space.end);
     space = undefined;
   };
@@ -112,13 +171,13 @@ export function fold(original: string, side: "stored" | "quotation"): Folded {
     if (side === "stored" && (char === "-" || char === "‐" || char === SOFT_HYPHEN)) {
       const next = joinAfter(original, i);
       if (next !== undefined) {
-        applied.push({ fold: "line_end_join", at: length, joined: joinedWord(original, i, next) });
+        allowed.add("line_end_join", length, joinedWord(original, i, next));
         i = next;
         continue;
       }
     }
     if (char === SOFT_HYPHEN) {
-      applied.push({ fold: "soft_hyphen", at: length });
+      allowed.add("soft_hyphen", length);
       i++;
       continue;
     }
@@ -140,13 +199,13 @@ export function fold(original: string, side: "stored" | "quotation"): Folded {
     flush();
     const cluster = original.slice(i, end);
     let text = cluster.normalize("NFD");
-    if (text !== cluster) applied.push({ fold: "canonical_form", at: length });
+    if (text !== cluster) allowed.add("canonical_form", length);
     if (Object.hasOwn(LIGATURES, text[0]!)) {
-      applied.push({ fold: "ligature", at: length });
+      allowed.add("ligature", length);
       text = LIGATURES[text[0]!]! + text.slice(1);
     }
     if (Object.hasOwn(QUOTES, text[0]!)) {
-      applied.push({ fold: "quotation_marks", at: length });
+      allowed.add("quotation_marks", length);
       text = QUOTES[text[0]!]! + text.slice(1);
     }
     push(text, i, end);
@@ -154,12 +213,9 @@ export function fold(original: string, side: "stored" | "quotation"): Folded {
   }
   flush();
   chunks.push(out.join(""));
-  const exact = capacity - length > 64;
   return {
-    original, text: chunks.join(""), applied,
-    from: exact ? from.slice(0, length) : from.subarray(0, length),
-    to: exact ? to.slice(0, length) : to.subarray(0, length),
-    starts: exact ? starts.slice(0, length) : starts.subarray(0, length),
+    original, text: chunks.join(""), appliedIn: (start, end) => allowed.within(start, end),
+    from: (at) => origins.from(at), to: (at) => origins.to(at), starts: (at) => origins.starts(at),
   };
 }
 
@@ -214,31 +270,17 @@ export function findQuotation(stored: Folded, quotation: string, within: Within 
   let first: Found | undefined;
   for (let at = stored.text.indexOf(needle.text); at !== -1; at = stored.text.indexOf(needle.text, at + 1)) {
     const after = at + needle.text.length;
-    if (!stored.starts[at] || (after < stored.text.length && !stored.starts[after])) continue;
+    if (!stored.starts(at) || (after < stored.text.length && !stored.starts(after))) continue;
     if (insideWord(stored.text, at) || insideWord(stored.text, after)) continue;
-    const span = { start: stored.from[at]!, end: stored.to[after - 1]! };
+    const span = { start: stored.from(at), end: stored.to(after - 1) };
     if (!within(span)) continue;
     if (stored.original.slice(span.start, span.end) === verbatim) return { ...span, match: "exact", folds: [], joined: [] };
     if (first) continue;
-    const here = appliedWithin(stored.applied, at, after);
-    const folds = new Set<Fold>([...here, ...needle.applied].map((a) => a.fold));
+    const here = stored.appliedIn(at, after);
+    const folds = new Set<Fold>([...here, ...needle.appliedIn(0, Number.POSITIVE_INFINITY)].map((a) => a.fold));
     first = { ...span, match: "normalized", folds: [...folds].sort(), joined: here.flatMap((a) => a.joined ?? []) };
   }
   return first;
-}
-
-/** Those applied from `start` up to `end`, found without reading the rest. */
-function appliedWithin(applied: Applied[], start: number, end: number): Applied[] {
-  let low = 0;
-  let high = applied.length;
-  while (low < high) {
-    const middle = (low + high) >> 1;
-    if (applied[middle]!.at < start) low = middle + 1;
-    else high = middle;
-  }
-  const out: Applied[] = [];
-  for (let i = low; i < applied.length && applied[i]!.at < end; i++) out.push(applied[i]!);
-  return out;
 }
 
 /** Starting values, to be tuned on pilot sources (SD-007 BR-709). */
@@ -402,15 +444,15 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
   let until = hay.length;
   let keep: (end: number) => boolean = () => true;
   if (region) {
-    const first = firstWhere(hay.length, (i) => stored.from[i]! >= region.start);
-    until = firstWhere(hay.length, (i) => stored.to[i]! > region.end);
+    const first = firstWhere(hay.length, (i) => stored.from(i) >= region.start);
+    until = firstWhere(hay.length, (i) => stored.to(i) > region.end);
     while (until < hay.length && hay[until] === " ") until++;
     begin = Math.max(0, first - m - 2 * limit - 2);
     // A span widened from a candidate holds the candidate's last unit that is not a space.
     keep = (end) => {
       let at = end - 1;
       while (at >= 0 && hay[at] === " ") at--;
-      return at >= 0 && stored.from[at]! >= region.start && stored.to[at]! <= region.end;
+      return at >= 0 && stored.from(at) >= region.start && stored.to(at) <= region.end;
     };
   }
   // The distance that counts is to the whole words shown, not to a stretch that cuts into one.
@@ -422,11 +464,11 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
     let { start, end } = candidate;
     while (start < end && hay[start] === " ") start++;
     while (end > start && hay[end - 1] === " ") end--;
-    while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
-    while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
+    while (start > 0 && (insideWord(hay, start) || !stored.starts(start))) start--;
+    while (end < hay.length && (insideWord(hay, end) || !stored.starts(end))) end++;
     const key = `${start} ${end}`;
     if (end <= start || tried.has(key)) continue;
-    const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
+    const span = { start: stored.from(start), end: stored.to(end - 1) };
     if (!within(span)) continue;
     tried.add(key);
     // The distance to the whole span, which holds at least one unit.
