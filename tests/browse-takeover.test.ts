@@ -45,7 +45,11 @@ describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () 
       });
       await page.goto(pathToFileURL(info.launch_file).href);
       await searchBox(page).waitFor();
+      // Past the page's next poll, on its clock; that poll is answered before the server stops,
+      // so that no call of the page's is left on its way to the stopped server.
       await page.clock.runFor(2500);
+      while (genuine.length < 2) await Bun.sleep(10);
+      await genuine.at(-1);
       const secret = (await stored(page)).session["stemma.secret"]!;
       const kept = await genuine[0]!;
       expect(kept.proof).toMatch(/^[A-Za-z0-9_-]{43}$/);
