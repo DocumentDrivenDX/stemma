@@ -1,5 +1,25 @@
 {
   "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:14:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:52Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, sections 2 and 3",
+      "value": "position:subsidence"
+    }
+  ],
   "citation_key": "geolsoc1838",
   "created": {
     "at": "2026-11-27T01:47:00Z",
@@ -21,6 +41,9 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "position:subsidence"
+  ],
   "title": {
     "value": "Proceedings of the Geological Society of London"
   },

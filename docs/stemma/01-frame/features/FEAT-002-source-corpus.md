@@ -18,7 +18,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 2. Source corpus
-**Covered PRD Requirements**: FR-6, FR-7, FR-8, FR-9, FR-10, FR-61, FR-84, FR-85, FR-86, FR-87, FR-88, FR-89, FR-90
+**Covered PRD Requirements**: FR-6, FR-7, FR-8, FR-9, FR-10, FR-61, FR-84, FR-85, FR-86, FR-87, FR-88, FR-89, FR-90, FR-94
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -82,6 +82,16 @@ STO-01 (FR-6, P0, M1). Capturing a source must save its whole text as source fil
 STO-02 (FR-6, P0, M1). Binaries and paper originals must not be stored in the repository.
 
 STO-03 (FR-6, FR-86, P0, M1). A library source must be fetched only by a route the library documents for automated use. A refused fetch must be reported, not worked around, so that the author can supply the file.
+
+#### Iterative capture
+
+ITR-01 (FR-94, P0, M1). Capturing an original must be possible before any text or bibliographic detail exists; capture, mapping to text, and each later addition must be separate steps that can be run again without duplicating anything.
+
+ITR-02 (FR-94, P0, M1). Adding library details or tags must write no source file, must keep passage addresses, and must record who, when, and, where known, from where. A recorded value must not be replaced unless asked; a differing value must be shown.
+
+ITR-03 (FR-94, FR-10, P0, M1). A detail added where none was recorded must not report the passages selected before it; a detail changed or removed must. Details not yet captured must never be a finding.
+
+ITR-04 (FR-94, P0, M1). Sources must be listed by tag, tag namespace, and stage, and each source's recorded history shown.
 
 #### Conversion
 
@@ -163,6 +173,7 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 - [US-110 — Convert a text-native source and reverify it](../user-stories/US-110-convert-and-reverify.md)
 - [US-111 — Compare and review source text](../user-stories/US-111-compare-and-review.md)
 - [US-112 — Capture a passage and cite it verbatim](../user-stories/US-112-capture-a-passage.md)
+- [US-115 — Capture a source and add to it over time](../user-stories/US-115-capture-and-enrich-a-source.md)
 
 ## Edge Cases and Error Handling
 
@@ -186,7 +197,7 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 
 - **Other features**: FEAT-001 provides the project; FEAT-011 holds records; FEAT-003 owns bibliographic content; FEAT-004 and FEAT-015 add sources; FEAT-007 runs checks on the corpus.
 - **External services**: A pinned PDF text library (SD-002); source libraries and catalogues reached only by explicit commands. Shapes belong to Contract artifacts (CONTRACT-001, CONTRACT-007).
-- **PRD requirements**: FR-6 to FR-10, FR-61, and FR-84 to FR-90.
+- **PRD requirements**: FR-6 to FR-10, FR-61, FR-84 to FR-90, and FR-94.
 
 ## Out of Scope
 

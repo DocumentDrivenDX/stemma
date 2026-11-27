@@ -94,10 +94,15 @@ absent (exit 4 if it cannot) and then runs
 | `coverage [<text id>]` | For each source file, report the method, parts reviewed whole by a person, flags, each current or stale comparison run with per-page agreement, and every disagreement with both readings. It emits no finding | M1 |
 | `passage find --source <id> <words>` | List the passage addresses where words occur under the quotation rules, with page or chapter | M1 |
 | `passage capture --address <address> --actor <kind>:<name> [--note <text>]` | Make a `passage` from an address such as `txt-…/105:main:120-240` or a range `txt-…/105:main:900-+106:main:0-80`, copying its exact text and locator, and print them with the quotation as the joining rules render it | M1 |
+| `source capture <original> [--source <id\|key>] --acquired-at <time> [--origin <text>] [--source-version <text>] --actor <kind>:<name>` | Record an original for a new or named source in an `upstream` record, and keep a copy in `.stemma/originals/`, without converting it. An original already held writes nothing unless another source is named. A later `source convert` of it must name the source (else `already_held`) and takes the time, origin, and version from that record; a conversion identical to one the source holds writes nothing | M1 |
+| `source enrich <id\|key> [--from <text>] [--add-identifier <scheme>:<value>]... [--set <name>=<value>]... [--author <name>]... [--replace] --actor <kind>:<name>` / `source enrich <id\|key> --lookup <resolution id> --actor <kind>:<name>` | Add library details to a source record and log each in its `changes`. Typed values need `--from`. A value that differs from a recorded one is listed as a disagreement and not written (exit 1) unless `--replace` is given. A saved lookup only fills absent title, authors, date, publisher, and container title; it does not take the date of a record of one volume of a set. Writes no source file | M1 |
+| `source tag <id\|key>... [--add <tag>]... [--remove <tag>]... [--from <text>] --actor <kind>:<name>` | Add and remove tags (CONTRACT-001 G) on one or more sources and log each. Any invalid tag or source writes nothing | M1 |
+| `source list [--tag <tag\|namespace:>]... [--stage record\|captured\|text] [--has identifiers\|lookup\|tags]...` | List non-retired sources that match every filter, with tag counts. The stage is how far a source has come: a record only, an original captured, or text held. It is no judgment and no finding | M1 |
+| `source history <id\|key>` | From the records, list what happened to a source, oldest first, with who, when, and where from: creation, captures, conversions, comparisons, lookups, passages, reviews, logged changes, and retirements. A record keeps only its latest edit of text labels or sealed text | M1 |
 | `source admit <id> \| source reject <id>` | Record the author's optional admission decision | M1 |
 | `key rename <source id> <key>` | Rename a citation key, keeping the old one as an alias | M1 |
 | `check [--changed \| --all]` | Run scripted checks; `--changed` (default) covers what changed since the check baseline (below); `--all` covers the project | M1 |
-| `resolve <source id>... [--via crossref\|internet_archive --identifier <value>] --actor <kind>:<name>` | Look up identifiers in a catalogue by its documented interface and save `resolution` records with the responses; without `--via`, make the lookups the source's upstream records list | M1 |
+| `resolve <source id>... [--via crossref\|internet_archive --identifier <value>] --actor <kind>:<name>` | Look up identifiers in a catalogue by its documented interface and save `resolution` records with the responses; without `--via`, make the lookups the source's upstream records list, or, with none listed, look up the identifiers on the source record | M1 |
 | `excerpt (--passage <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text (G) | M1 |
 | `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
 | `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced source file or a record the author rejects. The files stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
@@ -291,7 +296,9 @@ and source. A citation with no passage also rests on each source file of its
 source that was retired at or after the citation record was created; times are
 compared to the second and a tie is flagged. A passage whose part digests differ
 from its address is `text_changed`; an edit elsewhere in the source file does
-not affect it. It emits one result for each non-retired note, claim, passage, or
+not affect it. Source details differ (`source_details_changed`) when they are
+not those the passage was selected under, except that details only added since,
+as the record's `changes` show, are not reported (FR-94). It emits one result for each non-retired note, claim, passage, or
 citation that reaches a source or source file. Reason codes are
 `depends_on_retired`, `text_changed`, `source_details_changed`, and
 `record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed. While `manuscript/` holds files

@@ -22,7 +22,7 @@ feature's requirements; the PRD ranks each requirement.
 | ID | Name | Description | Priority | Owner | Source | Updated |
 |----|------|-------------|----------|-------|--------|---------|
 | FEAT-001 | Workspace and governance | Project setup, thesis, constructs and methodology inputs, standing rules, registers, AI roles | P0 | product owner | Subsystem 1: FR-1 to FR-5, FR-60 | 2026-11-26 |
-| FEAT-002 | Source corpus | Capture, conversion to source files in the repository, reverification, structure checks, comparisons and reviews, passage capture, change tracking, excerpts for hosted models | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61, FR-84 to FR-90 | 2026-11-26 |
+| FEAT-002 | Source corpus | Capture, conversion to source files in the repository, reverification, structure checks, comparisons and reviews, iterative capture of library details and tags, passage capture, change tracking, excerpts for hosted models | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61, FR-84 to FR-90, FR-94 | 2026-11-26 |
 | FEAT-003 | Citation store | Official bibliography records, keys, typed locators, legacy library exchange | P0 | product owner | Subsystem 3: FR-11 to FR-15 | 2026-11-26 |
 | FEAT-004 | Research and discovery | Candidate search, the author's admission decisions, coverage log | P0 | product owner | Subsystem 4: FR-16 to FR-19 | 2026-11-26 |
 | FEAT-005 | Notes, claims, constructs | Passage-anchored notes, claim ledger and claim relations, construct register | P0 | product owner | Subsystem 5: FR-20 to FR-23, FR-80 | 2026-11-26 |

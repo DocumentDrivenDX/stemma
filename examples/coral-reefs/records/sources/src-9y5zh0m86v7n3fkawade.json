@@ -8,6 +8,26 @@
       }
     }
   ],
+  "changed": {
+    "at": "2026-11-27T03:14:54Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:54Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 6",
+      "value": "position:later-assessment"
+    }
+  ],
   "citation_key": "steibl2024",
   "contributions": [
     {
@@ -59,6 +79,9 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "position:later-assessment"
+  ],
   "title": {
     "value": "A Renaissance of Atoll Ecology"
   },

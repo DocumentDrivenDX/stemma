@@ -1,5 +1,36 @@
 {
   "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:14:53Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:53Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, sections 5 and 6",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:53Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "funafuti"
+    }
+  ],
   "citation_key": "funafuti1904",
   "contributions": [
     {
@@ -30,6 +61,10 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "evidence:boring",
+    "funafuti"
+  ],
   "title": {
     "value": "The Atoll of Funafuti"
   },

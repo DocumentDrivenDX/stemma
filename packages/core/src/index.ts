@@ -24,3 +24,4 @@ export * from "./retire.ts";
 export { annotate, type AnnotationRequest, planAnnotation } from "./annotations.ts";
 export { headingMatches, catalogueTitleMatches, imprintYears, misreadRoman } from "./checks/metadata.ts";
 export * from "./research.ts";
+export * from "./enrich.ts";
