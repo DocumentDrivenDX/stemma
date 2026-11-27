@@ -1,13 +1,21 @@
-// The served page's calls to its own server (CONTRACT-005 M): the secret goes
-// as a header, never in an address or a cookie; every answer that holds data
-// names the data it came from; and the arras client forwards each read to
-// arras's static client in the server, unchanged.
+// The served page's calls to its own server (CONTRACT-005 M): neither the
+// secret nor the one-time code is sent, each signs what it is the key of; no
+// answer is used before it has proved that it holds the same key; every answer
+// that holds data names the data it came from; and the arras client forwards
+// each read to arras's static client in the server, unchanged.
+import { TAGS, type TagPair } from "../../core/src/browse-proof.ts";
 import type { ArrasClient, SchemaApi } from "./arras-types.ts";
+import { type Proved, provedPost } from "./proof.ts";
 
 const KEY = "stemma.secret";
 
 /** Why a call gave no data. `stale` passes; `locked` and `stopped` do not. */
 export type Trouble = "stale" | "locked" | "stopped" | "failed";
+
+/** What became of the one-time code. */
+export type Redemption = "opened" | "code_used" | "code_expired";
+/** The server's own limit on a request body (rule 10). */
+const MOST_BODY_BYTES = 64 * 1024;
 
 export class CallFailed extends Error {
   constructor(readonly trouble: Trouble, message: string) {
@@ -54,6 +62,8 @@ window.addEventListener("pageshow", () => (leaving = false));
 
 export class Server {
   private secret: string | undefined = stored();
+  /** Set for good once the server cannot be reached or an answer is not its own. */
+  private gone = false;
 
   get open(): boolean {
     return this.secret !== undefined;
@@ -64,49 +74,52 @@ export class Server {
     keep(undefined);
   }
 
-  private async post(path: string, body: unknown): Promise<{ status: number; json: Record<string, unknown> }> {
-    let response: Response;
-    let json: Record<string, unknown>;
+  /** Whatever answers at this address next gets no further call, and nothing signed with the key is of use to it. */
+  private stop(message: string): never {
+    this.gone = true;
+    this.forget();
+    throw new CallFailed("stopped", message);
+  }
+
+  private async post(key: string, tags: TagPair, path: string, body: string): Promise<{ status: number; json: Record<string, unknown> }> {
+    let proved: Proved | undefined;
     try {
-      response = await fetch(path, {
+      proved = await provedPost((to, init) => fetch(to, {
         method: "POST", cache: "no-store", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
-        headers: { "content-type": "application/json", "x-stemma-request": "1", ...(this.secret === undefined ? {} : { "x-stemma-secret": this.secret }) },
-        body: JSON.stringify(body),
-      });
-      json = (await response.json()) as Record<string, unknown>;
+        headers: { "content-type": "application/json", "x-stemma-request": "1", ...init.headers },
+        body: init.body,
+      }), key, tags, path, body);
     } catch {
       // A page that is being left is gone before this wait ends. One that stayed after all goes on below.
       if (leaving) await new Promise((resolve) => setTimeout(resolve, LEAVING_MS));
-      // Whatever answers at this address next is not to be trusted with the secret.
-      this.forget();
-      throw new CallFailed("stopped", "Stemma's server cannot be reached.");
+      return this.stop("Stemma's server cannot be reached.");
     }
-    return { status: response.status, json };
+    if (!proved) return this.stop("What answered could not prove that it is this run of Stemma.");
+    // An answer proved before another failed is not used after it.
+    if (this.gone) throw new CallFailed("stopped", "Stemma's server has stopped.");
+    return { status: proved.status, json: JSON.parse(proved.text) as Record<string, unknown> };
   }
 
-  /** Trades the one-time code for the run's secret. A refused code leaves any secret the tab already has. */
-  async exchange(code: string): Promise<boolean> {
-    const had = this.secret;
-    this.secret = undefined;
-    const { status, json } = await this.post("/api/session", { code });
+  /** Trades the one-time code, which signs the request and is not sent, for the run's secret. A refused code leaves any secret the tab already has. */
+  async exchange(code: string): Promise<Redemption> {
+    const { status, json } = await this.post(code, TAGS.code, "/api/session", "{}");
     if (status === 200 && typeof json.secret === "string") {
       this.secret = json.secret;
       keep(this.secret);
-      return true;
+      return "opened";
     }
-    this.secret = had;
-    return false;
+    return (json.error as { code?: string } | undefined)?.code === "code_expired" ? "code_expired" : "code_used";
   }
 
   async call(path: string, body: unknown): Promise<Record<string, unknown>> {
+    if (this.gone) throw new CallFailed("stopped", "Stemma's server has stopped.");
     if (this.secret === undefined) throw new CallFailed("locked", "This tab has no access.");
-    const { status, json } = await this.post(path, body);
+    const text = JSON.stringify(body);
+    // The server's refusal of this comes before it can prove anything, which would look like another program's answer.
+    if (new TextEncoder().encode(text).length > MOST_BODY_BYTES) throw new CallFailed("failed", "too_large: The request is too large.");
+    const { status, json } = await this.post(this.secret, TAGS.call, path, text);
     if (status === 200) return json;
     const error = (json.error ?? {}) as { code?: string; message?: string; arras?: { status: number; code?: string } };
-    if (error.code === "unauthorized") {
-      this.forget();
-      throw new CallFailed("locked", "This tab has no access.");
-    }
     if (error.code === "index_stale") throw new CallFailed("stale", error.message ?? "");
     if (error.arras) throw Object.assign(new Error(error.message), error.arras);
     throw new CallFailed("failed", `${error.code ?? status}: ${error.message ?? ""}`);

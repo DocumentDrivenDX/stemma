@@ -6,7 +6,7 @@ import { readFileSync, statSync, existsSync } from "node:fs";
 import { networkInterfaces, platform } from "node:os";
 import { dirname, join } from "node:path";
 import { createSession, LAUNCH_NAME, LIMITS, listen, type Listening, openerCommand, ProcessGone, type Session, type Verdict, writeLaunchFile } from "@stemma/server";
-import { raw, request } from "./browse-http.ts";
+import { newNonce, raw, request, requestMac, responseProof, type Use } from "./browse-http.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 const ASSETS = { html: "<!doctype html><title>shell</title>", js: "/* script */", css: "/* styles */" };
@@ -28,6 +28,13 @@ const verdict: Verdict = {
   },
 };
 
+/** Redeems a session's code as the page would, and gives the secret, or nothing. */
+function secretOf(of: Session): string | undefined {
+  const nonce = newNonce();
+  const got = of.redeem({ method: "POST", path: "/api/session", body: Buffer.from("{}"), nonce, mac: requestMac(of.code, "/api/session", "{}", nonce) });
+  return got && "secret" in got ? got.secret : undefined;
+}
+
 let server: Listening;
 let session: Session;
 let secret: string;
@@ -39,7 +46,7 @@ async function start(limits: Partial<typeof LIMITS> = {}, given: Session = creat
 beforeAll(async () => {
   session = createSession();
   server = await start({}, session);
-  secret = session.exchange(session.code)!;
+  secret = secretOf(session)!;
 });
 afterAll(async () => server.close());
 beforeEach(() => {
@@ -50,15 +57,24 @@ beforeEach(() => {
 });
 
 type Header = [string, string | undefined];
-/** The headers of a right call, with some changed or left out. */
-function headers(change: Record<string, string | undefined> = {}, to: Listening = server, key = secret): Header[] {
+interface Signing {
+  to?: Listening;
+  key?: string;
+  path?: string;
+  body?: string;
+  use?: Use;
+}
+/** The headers of a right call, signed over its path and body, with some changed or left out. */
+function headers(change: Record<string, string | undefined> = {}, { to = server, key = secret, path = "/api/query", body = "{}", use }: Signing = {}): Header[] {
+  const nonce = newNonce();
   const right: Record<string, string> = {
-    Host: `127.0.0.1:${to.port}`, Origin: `http://127.0.0.1:${to.port}`, "Content-Type": "application/json", "X-Stemma-Request": "1", "X-Stemma-Secret": key,
+    Host: `127.0.0.1:${to.port}`, Origin: `http://127.0.0.1:${to.port}`, "Content-Type": "application/json", "X-Stemma-Request": "1",
+    "X-Stemma-Nonce": nonce, "X-Stemma-Mac": requestMac(key, path, body, nonce, use),
   };
   return Object.entries({ ...right, ...change });
 }
 const call = (path: string, change: Record<string, string | undefined> = {}, body = "{}", method = "POST") =>
-  raw(server.port, [request(method, path, headers(change), body)]);
+  raw(server.port, [request(method, path, headers(change, { path, body }), body)]);
 const nothingReached = () => expect({ reached, scans, uses }).toEqual({ reached: [], scans: 0, uses: 0 });
 const refused = async (reply: ReturnType<typeof call>, status: number, code: string) => {
   const got = await reply;
@@ -87,7 +103,7 @@ describe("a right request", () => {
   });
 
   test("one request is answered on a connection, and a second one on it is not read", async () => {
-    const one = request("POST", "/api/boot", headers(), "{}");
+    const one = request("POST", "/api/boot", headers({}, { path: "/api/boot" }), "{}");
     const got = await raw(server.port, [one + one]);
     expect(got.body.match(/HTTP\/1\.1/g)).toBeNull();
     expect(reached).toHaveLength(1);
@@ -104,7 +120,7 @@ describe("rule 1: the loopback address only", () => {
   });
 
   test("a repeated header a rule reads is refused, whichever copy is right", async () => {
-    for (const [name, other] of [["Host", "evil.example"], ["Origin", "http://evil.example"], ["Content-Type", "text/plain"], ["X-Stemma-Secret", "wrong"], ["X-Stemma-Request", "0"]] as const) {
+    for (const [name, other] of [["Host", "evil.example"], ["Origin", "http://evil.example"], ["Content-Type", "text/plain"], ["X-Stemma-Mac", "wrong"], ["X-Stemma-Nonce", "wrong"], ["X-Stemma-Request", "0"]] as const) {
       for (const first of [true, false]) {
         const all = headers();
         const extra: Header = [name, other];
@@ -148,7 +164,7 @@ describe("rules 3 and 4: the exact Origin, and no preflight", () => {
   test("a preflight and every method but GET and POST is refused, with no permission in the answer", async () => {
     for (const method of ["OPTIONS", "PUT", "DELETE", "PATCH", "HEAD", "TRACE"]) {
       for (const path of ["/", "/api/query"]) {
-        const got = await raw(server.port, [request(method, path, [...headers(), ["Access-Control-Request-Method", "POST"], ["Access-Control-Request-Headers", "x-stemma-secret"]])]);
+        const got = await raw(server.port, [request(method, path, [...headers(), ["Access-Control-Request-Method", "POST"], ["Access-Control-Request-Headers", "x-stemma-mac"]])]);
         expect([method, got.status]).toEqual([method, 405]);
         expect(Object.keys(got.headers).filter((name) => name.startsWith("access-control"))).toEqual([]);
       }
@@ -176,77 +192,145 @@ describe("rule 5: JSON and the request header", () => {
   });
 });
 
-describe("rule 6: the secret", () => {
-  test("US-119-AC5 every call but session needs this run's secret; no cookie and no address carries it", async () => {
+describe("rule 6: signed with the secret, which is never sent", () => {
+  test("US-119-AC5 every call but session needs this run's signature; no cookie, address or header with the secret stands in for it", async () => {
     const other = createSession();
-    const otherSecret = other.exchange(other.code)!;
+    const otherSecret = secretOf(other)!;
     for (const path of ["/api/status", "/api/boot", "/api/arras", "/api/query", "/api/source-view", "/api/manuscript"]) {
-      for (const wrong of [undefined, "", "x", secret.slice(0, -1), `${secret}x`, secret.toUpperCase(), otherSecret, session.code]) {
-        await refused(call(path, { "X-Stemma-Secret": wrong }), 401, "unauthorized");
+      for (const wrong of ["x", secret.slice(0, -1), `${secret}x`, secret.toUpperCase(), otherSecret, session.code]) {
+        await refused(raw(server.port, [request("POST", path, headers({}, { key: wrong, path }), "{}")]), 401, "unauthorized");
       }
-      await refused(raw(server.port, [request("POST", path, [...headers({ "X-Stemma-Secret": undefined }), ["Cookie", `stemma=${secret}`], ["Authorization", `Bearer ${secret}`]], "{}")]), 401, "unauthorized");
-      await refused(call(`${path}?secret=${secret}`, { "X-Stemma-Secret": undefined }), 404, "not_found");
+      for (const wrong of [undefined, "", "x", "A".repeat(43), secret]) await refused(call(path, { "X-Stemma-Mac": wrong }), 401, "unauthorized");
+      for (const wrong of [undefined, "", "x", newNonce().slice(0, -1), `x${newNonce()}`]) await refused(call(path, { "X-Stemma-Nonce": wrong }), 401, "unauthorized");
+      await refused(raw(server.port, [request("POST", path, [...headers({ "X-Stemma-Mac": undefined }, { path }), ["Cookie", `stemma=${secret}`], ["Authorization", `Bearer ${secret}`], ["X-Stemma-Secret", secret]], "{}")]), 401, "unauthorized");
+      await refused(call(`${path}?secret=${secret}`), 404, "not_found");
     }
+  });
+
+  test("US-119-AC5 a signature holds for one method, path, body, nonce and use", async () => {
+    const nonce = newNonce();
+    const signed = (mac: string, body = "{}") => refused(raw(server.port, [request("POST", "/api/query", headers({ "X-Stemma-Nonce": nonce, "X-Stemma-Mac": mac }), body)]), 401, "unauthorized");
+    await signed(requestMac(secret, "/api/boot", "{}", nonce));
+    await signed(requestMac(secret, "/api/query", "{ }", nonce));
+    await signed(requestMac(secret, "/api/query", "{}", nonce), '{"a":1}');
+    await signed(requestMac(secret, "/api/query", "{}", newNonce()));
+    await signed(requestMac(secret, "/api/query", "{}", nonce, "code"));
+    await signed(requestMac(secret, "/api/query", "{}", nonce, "call", "GET"));
+  });
+
+  test("US-119-AC5 a request sent again is refused and reaches nothing, and so is one whose time is not now", async () => {
+    const one = request("POST", "/api/query", headers(), "{}");
+    expect((await raw(server.port, [one])).status).toBe(200);
+    reached.length = 0;
+    scans = 0;
+    uses = 0;
+    for (let again = 0; again < 3; again++) {
+      const got = await refused(raw(server.port, [one]), 401, "replayed");
+      expect(got.headers["x-stemma-proof"]).toBeUndefined();
+    }
+    for (const at of [Date.now() - 61_000, Date.now() + 61_000]) {
+      const nonce = newNonce(at);
+      await refused(call("/api/query", { "X-Stemma-Nonce": nonce, "X-Stemma-Mac": requestMac(secret, "/api/query", "{}", nonce) }), 401, "replayed");
+    }
+  });
+
+  test("the nonces remembered are bounded: those too old are forgotten, a full memory refuses, and a clock set back lets none in again", () => {
+    let now = 1_000_000;
+    const bounded = createSession(() => {}, 600_000, () => now, { windowMs: 1000, most: 3 });
+    const key = secretOf(bounded)!;
+    const signed = (nonce: string, with_ = key) => ({ method: "POST", path: "/api/status", body: Buffer.from("{}"), nonce, mac: requestMac(with_, "/api/status", "{}", nonce) });
+    const verdict = (nonce: string) => bounded.admit(signed(nonce))?.verdict;
+    // Nothing unsigned is remembered, so only a holder of the secret can fill the memory.
+    for (let i = 0; i < 20; i++) expect(bounded.admit(signed(newNonce(now), "wrong"))).toBeUndefined();
+    const first = newNonce(now);
+    expect([first, newNonce(now + 1), newNonce(now + 2)].map(verdict)).toEqual(["accepted", "accepted", "accepted"]);
+    expect([verdict(newNonce(now + 3)), verdict(first)]).toEqual(["too_many", "replayed"]);
+    now += 1002;
+    // The first two are too old and gone; there is room again, and they stay refused.
+    expect([verdict(newNonce(now)), verdict(newNonce(now)), verdict(first)]).toEqual(["accepted", "accepted", "replayed"]);
+    now -= 1002;
+    expect(verdict(first)).toBe("replayed");
   });
 
   test("the secret is long, new at each start, and not the code", () => {
     const runs = Array.from({ length: 50 }, () => {
       const one = createSession();
-      return [one.code, one.exchange(one.code)!];
+      return [one.code, secretOf(one)!];
     }).flat();
     expect(new Set(runs).size).toBe(100);
     for (const value of runs) expect(value).toMatch(/^[A-Za-z0-9_-]{43}$/);
   });
 
-  test("it is compared as digests with the constant-time comparison", () => {
+  test("signatures are compared with the constant-time comparison", () => {
     const source = readFileSync(join(ROOT, "packages/server/src/session.ts"), "utf8");
-    expect(source).toContain("timingSafeEqual(digest(a), b)");
-    expect(source).not.toMatch(/===\s*(secret|code)\b|\b(secret|code)\s*===/);
+    expect(source).toContain("timingSafeEqual(given, right)");
+    expect(source).not.toMatch(/[=!]==\s*(secret|code|mac|right|given)(?![\w.])|\b(secret|mac|right|given)\s*[=!]==/);
   });
 });
 
 describe("rule 7: the one-time code", () => {
-  const exchange = (to: Listening, code: unknown) => raw(to.port, [request("POST", "/api/session", headers({ "X-Stemma-Secret": undefined }, to), JSON.stringify({ code }))]);
+  const exchange = async (to: Listening, key: string, nonce = newNonce()) => {
+    const got = await raw(to.port, [request("POST", "/api/session", headers({ "X-Stemma-Nonce": nonce, "X-Stemma-Mac": requestMac(key, "/api/session", "{}", nonce) }, { to }), "{}")]);
+    return {
+      status: got.status,
+      body: JSON.parse(got.body) as { secret?: string; error?: { code: string } },
+      proof: got.headers["x-stemma-proof"],
+      /** Whether the answer proves that it holds the code. */
+      proved: got.headers["x-stemma-proof"] === responseProof(key, "/api/session", got.status, got.body, nonce),
+    };
+  };
 
-  test("US-119-AC5 it gives the secret once; again, wrong or missing codes give nothing, and a wrong one uses nothing up", async () => {
-    let gone = 0;
-    const fresh = createSession(() => gone++);
+  test("US-119-AC5 it gives the secret once and then says that it was used; wrong keys get no proof and use nothing up", async () => {
+    const ends: string[] = [];
+    const fresh = createSession((how) => ends.push(how));
     const to = await start({}, fresh);
     try {
-      for (const wrong of ["", "x", fresh.code.slice(1), 1, null, [fresh.code], { code: fresh.code }]) {
+      for (const wrong of ["x", fresh.code.slice(1), createSession().code]) {
         const got = await exchange(to, wrong);
-        expect([got.status, got.body.includes("secret\":")]).toEqual([401, false]);
+        expect([got.status, got.body.error?.code, got.body.secret, got.proof]).toEqual([401, "code_refused", undefined, undefined]);
       }
-      expect([gone, uses]).toEqual([0, 0]);
+      // The code itself, sent as the old exchange sent it, is worth nothing.
+      const sent = await raw(to.port, [request("POST", "/api/session", [...headers({ "X-Stemma-Nonce": undefined, "X-Stemma-Mac": undefined }, { to })], JSON.stringify({ code: fresh.code }))]);
+      expect([sent.status, sent.body.includes('secret":')]).toEqual([401, false]);
+      expect([ends, uses]).toEqual([[], 0]);
       const first = await exchange(to, fresh.code);
-      expect(first.status).toBe(200);
-      const key = (JSON.parse(first.body) as { secret: string }).secret;
-      expect(fresh.allows(key)).toBe(true);
-      expect(gone).toBe(1);
-      const again = await exchange(to, fresh.code);
-      expect([again.status, again.body.includes(key)]).toEqual([401, false]);
-      expect(again.body).toContain("code_refused");
+      expect([first.status, first.proved]).toEqual([200, true]);
+      expect(ends).toEqual(["used"]);
+      const nonce = newNonce();
+      for (const used of [nonce, nonce, newNonce()]) {
+        const again = await exchange(to, fresh.code, used);
+        expect([again.status, again.body.error?.code, again.body.secret, again.proved]).toEqual([401, "code_used", undefined, true]);
+      }
+      expect(ends).toEqual(["used"]);
     } finally {
       await to.close();
     }
   });
 
-  test("US-119-AC5 it expires, and its end is told once", async () => {
+  test("US-119-AC5 it expires, which has a code of its own, and its end is told once with the time", async () => {
     let now = 0;
-    let gone = 0;
-    const expired = createSession(() => gone++, 600_000, () => now);
-    now = 600_000;
-    expect(expired.exchange(expired.code)).toBeUndefined();
+    const ends: [string, number][] = [];
+    const expired = createSession((how, at) => ends.push([how, at]), 600_000, () => now);
+    const to = await start({}, expired);
+    try {
+      now = 600_000;
+      for (let i = 0; i < 2; i++) {
+        const got = await exchange(to, expired.code);
+        expect([got.status, got.body.error?.code, got.body.secret, got.proved]).toEqual([401, "code_expired", undefined, true]);
+      }
+    } finally {
+      await to.close();
+    }
     expired.expire();
-    expect(gone).toBe(1);
+    expect(ends).toEqual([["expired", 600_000]]);
     let removed = false;
     const timed = createSession(() => (removed = true), 30);
     await Bun.sleep(80);
-    expect([removed, timed.exchange(timed.code)]).toEqual([true, undefined]);
+    expect([removed, secretOf(timed)]).toEqual([true, undefined]);
     now = 0;
     const inTime = createSession(() => {}, 600_000, () => now);
     now = 599_999;
-    expect(inTime.exchange(inTime.code)).toBeDefined();
+    expect(secretOf(inTime)).toBeDefined();
   });
 });
 
@@ -263,7 +347,7 @@ describe("rule 8: how the code reaches the browser", () => {
       expect(statSync(launch.path).mode & 0o777).toBe(0o600);
       expect(statSync(dirname(launch.path)).mode & 0o777).toBe(0o700);
     }
-    expect(text).not.toContain(one.exchange(one.code)!);
+    expect(text).not.toContain(secretOf(one)!);
     expect(writeLaunchFile("http://127.0.0.1:5000/", "c", parent).path).not.toBe(launch.path);
     launch.remove();
     expect(existsSync(dirname(launch.path))).toBe(false);
@@ -329,9 +413,9 @@ describe("rule 10: bounds on size, time and connections", () => {
   test("US-119-AC5 a request that does not arrive whole in time is ended: silent, slow headers, or slow body", async () => {
     const quick = createSession();
     const to = await start({ requestMs: 1000 }, quick);
-    const key = quick.exchange(quick.code)!;
+    const key = secretOf(quick)!;
     try {
-      const head = request("POST", "/api/query", [...headers({}, to, key), ["Content-Length", "40"]]);
+      const head = request("POST", "/api/query", [...headers({}, { to, key }), ["Content-Length", "40"]]);
       const [silent, partial, slowHeaders, slowBody] = await Promise.all([
         raw(to.port, [], { waitMs: 8000 }),
         raw(to.port, ["POST /api/query HTTP/1.1\r\nHost: 127.0.0.1"], { waitMs: 8000 }),
@@ -345,7 +429,7 @@ describe("rule 10: bounds on size, time and connections", () => {
       nothingReached();
       // The limit is on the request arriving, not on the time the answer takes.
       delayMs = 2200;
-      const late = await raw(to.port, [request("POST", "/api/query", headers({}, to, key), "{}")], { waitMs: 8000 });
+      const late = await raw(to.port, [request("POST", "/api/query", headers({}, { to, key }), "{}")], { waitMs: 8000 });
       expect([late.status, late.body.includes("PRIVATE TEXT")]).toEqual([200, true]);
     } finally {
       await to.close();
@@ -376,10 +460,11 @@ describe("status and a snapshot that is not current", () => {
     for (const [thrown, expected] of [[new ProcessGone(), [503, "index_stale"]], [new Error("PRIVATE detail /Users/someone"), [500, "internal_error"]]] as const) {
       const one = createSession();
       const to = await listen({ assets: ASSETS, session: one, check: async () => ({ ...verdict, process: { ...(verdict as Extract<Verdict, { state: "current" }>).process, ask: () => Promise.reject(thrown) } }) as Verdict });
-      const key = one.exchange(one.code)!;
+      const key = secretOf(one)!;
       try {
-        const got = await raw(to.port, [request("POST", "/api/query", headers({}, to, key), "{}")]);
+        const got = await raw(to.port, [request("POST", "/api/query", headers({}, { to, key }), "{}")]);
         expect([got.status, (JSON.parse(got.body) as { error: { code: string } }).error.code]).toEqual([...expected]);
+        expect(got.headers["x-stemma-proof"]).toBeDefined();
         expect(got.body).not.toContain("PRIVATE");
       } finally {
         await to.close();
@@ -391,11 +476,12 @@ describe("status and a snapshot that is not current", () => {
     for (const [given, status] of [[{ state: "rebuilding" }, { state: "rebuilding" }], [{ state: "failed", message: "why" }, { state: "failed", message: "why" }]] as const) {
       const one = createSession();
       const to = await listen({ assets: ASSETS, session: one, check: async () => given });
-      const key = one.exchange(one.code)!;
+      const key = secretOf(one)!;
       try {
-        const got = await raw(to.port, [request("POST", "/api/query", headers({}, to, key), "{}")]);
+        const got = await raw(to.port, [request("POST", "/api/query", headers({}, { to, key }), "{}")]);
+        expect(got.headers["x-stemma-proof"]).toBeDefined();
         expect([got.status, (JSON.parse(got.body) as { error: { code: string } }).error.code]).toEqual([503, "index_stale"]);
-        expect(JSON.parse((await raw(to.port, [request("POST", "/api/status", headers({}, to, key), "{}")])).body)).toEqual(status);
+        expect(JSON.parse((await raw(to.port, [request("POST", "/api/status", headers({}, { to, key, path: "/api/status" }), "{}")])).body)).toEqual(status);
       } finally {
         await to.close();
       }

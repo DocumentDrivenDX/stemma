@@ -7,7 +7,7 @@ import { cpSync, existsSync, lstatSync, readdirSync, readFileSync, writeFileSync
 import { platform } from "node:os";
 import { dirname, join } from "node:path";
 import { browse } from "../packages/cli/src/browse.ts";
-import { alive, Browsing, childrenOf, codeIn, commandOf, endRuns, post, Run } from "./browse-run.ts";
+import { alive, Browsing, childrenOf, codeIn, commandOf, endRuns, post, redeem, Run } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 afterAll(endRuns);
@@ -66,7 +66,10 @@ describe("US-119-AC1 and AC6: what a run shows and writes", () => {
     expect(one.secret).toMatch(/^[A-Za-z0-9_-]{43}$/);
     // The code was used, so the launch file and its directory are gone.
     expect(existsSync(dirname(one.info.launch_file))).toBe(false);
-    expect((await post(one.info, "/api/session", { code: one.code })).status).toBe(401);
+    const again = await redeem(one.info, one.code);
+    expect([again.status, again.json.error.code, again.proved]).toEqual([401, "code_used", true]);
+    // The author is told once that the link was opened, and when.
+    expect(one.run.stderr.match(/The one-time link was opened at \d{2}:\d{2}:\d{2} /g)).toHaveLength(1);
     const replies = await useEverything(one);
     const workers = childrenOf(one.run.child.pid);
     expect(workers.map((w) => w.command.includes("browse-worker.js"))).toEqual([true]);
@@ -94,6 +97,7 @@ describe("US-119-AC1 and AC6: what a run shows and writes", () => {
     const path = /^ {2}(\S.*open-stemma\.html)$/m.exec(run.stdout)![1]!;
     expect(path.startsWith(run.tmp)).toBe(true);
     const code = codeIn(path);
+    expect(run.stdout).not.toContain("was opened at");
     if (platform() !== "win32") expect([lstatSync(path).mode & 0o777, lstatSync(dirname(path)).mode & 0o777]).toEqual([0o600, 0o700]);
     const holders = [...filesIn(run.tmp), ...filesIn(run.home), ...filesIn(dir)].filter((file) => readFileSync(file, "latin1").includes(code));
     expect(holders).toEqual([path]);
@@ -103,6 +107,20 @@ describe("US-119-AC1 and AC6: what a run shows and writes", () => {
     expect([run.stdout.includes(code), run.stderr.includes(code), commands.includes(code)]).toEqual([false, false, false]);
     // Unused, it is removed when the run ends.
     expect(existsSync(dirname(path))).toBe(false);
+  }, 60_000);
+
+  test("when something redeems the code, the command's own output says that the link was opened, and when, with neither code nor secret", async () => {
+    const run = await Run.command(["browse", "--no-open", "--project", project()]);
+    await run.until(() => run.stdout.includes("without use"));
+    const path = /^ {2}(\S.*open-stemma\.html)$/m.exec(run.stdout)![1]!;
+    const address = /http:\/\/127\.0\.0\.1:\d+\//.exec(run.stdout)![0];
+    const code = codeIn(path);
+    const secret = (await redeem({ address }, code)).json.secret as string;
+    await run.until(() => run.stdout.includes("was opened at"));
+    expect(run.stdout).toMatch(/^The one-time link was opened at \d{2}:\d{2}:\d{2} \(this computer's time\)\..*another page or program opened the link first.*stop this command and run it again\.$/m);
+    expect(existsSync(dirname(path))).toBe(false);
+    expect(await run.stop()).toBe(0);
+    for (const kept of [code, secret]) expect((run.stdout + run.stderr).includes(kept)).toBe(false);
   }, 60_000);
 
   test("the browser is opened on the file: the opener gets its path, and the output holds no code", async () => {

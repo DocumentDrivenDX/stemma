@@ -168,7 +168,8 @@ modules, or the product owner for accepted risks.
 | TM-S-005 | A comment file claims another reviewer or package; a made-up package is shown as Stemma-checked | 2 | 2 | 4 | `core`, `publish` | SEC-002; CONTRACT-005 E2 |
 | TM-S-006 | `rules.md`, agent instruction files, or manuscript text from a shared project are followed as the author's rules | 4 | 2 | 8 | Author; `skills/stemma` | SEC-009; rules cannot relax the contract in text only |
 | TM-S-007 | A wrong or spoofed resolver or search response is saved as authoritative metadata | 2 | 1 | 2 | `workspace` | SEC-008; saved with source and date |
-| TM-S-008 | Another local user: after the server stops, a program takes the same port, and a still-open page sends it the ended secret or believes its answers | 2 | 1 | 2 | `server`, `explorer` | The page drops the secret and its data when a call fails; the ended secret opens nothing. A takeover within one polling interval is not detected |
+| TM-S-008 | Another local program, of any user: after the server stops, it takes the same port, and a still-open page sends it the secret or shows its invented records as current | 4 | 2 | 8 | `server`, `explorer` | SEC-037: requests are signed and the code and secret are never sent; the page uses no answer without a proof bound to its request, and on one drops the secret and its data. It receives the bodies of calls under way. Not covered: TM-S-009 |
+| TM-S-009 | Another local program holds the port when the browser asks for the page itself (a reload or restore after the server stopped, or a launch file left behind), and serves its own page; it may also leave a service worker for that address, which a later run on the same port would meet | 4 | 1 | 4 | Author (accepted) | None in the page, whose script comes from the port. The stopped notice says to close the tab without reloading it; the launch file is removed when the command ends |
 
 ### Tampering
 
@@ -219,7 +220,7 @@ modules, or the product owner for accepted risks.
 | TM-I-015 | The index and saved reports copy source text; sharing the working folder shares them | 3 | 2 | 6 | Author | SEC-019 |
 | TM-I-016 | Hostile web page in the author's browser reads the local server: a cross-origin fetch or form post, DNS rebinding to 127.0.0.1, framing, or guessing paths | 4 | 3 | 12 | `server` | SEC-034, SEC-036: exact Host and Origin, no cross-origin permission, JSON and custom header, secret header, no cookie, framing refused |
 | TM-I-017 | Another local port: a page or program on another loopback port reaches the server, or receives its cookie or secret | 4 | 2 | 8 | `server`, `explorer` | SEC-034: origin includes the port; no cookie (cookies are shared between ports); the secret is in per-origin session storage |
-| TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested |
+| TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested. Neither is sent (SEC-037). A process running as the author that redeems the code first gets in; the author's page and the command's output then say that the link was opened first, which tells of it and does not prevent it |
 
 ### Denial of Service
 

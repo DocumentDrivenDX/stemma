@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { bundle } from "../scripts/build.ts";
+import { newNonce, requestMac, responseProof } from "./browse-http.ts";
 import { temporary } from "./helpers.ts";
 
 let built: Promise<string> | undefined;
@@ -84,6 +85,7 @@ export class Run {
 export interface Answered {
   status: number;
   json: Record<string, any>;
+  proved: boolean;
 }
 
 /** A served run with its page's access: the code read from the launch file and traded for the secret. */
@@ -96,7 +98,7 @@ export class Browsing {
     if (!run.stdout.includes("\n")) throw new Error(`browse did not start: ${run.stderr}`);
     const info = JSON.parse(run.stdout.split("\n")[0]!) as Ran;
     const code = codeIn(info.launch_file);
-    const got = await post(info, "/api/session", { code });
+    const got = await redeem(info, code);
     return new Browsing(run, info, code, got.json.secret as string);
   }
 
@@ -126,14 +128,28 @@ export class Browsing {
 
 export const codeIn = (launchFile: string): string => /#code=([A-Za-z0-9_-]+)/.exec(readFileSync(launchFile, "utf8"))![1]!;
 
-export async function post(info: { address: string }, path: string, body: unknown, secret?: string): Promise<Answered> {
+/**
+ * A POST as the page makes it. With a key, it is signed with it, and the answer
+ * must either prove that it holds the key, or be a refusal.
+ */
+export async function post(info: { address: string }, path: string, body: unknown, key?: string): Promise<Answered> {
   const origin = info.address.replace(/\/$/, "");
+  const text = JSON.stringify(body);
+  const nonce = newNonce();
   const response = await fetch(`${origin}${path}`, {
-    method: "POST", headers: { origin, "content-type": "application/json", "x-stemma-request": "1", ...(secret ? { "x-stemma-secret": secret } : {}) },
-    body: JSON.stringify(body),
+    method: "POST",
+    headers: { origin, "content-type": "application/json", "x-stemma-request": "1", ...(key ? { "x-stemma-nonce": nonce, "x-stemma-mac": requestMac(key, path, text, nonce) } : {}) },
+    body: text,
   });
-  return { status: response.status, json: (await response.json()) as Record<string, any> };
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  const proof = response.headers.get("x-stemma-proof");
+  const proved = key !== undefined && proof === responseProof(key, path, response.status, bytes, nonce);
+  if (response.ok ? !proved : proof !== null && !proved) throw new Error(`${path} answered ${response.status} without its right proof`);
+  return { status: response.status, json: JSON.parse(new TextDecoder().decode(bytes)) as Record<string, any>, proved };
 }
+
+/** Trades the one-time code, which signs and is not sent, for the secret. */
+export const redeem = (info: { address: string }, code: string): Promise<Answered> => post(info, "/api/session", {}, code);
 
 /** The processes whose parent is this one, with their command lines. */
 export function childrenOf(pid: number): { pid: number; command: string }[] {

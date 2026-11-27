@@ -273,10 +273,18 @@ read is kept in this conversation:
   them what they see.
 - Never add the code or secret to a command, a file, or a message, and if the
   author pastes one, do not repeat it: stop the command and start it again.
-- If their page says the tab has no access or the link was used, or the server
-  has stopped, stop the command if it still runs and start it again. If the link
-  was used before they opened it, say so: something else on their computer read
-  it first.
+- When the link is used, the command prints "The one-time link was opened at"
+  with the time. That line holds no code. It does not tell who opened it: if
+  they saw no page open then, treat it as opened by something else.
+- If their page says another page or program opened the link first, and they did
+  not open it in another tab or window themselves, tell them plainly that another
+  program on their computer may have used it and could read their records while
+  the command ran. Stop the command at once. Give them the time the command
+  printed, and start it again only after telling them.
+- If their page says the link expired, the tab has no access, or the server has
+  stopped, stop the command if it still runs and start it again. Ask them to
+  close a tab that says the server stopped, and not to reload it: another program
+  could answer at its address.
 
 What to tell them, once:
 

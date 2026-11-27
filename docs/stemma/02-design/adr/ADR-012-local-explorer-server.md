@@ -55,6 +55,30 @@ engine remains the later FEAT-011 engine, with its own conformance suite.
 ### Over a hosted service
 Stemma has no accounts and sends the author's material nowhere.
 
+### Page and server prove themselves to each other
+
+A secret sent as a header, and any `200` believed, were not enough. When the
+server stops, another program can take its port within a fraction of a second,
+receive the secret from a page still open, and show it invented records as
+current. So after the launch file, no request carries the code or the secret:
+each signs the request with HMAC, and each answer proves that it holds the same
+key, bound to that request (CONTRACT-005 M, "Proofs"). The exchange is signed in
+the same way because a code sent in it would let another program that received it
+answer with a key of its own and be believed from then on.
+
+- Over TLS: a certificate the browser trusts for a loopback address would have to
+  be added to the computer's trust store, and its private key kept.
+- Over sending the secret and checking only the answers: the first call after a
+  takeover would hand over the secret.
+- Over a cookie or a token in each address: both are sent to whatever answers.
+
+This does not cover the page's own script. A page asked for while another
+program holds the port is that program's (CONTRACT-005 M, "What this does not
+defend against").
+
+The command also says when the code is redeemed, and the page says when the code
+was already used, so that an author can tell that something else got in first.
+
 ## Consequences
 
 **Good**: No size cap drops source text from a served page; an open page follows

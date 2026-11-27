@@ -72,7 +72,7 @@ Boundary IDs match the [threat model](../01-frame/threat-model.md).
 | B6 To reviewer or host | Source text, positions | Recipient gets everything in the files | Audience filtering before writing, redaction, scan |
 | B7 Tools and releases | Machine | Third-party code runs with author's rights | Pins, digests, lockfile, no runtime download, release audit |
 | B8 Collaborator input | Records, rules, agent behavior | Others' text becomes project content | Validation; comment import writes only comment records. `rules.md` is followed by the agent, so the author reviews changes to it |
-| B9 Requests to the local server | Everything an author export holds | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, a per-run secret got by a one-time code, no cookie and no cross-origin permission, bounded requests, fixed routes |
+| B9 Requests to the local server | Everything an author export holds | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, calls signed with a per-run secret got by a one-time code and each accepted once, answers proved to the page, neither key sent by the page, no cookie and no cross-origin permission, bounded requests, fixed routes |
 
 ## Control Mapping
 
@@ -97,7 +97,8 @@ Verification names the SEC criterion that tests the control.
 | TM-T-005, TM-T-004, TM-D-003 | Derived data is never authoritative; validate on read; digest verification | `core`, `graph`, `records` | SEC-004, SEC-008 |
 | TM-T-007, TM-E-007, TM-S-004, TM-R-004 | Pinned and recorded tools, lockfile, digests, controlled install scripts, identified release package, release audit and secret scan | Release and bundle scripts | SEC-025 to SEC-028 |
 | TM-I-013 | Synthetic or open fixtures; secret scan | Repository | SEC-029, SEC-026 |
-| TM-I-016, TM-I-017, TM-S-008 | CONTRACT-005 M rules 2 to 7, 9, 11 | `server`, `explorer` | SEC-034 |
+| TM-I-016, TM-I-017 | CONTRACT-005 M rules 2 to 7, 9, 11 | `server`, `explorer` | SEC-034 |
+| TM-S-008, TM-I-018 | Signed requests, each accepted once, and proved answers; code and secret not sent; the command and page say that the code was already used (CONTRACT-005 M, "Proofs", rules 7 and 9) | `server`, `explorer`, `cli` | SEC-037 |
 | TM-I-018 | Launch file in a private directory; nothing in arguments or output | `server`, `cli` | SEC-035 |
 | TM-D-010, TM-E-008 | CONTRACT-005 M rules 1, 10, 12; fixed routes | `server` | SEC-036 |
 
@@ -115,8 +116,8 @@ TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
   `annotate`
   cannot tell who ran it, and a host permission prompt adds no assurance.
 - Session or token handling: the local server makes a new secret at each start
-  and gives it once, for a one-time code, to the page, which keeps it in
-  `sessionStorage`. Stemma writes it to no file; the code is only in the private
+  and gives it once, for a request signed with a one-time code, to the page,
+  which keeps it in `sessionStorage` and signs with it. Stemma writes it to no file; the code is only in the private
   launch file. No design stores an API key. A resolver that needs one requires a
   new design decision.
 
@@ -232,5 +233,5 @@ the system they ran on; none is required to continue.
 | Typst escape, outside-file read, unvendored package, hostile EPS | SEC-010, SEC-012 | M1 basic build; EPS M2 |
 | Browser: hostile strings and SVG, network denied | SEC-011, SEC-023 | M3 |
 | Seeded long source text in every package part | SEC-017, SEC-018 | M3 |
-| Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files | SEC-034 to SEC-036 | With the server |
+| Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files, another program on the port, changed and repeated messages | SEC-034 to SEC-037 | With the server |
 | Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

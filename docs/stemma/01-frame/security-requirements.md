@@ -50,7 +50,7 @@ Each item states its acceptance criterion.
 
 - **SEC-001**: A search of a seeded project, release package, and repository
   finds no Stemma account, token, or credential. No command asks for a password.
-- **SEC-034**: The local server gives project data only to a request that carries
+- **SEC-034**: The local server gives project data only to a request signed with
   the run's secret, with the exact `Host`, `Origin`, content type, and request
   header of CONTRACT-005 M, rules 2 to 6. It sets no cookie and permits no
   cross-origin read. A one-time code is exchanged for the secret once and within
@@ -64,6 +64,12 @@ Each item states its acceptance criterion.
   routes, lets no request name a file, bounds request size, time, and
   connections, sends the headers and policy of CONTRACT-005 M, rules 10 and 11,
   writes nothing in the project, and makes no outbound request.
+- **SEC-037**: No request carries the code or the secret. The server accepts each
+  signed call once, and the page uses no byte of an answer whose proof, bound to
+  its request, is missing or wrong; it then drops the secret and what it showed
+  (CONTRACT-005 M, "Proofs"). When the code is redeemed the command says so with
+  the time, and a page given a used code says that another page or program opened
+  the link first. A page served by another program is not covered (TM-S-009).
 - **SEC-002**: Every user-facing text about review marks, annotations, text
   reviews, comparisons, restriction marks, and support verdicts, including the disclosure, calls them
   records and not proof of who acted or verification of support.
@@ -228,6 +234,7 @@ controls cover only its instructions and its own commands.
 | SEC-034 | Only the opened page reads the local server | G: CONTRACT-005 M, ADR-012; TM-S-008, TM-I-016, TM-I-017 | High | One refusal test per rule |
 | SEC-035 | Code and secret stay out of arguments, output, and files | G: CONTRACT-005 M; TM-I-017, TM-I-018 | High | Run and search output, arguments, files |
 | SEC-036 | Loopback only, fixed routes, bounds, no outbound request | G: CONTRACT-005 M; TM-D-010, TM-I-016, TM-E-008 | High | Socket, path, size, time, and header tests |
+| SEC-037 | Page and server prove themselves; the author is told of a first opener | G: CONTRACT-005 M, ADR-012; TM-S-008, TM-I-018 | High | A program on the port, changed, moved, and repeated answers and requests, and both code notices |
 
 ## Compliance Requirements
 
@@ -271,7 +278,7 @@ allows hosted processing. Stemma does not decide or enforce it.
   SEC-023 bounds network use.
 - [ ] Application security testing: hostile fixtures for the criteria above.
 - [ ] Dependency vulnerability scanning: SEC-026.
-- [ ] Server hardening: the local server follows SEC-034 to SEC-036. There is no
+- [ ] Server hardening: the local server follows SEC-034 to SEC-037. There is no
   hosted server.
 - [ ] Patch management: pins change only through a new release (SEC-025, SEC-026).
 - [ ] Backup and recovery tested: the author backs up git, source files

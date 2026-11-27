@@ -47,12 +47,15 @@ to the author's own page only.
 - [ ] **US-119-AC7** — Given a run, when its sockets and requests are observed, then it listens on 127.0.0.1 only and connects nowhere.
 - [ ] **US-119-AC8** — Given the installed plugin with no packages, when the command runs, then it serves the explorer.
 - [ ] **US-119-AC9** — Given an interrupt, or an hour without use, then the server and its child end and the launch file is gone.
+- [ ] **US-119-AC10** — Given another program that takes the port of a server that has stopped, when an open page calls it, then the page shows nothing that program gave, takes down what it showed, and the program gets neither the code nor the secret.
+- [ ] **US-119-AC11** — Given a one-time code that something redeemed, then the command says when, and a page given that code again says that another page or program opened the link first; an expired code is said to be expired.
 
 ## Edge Cases
 
 - **The browser does not open**: The command prints the launch file's path.
 - **A second tab**: A tab opened from the page keeps its access; a fresh one is told to run the command again.
-- **The server stopped**: The page says so and shows nothing it had loaded.
+- **The server stopped**: The page says so and shows nothing it had loaded. A tab reloaded after that asks whatever holds the port for the page itself, which the page cannot guard against.
+- **Something else used the link first**: The command says when it was opened, and her page says that something else opened it first.
 - **A change that breaks the project**: The page says what is wrong and shows no earlier data.
 
 ## Test Scenarios
@@ -68,6 +71,8 @@ to the author's own page only.
 | Sockets | US-119-AC7 | A run | List sockets | Loopback listener only |
 | Installed | US-119-AC8 | Plugin check | Run installed | Served |
 | Stop | US-119-AC9 | Idle limit, interrupt | Wait, signal | Ended; file removed |
+| Impostor | US-119-AC10 | A program on the port answering 200; changed, moved, and repeated messages | Page calls it | Nothing shown from it; "stopped" |
+| Opened first | US-119-AC11 | Code redeemed elsewhere, or expired | Open the link | Distinct notices; command says when |
 
 ## Dependencies
 

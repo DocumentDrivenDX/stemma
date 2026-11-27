@@ -11,7 +11,7 @@ import { Explorer } from "./app.tsx";
 import { Banner } from "./Banner.tsx";
 import { foldingClient } from "./client.ts";
 import { Manuscript } from "./Manuscript.tsx";
-import { CallFailed, noSchemaApi, type Read, readsOf, remoteClient, Server, takeCode } from "./remote.ts";
+import { CallFailed, noSchemaApi, type Read, readsOf, type Redemption, remoteClient, Server, takeCode } from "./remote.ts";
 import type { ManuscriptRoute } from "./route.ts";
 import { type GetSourceView, Served, Text, useLoaded } from "./SourcePanel.tsx";
 
@@ -31,6 +31,8 @@ interface Loaded {
 type Phase =
   | { kind: "opening" }
   | { kind: "locked" }
+  | { kind: "code_used" }
+  | { kind: "code_expired" }
   | { kind: "stopped" }
   | { kind: "waiting" }
   | { kind: "failed"; message: string }
@@ -51,13 +53,26 @@ const NOTICES = {
   opening: <Notice title="Opening"><p>Reading from Stemma on this computer.</p></Notice>,
   locked: (
     <Notice title="This tab has no access">
-      <p>The explorer opens only from the one-time file that Stemma’s <code>browse</code> command makes. That link has been used, has expired, or was never given to this tab.</p>
+      <p>The explorer opens only from the one-time file that Stemma’s <code>browse</code> command makes. This tab was not given its link.</p>
       <p>Stop the command and run it again, or ask your assistant to.</p>
+    </Notice>
+  ),
+  code_used: (
+    <Notice title="Another page or program opened this link first">
+      <p>Stemma’s link works once, and something had already opened it when this page tried, so this page has no access.</p>
+      <p>Unless that was you, in another tab or window, another program on this computer may have used the link and be reading your records now. Stop the <code>browse</code> command, or ask your assistant to, before you run it again. The command’s output says when the link was opened.</p>
+    </Notice>
+  ),
+  code_expired: (
+    <Notice title="This link has expired">
+      <p>Stemma’s link works within 10 minutes of the command’s start, and nothing opened it in that time.</p>
+      <p>Stop the <code>browse</code> command and run it again, or ask your assistant to.</p>
     </Notice>
   ),
   stopped: (
     <Notice title="Stemma’s server has stopped">
-      <p>It cannot be reached, so what it showed is taken down. Run <code>browse</code> again, or ask your assistant to, and use the page it opens.</p>
+      <p>It cannot be reached, or what answered could not prove that it is Stemma, so what it showed is taken down. Close this tab and do not reload it: another program could answer at its address.</p>
+      <p>Run <code>browse</code> again, or ask your assistant to, and use the page it opens.</p>
     </Notice>
   ),
   waiting: (
@@ -95,7 +110,7 @@ function Ready({ server, loaded, lost }: { server: Server; loaded: Loaded; lost(
   );
 }
 
-function App({ server, code }: { server: Server; code: Promise<boolean> }) {
+function App({ server, code }: { server: Server; code: Promise<Redemption | undefined> }) {
   const [phase, setPhase] = useState<Phase>({ kind: "opening" });
   const [covered, setCovered] = useState(false);
   const lost = useRef<(error: CallFailed) => void>(() => {});
@@ -116,11 +131,16 @@ function App({ server, code }: { server: Server; code: Promise<boolean> }) {
       era++;
       setPhase(next);
     };
+    const finish = (kind: "locked" | "stopped" | "code_used" | "code_expired") => {
+      // The first reason stands: a later call's does not replace it.
+      if (over) return;
+      over = true;
+      clearTimeout(timer);
+      drop({ kind });
+    };
     const end = (error: unknown) => {
       if (error instanceof CallFailed && (error.trouble === "locked" || error.trouble === "stopped")) {
-        over = true;
-        clearTimeout(timer);
-        drop({ kind: error.trouble });
+        finish(error.trouble);
         return true;
       }
       return false;
@@ -186,9 +206,9 @@ function App({ server, code }: { server: Server; code: Promise<boolean> }) {
     document.addEventListener("visibilitychange", shown);
     void (async () => {
       try {
-        await code;
-        if (!server.open) end(new CallFailed("locked", ""));
-        else await tick();
+        const redeemed = await code;
+        if (server.open) await tick();
+        else finish(redeemed === undefined || redeemed === "opened" ? "locked" : redeemed);
       } catch (error) {
         end(error);
       }
@@ -223,6 +243,6 @@ function App({ server, code }: { server: Server; code: Promise<boolean> }) {
 // The code leaves the address before arras reads it, and before anything else happens.
 const given = takeCode();
 const server = new Server();
-const exchanged = given === undefined ? Promise.resolve(false) : server.exchange(given);
+const exchanged = given === undefined ? Promise.resolve(undefined) : server.exchange(given);
 
 createRoot(document.getElementById("root")!).render(<Served value={true}><App server={server} code={exchanged} /></Served>);

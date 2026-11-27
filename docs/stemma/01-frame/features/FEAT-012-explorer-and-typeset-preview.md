@@ -204,13 +204,14 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   with no size cap that leaves out text.
 - SRV-03. Browsing and search must answer as the offline explorer does, through
   arras's own static client, with the same stated search limits.
-- SRV-04. Data older than the record files must never be presented as current.
-  While the server rebuilds after a change, the page must say so and show no
+- SRV-04. Data older than the record files, or given by any other program that
+  answers at the server's address, must never be presented as current. While the server rebuilds after a change, the page must say so and show no
   earlier data.
 - SRV-05. Only the page the command opened must be able to read the project:
   CONTRACT-005 M's rules against other web pages, other local ports, other users
   of the computer, and malformed, oversize, or slow requests must hold, and what
-  they do not defend against must be stated.
+  they do not defend against must be stated. When the one-time link has already
+  been used, the author must be able to tell.
 - SRV-06. The server must listen on the loopback address only, make no outbound
   request, let no request name a file, and stop when interrupted or after an
   hour without use.

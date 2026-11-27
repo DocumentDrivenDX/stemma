@@ -1,6 +1,6 @@
 // `browse` (CONTRACT-002 B; CONTRACT-005 M): serves the explorer to a browser
 // on this computer. Neither the secret nor the one-time code is ever written to
-// standard output or standard error.
+// standard output or standard error; that the code was used, and when, is.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { inputsChanged, mayShowTheSame, scanInputs } from "@stemma/workspace";
@@ -44,6 +44,10 @@ function idleMinutes(options: Options): number {
   if (!/^(\d+|\d*\.\d+)$/.test(given) || !(minutes > 0) || minutes > 24 * 60) throw usageError("--idle-minutes is a number of minutes, more than 0 and at most 1440.");
   return minutes;
 }
+
+/** Said when the code is redeemed, so that the author can tell their own browser from anything else's. */
+const openedLine = (at: number) =>
+  `The one-time link was opened at ${new Date(at).toLocaleTimeString("en-GB")} (this computer's time). That should be your browser showing the explorer. If your page says that another page or program opened the link first, or you saw no page open then, stop this command and run it again.`;
 
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
 
@@ -102,7 +106,10 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
     const buildMs = Date.now() - began;
 
     let used = Date.now();
-    const session = createSession(() => launch?.remove());
+    const session = createSession((how, at) => {
+      launch?.remove();
+      if (how === "used") tell(openedLine(at));
+    });
     const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()) }).catch((error: unknown) => {
       throw new CommandError(5, "cannot_listen", `No port on 127.0.0.1 could be opened, so nothing is served. ${error instanceof Error ? error.message : ""}`);
     });

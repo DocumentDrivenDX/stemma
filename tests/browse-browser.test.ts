@@ -9,7 +9,10 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import AxeBuilder from "@axe-core/playwright";
 import { type Browser, chromium, type Page } from "@playwright/test";
-import { Browsing, codeIn, endRuns, post, Run } from "./browse-run.ts";
+import { createSession, listen } from "@stemma/server";
+import { buildServed } from "../packages/explorer/build.ts";
+import { responseProof } from "./browse-http.ts";
+import { Browsing, codeIn, endRuns, redeem, Run } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 const launch = (args: string[] = []) => chromium.launch({ args }).catch((error: unknown) => {
@@ -51,8 +54,11 @@ async function unused(dir: string) {
 async function watched(context = browser!) {
   const own = await context.newContext({ viewport: { width: 1400, height: 900 } });
   const page = await own.newPage();
-  const seen = { requests: [] as string[], errors: [] as string[], dialogs: [] as string[] };
-  own.on("request", (request) => seen.requests.push(`${request.method()} ${request.url()}`));
+  const seen = { requests: [] as string[], sent: [] as string[], errors: [] as string[], dialogs: [] as string[] };
+  own.on("request", (request) => {
+    seen.requests.push(`${request.method()} ${request.url()}`);
+    seen.sent.push(JSON.stringify([request.headers(), request.postData()]));
+  });
   page.on("console", (message) => {
     if (message.type() === "error" || message.type() === "warning") seen.errors.push(message.text());
   });
@@ -127,7 +133,7 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       await notice(other, "This tab has no access").waitFor();
       const stranger = await watched();
       await stranger.page.goto(`${info.address}#code=${code}`);
-      await notice(stranger.page, "This tab has no access").waitFor();
+      await notice(stranger.page, "Another page or program opened this link first").waitFor();
       await takenDown(stranger.page);
       expect(stranger.page.url()).not.toContain(code);
       await stranger.context.close();
@@ -136,6 +142,9 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       const elsewhere = seen.requests.filter((r) => !r.includes(` ${origin}/`) && !r.startsWith("GET file:") && !r.includes(" data:"));
       expect(elsewhere).toEqual([]);
       expect(seen.requests.filter((r) => r.includes(secret) || (r.includes(code) && !r.startsWith("GET file:")))).toEqual([]);
+      // Neither is in any header or body the page sent: each only signs. The local file's own address is not sent anywhere.
+      expect(seen.sent.length).toBeGreaterThan(20);
+      expect(seen.sent.filter((r) => r.includes(secret) || r.includes(code))).toEqual([]);
       expect([seen.errors, seen.dialogs]).toEqual([[], []]);
 
       expect(await run.stop()).toBe(0);
@@ -154,9 +163,13 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
     try {
       await page.goto(pathToFileURL(info.launch_file).href);
       await searchBox(page).waitFor();
+      const secret = (await stored(page)).session["stemma.secret"]!;
       await page.route("**/api/query", async (route) => {
         const response = await route.fetch();
-        await route.fulfill({ response, json: { ...(await response.json()), data_identity: "other", result: { data: null, errors: [], marker: "FROM OTHER DATA" } } });
+        // Proved as the server proves it: only a holder of the secret can make the page read it at all.
+        const body = JSON.stringify({ ...(await response.json()), data_identity: "other", result: { data: null, errors: [], marker: "FROM OTHER DATA" } });
+        const proof = responseProof(secret, "/api/query", response.status(), body, route.request().headers()["x-stemma-nonce"]!);
+        await route.fulfill({ response, body, headers: { ...response.headers(), "content-length": String(Buffer.byteLength(body)), "x-stemma-proof": proof } });
       });
       let slow = 1500;
       await page.route("**/api/status", async (route) => {
@@ -237,7 +250,7 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       expect(await framed?.locator("#root").count().catch(() => 0) ?? 0).toBe(0);
       // Not one of those used the code up.
       expect(posted.filter(([, status]) => status < 400)).toEqual([]);
-      expect((await post(info, "/api/session", { code })).status).toBe(200);
+      expect((await redeem(info, code)).status).toBe(200);
       await run.stop();
     } finally {
       attacker.stop(true);
@@ -258,10 +271,44 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
         return [got.status, await got.text()];
       }, code);
       expect(call).toEqual([403, expect.stringContaining("forbidden_host")]);
-      expect((await post(info, "/api/session", { code })).status).toBe(200);
+      expect((await redeem(info, code)).status).toBe(200);
       await run.stop();
     } finally {
       await rebinding.close();
+    }
+  }, 60_000);
+
+  test("when something else redeems the code first, the page says so plainly, and so does the command", async () => {
+    const { run, info, code } = await unused(project());
+    const { context, page } = await watched();
+    try {
+      expect((await redeem(info, code)).status).toBe(200);
+      await run.until(() => run.stderr.includes("The one-time link was opened at "));
+      await page.goto(`${info.address}#code=${code}`);
+      await notice(page, "Another page or program opened this link first").waitFor();
+      await page.getByText("another program on this computer may have used the link").waitFor();
+      await takenDown(page);
+      expect(page.url()).not.toContain(code);
+      expect(Object.keys((await stored(page)).session)).toEqual([]);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await run.stop();
+    } finally {
+      await context.close();
+    }
+  }, 60_000);
+
+  test("an expired code has a notice of its own", async () => {
+    const session = createSession(() => {}, 1);
+    const server = await listen({ assets: await buildServed(), session, check: async () => ({ state: "rebuilding" }) });
+    const { context, page } = await watched();
+    try {
+      await Bun.sleep(20);
+      await page.goto(`${server.address}#code=${session.code}`);
+      await notice(page, "This link has expired").waitFor();
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    } finally {
+      await context.close();
+      await server.close();
     }
   }, 60_000);
 
@@ -273,6 +320,166 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       await notice(page, "This tab has no access").waitFor();
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       await one.stop();
+    } finally {
+      await context.close();
+    }
+  }, 60_000);
+});
+
+const FAKE = "FAKE RECORD FROM ANOTHER PROGRAM";
+
+/** What the page asked of another program, which answers every call with 200 and data of the right shape. */
+interface Impostor {
+  asked: { path: string; headers: Record<string, string>; body: string }[];
+  stop(): void;
+}
+
+type Answer = (path: string) => { body: string; proof?: string | undefined };
+
+/** Data as the real server would give it, naming the data the page loaded. */
+const plausible = (identity: string): Answer => (path) => ({
+  body: JSON.stringify(path === "/api/session" ? { secret: "A".repeat(43) }
+    : path === "/api/status" ? { state: "current", data_identity: identity }
+    : { data_identity: identity, result: path === "/api/boot" ? { banner: { warnings: [FAKE] }, manuscript_state: "none" } : { data: { marker: FAKE }, errors: [] } }),
+});
+
+/** Takes the port a server has just left. */
+function impostor(address: string, answer: Answer): Impostor {
+  const asked: Impostor["asked"] = [];
+  const server = Bun.serve({
+    hostname: "127.0.0.1", port: Number(new URL(address).port),
+    async fetch(request) {
+      const path = new URL(request.url).pathname;
+      asked.push({ path, headers: Object.fromEntries(request.headers), body: await request.text() });
+      const { body, proof } = answer(path);
+      return new Response(body, { headers: { "content-type": "application/json", ...(proof === undefined ? {} : { "x-stemma-proof": proof }) } });
+    },
+  });
+  return { asked, stop: () => void server.stop(true) };
+}
+
+/** The page has said it stopped, shows and keeps nothing, and asks no more. */
+async function givenUp(page: Page, other: Impostor, kept: string[]) {
+  await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });
+  await takenDown(page);
+  expect(await page.content()).not.toContain(FAKE);
+  expect(await page.title()).toBe("Stemma explorer");
+  expect(Object.keys((await stored(page)).session)).toEqual([]);
+  const so = other.asked.length;
+  await Bun.sleep(4500);
+  expect(other.asked.length).toBe(so);
+  // It was sent signatures, never a key.
+  expect(other.asked.length).toBeGreaterThan(0);
+  for (const key of kept) expect(JSON.stringify(other.asked).includes(key)).toBe(false);
+}
+
+describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () => {
+  test.each([
+    ["with no proof", (): string | undefined => undefined],
+    ["with a made-up proof", (): string | undefined => "A".repeat(43)],
+  ] as const)("after the page has loaded, answering 200 with plausible data %s, is not believed", async (_, proof) => {
+    const { run, info, code } = await unused(project());
+    const { context, page } = await watched();
+    let other: Impostor | undefined;
+    try {
+      await page.goto(pathToFileURL(info.launch_file).href);
+      await searchBox(page).waitFor();
+      const secret = (await stored(page)).session["stemma.secret"]!;
+      await run.stop();
+      const answer = plausible(info.data_identity);
+      other = impostor(info.address, (path) => ({ ...answer(path), proof: proof() }));
+      await givenUp(page, other, [secret, code]);
+    } finally {
+      other?.stop();
+      await context.close();
+    }
+  }, 60_000);
+
+  test("sending again a real answer with its real proof is not believed", async () => {
+    const { run, info, code } = await unused(project());
+    const { context, page } = await watched();
+    let other: Impostor | undefined;
+    try {
+      const genuine: Promise<{ body: string; proof: string }>[] = [];
+      page.on("response", (response) => {
+        if (response.url().endsWith("/api/status")) genuine.push(response.text().then((body) => ({ body, proof: response.headers()["x-stemma-proof"]! })));
+      });
+      await page.goto(pathToFileURL(info.launch_file).href);
+      await searchBox(page).waitFor();
+      await Bun.sleep(2500);
+      const secret = (await stored(page)).session["stemma.secret"]!;
+      const kept = await genuine[0]!;
+      expect(kept.proof).toMatch(/^[A-Za-z0-9_-]{43}$/);
+      await run.stop();
+      other = impostor(info.address, () => kept);
+      await givenUp(page, other, [secret, code]);
+    } finally {
+      other?.stop();
+      await context.close();
+    }
+  }, 60_000);
+
+  test.each(["/api/session", "/api/boot"])("before the page has any data, taking the port ahead of %s, it gets nothing it can use and shows nothing", async (first) => {
+    const { run, info, code } = await unused(project());
+    const { context, page } = await watched();
+    let other: Impostor | undefined;
+    try {
+      let release!: () => void;
+      const held = new Promise<void>((resolve) => (release = resolve));
+      let holding = false;
+      // The shell and script come from Stemma; the named call is held until the port has changed hands.
+      await page.route(`**${first}`, async (route) => {
+        holding = true;
+        await held;
+        await route.continue().catch(() => {});
+      });
+      await page.goto(pathToFileURL(info.launch_file).href);
+      while (!holding) await Bun.sleep(25);
+      const secret = (await stored(page)).session["stemma.secret"];
+      expect(secret === undefined).toBe(first === "/api/session");
+      await run.stop();
+      other = impostor(info.address, plausible(info.data_identity));
+      release();
+      await givenUp(page, other, [code, ...(secret ? [secret] : [])]);
+      expect(other.asked[0]!.path).toBe(first);
+      if (first === "/api/session") expect(other.asked.map((a) => [a.path, a.body])).toEqual([["/api/session", "{}"]]);
+    } finally {
+      other?.stop();
+      await context.close();
+    }
+  }, 60_000);
+
+  test.each([
+    ["/api/boot", async () => {}],
+    ["/api/arras", async () => {}],
+    ["/api/query", async (page: Page) => searchBox(page).fill("subsidence")],
+    ["/api/manuscript", async (page: Page) => page.getByRole("link", { name: "Manuscript", exact: true }).click()],
+    ["/api/source-view", async (page: Page) => {
+      await page.getByRole("link", { name: "Manuscript", exact: true }).click();
+      await page.locator("a.stemma-quotation").first().click();
+    }],
+  ] as const)("a real answer of %s with its body changed is not used", async (path, reach) => {
+    const { run, info } = await unused(project());
+    const { context, page } = await watched();
+    try {
+      let changed = 0;
+      await page.route(`**${path}`, async (route) => {
+        const response = await route.fetch();
+        // The real status and proof, and a body that differs by one added space.
+        const body = `${await response.text()} `;
+        changed++;
+        await route.fulfill({ response, body, headers: { ...response.headers(), "content-length": String(Buffer.byteLength(body)) } });
+      });
+      await page.goto(pathToFileURL(info.launch_file).href);
+      if (path !== "/api/boot" && path !== "/api/arras") {
+        await searchBox(page).waitFor();
+        await reach(page);
+      }
+      await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });
+      expect(changed).toBeGreaterThan(0);
+      await takenDown(page);
+      expect(Object.keys((await stored(page)).session)).toEqual([]);
+      await run.stop();
     } finally {
       await context.close();
     }

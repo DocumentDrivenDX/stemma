@@ -10,6 +10,8 @@
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
+import { TAGS, type TagPair } from "../packages/core/src/browse-proof.ts";
+import { provedPost } from "../packages/explorer/src/proof.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { makePdf } from "../tests/pdf.ts";
 
@@ -157,13 +159,16 @@ async function checkBrowse(): Promise<void> {
   console.log(output.trim().replaceAll(base, "$CHECK"));
   const origin = info.address.replace(/\/$/, "");
   const code = /#code=([A-Za-z0-9_-]+)/.exec(readFileSync(info.launch_file, "utf8"))?.[1] ?? fail("the launch file holds no code");
-  const post = async (path: string, body: unknown, secret?: string) => {
-    const response = await fetch(`${origin}${path}`, { method: "POST", headers: { origin, "content-type": "application/json", "x-stemma-request": "1", ...(secret ? { "x-stemma-secret": secret } : {}) }, body: JSON.stringify(body) });
-    return { status: response.status, json: (await response.json()) as Record<string, any> };
+  const send = (path: string, init: { headers: Record<string, string>; body: string }) =>
+    fetch(`${origin}${path}`, { method: "POST", headers: { origin, "content-type": "application/json", "x-stemma-request": "1", ...init.headers }, body: init.body });
+  // Signed, and the answer's proof checked, as the page does it.
+  const post = async (path: string, body: unknown, key: string, tags: TagPair = TAGS.call) => {
+    const got = await provedPost(send, key, tags, path, JSON.stringify(body)) ?? fail(`the answer to ${path} proved nothing`);
+    return { status: got.status, json: JSON.parse(got.text) as Record<string, any> };
   };
-  if ((await post("/api/boot", {})).status !== 401) fail("a call without the secret was answered");
-  const secret = (await post("/api/session", { code })).json.secret as string;
-  if (!secret || (await post("/api/session", { code })).status !== 401) fail("the one-time code did not work exactly once");
+  if ((await send("/api/boot", { headers: {}, body: "{}" })).status !== 401) fail("an unsigned call was answered");
+  const secret = (await post("/api/session", {}, code, TAGS.code)).json.secret as string;
+  if (!secret || (await post("/api/session", {}, code, TAGS.code)).json.error?.code !== "code_used") fail("the one-time code did not work exactly once");
   if (existsSync(info.launch_file)) fail("the launch file stayed after its code was used");
   for (const asset of ["", "app.js", "app.css"]) {
     if ((await fetch(`${origin}/${asset}`)).status !== 200) fail(`the installed copy did not serve /${asset}`);
@@ -184,6 +189,7 @@ async function checkBrowse(): Promise<void> {
   const said = output + rest + (await new Response(child.stderr).text());
   if (exit !== 0) fail(`browse ended with ${exit}: ${said}`);
   if (said.includes(secret) || said.includes(code)) fail("the secret or the code was printed");
+  if (!said.includes("The one-time link was opened at ")) fail("the command did not say that the link was opened");
   if (Bun.spawnSync(["ps", "-A", "-o", "command="]).stdout.toString().includes(join(installed, "dist/browse-worker.js"))) fail("the process holding the data was left running");
   console.log(`[exit ${exit}] served the page, a search, the manuscript and a highlighted source view; the code worked once; neither it nor the secret was printed.`);
 }

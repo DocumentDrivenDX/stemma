@@ -627,7 +627,7 @@ the three assets are held in memory.
 | Method and path | Body | Answer |
 |---|---|---|
 | `GET /`, `GET /app.js`, `GET /app.css` | none | The page shell, script, and styles. They hold no project data |
-| `POST /api/session` | `{"code"}` | `{"secret"}`, once |
+| `POST /api/session` | `{}`, signed with the one-time code | `{"secret"}`, once; after that the refusal `code_used` or `code_expired` |
 | `POST /api/status` | `{}` | `{"state": "current" \| "rebuilding" \| "failed", "data_identity"?, "message"?}` |
 | `POST /api/boot` | `{}` | Banner data and the manuscript view's state |
 | `POST /api/arras` | `{"call"}` with `call` one of `version`, `viewer`, `meta`, `status`, `schemaCatalog`; or `{"call": "export", "request"}` | What arras's static client answers |
@@ -655,13 +655,20 @@ are refused in the page as the static profile refuses them.
    method other than `GET` and `POST` are refused, so a preflight fails.
 5. Every `POST` must carry `Content-Type` exactly `application/json` and the
    header `X-Stemma-Request: 1`.
-6. Every `/api/` call but `session` must carry the run's secret in
-   `X-Stemma-Secret`. The secret is 256 random bits made at each start and is
-   compared in constant time. No cookie is set or read, since cookies are shared
-   between ports.
-7. The page gets the secret only by sending a one-time code (256 random bits) to
-   `session`. The code is accepted once, within 10 minutes of the start; after
-   that it is refused. A wrong code uses nothing up.
+6. Every `/api/` call but `session` must be signed with the run's secret, as
+   "Proofs" below says, and its nonce is accepted once. The secret is 256 random
+   bits made at each start. No request carries it. No cookie is set or read,
+   since cookies are shared between ports.
+7. The page gets the secret only from `session`, with a request signed with the
+   one-time code (256 random bits). No request carries the code. The code is
+   accepted once, within 10 minutes of the start. A request signed with it later
+   is refused with `code_used` when the code was used, and `code_expired` when it
+   expired unused, each proved with the code. A request not signed with it is
+   refused with `code_refused`, without a proof, and uses nothing up. When the
+   code is accepted, the command prints that the one-time link was opened, with
+   the time on this computer, and what to do if it was not the author's page
+   that opened it; with `--format json` this goes to standard error. It prints
+   neither code nor secret.
 8. The code reaches the browser in a file the command writes in a new directory
    of the system's temporary directory (directory mode 700, file mode 600). The
    file sends the browser to the server's address with the code in the fragment,
@@ -670,10 +677,16 @@ are refused in the page as the static profile refuses them.
    in a process argument, standard output, standard error, or a log; the server
    keeps no request log. The file is removed when the code is used or expires,
    and when the command ends. The secret is written to no file by Stemma.
-9. The page removes the code from its address at once, keeps the secret in
-   `sessionStorage` only, and sends it only as the header. When it cannot reach
-   the server, other than because the page itself is being left, it drops the
-   secret, shows nothing it loaded, and asks no more.
+9. The page removes the code from its address at once and keeps the secret in
+   `sessionStorage` only. It signs with both and sends neither. When it cannot
+   reach the server, other than because the page itself is being left, or an
+   answer's proof is missing or wrong, it drops the secret, shows nothing it
+   loaded, says that the server has stopped, tells the author to close the tab
+   without reloading it, and asks no more. On `code_used`, when it has no secret
+   already, it says that another page or program opened the link first, that
+   unless that was the author another program may be reading the records, and to
+   stop the command before running it again. On `code_expired` it says that the
+   link expired.
 10. A request's headers may take at most 16 KiB and its body at most 64 KiB; a
     request must arrive whole within 10 seconds of its connection; at most 64
     connections are open at once, and each carries one request.
@@ -687,6 +700,50 @@ are refused in the page as the static profile refuses them.
     'none'`. The served page is its own template: its script and styles are
     separate files, with none inline.
 12. The server and its child make no outbound request.
+
+**Proofs.** Once a server stops, another program can take its port at once, and
+an open page would reach it. So each side shows the other, on every `POST`, that
+it holds a key, without sending the key.
+
+- The key of `session` is the one-time code; the key of every other call is the
+  secret. A key is the UTF-8 bytes of its base64url text. A MAC and a proof are
+  HMAC-SHA-256 in base64url without padding.
+- What is signed is a list of fields, each written as its length in bytes (4
+  bytes, big-endian) and then its bytes, so that no two lists give the same
+  bytes. Text is UTF-8. A body hash is the 32 bytes of the SHA-256 of the body
+  as sent.
+- A request carries `X-Stemma-Nonce` and `X-Stemma-Mac`. The nonce is the time
+  it was made, in milliseconds since 1970, a dot, and 128 fresh random bits in
+  base64url. The MAC is over: request tag, method, path, body hash, nonce.
+- An answer carries `X-Stemma-Proof`, over: response tag, the request's nonce,
+  path, status in decimal, body hash.
+- The four tags are `stemma-browse-1 code request`,
+  `stemma-browse-1 code response`, `stemma-browse-1 call request`, and
+  `stemma-browse-1 call response`.
+- The server compares a MAC in constant time. A header of the wrong shape is
+  refused before the body is read; the MAC covers the body, so it is checked
+  after the body, within the bounds of rule 10.
+- The server accepts a call's nonce once, and only when its time is within 60
+  seconds of the server's clock, either way. It remembers each accepted nonce
+  until its time is older than that, and accepts none as old as one it has
+  forgotten, even if the clock is set back. It remembers at most 50,000. Only a
+  call signed with the secret is remembered, so nothing without the secret can
+  use this memory, which stays within a few megabytes. When it is full, a signed
+  call is refused with `too_many_calls` (503) rather than one forgotten that
+  could still be sent again. The exchange needs no such memory: its code works
+  once. A repeated or untimely nonce is refused with `replayed` (401), without a
+  proof.
+- Every answer to a request whose MAC held, a refusal included, carries a proof,
+  except `replayed`. So every successful answer is proved. A refusal made before
+  that carries none.
+- The page gives each request a new nonce. It checks the proof, with WebCrypto's
+  `verify`, over the status and the bytes received, before it reads any of them,
+  whatever the status. This covers every answer it uses: the secret, status,
+  banner, arras's answers over the module and graph, source views, and the
+  manuscript. A proof therefore answers one request only: it fails for a changed
+  body or status, another path, or another request. The page's script and styles
+  are not covered (see below). WebCrypto is available because a browser treats a
+  loopback address as a secure context.
 
 **Freshness.** Data older than the record files is never presented as current.
 
@@ -720,17 +777,53 @@ are refused in the page as the static profile refuses them.
 minutes (`--idle-minutes`) pass with no accepted call. An open page keeps it
 running. It then removes the launch file and ends its child.
 
-**What this does not defend against.** A process that runs as the author can read
-the launch file, the browser's storage, and either process's memory, as it can
-already read the project. A browser extension allowed on the page reads what the
-page shows. Another user of the computer can connect to the port and use up
-connections; without the secret it reads nothing. The page notices a change or a stopped server at its next call, so an open page
-can show what it last loaded for up to its polling interval, or 8 seconds after
-it comes back into view; if another program took the same port within that
-interval, the page would send it the ended run's secret and believe its answers.
-Two writes to one input within the file system's time resolution that keep its
-size can pass the scan unseen. On Windows the file modes of rule 8 are not
-applied, and the temporary directory's own permissions are all that guard it.
+**What this does not defend against.**
+
+- A process that runs as the author can read the launch file, the browser's
+  storage, and either process's memory, as it can already read the project. If it
+  reads the launch file and redeems the code before the author's page does, it
+  gets in; the author's page and the command's output then show that the link was
+  opened first (rules 7 and 9), but only after the fact. One that does so with
+  `--no-open`, or before the author opens the file, is shown by the command's
+  line alone until the author's page tries. If it reads the code and takes the
+  port after the server has ended, before the author's page has redeemed it, it
+  can answer that page as Stemma.
+- The proofs are checked by the page's own script, which comes from the port
+  unproved. If another program holds the port when the browser asks for the page
+  itself, as when a tab is reloaded or restored after the server has stopped, or
+  a launch file left by a command that was killed is opened, the page is that
+  program's, and it can show anything as the author's records. It can read what
+  the tab kept for that address: the ended run's secret, which opens nothing. A
+  code it receives there opens nothing either, since the server that made it no
+  longer listens. It can also leave things in the browser for that address, such
+  as a service worker, which a later run given the same port would meet. The
+  author should close a tab that says the server has stopped, and open only what
+  a running `browse` opens.
+- Another program on the port gets the body of each call the page makes before
+  it sees that the answer is unproved, at most the calls already under way: a
+  search's words, a query, or a record ID, never record contents, the secret, or
+  the code. Their signatures open nothing: the server that took that key has
+  stopped.
+- Another program can still stop the page, by holding the port or by answering
+  nothing.
+- A browser extension allowed on the page reads what the page shows.
+- The secret crosses the loopback interface once, in the answer to the exchange,
+  and record contents cross it unencrypted. A program able to capture loopback
+  traffic, which needs administrator rights, reads them.
+- Another user of the computer can connect to the port and use up connections;
+  without a key it reads nothing.
+- The page notices a change or a stopped server at its next call, so an open page
+  can show what it last loaded from Stemma for up to its polling interval, or 8
+  seconds after it comes back into view. Another program on the port cannot add
+  to or change what is shown; one that answers nothing leaves it covered, not
+  removed.
+- If the computer's clock is set by more than 60 seconds while a page makes a
+  call, or back past nonces already forgotten, calls are refused and the page
+  says that the server has stopped.
+- Two writes to one input within the file system's time resolution that keep its
+  size can pass the scan unseen.
+- On Windows the file modes of rule 8 are not applied, and the temporary
+  directory's own permissions are all that guard it.
 
 ## Precedence and Compatibility
 
@@ -769,7 +862,9 @@ applied, and the temporary directory's own permissions are all that guard it.
 | A served request breaks a rule of M | Refused with a status and code; nothing is read from the snapshot | no | Open the page from `browse` |
 | The inputs changed (M) | `index_stale` until rebuilt; the page says so | yes | Wait; the page loads again |
 | A rebuild fails (M) | State `failed` with what is wrong; no earlier data is served | after a change | Fix the project; run `check` |
-| The one-time code was already used or has expired (M) | The page says so and shows nothing | no | Stop `browse` and run it again |
+| The one-time code was already used (M) | The page says that another page or program opened the link first; the command has printed when it was opened | no | Stop `browse`, then run it again |
+| The one-time code expired unused (M) | The page says that the link expired | no | Stop `browse` and run it again |
+| An answer's proof is missing or wrong (M) | The page shows nothing it loaded, drops the secret, and says that the server has stopped | no | Close the tab; run `browse` again |
 
 ## Examples
 
@@ -809,7 +904,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |
 | Source views (K) | Tests over invented sources for every state, and the worked example: 4 citations and 125 passages highlighted, 748,172 bytes of source views in a 2.7 MB page, of which about 212 KB is page text repeated for passages that share a page. A synthetic page at the cap (8.0 MB of source views, 9.2 MB in all, 450 passages) opened in about 0.13 s and showed its first citation in about 0.04 s, in headless Chromium from a local file on one macOS system (Apple silicon) | A real large project; slower machines and other browsers; right-to-left and complex-script page text; keyboard and screen-reader use by hand |
 | Manuscript view (L) | Local tests over invented reports for broken, withheld, and hostile cases; the worked example's report (116 quotations, 80 note citations, and 19 bibliography entries all linked; 228,368 bytes, in a 3.0 MB page); headless Chromium from a local file on one macOS system (Apple silicon) | A real author's report; other browsers; keyboard and screen-reader use by hand |
-| Local server (M) | Local tests of each rule against raw requests, the built command, and headless Chromium on one macOS system (Apple silicon), with a hostile page on another loopback port and a name mapped to this computer; the installed plugin served the worked example. Worked example: ready in 2.6 s, rebuilt in 2.5 s after an edit, 7 ms a call for the scan; the holding process used up to 0.9 GB while building and 0.1 GB after. Synthetic project of 5,000 sources (172,873 inputs, 79,020 entries, no report): ready in 31 s, rebuilt in 32 s after an edit, 11 s after a touch that changed nothing; the scan adds about 0.2 s to each call (a search took 0.25 s; the page opened in 0.9 s); the holding process used up to 9.4 GB while building and 1.5 GB half a minute after (its resident size still showed 11.6 GB) | Linux and Windows, where the launch file, the opener, and the file modes are untried; desktop apps and the system's real opener; other browsers; a real author's project; a computer with 16 GB or less; a network file system; keyboard and screen-reader use by hand; any outside security review |
+| Local server (M) | Local tests of each rule against raw requests, the built command, and headless Chromium on one macOS system (Apple silicon), with a hostile page on another loopback port and a name mapped to this computer; another program taking a stopped server's port before and after the page has data, answering 200 with no proof, a made-up one, and a real answer repeated; real answers with a changed body; changed paths, statuses, and nonces and repeated requests against the signing code; the installed plugin served the worked example. Worked example: ready in 2.6 s, rebuilt in 2.5 s after an edit, 7 ms a call for the scan; the holding process used up to 0.9 GB while building and 0.1 GB after. Synthetic project of 5,000 sources (172,873 inputs, 79,020 entries, no report): ready in 31 s, rebuilt in 32 s after an edit, 11 s after a touch that changed nothing; the scan adds about 0.2 s to each call (a search took 0.25 s; the page opened in 0.9 s); the holding process used up to 9.4 GB while building and 1.5 GB half a minute after (its resident size still showed 11.6 GB) | Linux and Windows, where the launch file, the opener, and the file modes are untried; desktop apps and the system's real opener; other browsers; a real author's project; a computer with 16 GB or less; a network file system; keyboard and screen-reader use by hand; any outside security review |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 
