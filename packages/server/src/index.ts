@@ -1,5 +1,6 @@
 export * from "./agent.ts";
 export * from "./answers.ts";
+export * from "./highlighter.ts";
 export * from "./http.ts";
 export * from "./launch.ts";
 export * from "./lock.ts";

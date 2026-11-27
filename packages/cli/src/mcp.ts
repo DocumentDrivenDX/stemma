@@ -9,11 +9,11 @@ import { isAbsolute, join, resolve } from "node:path";
 import { showControls } from "@stemma/records";
 import { findProject, inputsChanged, mayShowTheSame, scanInputs } from "@stemma/workspace";
 import {
-  createOriginals, createSession, type LaunchFile, type Listening, listen, type Lock, lockDirectory, lockHolder, openInBrowser,
+  createHighlighter, createOriginals, createSession, type LaunchFile, type Listening, listen, type Lock, lockDirectory, lockHolder, openInBrowser,
   ProcessGone, type Session, type SnapshotProcess, Snapshots, spawnSnapshotProcess, takeLock, writeLaunchFile, serveMcp, type ToolResult,
   AGENT_LIMITS, recordRoute, SEARCH_LIMITS,
 } from "@stemma/server";
-import { pageAssets, workerCommand } from "./browse.ts";
+import { highlightCommand, pageAssets, workerCommand } from "./browse.ts";
 import { type Options, usageError, VERSION } from "./context.ts";
 
 export const MCP_BOUNDS = {
@@ -245,6 +245,7 @@ export function mcpTools(options: { project?: string | undefined; idleMinutes?: 
         check: async () => (held?.root === project && !held.starting && held.failure === undefined ? held.snapshots.check() : { state: "rebuilding" }),
         used: () => (used = now()),
         originals: createOriginals(project, []),
+        highlighter: createHighlighter(highlightCommand()),
       });
       // The host may have ended the server while the listener was being made.
       if (closed) {

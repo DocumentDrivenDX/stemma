@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { inputsChanged, mayShowTheSame, scanInputs } from "@stemma/workspace";
 import {
-  type Assets, BuildFailure, type Built, createOriginals, createSession, type LaunchFile, listen, openInBrowser, originalPlaces, PDF_SCRIPTS, type PdfAssets,
+  type Assets, BuildFailure, type Built, createHighlighter, createOriginals, createSession, type LaunchFile, listen, openInBrowser, originalPlaces, PDF_SCRIPTS, type PdfAssets,
   pdfData, type SnapshotEvent, Snapshots, spawnSnapshotProcess, writeLaunchFile, type Lock, lockDirectory, takeLock,
 } from "@stemma/server";
 import { CommandError, type Options, requireProject, usageError, VERSION } from "./context.ts";
@@ -38,8 +38,10 @@ export async function pageAssets(): Promise<Assets> {
   throw new CommandError(70, "page_template_missing", "This copy of Stemma lacks its served explorer page, so nothing was served. Install Stemma again.", [shipped]);
 }
 
-export function workerCommand(): string[] {
-  const worker = join(import.meta.dir, fromSource() ? "browse-worker.ts" : "browse-worker.js");
+export const highlightCommand = (): string[] => workerCommand("highlight-worker");
+
+export function workerCommand(name: "browse-worker" | "highlight-worker" = "browse-worker"): string[] {
+  const worker = join(import.meta.dir, `${name}.${fromSource() ? "ts" : "js"}`);
   if (!existsSync(worker)) throw new CommandError(70, "worker_missing", "This copy of Stemma lacks part of its local server, so nothing was served. Install Stemma again.", [worker]);
   return [process.execPath, ...ISOLATION_FLAGS, worker];
 }
@@ -87,6 +89,7 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
   const tell = json ? (line: string) => process.stderr.write(`${line}\n`) : say;
   const assets = await pageAssets();
   const command = workerCommand();
+  const reader = highlightCommand();
 
   let ending: (why: string) => void = () => {};
   const ended = new Promise<string>((resolve) => (ending = resolve));
@@ -126,7 +129,7 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
       const by = lock.by;
       throw new CommandError(5, "already_served", `Another Stemma process${by ? ` (process ${by.pid}${by.address ? `, at ${by.address}` : ""})` : ""} already serves this project on this computer, so nothing is served. Use the page it opened, or stop it first.`);
     }
-    const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()), originals: createOriginals(root, originals.places) }).catch((error: unknown) => {
+    const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()), originals: createOriginals(root, originals.places), highlighter: createHighlighter(reader) }).catch((error: unknown) => {
       throw new CommandError(5, "cannot_listen", `No port on 127.0.0.1 could be opened, so nothing is served. ${error instanceof Error ? error.message : ""}`);
     });
     server = listening;

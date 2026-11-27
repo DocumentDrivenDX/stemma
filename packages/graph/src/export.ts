@@ -1,7 +1,7 @@
 // `graph export` and `graph status` as pure functions (CONTRACT-005 B, C, J).
 // The same record and manuscript bytes and the same exporter version give the
 // same bytes: no export holds a time, a user, a machine path or a git revision.
-import { type ManuscriptView, type RecordStates, recordStates, type TextOriginal, textOriginals } from "@stemma/core";
+import { highlightTargets, type HighlightTargets, type ManuscriptView, type RecordStates, recordStates, type TextOriginal, textOriginals } from "@stemma/core";
 import { compareCodePoints, type Corpus, corpusDigest, isObject, type LoadedFile, SEARCH_FOLD_VERSION, sha256 } from "@stemma/records";
 import { graphDocument, jsonText, MODULE_NAME, moduleDocument, typeLabel, VIEW_VERSION } from "./module.ts";
 import { type ManuscriptPort, manuscriptFile, manuscriptOf, quotedPassages } from "./manuscript.ts";
@@ -192,6 +192,8 @@ export interface Served {
   search: { types: { type: string; label: string }[]; entries: { type: string; key: string; label: string; text: string }[] };
   /** What each source file records of its original (CONTRACT-005 M, "Originals"). */
   originals: Record<string, TextOriginal>;
+  /** Where each passage's words lie in its parts' text, for marking an original (CONTRACT-005 M). */
+  highlights: HighlightTargets;
 }
 
 /**
@@ -208,6 +210,7 @@ export function servedData(corpus: Corpus, request: Pick<ExportRequest, "version
     banner: { ...banner, warnings: banner.warnings.filter((w) => w.code !== "large_graph").map(servedWarning) },
     moduleText: made.moduleText, graphText: made.graphText, views: made.sources.views, manuscript: made.manuscript.view,
     originals: textOriginals(corpus),
+    highlights: highlightTargets(corpus, made.sources.views),
     search: {
       types: made.projection.types.map((type) => ({ type, label: typeLabel(type) })),
       entries: made.projection.entities.map((e, i) => ({ type: e.type, key: e.key, label: String(e.properties.heading), text: made.projection.search![i]! })),

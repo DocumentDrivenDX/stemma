@@ -64,7 +64,13 @@ export async function bundle(outdir: string): Promise<string> {
     outdir, naming: { entry: "browse-worker.js" }, target: "bun", minify: false,
   });
   if (!worker.success) throw new Error(worker.logs.join("\n"));
-  const parts = [...built.outputs, ...worker.outputs].filter((o) => o.path.endsWith(".js")).map((o) => basename(o.path));
+  // The process that reads a page of an original to place a highlight: whole too, with the PDF library inside it.
+  const reader = await Bun.build({
+    entrypoints: [join(root, "packages/cli/src/highlight-worker.ts")],
+    outdir, naming: { entry: "highlight-worker.js" }, target: "bun", minify: false,
+  });
+  if (!reader.success) throw new Error(reader.logs.join("\n"));
+  const parts = [...built.outputs, ...worker.outputs, ...reader.outputs].filter((o) => o.path.endsWith(".js")).map((o) => basename(o.path));
   const left = parts.flatMap((part) => unresolvedImports(readFileSync(join(outdir, part), "utf8")))
     .filter((i) => !(i.startsWith("./") && parts.includes(i.slice(2))));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);

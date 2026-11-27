@@ -9,7 +9,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { DRAWN_TYPES, MOST_ORIGINAL_BYTES } from "../../core/src/original-pages.ts";
 import { MAC_HEADER, MAC_SHAPE, NONCE_HEADER, NONCE_SHAPE, PROOF_HEADER } from "../../core/src/browse-proof.ts";
+import { type Highlight, noHighlight, type HighlightTarget } from "../../core/src/highlight.ts";
 import { refusal } from "./answers.ts";
+import type { Highlighter } from "./highlighter.ts";
 import type { Originals } from "./originals.ts";
 import { ProcessGone } from "./process.ts";
 import type { Prove, Session, Signed } from "./session.ts";
@@ -62,7 +64,7 @@ const SNAPSHOT_CALLS: Record<string, string> = {
   "/api/boot": "boot", "/api/arras": "arras", "/api/query": "query", "/api/source-view": "source-view", "/api/manuscript": "manuscript", "/api/search": "search",
   "/api/original-page": "original-page",
 };
-const CALLS = new Set(["/api/session", "/api/status", "/original", "/pdfjs-data", ...Object.keys(SNAPSHOT_CALLS)]);
+const CALLS = new Set(["/api/session", "/api/status", "/original", "/api/original-highlight", "/pdfjs-data", ...Object.keys(SNAPSHOT_CALLS)]);
 
 /** Headers a rule reads. Node keeps only the first of some repeats, so a repeat is refused. */
 const ONCE = ["host", "origin", "content-type", "content-length", "transfer-encoding", REQUEST_HEADER, NONCE_HEADER, MAC_HEADER];
@@ -77,6 +79,8 @@ export interface ListenOptions {
   /** Where originals are read from. Without it, none is held. */
   originals?: Originals;
   originalLimits?: Partial<typeof ORIGINAL_LIMITS>;
+  /** What reads a page of an original to place a highlight. Without it, none is placed. It is closed with the server. */
+  highlighter?: Highlighter;
 }
 
 /** An answer whose body is bytes: only ever a successful one. */
@@ -264,6 +268,35 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     }
   }
 
+  /** Where a passage's words lie on a page of its original, or why they are not marked (CONTRACT-005 M, "Highlighting on originals"). */
+  async function highlight(verdict: Extract<Verdict, { state: "current" }>, body: Record<string, unknown>, response: ServerResponse): Promise<Answer> {
+    const asked = await verdict.process.ask("highlight-target", body);
+    if (asked.status !== 200) return asked;
+    const { result } = JSON.parse(asked.body) as { result: { highlight: Highlight } | { target: HighlightTarget } };
+    const answered = (made: Highlight): Answer => ({ status: 200, body: JSON.stringify({ data_identity: verdict.data_identity, result: made }) });
+    if ("highlight" in result) return answered(result.highlight);
+    const { target } = result;
+    if (target.size > originalLimits.bytes) return answered(noHighlight("too_large"));
+    if (!options.highlighter) return answered(noHighlight("failed"));
+    return answered(await options.highlighter.place(target, async () => {
+      // The original read for this counts among those held at once.
+      const release = await hold();
+      if (response.destroyed || !options.originals) {
+        release();
+        return { refused: "original_not_held" };
+      }
+      try {
+        const found = await options.originals.read(target.sha256, target.size);
+        if ("bytes" in found) return { bytes: found.bytes, release };
+        release();
+        return found;
+      } catch (error) {
+        release();
+        throw error;
+      }
+    }, () => response.destroyed));
+  }
+
   /** The answer to a call that was accepted. */
   async function respond(url: string, text: string, response: ServerResponse): Promise<Answer | Bytes> {
     let body: Record<string, unknown>;
@@ -292,6 +325,7 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     }
     try {
       if (url === "/original") return await original(verdict.process, body, response);
+      if (url === "/api/original-highlight") return await highlight(verdict, body, response);
       return await verdict.process.ask(SNAPSHOT_CALLS[url]!, body);
     } catch (error) {
       // Only a process that has ended is a reason to wait; anything else would have the page wait for ever.
@@ -322,6 +356,7 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     port,
     address: `${origin}/`,
     close: () => new Promise<void>((resolve) => {
+      options.highlighter?.close();
       server.close(() => resolve());
       server.closeAllConnections();
     }),

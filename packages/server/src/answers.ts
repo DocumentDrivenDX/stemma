@@ -6,6 +6,8 @@
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
 import { agentRecordOf, agentSearch, agentView } from "./agent.ts";
 import { originalPage, recordedOriginals, type TextOriginal } from "../../core/src/original-pages.ts";
+import { type HighlightTarget, noHighlight, type NoHighlightReason } from "../../core/src/highlight.ts";
+import type { HighlightTargets } from "../../core/src/highlight-target.ts";
 import { ARRAS_SEARCH_QUERY, arrasAccepts, createSearch, queryOf, SEARCH_LIMITS, type SearchData } from "./search.ts";
 import type { SourceView } from "../../core/src/source-view.ts";
 import type { Answer } from "./snapshots.ts";
@@ -20,7 +22,12 @@ export interface ServedData {
   search: SearchData;
   /** What each source file records of its original, for the page it is and the digests that may be given. */
   originals?: Record<string, TextOriginal>;
+  /** Where each highlighted passage's words lie in the text of each of its parts, for marking an original. */
+  highlights?: HighlightTargets;
 }
+
+/** What a snapshot says of a passage's place on an original: what to look for, or why nothing is. */
+export type HighlightAsk = { target: HighlightTarget } | { none: NoHighlightReason };
 
 export const ARRAS_CALLS = ["version", "viewer", "meta", "status", "schemaCatalog", "export"] as const;
 
@@ -77,6 +84,18 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
     const answered = search.arrasPage(asked, names as string[] | undefined, (limit as number | null) ?? 20, freshness);
     return Promise.resolve(ok({ data: { _search: answered }, errors: [], revision: probe.revision }));
   };
+  /** What must be found on the page of the original for the passage's words on this part to be marked. */
+  const highlightAsk = (passage: string, index: number): HighlightAsk => {
+    const view = Object.hasOwn(data.views, passage) ? (data.views as Record<string, SourceView>)[passage] : undefined;
+    const text = view?.kind === "passage" && view.state === "highlighted" ? view.source_text?.id : undefined;
+    const found = text !== undefined && view!.segments.some((s) => s.index === index) ? data.highlights?.[passage]?.[index] : undefined;
+    if (text === undefined || !found || !Object.hasOwn(texts, text)) return { none: "no_segment" };
+    const page = originalPage(texts[text]!, index);
+    if (page.state === "image") return { none: "page_image" };
+    if (page.state === "none") return { none: "no_pdf_page" };
+    if ("refused" in found) return { none: found.refused };
+    return { target: { sha256: page.sha256, size: page.size, page: page.page, page_count: page.page_count, text_sha256: found.text_sha256, ranges: found.ranges } };
+  };
   const answer = async (route: string, body: unknown): Promise<Answer> => {
     if (!isObject(body)) return BAD;
     if (route === "boot") return ok({ banner, manuscript_state: manuscript.state });
@@ -85,6 +104,13 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
       const { text, index } = body;
       if (Object.keys(body).some((key) => key !== "text" && key !== "index") || typeof text !== "string" || !wholeFrom(index, 0, Number.MAX_SAFE_INTEGER)) return BAD;
       return ok(Object.hasOwn(texts, text) ? originalPage(texts[text]!, index) : null);
+    }
+    // Asked by the command alone, for `/api/original-highlight`, which reads the file itself.
+    if (route === "highlight-target") {
+      const { passage, index } = body;
+      if (Object.keys(body).some((key) => key !== "passage" && key !== "index") || typeof passage !== "string" || !wholeFrom(index, 0, Number.MAX_SAFE_INTEGER)) return BAD;
+      const made = highlightAsk(passage, index);
+      return ok("none" in made ? { highlight: noHighlight(made.none) } : made);
     }
     // Asked by the command alone, for `/original`: the page cannot name this call.
     if (route === "original-record") return ok(typeof body.sha256 === "string" ? recorded.get(body.sha256) : null);

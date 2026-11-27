@@ -907,7 +907,8 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
 - **Positions.** Boxes come from the page's drawing operators, not from the text
   layer's word list. Every non-space character of the page's text must come, in
   order, from a glyph the operators draw: the two sequences must be equal for the
-  whole page. Each quoted glyph's box is its advance width and its outline.
+  whole page. Glyphs that begin off the page, which pdf.js's text content leaves
+  out, are left out by the same rule as its own. Each quoted glyph's box is its advance width and its outline.
   As a cross-check, each quoted glyph must lie on the baseline of, and within, the
   piece of pdf.js's text content that holds its character.
 - **Drawn to be seen.** A quoted glyph must be filled (text rendering mode 0) in

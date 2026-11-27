@@ -7,7 +7,8 @@
 // it is: the plugin ships no native drawing module, and pdf.js says so.
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type Removal, removals, removeFromPieces } from "./stamps.ts";
+import type { Removal } from "./stamps.ts";
+import { type RawItem, readPageItems } from "./pdf-lines.ts";
 
 /** One piece of text with its place: x and y of its baseline start, its width, and its size. */
 export interface PdfItem { text: string; x: number; y: number; width: number; size: number }
@@ -88,31 +89,12 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
       const page = await document.getPage(number);
       // Characters are kept as the file maps them: no compatibility folding.
       const content = await page.getTextContent({ disableNormalization: true });
-      // A download stamp goes before anything is worked out from the text.
-      const items = content.items.flatMap((item) => ("str" in item ? [item] : []));
-      const cleaned = removeFromPieces(items.map((item) => ({ text: item.str, after: item.hasEOL ? "\n" : "" })));
-      removed.push(removals(cleaned.rules));
-      const text = items
-        .map((item, i) => cleaned.texts[i]! + (item.hasEOL ? "\n" : ""))
-        .join("")
-        // A form feed marks a page end in the saved text, so none may come from inside a page.
-        .replace(/\f/g, " ")
-        .replace(/\0/g, "�");
-      size += Buffer.byteLength(text) + 1;
+      const read = readPageItems(content.items as RawItem[]);
+      removed.push(read.removed);
+      size += Buffer.byteLength(read.text) + 1;
       if (size > limits.text_bytes) throw new PdfUnreadable("too_much_text");
-      pages.push(text);
-      const pageLines: PdfLine[] = [{ items: [], text: "" }];
-      for (const [i, item] of items.entries()) {
-        const line = pageLines.at(-1)!;
-        const piece = cleaned.texts[i]!.replace(/[\f\0]/g, " ");
-        line.text += piece;
-        if (piece !== "") {
-          const [a, b, , d, x, y] = item.transform as number[];
-          line.items.push({ text: piece, x: x!, y: y!, width: item.width, size: Math.hypot(a!, b!) || Math.abs(d!) });
-        }
-        if (item.hasEOL) pageLines.push({ items: [], text: "" });
-      }
-      lines.push(pageLines.filter((l) => l.text.trim() !== ""));
+      pages.push(read.text);
+      lines.push(read.lines);
       widths.push(page.view[2]! - page.view[0]!);
       page.cleanup();
     }

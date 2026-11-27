@@ -28,4 +28,6 @@ export * from "./enrich.ts";
 export * from "./states.ts";
 export * from "./source-view.ts";
 export * from "./original-pages.ts";
+export * from "./highlight.ts";
+export * from "./highlight-target.ts";
 export * from "./manuscript-view.ts";
