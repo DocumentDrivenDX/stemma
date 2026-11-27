@@ -281,8 +281,9 @@ current values. A `comparison_run` records an automated comparison: `method`
 (`reconversion`, a fresh conversion of the original with the recorded settings;
 or `supplied_text`, another text of the same pages), whether it is
 `independent` of the converter, the tools, what it compared against and that
-file's hash, and for each part the part's text digest, the words compared, the
-words differing, agreement in thousandths, and the differing readings (up to 20
+file's hash, and for each part a digest of what was compared (the part's text
+digest; for a reconversion, joined with its as-converted reading, so that
+marking a correction ends the run), the words compared, the words differing, agreement in thousandths, and the differing readings (up to 20
 a part, with the full count). It is current only while the part digests are
 unchanged and its tool versions match the current ones.
 

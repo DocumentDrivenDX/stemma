@@ -9,7 +9,7 @@ import {
 } from "@stemma/records";
 import { type Actor, InvalidInput } from "./operations.ts";
 import { viewOf } from "./matching/texts.ts";
-import { asConverted, diffWords, reviewDigest, currentReview, currentRun } from "./verification.ts";
+import { asConverted, comparedDigest, diffWords, reviewDigest, currentReview, currentRun } from "./verification.ts";
 import { sourceBinding } from "./checks/changed.ts";
 import { textAt } from "./passages.ts";
 import { SourceTexts } from "./matching/texts.ts";
@@ -328,7 +328,7 @@ export function planComparison(corpus: Corpus, request: ComparisonRequest) {
     const reading = request.method === "reconversion" ? asConverted(part.part.blocks) : part.streams.main;
     const diff = diffWords(reading, request.other.get(part.index) ?? "");
     return {
-      index: part.index, sha256: part.digest,
+      index: part.index, sha256: comparedDigest(request.method, part.part.blocks),
       agreement_permille: diff.words === 0 ? 1000 : Math.max(0, Math.floor((1000 * (diff.words - diff.differing)) / diff.words)),
       words: diff.words, differing_words: diff.differing, differences: diff.differences,
     };
@@ -339,7 +339,8 @@ export function planComparison(corpus: Corpus, request: ComparisonRequest) {
     tools: request.tools, against: request.against,
     ...(request.other_sha256 ? { other_sha256: request.other_sha256 } : {}),
     ...(request.original_sha256 ? { original_sha256: request.original_sha256 } : {}),
-    run: stamp(request.actor, request.now), pages,
+    // Runs keep the full time, so that the newest of several is never a guess.
+    run: { at: request.now.toISOString(), by: { ...request.actor } }, pages,
   };
   const written = record("comparison_run", value);
   assertValid("ComparisonRun", "comparison_run", written.text);

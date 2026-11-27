@@ -16,11 +16,17 @@ export const reconversions = (corpus: Corpus, text: string): LoadedFile[] =>
   records(corpus, "comparison_run").filter((r) => r.data!.text === text && r.data!.method === "reconversion")
     .sort((a, b) => atOf(b.data!, "run").localeCompare(atOf(a.data!, "run")) || (a.path < b.path ? 1 : -1));
 
-const digests = (text: LoadedText) => new Map(text.parts.map((p) => [p.index, textDigest(p.blocks)]));
+/**
+ * What a run binds to on one page. A fresh conversion is compared with the
+ * as-converted reading, so marking a change as a person's correction ends it even
+ * though the words now read the same.
+ */
+export const comparedDigest = (method: string, blocks: Parameters<typeof streamsOf>[0]): string =>
+  method === "reconversion" ? sha256(`${textDigest(blocks)}\n${asConverted(blocks)}`) : textDigest(blocks);
 
 /** Whether a run still describes the text, made with the tools this version has. */
 export function currentRun(run: JsonObject, text: LoadedText, tools: Record<string, string>): boolean {
-  const now = digests(text);
+  const now = new Map(text.parts.map((p) => [p.index, comparedDigest(String(run.method), p.blocks)]));
   const pages = list(run.pages);
   if (pages.some((p) => now.get(Number(p.index)) !== p.sha256)) return false;
   if (run.method !== "reconversion") return true;
