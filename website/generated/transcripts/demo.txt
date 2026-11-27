@@ -1,8 +1,7 @@
 Stemma demo. All names and sources are invented.
 DEMO is a fresh temporary directory
 STEMMA_STORE_DIR is set to $DEMO/store, the private content store, outside the project.
-"stemma" below means: cd <plugin root> && bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js
-Plugin root: <plugin root>
+"stemma" below is the command line inside the plugin. In use, Claude runs it for the author.
 
 =============== 1. Create a project and record two sources
 
@@ -45,7 +44,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 =============== 3. Check: the seeded errors are reported and explained
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 13 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
@@ -77,7 +76,7 @@ Checked the whole project: 13 result(s) passed.
        key: hartwell1998
        source file: records/sources/src-demo0harbour01.json
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
@@ -85,7 +84,7 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
 
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
@@ -98,7 +97,7 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 15 result(s) passed.
 
 1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held, 2 places]
@@ -113,7 +112,7 @@ Checked the whole project: 15 result(s) passed.
        key: hartwell1998
        source file: records/sources/src-demo0harbour01.json
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
@@ -121,11 +120,11 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
 
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
-=============== 5. A paper-only book: add its scan. A scan alone is not yet checkable
+=============== 5. A paper-only book: add its scan. A scan alone is not checkable
 
 $ stemma source add $DEMO/materials/ledger-scan.pdf --source src-demo0harbour01 --origin my own scan --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/book
 Stored the copy and recorded it as cap-random0001.
@@ -144,7 +143,7 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 17 result(s) passed.
 
 1. PROBLEM: A cited source has a stored copy but no extracted text, so this citation is unchecked.  [source.held, 2 places]
@@ -163,7 +162,7 @@ Checked the whole project: 17 result(s) passed.
        capture file: records/captures/cap-random0001.json
        copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
@@ -173,7 +172,7 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
 
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
@@ -191,10 +190,10 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 0 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 0 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 21 result(s) passed.
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
@@ -204,18 +203,18 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
 
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
 No finding is left. The project is still NOT called checked clean, on purpose: it cites
-a source, and this version cannot yet check some things about cited sources (listed
-under NOT CHECKED). Those count as open.
+a source, and some checks of cited sources are not run (listed under NOT CHECKED).
+Those count as open.
 
 =============== 7. Without the store, nothing passes by default: could not check
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 2 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 2 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 19 result(s) passed.
 
 1. COULD NOT CHECK: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 2 places]
@@ -234,7 +233,7 @@ Checked the whole project: 19 result(s) passed.
        capture file: records/captures/cap-random0001.json
        copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
@@ -245,7 +244,7 @@ For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
 
 Content store looked in: $DEMO/store (chosen by STEMMA_STORE_DIR). It is private and not part of the repository; where its files are absent or changed, nothing about them was checked.
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
@@ -267,7 +266,7 @@ Content store: $DEMO/store (chosen by STEMMA_STORE_DIR)
 The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
 [exit 0]
 
-=============== 8. What checked clean looks like today: sources recorded, nothing cited yet
+=============== 8. What checked clean looks like: sources recorded, nothing cited
 
 $ stemma init --project $DEMO/reading-list
 Created a Stemma project in $DEMO/reading-list
@@ -288,7 +287,7 @@ CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
 Checked the whole project: 6 result(s) passed.
 
-No change baseline is kept yet, so the whole project was checked.
+The whole project is checked each time.
 Full report: $DEMO/reading-list/.stemma/reports/check.json
 [exit 0]
 

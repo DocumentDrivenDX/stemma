@@ -48,8 +48,7 @@ const heading = (text: string) => console.log(`\n=============== ${text}`);
 console.log(`Stemma demo. All names and sources are invented.
 DEMO=${base}
 STEMMA_STORE_DIR is set to $DEMO/store, the private content store, outside the project.
-"stemma" below means: cd <plugin root> && bun ${FLAGS.join(" ")} <plugin root>/dist/stemma.js
-Plugin root: ${plugin}`);
+"stemma" below is the command line inside the plugin. In use, Claude runs it for the author.`);
 
 heading("1. Create a project and record two sources");
 stemma(0, book, "init");
@@ -80,7 +79,7 @@ const second = stemma(1, book, "check");
 expect(second.includes("OPEN FINDINGS: 2 problem(s), 0 could not be checked"), "only the two unheld citations should be left");
 expect(second.includes("[source.held, 2 places]"), "both citations of the unheld source should be reported");
 
-heading("5. A paper-only book: add its scan. A scan alone is not yet checkable");
+heading("5. A paper-only book: add its scan. A scan alone is not checkable");
 const addArgs = ["--actor", "person:demo-author", "--acquired-at", "2026-01-05T09:00:00Z"];
 const added = stemma(0, book, "source", "add", join(materials, "ledger-scan.pdf"), "--source", harbour, "--origin", "my own scan", ...addArgs);
 const capture = /recorded it as (cap-[0-9a-z]+)/.exec(added)![1]!;
@@ -95,8 +94,8 @@ const heldReport = stemma(1, book, "check");
 expect(heldReport.includes("OPEN FINDINGS: 0 problem(s), 0 could not be checked"), "the held citations should now pass");
 console.log(`
 No finding is left. The project is still NOT called checked clean, on purpose: it cites
-a source, and this version cannot yet check some things about cited sources (listed
-under NOT CHECKED). Those count as open.`);
+a source, and some checks of cited sources are not run (listed under NOT CHECKED).
+Those count as open.`);
 
 heading("7. Without the store, nothing passes by default: could not check");
 renameSync(store, `${store}-elsewhere`);
@@ -106,7 +105,7 @@ stemma(1, book, "store", "verify");
 renameSync(`${store}-elsewhere`, store);
 stemma(0, book, "store", "verify");
 
-heading("8. What checked clean looks like today: sources recorded, nothing cited yet");
+heading("8. What checked clean looks like: sources recorded, nothing cited");
 const shelf = join(base, "reading-list");
 stemma(0, shelf, "init");
 const input = join(base, "harbour.json");

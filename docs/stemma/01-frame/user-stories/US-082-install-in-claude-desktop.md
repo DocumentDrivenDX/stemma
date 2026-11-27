@@ -20,7 +20,7 @@ ddx:
 
 **As a** Margit, the AI-cautious humanist
 **I want** to add Stemma from a marketplace in Claude desktop
-**So that** I can run its checks on my own computer after following the documented steps.
+**So that** I can run its checks on my own computer by installing the plugin and nothing else.
 
 ## Context
 
@@ -28,20 +28,20 @@ The first version promises full function only in the local Code tab of Claude de
 
 ## Walkthrough
 
-1. Margit installs the documented Bun version.
-2. In Claude desktop she adds the project's repository marketplace and installs the Stemma plugin.
-3. She starts a local Code tab session on her project.
-4. The plugin loads, the Stemma skill is available, and a scripted check runs.
+1. In Claude desktop she adds the project's repository marketplace and installs the Stemma plugin.
+2. She starts a local Code tab session on her project and asks for a check.
+3. Claude says it is setting the plugin up, and she allows it if asked.
+4. A scripted check runs.
 
 ## Acceptance Criteria
 
 - [ ] **US-082-AC1** — Given a clean profile in Claude desktop and the project's repository marketplace, when Margit installs the plugin, then it loads in a local Code tab session and the Stemma skill is available.
-- [ ] **US-082-AC2** — Given the documented runtime is installed and the plugin is loaded, when she runs a scripted check in a local Code tab session, then the check runs on her computer and reports results.
+- [ ] **US-082-AC2** — Given the plugin is installed and no Bun is on the computer's search path, when she asks for a scripted check in a local Code tab session, then the plugin sets up its pinned runtime without any step of hers beyond the host's permission prompt, and the check runs on her computer and reports results.
 - [ ] **US-082-AC3** — Given a session that does not run on her computer, when she asks for a check or build, then Stemma says it makes no promise there and reports no check result it did not run.
-- [ ] **US-082-AC4** — Given the runtime is missing or not visible to the app, when she runs a scripted check, then a plain-language message names the problem and the fix.
+- [ ] **US-082-AC4** — Given setup fails or is declined, when she asks for a scripted check, then a plain-language message names the problem and says nothing was checked, and she is not asked to install anything by hand.
 - [ ] **US-082-AC5** — Given the published product description, when an author reads which sessions are supported, then it promises full function only for Claude desktop's local Code tab and says command-line results do not verify the desktop app.
 - [ ] **US-082-AC6** — Given the published product description, when an author reads about local models, then it calls their use an unsupported experiment that is not blocked, promised, or tested.
-- [ ] **US-082-AC7** — Given a release, when Margit installs from the repository marketplace, then the release package's command line is delivered and runs, although it is not committed to the Stemma repository; a separate distribution repository for built files may deliver it if the marketplace requires one.
+- [ ] **US-082-AC7** — Given a release, when Margit installs from the repository marketplace, then the release's command line is delivered from the distribution repository and runs, although it is not committed to the Stemma repository.
 
 ## Edge Cases
 
@@ -58,7 +58,7 @@ Inputs are synthetic.
 | Install | US-082-AC1 | Clean Claude desktop profile | Add the marketplace and install | Plugin loads in the Code tab |
 | Local check | US-082-AC2 | Synthetic project; documented Bun version | Ask to verify | Scripted results appear |
 | Non-local session | US-082-AC3 | Session with no access to the author's computer | Ask to verify | No result; limit stated |
-| Missing runtime | US-082-AC4 | Machine without Bun | Ask to verify | Message names Bun and how to install it; no pass |
+| Setup fails | US-082-AC4 | No Bun and no network | Ask to verify | Message names the failed setup and says nothing was checked; no pass |
 | Support statement | US-082-AC5 | Release description | Read the support statement | Only the desktop local Code tab is promised |
 | Local models | US-082-AC6 | Release description | Read the support statement | The three limits are stated; no support claimed |
 | Bundle delivery | US-082-AC7 | Clean profile; tagged release | Install; run a check | Command line present and runs; repository holds no bundle |

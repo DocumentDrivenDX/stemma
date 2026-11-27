@@ -69,6 +69,13 @@ rules.
     reviews, or automation would delay working behavior without catching a
     material defect.
 
+11. **The plugin is the product** — Stemma is first and foremost a Claude
+    plugin. Every other part is designed to support it. Installing the plugin is
+    the only installation a person does; the plugin and Claude obtain and set up
+    whatever else it needs, from pinned and verified downloads, within the
+    host's permission prompts. This changes decisions when a feature would ask
+    the author to install, configure, or type something.
+
 ## Tension Resolution
 
 - **Tools and reports vs. No source, no citation**: report the unsupported

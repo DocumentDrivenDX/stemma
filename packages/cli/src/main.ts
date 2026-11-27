@@ -21,7 +21,7 @@ const VERSION: string = manifest.version;
 const REPORT_PATH = ".stemma/reports/check.json";
 
 const USAGE = `stemma ${VERSION}
-Run as: bun ${ISOLATION_FLAGS.join(" ")} <plugin root>/dist/stemma.js <command> [options]
+The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version
   doctor
@@ -443,7 +443,7 @@ function check(options: Options): number {
   } catch {
     throw new CommandError(70, "report_not_written", "The report could not be written, so this run does not count.", [REPORT_PATH]);
   }
-  const widened = options.all ? "" : "No change baseline is kept yet, so the whole project was checked.\n";
+  const widened = options.all ? "" : "The whole project is checked each time.\n";
   const absent = opened && body.results.some((r) => r.check === "source.held" && /_(missing|altered)$/.test(r.reason_code ?? ""))
     ? `Content store looked in: ${opened.path} (chosen by ${opened.chosen_by}). It is private and not part of the repository; where its files are absent or changed, nothing about them was checked.\n` : "";
   emit(options, report, `${renderReport(body)}\n${absent}${widened}Full report: ${join(root, REPORT_PATH)}\n`);

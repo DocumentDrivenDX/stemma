@@ -39,16 +39,21 @@ work.
 
 ### A. Invocation
 
-`bun --no-install <plugin root>/dist/stemma.js <command> [options]`
+`sh <plugin root>/scripts/stemma.sh <data directory> <command> [options]`
+
+The launcher (CONTRACT-004 D) is how the skill and the tests of the installed
+plugin run a command. It sets up the pinned Bun in the data directory when
+absent (exit 4 if it cannot) and then runs
+`bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js <command> [options]`.
 
 - Observed on Bun 1.4.5 (macOS): a `bunfig.toml` in the working directory ran
   preload code and a `.env` there set a store variable, with or without
   `--no-install`. Files beside the script were not loaded. The full invocation is
   therefore
   `bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js`,
-  and with those two added flags neither file was loaded. The skill and the
-  documented terminal use also start Bun with the plugin root as the working
-  directory, and pass `--project` and every path as absolute paths. A relative
+  and with those two added flags neither file was loaded. The launcher
+  starts Bun with the plugin root as the working
+  directory; callers pass `--project` and every path as absolute paths. A relative
   path given to a command is resolved against the project directory. A command
   started without `--no-install` exits 4; `doctor` warns when another of these
   flags is missing, since a preload has already run by then. The `/dev/null`
@@ -458,7 +463,7 @@ commands, MUST NOT treat it as a reason to refuse or stop work.
 | Report cannot be written | Exit 70; the build is reported as failed | yes | Fix the output path |
 | No network during `resolve` | No record written; dependants stay `unverifiable` or use the cached record and report its date | yes | Run again online |
 | Support input stale | `support record` saves nothing and exits 5 with `stale_input` | yes | Prepare again and rerun the verdict |
-| Typst or font missing | Exit 4; no output | yes | Install the pinned tool |
+| Typst or font missing | Exit 4; no output | yes | The plugin's setup obtains the pinned tool |
 | Another Stemma command is writing | Exit 3 with `busy` | yes | Wait |
 
 Errors in JSON mode are `{"error":{"code":…,"message":…,"paths":[…]}}`.

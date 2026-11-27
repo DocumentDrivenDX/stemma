@@ -15,6 +15,12 @@ Stemma is a plugin that helps scholars research, write, and typeset books with
 AI, checking citations with scripts, explaining what it finds, and tracing claims
 to stored sources.
 
+Stemma is first and foremost a Claude plugin. The author asks Claude in plain
+words; the skill, the command line, and later the graph engine, the explorer,
+and the website exist to support the plugin. The one thing a person ever
+installs is the plugin. Whatever it needs, it and Claude obtain and set up
+themselves.
+
 ## Positioning
 
 For academic researchers who want AI to speed up research and composition but

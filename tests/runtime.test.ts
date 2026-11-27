@@ -14,7 +14,7 @@ const bun = (args: string[], cwd: string, env: Record<string, string> = {}) => {
 describe("one pinned runtime", () => {
   test("tests run on the pin, and every statement of it agrees", () => {
     expect(Bun.version).toBe(PINNED_BUN);
-    expect(read("scripts/setup-bun.sh")).toContain(`version=${PINNED_BUN}`);
+    expect(read("scripts/stemma.sh")).toContain(`version=${PINNED_BUN}`);
     expect(JSON.parse(read("package.json")).packageManager).toBe(`bun@${PINNED_BUN}`);
     expect(read("skills/stemma/SKILL.md")).toContain(PINNED_BUN);
   });
@@ -31,8 +31,12 @@ describe("one pinned runtime", () => {
     expect(runtimeProblem(PINNED_BUN, ISOLATION_FLAGS)).toBeUndefined();
   });
 
-  test("the skill shows the invocation with every isolation flag", () => {
-    expect(read("skills/stemma/SKILL.md")).toContain(`cd "<plugin root>" && bun ${ISOLATION_FLAGS.join(" ")} "<plugin root>/dist/stemma.js"`);
+  test("the skill runs the launcher with the host's two plugin paths, and the launcher passes every isolation flag", () => {
+    const skill = read("skills/stemma/SKILL.md");
+    expect(skill).toContain('sh "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh" "${CLAUDE_PLUGIN_DATA}" <command>');
+    // The host asks before a command runs; the skill does not approve its own.
+    expect(skill).not.toContain("allowed-tools");
+    expect(read("scripts/stemma.sh")).toContain(`exec "$bun" ${ISOLATION_FLAGS.join(" ")} "$root/dist/stemma.js"`);
   });
 });
 

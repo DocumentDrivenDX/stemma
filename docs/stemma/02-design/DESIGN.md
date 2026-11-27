@@ -17,7 +17,8 @@ ddx:
 # DESIGN.md: Stemma
 
 Stemma has two interfaces: turns in an agent chat (M1 on) and the offline browser
-explorer (M3). A terminal user sees the command line's own output (CONTRACT-002).
+explorer (M3). The command line's output (CONTRACT-002) reaches the author through the agent.
+Stemma is first and foremost a Claude plugin, and both interfaces serve it.
 Neither is built. The one thing built from this document is the documentation
 microsite (`website/`, see Microsite), which is not a product interface. Screen
 readers and host chat rendering are untested; for the microsite only headless
@@ -263,7 +264,7 @@ italics are synthesized by the browser.
 | Report excerpt | A figure whose caption says what the text is (commands to type, or a transcript of a real run) and what was replaced. Monospace, no ligatures, long lines wrap, reachable by keyboard. Color only repeats the report's own words |
 | Finding | Outcome, check ID and reason code; what is wrong; why it matters; what to do; evidence. Filled from a JSON report. A drawing of a report entry is labeled as such and is not presented as a Stemma screen |
 | Figure | A screenshot has alternative text, a caption saying how it was made, and the same content available as text. A captured page of command output says "Rendered page, not a terminal window" in the image and in its caption |
-| Planned work | Listed apart from what works, with the words "not built". It gets no screenshot or sample output |
+| Unbuilt behaviour | The microsite presents and demonstrates what works, from real output. It carries no roadmap, planned-work, or in-progress content, and shows or claims nothing that does not work |
 
 ### Styling: Tailwind with arras styles
 
@@ -294,6 +295,11 @@ and location, work without an arras extension (CONTRACT-005 G); and that the
 single offline page's content security policy accepts the bundled stylesheet.
 
 ## Microsite
+
+The microsite presents the plugin. The one installation it may describe is
+installing the plugin; it states install commands only once they have been shown
+to work against the published marketplace. It gives no runtime, command-line, or
+build instructions.
 
 `website/` is static HTML with one Tailwind stylesheet and no JavaScript, built by
 a Bun script (`./scripts/dev.sh site`). That is lighter than the family's Hugo

@@ -1,123 +1,82 @@
 # Stemma
 
-A plugin that helps scholars research, write, and typeset books with AI,
-checking citations with scripts, explaining what it finds, and tracing claims to
-stored sources. Its own documents are specified with
-[HELIX](https://github.com/DocumentDrivenDX/helix).
+A Claude plugin that helps scholars write books with checked citations. Ask
+Claude in plain words; Stemma's scripts check your project against your own
+stored copies of your sources and explain what they find. Its own documents are
+specified with [HELIX](https://github.com/DocumentDrivenDX/helix), which authors
+do not need.
 
 A *stemma codicum* is the family tree of a text's manuscripts: it shows which copy
-derives from which. Stemma aims to give a book the same property: each cited
-claim has a traceable line of descent to a stored source.
+derives from which. Stemma gives a book's citations a line of descent to a stored
+source.
 
-Pre-release. A first part of the command line works: project setup, adding
-records, record-format checks, two bibliography checks, and a warning about
-coordinates written in project files. Everything else below is planned. The
-vision, requirements, and design decisions live under
-[`docs/stemma/`](docs/stemma/).
+Pre-release.
 
-## Try it from a checkout
+## Install
 
-Set up and tried only on macOS on Apple silicon. The script fetches the pinned
-Bun into the ignored `.tools/` directory and installs nothing system-wide.
+Installing the plugin is the only installation there is. The plugin and Claude
+set up everything else themselves.
 
-```sh
-./scripts/dev.sh demo          # a guided run in a fresh temporary directory
-./scripts/dev.sh check         # type check and tests
-./scripts/dev.sh plugin-check  # needs the claude command; uses a throwaway profile
-```
+Stemma is not published to a marketplace, so there is no install command to
+give here.
 
-To run your own command after `./scripts/dev.sh build` (the project path must be
-absolute):
+On first use Claude fetches a pinned copy of the Bun runtime, checks it against a
+digest shipped in the plugin, and keeps it in the plugin's own data directory. It
+changes no system or shell setting, and Claude's usual permission prompts apply.
 
-```sh
-root="$PWD/dist/release"
-(cd "$root" && "$OLDPWD/.tools/bun" --no-install --no-env-file --config=/dev/null \
-  "$root/dist/stemma.js" check --project /absolute/path/to/project)
-```
+## What to ask Claude
 
-Keep all three flags: without them Bun can download packages, or load a
-`bunfig.toml` or `.env` from the working directory.
+- "Start a Stemma project in this folder."
+- "Add a source record for this book, taking the details from its title page."
+- "Keep this PDF as my copy of that source. I downloaded it from the library today."
+- "Attach the text of that copy, with its page breaks."
+- "Record the citations in this chapter."
+- "Check the project and explain what is open."
+- "Is anything missing from my source store?"
 
-## Website
+## What it does
 
-`website/` holds a static microsite: what Stemma is, what works today, a checks
-reference, real example output, and the design language. It is not deployed.
+- Keeps sources and citations as plain record files in your project.
+- Keeps copies of your sources and their text in a private store outside the
+  project, with where and when each came from. Backing that store up is your job.
+- Checks that each cited source has a stored copy with text that still matches,
+  that citation keys resolve, that listed bibliography entries are cited, that
+  record files are well formed, and that no coordinate text slips into the
+  project.
+- Explains every finding: what is wrong, the evidence, why it matters, and what
+  to do. Nothing is blocked. A project is called checked clean only when nothing
+  is open, and a report lists any check it did not run.
 
-```sh
-./scripts/dev.sh preview     # build it and serve it on http://127.0.0.1:4173/
-./scripts/dev.sh browsers    # once: fetch the pinned headless Chromium into .tools/
-./scripts/dev.sh docs        # regenerate transcripts, reports, check list, screenshots
-./scripts/dev.sh docs-check  # fail if that content is stale (also part of check)
-./scripts/dev.sh e2e         # Playwright tests of the built site
-```
+For a PDF or scan, the text comes from a text layer given to Stemma with its page
+breaks. Stemma does not read a PDF's text itself and does not compare a supplied
+text layer with the pages.
 
-Run `docs` after changing command output, fixtures, the demo, or the report
-styles, and commit the result. `docs` and `e2e` need the browser; `check` does
-not.
+## Where it has been tried
 
-## Idea
+On one Mac with Apple silicon: the checks, and installation through the
+marketplace entry with the Claude command-line tool, using a local stand-in for
+the distribution repository. The Claude desktop app, a live Claude session using
+the skill, Windows, and Linux are untested. Setup on Windows needs Git Bash.
 
-Two strands run together, as in HELIX:
-
-- **Evidence strand**: source records, reading notes with page-level locators,
-  constructs, places, and a claim ledger that ties claims to the sources that
-  support them, held together as a graph of plain files.
-- **Manuscript strand**: thesis, outline, chapter specifications, drafts, and
-  the assembled book.
-
-The thesis, with any stated theoretical constructs and research methodology,
-governs the outline, which governs chapter specifications, which govern drafts.
-Evidence runs beside this order: drafts are written from the claim ledger.
-
-## Planned capabilities
-
-- Take over an existing Word manuscript and its reference libraries, or start a
-  new book. Fixes go into a Stemma copy in marked-up Markdown, converted to Typst with
-  only defined layout features; originals stay unchanged. The first
-  pilot also typesets a basic PDF, with a report of what is open.
-- Check citations while you work. Stemma finds problems and explains them. It
-  never stops you from writing and never blocks a build: every build completes
-  and comes with a plain-language report, and is called checked clean only when
-  no check finding is open; the report counts unreviewed items separately. What
-  an AI proposes is used at once and marked unreviewed.
-- Explore the evidence graph, argument and geographic maps, and typeset pages.
-- Typeset with Typst, with Chicago notes and bibliography guaranteed first, in
-  6 x 9 in, 5.5 x 8.5 in, or A5. Word, LaTeX, and HTML export are deferred.
-- Extend voice and style profiles and amend them from your own writing.
-- Install as a plugin from this repository's marketplace: Claude desktop's local
-  Code tab on macOS and native Windows first, ChatGPT and Codex later. The
-  scripted tools also run on Linux, with no desktop-app promise there. How the
-  marketplace delivers the command line is not designed yet.
-
-Stemma is for material that may be sent to a language model. It sends only the
-excerpts a task needs and does not hold back individual sources. Local models are
-an unsupported experiment.
-
-## Principles
-
-1. Tools and reports, not gates and approvals. Review and attestation happen
-   when you choose.
-2. No reference is invented. A citation rests on a source record and a stored
-   copy, and one without them is shown as unchecked.
-3. Scripts check, models propose. A model's support verdict is a record, not
-   proof.
-4. Stemma's own record files are the official bibliography and evidence graph.
-   Other formats are imports and exports.
-5. Stemma says what its checks cannot show. Review marks and verdicts are not
-   forgery-proof.
-6. Stemma works without HELIX installed. HELIX specifies and designs Stemma; it is
-   not a runtime dependency.
+Stemma is for material that may be sent to a language model. It holds back no
+individual source.
 
 ## Layout
 
 ```text
 .claude-plugin/   plugin and marketplace manifests
 skills/stemma/    the single public skill
-packages/         command line and its libraries
-fixtures/, tests/, scripts/
+packages/         the command line inside the plugin, and its libraries
+scripts/          the plugin's launcher, and tools for building the plugin
+examples/         a worked example (records only; no source copies)
+fixtures/, tests/
 website/          microsite sources and generated documentation
-docs/stemma/      Stemma's own governed documents (specified with HELIX)
+docs/stemma/      Stemma's own governed documents
 ```
+
+[`website/`](website/) is a static microsite whose examples and screenshots are
+generated from real runs. The product requirements and design are under
+[`docs/stemma/`](docs/stemma/).
 
 ## License
 

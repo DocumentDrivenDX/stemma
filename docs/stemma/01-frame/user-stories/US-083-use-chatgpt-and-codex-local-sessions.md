@@ -28,8 +28,8 @@ This is P1 and does not block the first version. Research read vendor documents 
 
 ## Walkthrough
 
-1. Tomasz installs the documented runtime.
-2. He installs the marketplace plugin in ChatGPT desktop.
+1. Tomasz installs the marketplace plugin in ChatGPT desktop.
+2. The plugin sets up what it needs.
 3. He opens a local session on his project and runs a scripted check and a build.
 4. Both behave as they do in a Claude desktop local Code tab session.
 

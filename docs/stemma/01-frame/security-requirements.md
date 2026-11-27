@@ -140,20 +140,20 @@ controls cover only its instructions and its own commands.
 
 - **SEC-025**: A wrong Bun version is refused and no run downloads a package.
   Dependencies are in a committed lockfile. Fonts and Typst packages are
-  vendored or pinned by digest. Stemma installs no tool unless the author asks
-  it to (CONTRACT-004 D).
+  vendored or pinned by digest. The plugin obtains only pinned tools, from fixed
+  HTTPS addresses, verified against a digest shipped in the plugin before they
+  are unpacked or run, into its own data directory, through the host's
+  permission prompts; it changes no system or shell setting (CONTRACT-004 D).
 - **SEC-026**: Before each release, a local `bun audit` and secret scan are run
   and reported. A known high-severity advisory or secret needs a stated
   decision.
 - **SEC-027**: Dependency installs run no lifecycle script unless that package
   is listed with a reason.
-- **SEC-028**: An installed plugin comes from one identified release package.
-  Its SHA-256 digest is published, and the install proof compares the installed
-  bundle with it. Until delivery is designed, the manifest claims no bundle. If
-  delivery uses a separate distribution repository for built files, the
-  marketplace entry pins a commit or tag in it, that repository holds only
-  release outputs built from a tagged Stemma revision, and each release records
-  which Stemma revision produced it.
+- **SEC-028**: An installed plugin comes from one identified release: a version
+  tag of the distribution repository, which holds only release trees built from
+  the Stemma repository. A published tag is never moved, and the install check
+  compares the installed bundle with the built one. Each release records which
+  Stemma revision produced it.
 - **SEC-029**: The public repository and release packages hold only synthetic or
   openly licensed fixtures, with no private source, personal data, or secret.
 - **SEC-030**: A license review of citeproc-js is recorded before the pilot

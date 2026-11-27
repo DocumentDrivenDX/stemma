@@ -78,9 +78,9 @@ export const TEMPLATES = {
     "An unused bibliography entry would go unnoticed.",
     ["Add citation records for the citations in your manuscript, or run this again once the manuscript is in the project."]),
   "bib.uncited:manuscript_not_read": explain(
-    "Whether a listed source is cited could not be checked: this version cannot yet read the files in manuscript/.",
+    "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
     "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.",
-    ["Nothing to fix in your files. Check this entry by hand until Stemma reads manuscripts."]),
+    ["Nothing to fix in your files. Check this entry by hand."]),
   "bib.uncited:citation_unreadable": explain(
     "Whether a listed source is cited could not be checked: at least one citation record cannot be read.",
     "The unreadable file may be the citation of this source.",

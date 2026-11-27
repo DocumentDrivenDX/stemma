@@ -146,19 +146,15 @@ TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
   recipient.
 - Secrets and key handling: no Stemma secrets or keys. Nothing is signed.
   Digests detect change against a trusted reference; they do not prove origin.
-- Supply chain: the bundle ships unminified in release packages, not in git. Each
-  release publishes the package digest, and the install proof compares it. The
-  marketplace route that delivers it is undesigned and untested. The current
-  manifest points at the git address without a pinned revision and delivers no
-  command line, so installed skill text can follow whatever that address
-  serves. Release packages are the first route tried. If the marketplace needs
-  a separate distribution repository for built files, that repository is a
-  second publishing surface: its entry pins a commit or tag, it holds only
-  outputs built from a tagged Stemma revision with the revision recorded, and
-  its write access is limited to the release maintainer (SEC-028). A published
-  digest from the same publisher helps comparison but does not protect against
-  a compromised publisher account.
-
+- Supply chain: the bundle ships unminified in tagged release trees of a
+  separate distribution repository, not in the Stemma repository. That
+  repository is a second publishing surface, and whoever can push to it or move
+  a tag controls the installed skill and code. On first use the launcher
+  downloads Bun from the npm registry and refuses it unless its SHA-512 matches
+  the digest shipped in the plugin, so the registry is trusted only for
+  availability. The program is not verified again on later runs; it sits in a
+  directory the author's account can write. Digests from the same publisher do
+  not protect against a compromised publisher account.
 ## Logging and Monitoring
 
 - Security events: none are logged. Errors use the contract exit codes and

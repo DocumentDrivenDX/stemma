@@ -1,5 +1,5 @@
 $ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY
-OPEN FINDINGS: 0 problem(s), 3 could not be checked, 5 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 3 could not be checked, 5 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 20 result(s) passed.
 
 1. COULD NOT CHECK: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 3 places]
@@ -24,7 +24,7 @@ Checked the whole project: 20 result(s) passed.
        capture file: records/captures/cap-7sskba1cqwz7975wsc1v.json
        copy sha256: 52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - whether cited pages and other locators fall inside the source  [locator.extent]
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]

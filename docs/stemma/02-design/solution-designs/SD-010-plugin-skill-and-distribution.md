@@ -26,7 +26,7 @@ ddx:
 
 - Covers the runtime, the bundled command line, the plugin and its one skill, release packages, install delivery, and install tests.
 - Governed by the Architecture, ADR-001, ADR-003, ADR-004, ADR-007, CONTRACT-002 (commands, reports, exit codes), CONTRACT-004 (plugin, modes, agent obligations, host claims), and Project Concerns.
-- M1, first in the design order. A first part is built: the runtime guard, the bundle script, part of the command line, and a local load script that installs a locally built tree with the Claude command-line tool. Install and host behaviour below is otherwise unverified unless a row says so.
+- M1, first in the design order. A first part is built: the plugin launcher that sets up the pinned runtime, the runtime guard, the bundle script, part of the command line, the distribution repository script, and a local check that installs through a marketplace entry with the Claude command-line tool. Install and host behaviour below is otherwise unverified unless a row says so.
 
 ## Requirements Mapping
 
@@ -40,8 +40,8 @@ FEAT-010 identifiers carry the PRD requirement in parentheses.
 | SKL-04 to SKL-06 (FR-48) | Delivery table in the skill, exit 2 backstop, relay and data-not-instruction rules | Skill, command line | P0 |
 | CLI-01 to CLI-03 (FR-49) | One bundle for terminal and agent; distinct exit codes | `cli` | P0 |
 | CLI-04, CLI-05 (FR-49) | Each function is a command over a core operation that interfaces also use | `cli`, `core` | P0 |
-| RUN-01 to RUN-06 (FR-75) | One pinned Bun, tool record, no run-time packages, platform rules | Runtime guard, bundler, release check | P0 |
-| DST-01, DST-06 (FR-50) | Self-contained release package delivered by the repository marketplace | Packager, manifests | P0 |
+| RUN-01 to RUN-06 (FR-75) | One pinned Bun set up by the plugin, tool record, no run-time packages, platform rules | Launcher, runtime guard, bundler, release check | P0 |
+| DST-01, DST-06 (FR-50) | Self-contained release tree delivered by the repository marketplace from a distribution repository | Packager, manifests | P0 |
 | DST-02, DST-03, DST-05 (FR-50) | Support statement and skill wording per session type | Skill, README, release report | P0 |
 | DST-04 (FR-77) | Same package; claim withheld until observed | Manifests | P1 |
 | PER-01 to PER-03 (FR-51) | Persona settings read by the skill only | Skill, project settings | P1 |
@@ -58,38 +58,27 @@ FEAT-010 identifiers carry the PRD requirement in parentheses.
 
 ## Solution Approaches
 
-The open choice is how a repository marketplace install delivers a bundle that is not in git.
+The choice is how installing from the repository marketplace delivers a bundle
+that is not in the Stemma repository.
 
-### Approach 1: Commit the bundle to the repository
-
-**Pros**: A plain git marketplace source delivers a runnable plugin.
-**Cons**: A built file in git.
-**Evaluation**: Rejected by owner decision. A release branch in the Stemma repository is the same thing and is rejected too.
-
-### Approach 2: Fetch the bundle on first run
-
-**Pros**: The git source stays small.
-**Cons**: The installed plugin downloads code while in use, needs network, and runs it. CONTRACT-004 A requires an installed plugin to run without downloading packages.
-**Evaluation**: Rejected.
-
-### Approach 3: Release package that is the whole plugin, delivered by the marketplace entry
-
-**Description**: A release script builds one directory tree holding the manifests, skill, templates, bundle, and bundle assets. The repository marketplace entry points at that released tree.
-**Pros**: Meets the owner decision; install is atomic; skill and bundle share one version.
-**Cons**: No delivery mechanism has been shown to work in Claude desktop. The current entry is a git reference to the repository, which would deliver no bundle.
-**Evaluation**: Selected for the package. The pointing mechanism stays open (PRD open question).
-
-**Selected Approach**: Approach 3. Everything except the marketplace entry is independent of the mechanism, so the proof below can run first and change only the entry and the publish step.
-
-**Delivery proof (S-DIST, before dependent M1 work)**. The proof tries mechanisms in this order and stops at the first that passes. The order is a design proposal. None is claimed to be supported.
-
-| Candidate | What must be learned | Concern |
+| Approach | Finding | Decision |
 |---|---|---|
-| A marketplace source that names a versioned release archive | Whether Claude desktop accepts such a source at all | Not shown by research |
-| A marketplace source that names a package-registry release | Desktop support, and whether the author needs a second tool such as npm | A second install would conflict with RUN-02 |
-| A git source naming a separate distribution repository that holds release trees | Whether Claude desktop installs it and updates skill and bundle together | Allowed by owner decision when the marketplace requires git; the Stemma repository still holds no built file |
+| Commit the bundle to the repository, or to a release branch of it | Works through git, but puts built files in the repository | Rejected by owner decision |
+| Fetch the bundle on first run | The installed plugin would download its own code while in use | Rejected |
+| Marketplace `archive` source naming a release archive | Documented by the vendor with a SHA-256. In Claude command-line tool 2.1.236, `plugin validate` rejects the source, and an install requires a public HTTPS address, so it cannot be shown to work before publishing | Not selected; revisit when the target hosts accept it |
+| Marketplace `npm` source | Adds a package registry as a publishing surface and its tooling on the author's side | Not selected |
+| Marketplace `url` source naming a separate distribution repository at a version tag | Observed to install with the Claude command-line tool against a local stand-in repository. Allowed by owner decision when needed | Selected |
 
-Pass criteria, from an empty profile in a Claude desktop local Code tab session: add the repository marketplace, install, list exactly one skill, and run `doctor` and `check` from the delivered bundle with network denied after install. Updating to a second version must replace skill and bundle together. A manual archive upload does not pass, because FR-50 requires a repository marketplace install. If no candidate passes, FR-50 cannot be met and the owner decides what changes.
+**Selected Approach**: `.claude-plugin/marketplace.json` on the default branch
+installs `https://github.com/DocumentDrivenDX/stemma-dist.git` at `v<version>`.
+`dev.sh release-repo` builds that repository locally: its tree is exactly the
+release tree (manifests, skill, launcher, bundle, license), one commit and one
+tag per version, and a tag is never moved. Publishing is pushing it, which the
+owner does.
+
+**Not shown.** Installation from GitHub, any install or run in Claude desktop,
+an update from one version to the next, and operation with the network denied
+after setup.
 
 **Architecture/ADR impact**: No change now. The proof result is recorded in the Architecture, and in an ADR if the distribution repository is used.
 
@@ -115,9 +104,19 @@ An **observation** is one result for a host and operating system: passed, failed
 - **BR-1003** — Self-contained package: the bundler fails if an import stays unresolved at run time. A library data file (fonts, character maps, workers) ships inside the package and is loaded by a package-relative path.
 - **BR-1004** — Readable bundle: the bundle is unminified. Bundled third-party licenses ship with it. The citeproc-js license review precedes the first package that contains it (ADR-005).
 - **BR-1005** — One pin: one source file states the Bun version. The runtime guard, `doctor`, the tool record, the install instructions, and the harness all derive from it. The first pin is Bun 1.4.5 (Architecture assumption).
-- **BR-1006** — Guard first: the version guard runs before any command work. A wrong version exits 4 and names the found version, the required version, and the install instructions.
-- **BR-1007** — Missing runtime: the bundle cannot report that Bun is absent. The skill and install instructions own that message: nothing was checked, how to install, and how to make a desktop app find Bun. A terminal user without Bun sees only the shell's error.
-- **BR-1008** — Runtime lookup: the skill tries `bun` on the search path, then Bun's documented per-user install location, and then stops. It installs nothing unless the author asks (CONTRACT-004 D).
+- **BR-1006** — Guard first: the version guard runs before any command work. A wrong version exits 4 and names the found version, the required version, and the launcher that provides it.
+- **BR-1007** — Setup by the plugin: the launcher takes the plugin's data
+  directory, which the skill gets from the host's `${CLAUDE_PLUGIN_DATA}`
+  substitution. When that directory lacks the pinned Bun it fetches the platform
+  package from the npm registry over HTTPS, compares its SHA-512 with the pinned
+  digest before unpacking, extracts only the program, moves it into place, and
+  confirms its version. A failure exits 4, says that nothing was checked, and
+  leaves nothing unpacked. It writes only inside the data directory.
+- **BR-1008** — Permissions: setup runs only as a command Claude issues. The
+  skill declares no `allowed-tools`, the plugin ships no hook and no `bin/`
+  directory (claude.ai and Cowork do not install a plugin that has one), and
+  nothing changes a permission setting. If the host or author refuses, the skill
+  stops that action and says nothing was checked.
 - **BR-1009** — Mode availability: `SKILL.md` marks each mode delivered or not in the shipped version. A release marks a mode delivered only when its commands are implemented; a package test compares the two. An unimplemented command exits 2.
 - **BR-1010** — Platform neutrality: scripts are TypeScript run by Bun. The bundle builds paths with platform functions, passes subprocess arguments as lists, sorts by code point, and depends on no shell or locale. Record normalization is SD-011's.
 - **BR-1011** — Observed claims only: a listing or manifest validation never yields "passed". "Passed" requires that the installed skill is loadable and the delivered command line ran.
@@ -167,19 +166,19 @@ The harness runs locally during development and in one workflow triggered only b
 
 **Runtime configuration.** On Bun 1.4.5 (macOS), `bunfig.toml` and `.env` in the working directory were loaded even with `--no-install`; adding `--no-env-file --config=/dev/null` stopped both. The invocation uses all three flags, starts in the plugin root, and passes absolute paths (CONTRACT-002 A); the guard exits 4 without `--no-install`. A seeded-file test covers SEC-014. Windows is untested. The author's own global Bun settings and environment, such as `BUN_OPTIONS`, are outside this control.
 
-**Release integrity and delivery.** Each release publishes one release package with its version and SHA-256. The install proof compares the installed bundle with that digest (SEC-028), and the marketplace manifest claims no delivery it does not perform: today it says the command line is not delivered. A digest from the same publisher does not protect against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
+**Release integrity and delivery.** Each release is one tagged commit of the distribution repository. The install check compares the installed bundle with the built one (SEC-028). A tag can be moved by whoever can push to that repository; neither it nor a digest from the same publisher protects against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
 
 ### Component Interactions
 
 ```mermaid
 graph TD
     Source["Repository source"] --> Packager
-    Packager --> Package["Release package"]
-    Entry["Marketplace entry"] -.->|"unproven delivery"| Package
+    Packager --> Package["Tagged tree in distribution repository"]
+    Entry["Marketplace entry"] -->|"url and tag"| Package
     Package --> Host["Agent host plugin cache"]
     Host --> Skill
-    Skill -->|"bun --no-install"| CLI["Bundle: guard then commands"]
-    Terminal["Author or script"] --> CLI
+    Skill --> Launcher["Launcher: set up pinned Bun in plugin data"]
+    Launcher --> CLI["Bundle: guard then commands"]
     Harness --> Host
     Harness --> CLI
 ```
@@ -206,7 +205,7 @@ Layered configuration files from `typescript-bun` are not used: CONTRACT-002 fix
 | CLI-04 | `cli` | CONTRACT-002 B | Command-line end-to-end test per function; then a Playwright test of the same function against the built interface (ADR-007) |
 | CLI-05 | `core` | Architecture, Command line first | Boundary check; review |
 | RUN-01, RUN-06 | `cli`, packager | BR-1010 | Seeded set with CRLF checkout, spaced and non-Latin paths; three systems on tags |
-| RUN-02, RUN-05 | Guard, skill | BR-1005 to BR-1008 | Wrong-version fixture; missing-Bun hand check in a desktop app |
+| RUN-02, RUN-05 | Launcher, guard, skill | BR-1005 to BR-1008 | Clean profile with no Bun on the search path; mismatched archive; wrong-version fixture; hand check in a desktop app |
 | RUN-03 | Packager | Tool record | Inspect record against lockfile and `doctor` |
 | RUN-04 | Packager | BR-1003 | Empty package cache, network denied |
 | DST-01, DST-06 | Packager, manifests | BR-1002, S-DIST | S-DIST pass criteria |
@@ -219,10 +218,11 @@ Layered configuration files from `typescript-bun` are not used: CONTRACT-002 fix
 
 ### Gaps
 
-- [ ] DST-01 and DST-06: delivery is unproven. S-DIST is the mitigation.
+- [ ] DST-01 and DST-06: shown only with the command-line tool and a local stand-in repository.
+- [ ] RUN-02 on Windows: the launcher needs Git Bash; Claude Code without it uses PowerShell, which this launcher does not support.
 - [ ] RUN-01: nothing has run on Linux, Windows, or any desktop app. Those cells stay "not observed". On Linux the harness exercises the command line only; no desktop-app integration is promised there in v1.
-- [ ] RUN-05: no tool can report a missing Bun from a bare terminal (BR-1007).
-- [ ] RUN-03: how Typst reaches a non-technical author is undecided; Stemma installs nothing unless the author asks.
+- [ ] RUN-02: no musl Linux build is selected.
+- [ ] RUN-03: Typst will be set up the same way as Bun, by the launcher; not built.
 - [ ] RUN-03: no contract defines the tool record, which `doctor` compares with installed tools.
 - [ ] PER-01 and PER-02: `Project.persona` (CONTRACT-001) holds name, explanation level, and checkpoints only; any further persona default needs a field before the P1 work.
 - [ ] The ChatGPT install route stays open (FEAT-010).
@@ -244,14 +244,14 @@ The domain model above only explains release concepts and adds no record kind. P
 
 - **Constraints**: The first version needs no host hook (CONTRACT-004 E). Required features need no WSL or Docker.
 - **Assumptions**: A host lets the skill run a Bun process on the author's computer; if not, that host gets no full-function claim. Package size stays within host plugin limits; research read limits of 200 MB and 5,000 files, unverified here.
-- **Dependencies**: Claude desktop and its marketplace, Bun, git hosting for releases.
+- **Dependencies**: Claude desktop and its marketplace, the npm registry (setup only), git hosting for releases.
 
 ## Risks
 
 | Risk | Prob | Impact | Mitigation |
 |---|---|---|---|
-| No marketplace mechanism delivers a release package in Claude desktop | M | H | Run S-DIST first; owner decides if all candidates fail |
-| A desktop app or sandbox cannot find or run Bun | M | H | BR-1008; hand check per system; claim only observed cells |
+| Claude desktop does not install from the distribution repository | M | H | Observe it before any support claim; the owner decides what changes |
+| A desktop app or sandbox blocks the setup download or the fetched program | M | H | BR-1007 message; hand check per system; claim only observed cells |
 | A bundled library needs files or native code that bundling breaks | M | M | BR-1003; run extraction and citation fixtures from the installed package |
 | The skill claims a check ran, or paraphrases a result | M | H | CONTRACT-004 C; hand checks; the author can rerun from a terminal; not enforceable |
 | A defect on another system appears only at a release tag | H | M | Advisory three-system run; state failures with the release (ADR-007) |

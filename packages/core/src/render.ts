@@ -44,7 +44,7 @@ export function renderReport(body: ReportBody): string {
     const parts = [
       `${summary.fail} problem(s)`,
       `${summary.unverifiable} could not be checked`,
-      `${summary.not_implemented} kind(s) of check this version cannot do yet`,
+      `${summary.not_implemented} kind(s) of check this version does not run`,
     ];
     lines.push(`OPEN FINDINGS: ${parts.join(", ")}. Nothing is blocked.`);
   }
@@ -53,7 +53,7 @@ export function renderReport(body: ReportBody): string {
   const missing = body.not_run.filter((n) => n.reason === "not_implemented");
   if (missing.length > 0) {
     lines.push(
-      "", "NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.",
+      "", "NOT CHECKED: this version does not run these, so the project is not called checked clean.",
       "Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.");
     for (const entry of missing) lines.push(`   - ${CHECK_DESCRIPTIONS[entry.check]}  [${entry.check}]`);
   }

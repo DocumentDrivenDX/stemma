@@ -1,15 +1,15 @@
 $ stemma check --all --project $PROJECTS/manuscript
-OPEN FINDINGS: 0 problem(s), 1 could not be checked, 11 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 1 could not be checked, 11 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 7 result(s) passed.
 
-1. COULD NOT CHECK: Whether a listed source is cited could not be checked: this version cannot yet read the files in manuscript/.  [bib.uncited]
+1. COULD NOT CHECK: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
    Why it matters: The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.
-   What to do: Nothing to fix in your files. Check this entry by hand until Stemma reads manuscripts.
+   What to do: Nothing to fix in your files. Check this entry by hand.
    - src-fixture0harbour01
        source file: records/sources/src-fixture0harbour01.json
        key: hartwell1998
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - bibliography entries that are never cited  [bib.uncited]
    - citation keys in the manuscript files  [cite.key]

@@ -19,13 +19,12 @@ export interface Page { file: string; nav: string; title: string; description: s
 const code = (text: string) => `<code>${escape(text)}</code>`;
 /** Inline Markdown the principles file uses: code spans and straight quotes only. */
 const inline = (text: string) => escape(text).replace(/`([^`]+)`/g, "<code>$1</code>");
-const shell = (text: string) => excerpt("<strong>Commands</strong> to type in a terminal.", text);
 const table = (label: string, head: string[], rows: string[][]) =>
   `<div class="table-wrap" tabindex="0" role="region" aria-label="${escape(label)}"><table><thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 
 interface Check {
-  id: string; built: boolean; covers?: string; summary?: string; limits?: string;
-  findings?: { reason: string; message: string; why: string; suggestions: string[] }[];
+  id: string; summary: string; limits: string;
+  findings: { reason: string; message: string; why: string; suggestions: string[] }[];
 }
 const checks = (): Check[] => JSON.parse(generated("checks.json"));
 const report = (name: string): CheckReport => JSON.parse(generated(`reports/check-${name}.json`));
@@ -54,17 +53,16 @@ function shot(file: string): string {
 
 function home(): string {
   return `<h1>Stemma</h1>
-<p class="lead">A plugin in the making that helps scholars research, write and typeset books with AI: it checks citations with scripts, explains what it finds, and aims to trace each cited claim to a stored source.</p>
-<p class="note"><strong>Pre-release.</strong> A first part of the command line works. Most of what Stemma is meant to do is not built. See <a href="status.html">what works today</a>.</p>
-<p><a class="button button-primary" href="quickstart.html">Try it on macOS</a> <a class="button" href="examples.html">See real output</a></p>
+<p class="lead">A Claude plugin that helps scholars write books with checked citations. Ask Claude in plain words; scripts check your project against your own stored copies and explain what they find.</p>
+<p class="note"><strong>Pre-release.</strong></p>
+<p><a class="button button-primary" href="install.html">Install and ask Claude</a> <a class="button" href="examples.html">See real output</a></p>
 <h2>The name</h2>
-<p>A <em>stemma codicum</em> is the family tree of a text's manuscripts: it shows which copy derives from which. Stemma aims to give a book the same property, so that each cited claim has a line of descent to a stored source.</p>
-<h2>How it is meant to work</h2>
-<p>Two strands run together. This describes the design, not what is built.</p>
-<ul><li><strong>Evidence strand:</strong> source records, reading notes with page-level locators, constructs, places, and a ledger tying claims to the sources that support them, kept as plain files.</li>
-<li><strong>Manuscript strand:</strong> thesis, outline, chapter specifications, drafts and the assembled book.</li></ul>
-<h2>What it does today</h2>
-<p>It sets up a project, adds records, checks the record format, runs two bibliography checks and warns about coordinates written in project files. Each finding says what is wrong, shows the evidence, says why it matters and suggests what to do.</p>
+<p>A <em>stemma codicum</em> is the family tree of a text's manuscripts: it shows which copy derives from which. Stemma gives a book's citations a line of descent to a stored source.</p>
+<h2>What it does</h2>
+<ul><li>Keeps sources and citations as plain record files in your project.</li>
+<li>Keeps copies of your sources and their text in a private store outside the project, with where and when each came from.</li>
+<li>Checks that each cited source is held with text that still matches, that citation keys resolve, that listed bibliography entries are cited, and that record files are well formed. It warns about coordinates written in project files.</li>
+<li>Explains every finding: what is wrong, the evidence, why it matters and what to do. Nothing is blocked.</li></ul>
 ${shot("demo-first-check.png")}
 <h2>Part of a family</h2>
 <p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. Its own documents are specified with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>, which authors do not need.</p>`;
@@ -77,80 +75,49 @@ function principles(): string {
   if (items.length < 5) throw new Error("principles.md no longer has the expected list");
   return `<h1>Principles</h1>
 <p class="lead">How Stemma decides between two reasonable options.</p>
-<p class="note">These are design commitments. Several describe parts that are <a href="status.html">not built yet</a>. This page is generated from the project's principles document.</p>
+<p class="note">These are the rules Stemma is designed by, not a list of its features. For what it does, with real output, see <a href="checks.html">Checks</a> and <a href="examples.html">Examples</a>. This page is generated from the project's principles document.</p>
 <ol>${items.map((m) => `<li><strong>${inline(m[1]!)}.</strong> ${inline(m[2]!.replace(/\s+/g, " ").trim())}</li>`).join("\n")}</ol>`;
 }
 
-function quickstart(): string {
-  return `<h1>Quick start on macOS</h1>
-<p class="lead">Run the first slice of the command line from a checkout.</p>
-<p class="note">Set up and tried only on macOS on Apple silicon. Intel Macs, Windows and Linux are untested, and the setup script stops on them. Installing the plugin from a marketplace for everyday use is not ready.</p>
-<h2>You need</h2>
-<ul><li>git, and the curl and openssl commands that macOS includes.</li><li>A network connection on the first run, to fetch the pinned Bun and the development packages from the npm registry.</li></ul>
-<h2>Run the demo</h2>
-<p>The script checks the Bun download against a pinned hash and keeps what it fetches inside the checkout. It installs nothing system-wide. All names and sources in the demo are invented. These steps need a checkout that holds this slice; if the repository's default branch does not hold it yet, a fresh clone will not have it.</p>
-${shell(`git clone ${REPOSITORY}.git
-cd stemma
-./scripts/dev.sh demo     # a guided run in a fresh temporary directory
-./scripts/dev.sh check    # type check and tests`)}
-<h2>Run your own command</h2>
-<p>Build first. The project path must be absolute.</p>
-${shell(`./scripts/dev.sh build
-root="$PWD/dist/release"
-(cd "$root" && "$OLDPWD/.tools/bun" --no-install --no-env-file --config=/dev/null \\
-  "$root/dist/stemma.js" check --project /absolute/path/to/project)`)}
-<p>Keep all three flags: without them Bun can download packages, or load a <code>bunfig.toml</code> or <code>.env</code> from the working directory. To start a project, replace <code>check</code> with <code>init</code>.</p>
-<h2>Commands</h2>
-${excerpt("<strong>Generated</strong> from <code>stemma --help</code>.", generated("transcripts/help.txt"))}
-<p>Where this page writes <code>stemma</code>, it means that long invocation. No <code>stemma</code> command is installed on your path.</p>`;
-}
+/** What a person might say, and what Stemma then does. Each maps to a command the demo or tests run. */
+const ASKS: [string, string][] = [
+  ["Start a Stemma project in this folder.", "Creates the project files and overwrites nothing."],
+  ["Add a source record for this book, taking the details from its title page.", "Writes a record of the work. Claude says where each detail came from."],
+  ["Keep this PDF as my copy of that source. I downloaded it from the library today.", "Stores the file in a private store outside the project, with its digest, origin and the time you got it."],
+  ["Attach the text of that copy, with its page breaks.", "Saves a plain-text file, or a text layer for a PDF or scan, page by page. A page gets a printed number only from stated evidence."],
+  ["Record the citations in this chapter.", "Writes one record for each citation, with its sentence and page."],
+  ["Check the project and explain what is open.", "Runs the checks and explains each finding in plain language."],
+  ["Is anything missing from my source store?", "Names every stored file that is missing or has changed."],
+];
 
-function status(): string {
-  const built = checks().filter((c) => c.built);
-  const unbuilt = checks().filter((c) => !c.built);
-  return `<h1>What works today</h1>
-<p class="lead">Built and planned are kept apart. Anything not in the first list does not work yet.</p>
-<h2>Works today (command line only)</h2>
-<ul>
-<li><code>init</code> creates a project; <code>record add</code> adds a record from a JSON file.</li>
-<li><code>validate</code>, <code>fmt</code> and <code>rules check</code> check and tidy record files and standing rules.</li>
-<li><code>check</code> runs ${built.length} checks (${built.map((c) => code(c.id)).join(", ")}), each <a href="checks.html">with stated limits</a>, and writes a text or JSON report.</li>
-<li><code>source add</code> keeps a copy of a source in a private store outside the project; <code>source text</code> attaches the text of a plain-text file, or a text layer you supply for a PDF or scan, with its page breaks; <code>store verify</code> names missing or altered files.</li>
-<li><code>version</code> and <code>doctor</code> say what is running and where the store is.</li>
-</ul>
-<p><code>check</code> keeps no change baseline yet, so it always checks the whole project. A project is not called checked clean while it holds something this version cannot check.</p>
-<p>Tried only on macOS on Apple silicon. No desktop app host and no release has been tested.</p>
-<h2>Planned, not built</h2>
-<ul>
-<li>Taking over a Word manuscript and its reference libraries; reading manuscript files at all.</li>
-<li>Reading text out of a PDF itself, recognizing characters in scans, and checking quotations and locators against stored text.</li>
-<li>Reading notes, a claim ledger, model support verdicts, review marks and annotations.</li>
-<li>A browser explorer for the evidence graph, argument and geographic maps and typeset pages. There is no web interface to Stemma today: this site is documentation.</li>
-<li>Typesetting with Typst, with Chicago notes and bibliography first.</li>
-<li>Voice and style profiles.</li>
-<li>Delivery of the command line through a plugin marketplace, in Claude desktop on macOS and Windows first, and in ChatGPT and Codex later.</li>
-<li>${unbuilt.length} further <a href="checks.html#not-built">checks that are named but not built</a>.</li>
-</ul>`;
+function install(): string {
+  return `<h1>Install and ask Claude</h1>
+<p class="lead">Installing the plugin is the only installation there is. The plugin and Claude set up everything else themselves.</p>
+<p class="note">Stemma is not published to a marketplace, so this page gives no install command. Installation through the plugin's marketplace entry has been tried with the Claude command-line tool on one Mac, using a local stand-in for the distribution repository. The Claude desktop app, Windows and Linux are untested.</p>
+<h2>What happens on first use</h2>
+<p>Claude fetches a pinned copy of the Bun runtime from the npm registry, checks it against a digest shipped in the plugin, and keeps it in the plugin's own data directory. It changes no system or shell setting, and Claude's usual permission prompts apply. If setup fails or you decline it, Claude says that nothing was checked, and your writing carries on.</p>
+<h2>What to ask Claude</h2>
+${table("Requests", ["You ask", "Stemma does"], ASKS.map(([ask, does]) => [`&ldquo;${escape(ask)}&rdquo;`, escape(does)]))}
+<p class="note">The commands behind these requests are tested. A live Claude session following the plugin's skill has not been tested.</p>
+<h2>Your copies stay yours</h2>
+<p>Copies of sources and their text go to a private store outside your project, never into it. Backing that store up is your job. Stemma is for material that may be sent to a language model: it holds back no individual source.</p>`;
 }
 
 function checksPage(): string {
   const all = checks();
   const seeded = report("seeded").body.results;
-  const built = all.filter((c) => c.built).map((c) => {
+  const built = all.map((c) => {
     const example = seeded.find((r) => r.check === c.id && r.open);
     return `<h3 id="${c.id.replace(".", "-")}">${code(c.id)}</h3>
-<p>${escape(c.summary!)}</p><p><strong>Limits:</strong> ${escape(c.limits!)}</p>
-${example ? `<p>An example from the <a href="examples.html#fixtures">seeded test fixture</a>. The card is this site's drawing of one entry in the JSON report; Stemma has no report viewer.</p>${findingCard(example)}` : ""}
-${table(`Findings of ${c.id}`, ["Reason code", "What is wrong", "Why it matters", "What to do"], c.findings!.map((f) => [code(f.reason), escape(f.message), escape(f.why), f.suggestions.map(escape).join(" ")]))}`;
+<p>${escape(c.summary)}</p><p><strong>Limits:</strong> ${escape(c.limits)}</p>
+${example ? `<p>An example from the <a href="examples.html#fixtures">seeded test fixture</a>. The card is this site's drawing of one entry in the JSON report; It is not a Stemma screen.</p>${findingCard(example)}` : ""}
+${table(`Findings of ${c.id}`, ["Reason code", "What is wrong", "Why it matters", "What to do"], c.findings.map((f) => [code(f.reason), escape(f.message), escape(f.why), f.suggestions.map(escape).join(" ")]))}`;
   });
   return `<h1>Checks reference</h1>
-<p class="lead">What each check looks at, what it cannot show, and every finding it can report.</p>
-<p class="note">This page is generated from the command line's own explanation texts and from a test run. Outcomes are <code>pass</code>, <code>fail</code> and <code>unverifiable</code> (could not check). No finding blocks anything. A <code>pass</code> covers only what the check says it reads.</p>
-<h2 id="built">Built</h2>
-${built.join("\n")}
-<h2 id="not-built">Named, not built</h2>
-<p>These do not run. When a project holds something one of them would check, the report lists it under NOT CHECKED, and the project is not called checked clean. The wording below is the report's own, and says what each would tell you.</p>
-${table("Checks that are not built", ["Check", "Would tell you about", "State"], all.filter((c) => !c.built).map((c) => [code(c.id), escape(c.covers!), '<span class="status status-none">not built</span>']))}`;
+<p class="lead">What each check looks at, what a pass does not show, and every finding it can report.</p>
+<p class="note">This page is generated from the command line's own explanation texts and from a test run. Outcomes are <code>pass</code>, <code>fail</code> and <code>unverifiable</code> (could not check). No finding blocks anything. A <code>pass</code> covers only what the check says it reads. When a project holds something no check here covers, its report says so, and the project is not called checked clean.</p>
+<h2 id="checks">The checks</h2>
+${built.join("\n")}`;
 }
 
 /** The demo transcript, one excerpt for each of its numbered steps. */
@@ -189,7 +156,7 @@ function darwin(): string {
 <p>These sentences are paraphrases written for the example, each compared with the image of the cited page. They quote nothing.</p>
 ${table("Citations", ["Page", "Sentence"], citations.map((c) => [escape(c.locator.value), escape(c.sentence.text)]))}
 <h2>What a check says without the private copy</h2>
-<p>Where the stored copy is not present, Stemma cannot check these citations, and says so. With it, all three citations passed <code>source.held</code> on the maintainer's machine on 2026-11-26; that run depends on the private store and is not reproduced here. Even then the project is not called checked clean, because some checks of cited sources are not built.</p>
+<p>Where the stored copy is not present, Stemma cannot check these citations, and says so. With it, all three citations passed <code>source.held</code> on the maintainer's machine on 2026-11-26; that run depends on the private store and is not reproduced here. Even then the project is not called checked clean: its report lists checks of cited sources that were not run.</p>
 ${excerpt("<strong>Transcript</strong> of a real run with an empty store, paths replaced.", generated("transcripts/example-coral-reefs.txt"))}`;
 }
 
@@ -202,7 +169,7 @@ function design(): string {
   const unverifiable = seeded.find((r) => r.outcome === "unverifiable")!;
   return `<h1>Design language</h1>
 <p class="lead">How Stemma looks and speaks: like a careful report.</p>
-<p class="note">This summarizes the interface design system in the repository, <code>docs/stemma/02-design/DESIGN.md</code>. This site uses it. The chat and explorer interfaces it describes are not built.</p>
+<p class="note">This summarizes how this site looks and speaks, from the design system in the repository, <code>docs/stemma/02-design/DESIGN.md</code>.</p>
 <h2>Identity</h2>
 <p><img src="mark.svg" alt="The Stemma mark: a small family tree with one root and three descendants" width="96" height="96"></p>
 <p>The mark is a small <em>stemma codicum</em>: one filled node for the earliest witness, and lines of descent to three open ones, one of them through an intermediate branch. It depicts no real manuscript tradition. Write the name <strong>Stemma</strong>, and <code>stemma</code> for the command. Keep clear space of a quarter of the mark's width around it, and do not use it below 16 pixels.</p>
@@ -212,7 +179,6 @@ ${table("Voice", ["Write", "Not"], [
     ["Nothing is blocked.", "You must fix this before continuing."],
     ["could not be checked", "probably fine"],
     ["The checks found nothing open. This does not mean that the book is correct.", "Verified. All good!"],
-    ["planned, not built", "coming soon"],
   ])}
 <h2>Color</h2>
 <p>Surfaces, text and the accent are the default role tokens of <a href="https://github.com/DocumentDrivenDX/arras">arras</a>; Stemma sets no brand color. It adds a strong line and three status colors. Light and dark follow the system setting, or <code>data-appearance</code> on the page. Status colors only repeat a word.</p>
@@ -234,7 +200,7 @@ ${table("Contrast ratios", ["Foreground on background", "Needs", "Light", "Dark"
 <h2>Components</h2>
 <h3>Status label</h3>
 <p>The script's own word in a bordered label. Never a check mark.</p>
-<p><span class="status status-pass">pass</span> <span class="status status-fail">fail</span> <span class="status status-unverifiable">unverifiable</span> <span class="status status-none">not built</span></p>
+<p><span class="status status-pass">pass</span> <span class="status status-fail">fail</span> <span class="status status-unverifiable">unverifiable</span></p>
 <h3>Report excerpt</h3>
 <p>Real command output in a monospace block. Its caption says what it is and what was replaced. Long lines wrap.</p>
 ${excerpt("<strong>Transcript</strong> of a real run.", generated("transcripts/check-clean.txt"))}
@@ -250,7 +216,7 @@ ${shot("check-clean.png")}
 }
 
 const BODIES: Record<(typeof NAV)[number]["file"], () => string> = {
-  "index.html": home, "principles.html": principles, "quickstart.html": quickstart, "status.html": status,
+  "index.html": home, "principles.html": principles, "install.html": install,
   "checks.html": checksPage, "examples.html": examples, "darwin.html": darwin, "design.html": design,
 };
 

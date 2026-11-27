@@ -1,5 +1,5 @@
 stemma 0.0.1
-Run as: bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js <command> [options]
+The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version
   doctor

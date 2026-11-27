@@ -70,10 +70,10 @@ PDF extraction is the main unsettled choice.
 **Cons**: Layout and hyphen handling needed corrections in that test; bundling its data files with Bun is unproven.
 **Evaluation**: First candidate to prove. Not selected as the library.
 
-### Approach 2: An external native extractor that authors install
+### Approach 2: An external native extractor installed on the author's computer
 
 **Pros**: Mature text tools exist.
-**Cons**: A per-system install and version pin for every author; licenses differ; research found no guarantee of identical output across platforms.
+**Cons**: A per-system program the plugin would have to obtain and pin; licenses differ; research found no guarantee of identical output across platforms.
 **Evaluation**: Considered if Approach 1 fails on pilot sources.
 
 ### Approach 3: Model-based transcription
@@ -84,7 +84,7 @@ PDF extraction is the main unsettled choice.
 
 **Selected Approach**: A `TextExtractor` port in `core` with saved, immutable output. That makes the library and any recognition engine replaceable, so both stay open. The pinned library is chosen after a proof on pilot sources: page text, printed labels, hyphens, ligatures, right-to-left and diacritic text, repeat runs, and the same results from the installed package.
 
-**Architecture/ADR impact**: No change. The chosen library is pinned and recorded (ADR-004); an ADR is warranted if it adds an author install.
+**Architecture/ADR impact**: No change. The chosen library is pinned and recorded (ADR-004); an ADR is warranted if it adds a tool the plugin must set up.
 
 For storage, git and git LFS (Large File Storage) were rejected by owner decision and the Data Design.
 
@@ -114,6 +114,8 @@ For storage, git and git LFS (Large File Storage) were rejected by owner decisio
   at load time about drawing support it cannot find. Not tried: bundling,
   right-to-left, diacritic or CID-font text without an embedded character map,
   and hostile files. Recommended as the library; adoption is not done.
+- The command line is run by the plugin's launcher (SD-010); nothing here is set
+  up by the author.
 - Not built: URL fetch, hostile-input time and memory limits, the project lock
   and staged multi-record write, admission, replacement, retirement, excerpts.
 

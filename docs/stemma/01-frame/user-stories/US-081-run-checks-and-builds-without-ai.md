@@ -26,6 +26,9 @@ ddx:
 
 Priya works in git and a terminal and may wire checks into automation of their own. Stemma requires no CI (continuous integration) or commit hook, but the command line must support an author who chooses them. The checks and the basic pilot build arrive in M1 (FR-83); the camera-ready build arrives in M2.
 
+The command line is the one inside the installed plugin, started through its
+launcher; there is no separate product to install.
+
 ## Walkthrough
 
 1. Priya opens a terminal in their project with no AI host running.

@@ -14,8 +14,10 @@ kind: product
 
 ## Summary
 
-Stemma is a plugin and toolchain for academic researchers who write books with
-AI assistance. It keeps a project's sources, passages, notes, claims, research
+Stemma is a Claude plugin for academic researchers who write books with AI
+assistance. The plugin is the product: its command line, and later its graph
+engine and explorer, exist to support it, and installing the plugin is the only
+installation a person does. It keeps a project's sources, passages, notes, claims, research
 constructs, methodology, and places as an evidence graph in plain files. It
 checks citations with scripts while the author works, takes over existing
 manuscripts, and typesets with Typst. AI-written prose is allowed. Stemma
@@ -399,11 +401,11 @@ Each requirement carries its priority and, for P0, its delivery step.
 ### Subsystem: 10. Plugin, skill, and distribution
 
 - **FR-48** (P0, M1) — Stemma ships as one public skill with modes. The modes cover starting a project, takeover, research, notes, outlining, drafting, voice and style, verification, building, audit, and review.
-- **FR-49** (P0, M1) — The scripted checks and the build run from a command line without an AI. Every function of Stemma is available on the command line first, and a user interface supports the same functions for ease of use; no function exists only in an interface. A function arrives on the command line no later than in an interface.
-- **FR-50** (P0, M1) — Stemma is published as a plugin in the project's repository marketplace and installs from it in Claude desktop; an official directory listing comes later. The bundled command line is not committed to the Stemma repository. It ships in release packages, and the repository marketplace install must deliver it; release packages are tried first, and a separate distribution repository for built files is allowed if the marketplace requires one. The first version promises full function only in the local Code tab of Claude desktop on macOS and Windows; it makes no desktop-app promise on Linux. Other sessions, including the Claude command-line tool, get no promise of local checks or builds. The command-line tool may serve as a test harness; its results do not verify the desktop app.
+- **FR-49** (P0, M1) — The scripted checks and the build run from a command line without an AI. The command line is how the plugin and its tests use Stemma's functionality; it ships inside the plugin and is not installed or set up by hand. Every function of Stemma is available on the command line first, and a user interface supports the same functions for ease of use; no function exists only in an interface. A function arrives on the command line no later than in an interface.
+- **FR-50** (P0, M1) — Stemma is published as a plugin in the project's repository marketplace and installs from it in Claude desktop; an official directory listing comes later. Installing the plugin is the only installation step a person takes. The bundled command line is not committed to the Stemma repository; the marketplace entry installs a versioned release tree from a separate distribution repository. The first version promises full function only in the local Code tab of Claude desktop on macOS and Windows; it makes no desktop-app promise on Linux. Other sessions, including the Claude command-line tool, get no promise of local checks or builds. The command-line tool may serve as a test harness; its results do not verify the desktop app.
 - **FR-77** (P1) — The marketplace plugin installs in ChatGPT desktop and gives full function in ChatGPT and Codex sessions that run on the author's computer.
 - **FR-51** (P1) — Persona defaults control onboarding, explanation level, and number of checkpoints, and every default can be overridden. No default hides a finding or changes when an output is called checked clean.
-- **FR-75** (P0, M1) — Deterministic scripts and tools run natively on macOS, Linux, and Windows, including on Linux without a desktop app; no required feature needs the Windows Subsystem for Linux (WSL) or Docker. Authors install one documented version of the Bun runtime. Any other tool the product uses is pinned and recorded.
+- **FR-75** (P0, M1) — Deterministic scripts and tools run natively on macOS, Linux, and Windows, including on Linux without a desktop app; no required feature needs the Windows Subsystem for Linux (WSL) or Docker. The plugin uses one pinned version of the Bun runtime. The plugin and Claude obtain it, and any other tool the product needs, themselves: a pinned download, verified against a digest, kept in the plugin's own data directory, with no change to the system or a shell profile, no step for the author, and the host's permission prompts left in force. Every tool is pinned and recorded.
 - **FR-78** (P0, M1) — The project's own tests show that the plugin installs and loads in each promised host, and that the scripted tools run on each supported system. A local script runs during development. The three supported systems are tested only for release tags, and those results are advisory and stop no work. A result from the Claude command-line tool does not count as a desktop observation.
 
 ### Subsystem: 11. Evidence graph and graph engine
@@ -504,9 +506,9 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-46 | Package for review | A project with a restricted source, a restricted coordinate typed in prose, and a failing quotation | The package holds the four items, protected text redacted from generated parts, and a coordinate warning |
 | FR-79 | Comment and import | A reviewer comments on a claim and saves the file | The author imports it; the comment is tied to the claim |
 | FR-48 | Use a mode | A takeover request | One skill routes it to takeover |
-| FR-49 | Run without an AI; command line first | A command-line check and build; one interface function and its command | Same scripted results as in the agent; the command does what the interface does, with the same result |
-| FR-50 | Install in Claude desktop | A clean profile and the repository marketplace | The release package's command line arrives and the plugin loads in a local Code tab session |
-| FR-75 | Run the tools on each system | The same fixtures on macOS, Linux, and Windows | Same results natively, with the documented Bun version |
+| FR-49 | Run without an AI; command line first | A command-line check and build through the plugin's launcher; one interface function and its command | Same scripted results as in the agent; the command does what the interface does, with the same result |
+| FR-50 | Install in Claude desktop | A clean profile and the repository marketplace | Installing the plugin delivers the command line, and it loads in a local Code tab session |
+| FR-75 | Run the tools on each system | The same fixtures on macOS, Linux, and Windows, from a profile with no Bun | The plugin sets up its pinned Bun itself; same results natively |
 | FR-78 | Tag a release | A release tag with one failing system | The report shows the failure and stops nothing automatically |
 | FR-64 | Explore a large project | A graph beyond the size of the current arras view | The records are searchable and the larger view renders |
 | FR-64 | Rebuild the browser graph | A changed record | The graph is regenerated from records; no generated graph is committed |
@@ -631,7 +633,7 @@ Windows, desktop apps, and files saved by real tools are untested.
 | The agent reads exact restricted coordinates and they reach its model or new text | Medium | High | Read only when a task needs them; never write them into tracked files or outputs; the scan only warns |
 | Joining a line-end hyphen lets a wrong quotation match, for example where the source's hyphen belongs to the word | Medium | Medium | Record how each quotation matched; test the approved list on pilot sources |
 | Image problems (low resolution, missing alternative text, credit, or permission) reach a finished book | Medium | High | Report them in every build; the author checks the report before publishing |
-| The repository marketplace cannot deliver a bundle that exists only in release packages | Medium | High | Prove the install route before the pilot, trying release packages first; fall back to a separate distribution repository for built files |
+| Claude desktop cannot install the release tree from the distribution repository, or its sandbox blocks the first-use download | Medium | High | Install and first run observed in the desktop app before any support claim |
 | Claude desktop on Linux is a beta limited to some distributions, so Linux authors may lack a desktop host (unverified) | Medium | Medium | Promise only the scripted tools on Linux; make no desktop-app promise there |
 | Checks and Typst output differ across systems | Medium | High | Run the seeded set on all three systems for each release tag |
 | A publisher bars AI-written text that Stemma helped draft | Medium | High | State that Stemma offers no mode that prevents agent writing; disclosure records AI use |
@@ -647,9 +649,6 @@ Windows, desktop apps, and files saved by real tools are untested.
   Blocks FR-8 and FR-9; design owner.
 - [ ] Which PDF text-extraction library do the checks use? Blocks FR-8; design
   owner.
-- [ ] How does the repository marketplace install deliver the command line that
-  ships only in release packages, or does it need a separate distribution
-  repository? Blocks FR-50; design owner, untested.
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a
   reviewer package? Blocks use of the allowance in FR-46; product owner.
 - [ ] Must the book's own thesis claim reach a note, or is it exempt from the

@@ -20,7 +20,14 @@ runs in a browser.
 ## Decision
 
 We will write the project's code in TypeScript. Deterministic tools run on one
-documented, pinned Bun version that authors install. Exploration and rendering
+pinned Bun version that the plugin obtains itself: Stemma is first and foremost
+a Claude plugin, and installing it is the only installation a person does. The
+plugin's launcher (`scripts/stemma.sh`) fetches the official `@oven` package for
+the computer from the npm registry, checks its SHA-512 digest against the one
+pinned in the launcher, unpacks only the program into the plugin's data
+directory, and runs only that copy. It changes no system or shell setting. The
+skill starts it, so the host's permission prompts apply; no hook downloads
+anything unasked. Exploration and rendering
 code is bundled for the browser. Another tool is allowed when its version is
 pinned and recorded.
 
@@ -40,16 +47,22 @@ It would require writing a PDF text reader and a citation formatter.
 
 **Good**: One language across checks and explorer; Bun runs TypeScript directly.
 
-**Trade-offs**: Every author installs Bun. Hosts and sandboxes may not find it or
-may block its installation. Bun can fetch a missing package while running, so
-runs must disable that. On macOS, Bun uses the system SQLite, so pinning Bun does
-not pin SQLite.
+**Trade-offs**: First use needs the network and a download of some tens of
+megabytes, which a host or sandbox may block. Windows needs a POSIX shell (Git
+Bash) for the launcher; a session without one is not covered. Changing the
+pinned version means changing every digest. Bun can fetch a missing package
+while running, so runs must disable that. On macOS, Bun uses the system SQLite,
+so pinning Bun does not pin SQLite.
 
-**Drift signals to watch**: A second runtime in author-facing steps; a run that
-downloads a package; an unrecorded tool.
+**Drift signals to watch**: Any author-facing installation step beyond the
+plugin; a second runtime; a check or build that downloads; an unrecorded tool.
 
 ## Validation
 
-**Result**: not tested
-**Evidence**: A package-free indexer ran on one macOS system. Desktop hosts,
-Linux, and Windows are untested.
+**Result**: partly tested
+**Evidence**: On one macOS arm64 system, with the Claude command-line tool
+2.1.236, a fresh profile and no Bun on the search path: the installed plugin's
+launcher fetched and verified Bun 1.4.5 into a stand-in for the plugin data
+directory and ran the installed command line. The host's substitution of that
+directory into a live session, desktop apps, Linux, and Windows are untested.
+

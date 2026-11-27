@@ -1,7 +1,7 @@
 {
   "name": "stemma",
   "version": "0.0.1",
-  "description": "Pre-release. Academic book research with checked citations. Today: project records, record checks and two bibliography checks. The command line ships only in a release package, which this repository does not contain; it needs Bun 1.4.5.",
+  "description": "Research and write books with citations checked by scripts against your own stored copies, with plain-language reports. Claude sets up what the plugin needs.",
   "author": {
     "name": "DocumentDrivenDX",
     "url": "https://github.com/DocumentDrivenDX"

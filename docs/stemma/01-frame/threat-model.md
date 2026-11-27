@@ -174,7 +174,7 @@ modules, or the product owner for accepted risks.
 | TM-T-004 | A blob is damaged or replaced; replacing blob and record digest together goes unnoticed except in history | 3 | 2 | 6 | `workspace` | SEC-015 |
 | TM-T-005 | The index or a saved report is edited to hide a finding | 3 | 2 | 6 | `core`, `graph` | SEC-004 |
 | TM-T-006 | A printed sentence is strengthened while its claim is unchanged; the support record stays current | 4 | 3 | 12 | Product owner (accepted) | SEC-002 |
-| TM-T-007 | A compromised dependency, release package, tool binary, or skill text changes behavior. The marketplace manifest names a git address with no pinned revision. A separate distribution repository, if delivery needs one, is a second publishing account and branch that can be altered apart from the Stemma source | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
+| TM-T-007 | A compromised dependency, release package, tool binary, or skill text changes behavior. The marketplace entry installs a version tag of a separate distribution repository, a second publishing surface that can be altered apart from the Stemma source, and a tag can be moved by whoever can push there. The first-use setup downloads Bun, which is refused unless it matches the pinned digest | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
 | TM-T-008 | A package or export is altered after production; nothing is signed | 3 | 1 | 3 | Author | None; manifest hashes detect only accidental change |
 | TM-T-009 | The agent or malware edits the installed bundle or skill | 4 | 2 | 8 | Author | SEC-028 allows comparison; nothing prevents |
 | TM-T-010 | A fix or takeover changes an original file | 4 | 1 | 4 | `intake`, `workspace` | SEC-005 |

@@ -44,17 +44,18 @@ and the obligations the agent has toward the command line and the records.
 | `skills/stemma/SKILL.md` | The only public skill |
 | `skills/stemma/modes/<mode>.md` | Instructions loaded for a mode |
 | `skills/stemma/prompts/support/<version>.md` | Versioned claim-support prompt; a released version is never edited |
-| `dist/stemma.js` | The bundled command line; needs only the pinned Bun. Not committed to the Stemma repository; present in a release package |
+| `scripts/stemma.sh` | The launcher: sets up the pinned Bun in the plugin data directory and runs the command line |
+| `dist/stemma.js` | The bundled command line; needs only the pinned Bun. Not committed to the Stemma repository; present in a release tree |
 | `skills/stemma/voices/<profile id>/<version>.md` | A shipped voice profile; read-only, and a released version is never edited |
 | `templates/` | Files `init` copies into a project |
 
 - The plugin MUST NOT add other public skills.
-- The bundle MUST NOT be committed to the Stemma repository. It ships in release
-  packages, and installing from the repository marketplace MUST deliver the
-  release package. A release package is tried first; if the marketplace can
-  install only from git, a separate distribution repository MAY hold the built
-  release trees. Neither route has been tested.
-- An installed plugin MUST run without installing or downloading packages.
+- The bundle MUST NOT be committed to the Stemma repository. The repository
+  marketplace entry MUST install the release tree from a version tag of the
+  separate distribution repository (SD-010). A published tag MUST NOT be moved.
+- Installing the plugin MUST be the only installation step a person takes. An
+  installed plugin MUST NOT download anything but the pinned tools of D, and no
+  check or build downloads.
 - The marketplace entry and manifest carry the same version.
 
 ### B. Modes
@@ -128,13 +129,21 @@ with ordinary file access, and user-facing text MUST NOT say it does.
 
 ### D. Runtime discovery
 
-The skill invokes the command line as in CONTRACT-002 A, with all three isolation
-flags, the host's plugin root path as the working directory, and absolute
-`--project` and file paths. Before the first command in a session it runs `doctor`. When Bun is
-missing or has another version, the agent shows the pinned version and official
-install instructions, runs no substitute check, and states that nothing was
-checked. It installs nothing unless the author asks it to. A missing runtime
-stops no writing work.
+The skill runs every command through the launcher, with the host's plugin root
+and plugin data paths, and absolute `--project` and file paths:
+
+`sh "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh" "${CLAUDE_PLUGIN_DATA}" <command> …`
+
+The launcher uses the plugin root as the working directory and passes all three
+isolation flags (CONTRACT-002 A). It MUST obtain the pinned Bun only from its
+fixed address, MUST verify the pinned digest before unpacking, MUST write only
+inside the data directory, and MUST NOT change a system or shell setting. Before
+the first command in a session the skill runs `setup`, telling the author what
+it fetches, then `doctor`. The skill MUST NOT pre-approve its own commands or
+otherwise work around the host's permission prompts. If setup is refused or
+fails, the agent says that nothing was checked, tries no other route, runs no
+substitute check, and asks the author to install nothing. No failed setup stops
+writing work.
 
 ### E. Hooks
 
@@ -169,7 +178,7 @@ Stemma MUST NOT install a git commit hook or require CI (ADR-003, ADR-007).
 
 | Condition | Outcome | Retry | Recovery Expectation |
 |---|---|---|---|
-| Runtime missing or wrong | No check ran; agent says so | yes | Author installs the pinned Bun |
+| Setup refused or failed, or wrong runtime | No check ran; agent says so and why | yes | Run setup again when the cause is gone |
 | Command exits 70 or output is unreadable | Agent reports no result | yes | Run `doctor`; report the defect |
 | Host blocks script execution | Agent states that checks and builds are unavailable | no | Use a supported session |
 | No separate context available | No support record written | yes | New session |
@@ -191,7 +200,7 @@ project without network access.
 ## Non-Normative Notes
 
 - A host that installs a plain git reference to the Stemma repository would get
-  no bundle. The install route has to be proved before the pilot.
+  no bundle, so the marketplace entry names the distribution repository.
 - v1 installs from the project's repository marketplace; listing in an official
   directory comes later.
 - Whether a host asks the author before a command runs depends on its
@@ -205,7 +214,7 @@ project without network access.
 |---|---|---|
 | Layout and install | One repository layout installed and listed in Claude Code and Codex CLI with throwaway configuration and no network, one macOS system, with a different toy runtime | The bundled `dist/stemma.js`, Bun, desktop apps, Linux, Windows |
 | Validation | `claude plugin validate` on the folder missed broken hooks; validating the plugin manifest caught them | Any host's own review rules for bundled code. Research reports that an official directory's review holds minified code, which matters for the later listing |
-| Local release tree | A built tree (manifests, skill, `dist/stemma.js`) installed from a local marketplace into an empty profile with Claude Code 2.1.236, listing one skill; the installed command line ran `doctor` and `check`. One macOS system | The repository marketplace route, desktop app, a live session using the skill, network denied |
+| Marketplace install and setup | With Claude Code 2.1.236, one macOS system: the repository's marketplace entry, its address changed to a local stand-in for the distribution repository, installed the tagged release tree into an empty profile with one skill; with no Bun on the search path the installed launcher fetched, verified, and used Bun 1.4.5 and ran `doctor` and `check` | GitHub, the desktop app, a live session using the skill, the host's data-directory substitution, updates, network denied, Windows, Linux |
 | Separate context, agent obligations | None | All; no live agent session was run |
 
 ## Schema Basis

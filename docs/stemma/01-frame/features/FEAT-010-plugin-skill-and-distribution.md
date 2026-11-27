@@ -22,19 +22,20 @@ ddx:
 
 ## Overview
 
-This feature is how an author gets Stemma and reaches its capabilities: one
-plugin, one skill with modes, and command-line tools on the Bun runtime. It
-also covers the evidence that the plugin installs where Stemma promises it.
+This feature is how an author gets Stemma and reaches its capabilities. Stemma
+is first and foremost a Claude plugin: one plugin, one skill with modes, and the
+command-line tools inside it that the skill and the tests use. It also covers the evidence that the plugin installs where Stemma promises it.
 
 ## Ideal Future State
 
-An author on macOS, Linux, or Windows installs one documented runtime version
-and runs Stemma's local tools. On macOS and Windows they add the Stemma plugin
-to Claude desktop from a marketplace; v1 makes no desktop-app promise on Linux. They state what they want in
-plain language, and the one skill takes them to the matching mode. The scripted
-checks and the build give the same results from the command line without an AI.
-For each release, the author can see which systems and hosts were exercised,
-which failed, and which are untested.
+An author installs the Stemma plugin and asks for what they want in plain
+language. That installation is the only one they perform. On first use the
+plugin and Claude set up the pinned runtime in the plugin's own data directory,
+subject to the host's permission prompts. The one skill takes the request to the
+matching mode. v1 promises this only for Claude desktop's local Code tab on
+macOS and Windows. The scripted checks and the build give the same results from
+the command line without an AI. For each release, the author can see which
+systems and hosts were exercised, which failed, and which are untested.
 
 ## Problem Statement
 
@@ -54,7 +55,7 @@ which failed, and which are untested.
 |------|----------------------|------------------------|
 | Skill and modes | How do I ask Stemma to do something? | One public skill that routes to modes |
 | Command line | Can I check and build without an AI? | The same scripted checks and build outside an agent |
-| Runtime | What must I install? | One pinned Bun version and recorded tools on three systems |
+| Runtime | What does the plugin set up for me? | One pinned Bun version and recorded tools, set up by the plugin, on three systems |
 | Hosts and distribution | Where does it work? | Marketplace install and a stated promise per host |
 | Persona defaults | How much guidance do I get? | Overridable onboarding, explanation, and checkpoint defaults |
 | Install evidence | Was it tried on my system? | Local and release-tag install and load tests with honest reports |
@@ -107,14 +108,19 @@ N/A — the tasks are traced in the user stories.
 - RUN-01. Deterministic scripts and tools must run natively on macOS, Linux, and
   Windows. No required feature may need the Windows Subsystem for Linux (WSL) or
   Docker.
-- RUN-02. An author must need to install only one runtime, one documented Bun
-  version.
+- RUN-02. An author must need to install nothing but the plugin. The plugin and
+  Claude obtain the one pinned Bun version, and any later pinned tool,
+  themselves: a download from a fixed address, checked against a pinned digest
+  before it is unpacked or run, kept in the plugin's data directory, with no
+  change to the system or a shell profile. The host's permission prompts apply
+  and are never worked around.
 - RUN-03. Every other tool the product uses must be pinned to a version and
   recorded.
-- RUN-04. A run must not download a package at run time. Stemma installs
-  nothing unless the author asks.
-- RUN-05. When the runtime or a pinned tool is missing or at another version,
-  the system must say what is wrong and what to install, in plain language.
+- RUN-04. A check or build must not download a package. The only download is the
+  pinned setup of RUN-02.
+- RUN-05. When setup fails or is declined, or a tool is missing or at another
+  version, the system must say what happened in plain language and that nothing
+  was checked. It must not ask the author to install anything by hand.
 - RUN-06. Results must not depend on platform line endings, file-system case
   behavior, shell, or an unrecorded system library version.
 
@@ -135,10 +141,9 @@ N/A — the tasks are traced in the user stories.
     (FR-77, P1). Until that is observed, no such support is claimed. FR-77 delays
   neither the pilot nor the first Claude release.
 - DST-06. The bundled command line must not be committed to the Stemma
-  repository. It must ship in release packages, and the repository marketplace
-  install must deliver it (FR-50). If the marketplace cannot deliver release
-  packages, a separate distribution repository for built files may be used.
-  That delivery is untested.
+  repository. The repository marketplace install must deliver it (FR-50), from a
+  version tag of a separate distribution repository that holds built release
+  trees.
 - DST-05. The product must describe use with a local model as an unsupported
   experiment: not blocked, not promised, and not tested (PRD Non-Goals; FR-50
   promises Claude desktop's local Code tab only).
@@ -190,8 +195,8 @@ N/A — the tasks are traced in the user stories.
 
 ## Edge Cases and Error Handling
 
-- **Runtime installed but not visible to a desktop app**: The failure names the
-  runtime and how to make the host see it. It does not report a check result.
+- **Setup declined, offline, or blocked**: The skill says so, gives the reason,
+  reports no check result, and does not try another route. Writing continues.
 - **Host sandbox blocks a script**: The session reports that the check did not
   run. A check that did not run is never reported as passed.
 - **Chat or cloud session**: The skill states that local checks and builds are
@@ -216,17 +221,17 @@ feature.
 - Assumption (PRD): "outlining" is a mode of its own within FR-48.
 - **Assumption**: SKL-04 and DST-03 apply the `honest-assurance` and
   `plugin-distribution` concerns to modes and sessions the product cannot serve.
-- **Risk**: A marketplace that installs a git reference does not by itself
-  deliver a bundle that exists only in release packages. How the install does so
-  is a design question, and untested.
+- **Unverified**: Installation of the release tree through a marketplace entry
+  and first-use setup were observed with the Claude command-line tool on one
+  macOS system, against a local stand-in for the distribution repository.
 - **Unverified**: One repository layout installed and listed in the Claude Code
   and Codex command-line tools on one macOS machine. Desktop apps, Linux,
   Windows, and hooks in a live session were not tested.
 - **Risk**: Which Claude desktop session types run on the author's computer and
   can run local scripts is not verified. Research read vendor documents that
   describe some task types running remotely or in a virtual machine.
-- **Risk**: A host sandbox or app search path may prevent finding or installing
-  Bun. Bun installs missing packages by default unless a run disables it.
+- **Risk**: A host sandbox may block the setup download or the fetched program.
+  Bun installs missing packages by default unless a run disables it.
 
 ## Dependencies
 
@@ -253,6 +258,3 @@ feature.
 
 - [ ] Is a command-line or administrator install acceptable for ChatGPT desktop?
   Blocks FR-77; product owner after a hands-on test (PRD).
-
-- [ ] How does the repository marketplace install deliver the release package?
-  Blocks DST-01 and DST-06; design owner, untested (PRD).

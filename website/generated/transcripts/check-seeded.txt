@@ -1,5 +1,5 @@
 $ stemma check --all --project $PROJECTS/seeded
-OPEN FINDINGS: 9 problem(s), 1 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 9 problem(s), 1 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 14 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
@@ -77,7 +77,7 @@ Checked the whole project: 14 result(s) passed.
        key: hartwell1998
        source file: records/sources/src-fixture0harbour01.json
 
-NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]

@@ -6,7 +6,7 @@
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CHECK_DESCRIPTIONS, IMPLEMENTED_CHECKS, TEMPLATES } from "@stemma/core";
+import { IMPLEMENTED_CHECKS, TEMPLATES } from "@stemma/core";
 import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { FIXTURES } from "./lib/fixtures.ts";
@@ -15,19 +15,19 @@ import { screenshotPlan, sha } from "./lib/screens.ts";
 export const ROOT = join(import.meta.dir, "..");
 export const GENERATED = join(ROOT, "website/generated");
 
-/** What each built check covers, and what it does not. */
+/** What each check covers, and what it does not. */
 const NOTES: Record<string, { summary: string; limits: string }> = {
   "record.valid": {
     summary: "Reads stemma.json, every record file and the rule headings in rules.md.",
-    limits: "Some record kinds have extra rules that are not checked yet. A report lists this as not checked when such a record is present.",
+    limits: "For some record kinds, rules beyond the record shape are not checked. A report says so when such a record is present.",
   },
   "cite.key": {
     summary: "Each citation record's key must name exactly one source record.",
-    limits: "Reads citation records only. It cannot read manuscript files yet, and it does not show that a source supports a sentence.",
+    limits: "Reads citation records only, not manuscript files. It does not show that a source supports a sentence.",
   },
   "bib.uncited": {
     summary: "Each source listed in bibliography_include must be cited by a citation record.",
-    limits: "When the project has a manuscript, this version cannot read it and reports that it could not check.",
+    limits: "It does not read manuscript files. For a project that has them, it reports that it could not check.",
   },
   "source.held": {
     summary: "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
@@ -123,14 +123,13 @@ export async function generateText(): Promise<Map<string, string>> {
       `$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY\n${without.out}[exit ${without.code}]\n`,
       [...both(example, "$PROJECTS/coral-reefs"), [empty, "$EMPTY"]]));
 
-    const checks = Object.keys(CHECK_DESCRIPTIONS).sort().map((id) => {
-      if (!(id in IMPLEMENTED_CHECKS)) return { id, built: false, covers: CHECK_DESCRIPTIONS[id] };
+    const checks = Object.keys(IMPLEMENTED_CHECKS).sort().map((id) => {
       const note = NOTES[id];
-      if (!note) throw new Error(`website/generate.ts has no note for the built check ${id}`);
+      if (!note) throw new Error(`website/generate.ts has no note for the check ${id}`);
       const findings = Object.entries(TEMPLATES)
         .filter(([key]) => key.startsWith(`${id}:`))
         .map(([key, t]) => ({ reason: key.slice(id.length + 1), message: t.message, why: t.why, suggestions: t.suggestions }));
-      return { id, built: true, ...note, findings };
+      return { id, ...note, findings };
     });
     files.set("checks.json", `${JSON.stringify(checks, null, 2)}\n`);
     return files;

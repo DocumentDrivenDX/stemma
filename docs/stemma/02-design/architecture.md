@@ -172,7 +172,7 @@ the contracts.
 .claude-plugin/          plugin and marketplace manifests
 skills/stemma/           SKILL.md, modes/, prompts/support/
 templates/               files copied into a new project
-dist/stemma.js           bundled command line, built from packages/; not committed, shipped in release packages
+dist/stemma.js           bundled command line, built from packages/; not committed, shipped in tagged release trees
 packages/{records,manuscript,core,workspace,extract,intake,cite,publish,graph,cli,explorer}/
 fixtures/                synthetic or openly licensed test material, seeded errors
 scripts/                 check, boundary, bundle, install-test scripts in TypeScript
@@ -190,18 +190,19 @@ copyrighted source.
 
 | Component | Infrastructure | Instances | Scaling | Backup / Recovery |
 |-----------|----------------|-----------|---------|-------------------|
-| Skill and command line | Plugin installed from the Git marketplace into the host's plugin cache; Bun installed by the author | One per host profile | Not applicable | Reinstall the same version |
+| Skill and command line | Plugin installed from the marketplace into the host's plugin cache; pinned Bun set up by the plugin in its data directory | One per host profile | Not applicable | Reinstall the same version |
 | Project files | Author's disk and chosen git remote | One working copy per machine | Bounded by record count; measured only to 25,000 synthetic records | git history |
 | Content store | Private directory outside git | One per machine | Bounded by disk | Author's backup; digests verify a restore |
 | Restricted store | Per-user directory outside the project | One per machine | Not applicable | Author's separate protected backup; Stemma copies it nowhere |
 | Derived index | `.stemma/` | One per working copy | Rebuilt | None needed |
-| Typst | Pinned program on the author's machine | One | Not applicable | Reinstall |
+| Typst | Pinned program the plugin sets up in its data directory (not built) | One | Not applicable | Set up again |
 | Explorer | Offline HTML file, or a static file host the author chooses | Per export | Graph size; chapter scope | Regenerate |
 
 ```mermaid
 graph TB
     subgraph Machine["Author's computer"]
-      Host["Agent host + plugin"] --> Bun["Bun running dist/stemma.js"]
+      Host["Agent host + plugin"] --> Launcher["Plugin launcher"]
+      Launcher --> Bun["Pinned Bun in plugin data, running dist/stemma.js"]
       Bun --> Project["Project: records, store, index"]
       Bun --> Outside["Restricted store"]
       Bun --> TypstBin["Typst"]
@@ -211,19 +212,17 @@ graph TB
     Bun --> Static["Static host (optional)"]
 ```
 
-Distribution: the bundle is not committed to the repository. It ships,
-unminified, in release packages and needs no package install. Installing from
-the repository marketplace must deliver that package. A marketplace source that
-names the release package is tried first; if the marketplace installs only from
-git, a separate distribution repository holds the built release trees. Neither
-is tested, and a plain git reference to the Stemma repository would deliver no
-bundle. `--no-install` stops Bun from fetching packages while running. How
-Typst reaches a non-technical author is undecided; Stemma installs nothing
-unless the author asks. Claude desktop's local Code tab is the only v1
-full-function promise; on Linux the command line, checks, and builds are
-targeted with no desktop-app integration promised; the Claude command-line tool
-is a test harness only. Each release publishes the package digest, and the
-install proof compares it.
+Distribution: Stemma is first and foremost a Claude plugin, and installing it
+is the only installation a person does. The bundle is not committed to the
+repository. The marketplace entry installs a tagged release tree (manifests,
+skill, launcher, unminified bundle) from a separate distribution repository. On
+first use the launcher sets up the pinned Bun in the plugin's data directory from
+a digest-verified download (ADR-004); Typst, when built, arrives the same way.
+`--no-install` stops Bun from fetching packages while running. Claude desktop's
+local Code tab is the only v1 full-function promise; on Linux the command line,
+checks, and builds are targeted with no desktop-app integration promised; the
+Claude command-line tool is a test harness only. SD-010 records what has been
+observed.
 Tests run locally, and on the three systems only for release tags, as advisory
 results (ADR-007).
 
@@ -287,7 +286,7 @@ format, or command depends on a particular model.
 | ADR-001 to ADR-009 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy | Their stated assumptions |
 | Architecture style: hexagonal, ports and adapters (HELIX `hexagonal-architecture`) | Decided by the product owner; fills the `architecture-style` slot | One core is driven by the command line and tests and drives parts that are undecided or will change: the index, extraction, recognition, manuscript form, and citation formatting. `classic-layered` would let checks depend on files and SQLite directly; onion and clean styles add layers no requirement needs. Core rules (`records`, `manuscript`, `core`) are independent of applications, databases, and file tools | Boundary check |
 | Checks are pure over ports | Proposed | Repeatable tests and one result path for agent, build, and terminal | none |
-| Ship the unminified command-line bundle in release packages, not in git | Decided by the product owner | No built file in the repository. Trade-off: the repository marketplace install must deliver a release package, which is untested | Install proof before the pilot |
+| Ship the unminified command-line bundle in a separate distribution repository, tagged by version | Decided by the product owner (distribution repository allowed if needed); mechanism chosen in SD-010 | No built file in the Stemma repository. Trade-off: a second publishing surface; unobserved in Claude desktop | Install check before the pilot |
 | Pin Bun 1.4.5 first | Assumption | It is the version tested | Confirm at first release |
 | Generated browser graph is rebuilt, never committed | Decided by the product owner | Record files are the one official copy | Fresh-clone test |
 | First engine scope: arras static-profile reads, TypeScript on SQLite, no writes | Decided by the product owner | Bounds the engine; writes and wider server compatibility come later | CONTRACT-005 I |
@@ -300,7 +299,7 @@ Solution design numbers follow feature numbers.
 
 | Design | Subject | Depends on | Step and unproven input |
 |---|---|---|---|
-| SD-010 | Runtime, bundle, command line, plugin, install tests | CONTRACT-002, 004; ADR-004, 007 | M1, first. Release-package bundle delivered by a repository marketplace install in Claude desktop, on three systems |
+| SD-010 | Runtime, bundle, command line, plugin, install tests | CONTRACT-002, 004; ADR-004, 007 | M1, first. Marketplace install that sets itself up in Claude desktop, on three systems |
 | SD-011 | Records, validators, disposable index, change closure; later the export and the read-only engine | CONTRACT-001, 005; Data Design; SD-010 | M1, first. Engine scope is CONTRACT-005 I |
 | SD-001 | Standing rules (M1), then setup and registers | SD-011; record-shape additions to CONTRACT-001 | M1, M2 |
 | SD-002 | Admission, stores, extraction, page maps, rights | SD-011 | M1. PDF text library; recognition on pilot scans |
@@ -325,11 +324,11 @@ on the pilot path and is untested.
 |---|---|
 | Browser Typst compilation is untried and may be blocked | Previews may need another host page, or fall back to prebuilt pages, which would not meet FR-65 |
 | citeproc-js is licensed CPAL (Common Public Attribution License) or AGPL (GNU Affero General Public License) | May change how `cite` ships or what formats citations |
-| A host blocks script execution or cannot find Bun | No checks there; the host cannot be claimed |
+| A host blocks script execution or the setup download | No checks there; the host cannot be claimed |
 | Real PDFs, scans, and Word files differ from synthetic fixtures | Extraction and intake designs may change |
 | Graph size exceeds arras's claimed 1,024 nodes | Scoped exports and measured claims |
 | The preview changes only after the agent rebuilds and the author reloads | An open page can show earlier text, so it shows its data identity |
-| The marketplace cannot deliver a release package | The plugin installs without its command line |
+| Claude desktop does not install from the distribution repository | The plugin cannot be installed there |
 | Nothing stops publication with open findings | A book or package can disclose a site or protected text, carry unusable or unpermitted images, or hold unsupported or unreviewed claims |
 | Basic typesetting joins the pilot | The citeproc-js license, Typst distribution, and the markup reader sit on the pilot path |
 | The defined Markdown features cannot carry a real chapter, or sentence and quotation reading is unstable | Takeover output, annotations, and quotation results would need a markup change |

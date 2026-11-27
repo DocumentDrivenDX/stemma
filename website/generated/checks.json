@@ -1,9 +1,8 @@
 [
   {
     "id": "bib.uncited",
-    "built": true,
     "summary": "Each source listed in bibliography_include must be cited by a citation record.",
-    "limits": "When the project has a manuscript, this version cannot read it and reports that it could not check.",
+    "limits": "It does not read manuscript files. For a project that has them, it reports that it could not check.",
     "findings": [
       {
         "reason": "not_cited",
@@ -23,10 +22,10 @@
       },
       {
         "reason": "manuscript_not_read",
-        "message": "Whether a listed source is cited could not be checked: this version cannot yet read the files in manuscript/.",
+        "message": "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
         "why": "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.",
         "suggestions": [
-          "Nothing to fix in your files. Check this entry by hand until Stemma reads manuscripts."
+          "Nothing to fix in your files. Check this entry by hand."
         ]
       },
       {
@@ -48,25 +47,9 @@
     ]
   },
   {
-    "id": "build.uncommitted",
-    "built": false,
-    "covers": "uncommitted changes (checked during a build)"
-  },
-  {
-    "id": "changelog.missing",
-    "built": false,
-    "covers": "the changelog entry (checked during a build)"
-  },
-  {
-    "id": "cite.format",
-    "built": false,
-    "covers": "citation formatting (checked during a build)"
-  },
-  {
     "id": "cite.key",
-    "built": true,
     "summary": "Each citation record's key must name exactly one source record.",
-    "limits": "Reads citation records only. It cannot read manuscript files yet, and it does not show that a source supports a sentence.",
+    "limits": "Reads citation records only, not manuscript files. It does not show that a source supports a sentence.",
     "findings": [
       {
         "reason": "key_unknown",
@@ -111,33 +94,7 @@
     ]
   },
   {
-    "id": "cite.unlinked",
-    "built": false,
-    "covers": "citations not linked to any claim"
-  },
-  {
-    "id": "claim.complete",
-    "built": false,
-    "covers": "whether each claim has evidence, confidence and a reason"
-  },
-  {
-    "id": "claim.inactive",
-    "built": false,
-    "covers": "manuscript text linked to a retired claim"
-  },
-  {
-    "id": "construct.complete",
-    "built": false,
-    "covers": "whether each construct has a definition and ownership"
-  },
-  {
-    "id": "construct.credit",
-    "built": false,
-    "covers": "who each construct is credited to"
-  },
-  {
     "id": "coordinate.stray",
-    "built": true,
     "summary": "Warns about written map coordinates in project files, without repeating the value.",
     "limits": "Recognizes only geo: addresses, degrees with N, S, E and W, and comma-separated decimal pairs with at least three decimal places. It cannot tell whether a site is restricted.",
     "findings": [
@@ -168,95 +125,9 @@
     ]
   },
   {
-    "id": "draft.marked",
-    "built": false,
-    "covers": "passages marked as needing a source"
-  },
-  {
-    "id": "id.resolves",
-    "built": false,
-    "covers": "whether DOIs and other identifiers name these works"
-  },
-  {
-    "id": "image.alt",
-    "built": false,
-    "covers": "image alternative text"
-  },
-  {
-    "id": "image.credit",
-    "built": false,
-    "covers": "image credits"
-  },
-  {
-    "id": "image.font",
-    "built": false,
-    "covers": "image fonts"
-  },
-  {
-    "id": "image.metadata",
-    "built": false,
-    "covers": "location data inside images"
-  },
-  {
-    "id": "image.permission",
-    "built": false,
-    "covers": "image permissions"
-  },
-  {
-    "id": "image.placement",
-    "built": false,
-    "covers": "image placement"
-  },
-  {
-    "id": "image.resolution",
-    "built": false,
-    "covers": "image resolution"
-  },
-  {
-    "id": "image.vector",
-    "built": false,
-    "covers": "vector images"
-  },
-  {
-    "id": "locator.extent",
-    "built": false,
-    "covers": "whether cited pages and other locators fall inside the source"
-  },
-  {
-    "id": "meta.resolver",
-    "built": false,
-    "covers": "authors, titles and dates against saved catalogue lookups"
-  },
-  {
-    "id": "meta.source",
-    "built": false,
-    "covers": "authors, titles and dates against your stored copies"
-  },
-  {
-    "id": "number.present",
-    "built": false,
-    "covers": "whether cited figures appear in the stored source text"
-  },
-  {
-    "id": "package.leak",
-    "built": false,
-    "covers": "protected text in a reviewer package (checked during a build)"
-  },
-  {
-    "id": "quote.present",
-    "built": false,
-    "covers": "whether quotations appear in the stored source text"
-  },
-  {
-    "id": "quote.self",
-    "built": false,
-    "covers": "your own claims presented as quotations from a source"
-  },
-  {
     "id": "record.valid",
-    "built": true,
     "summary": "Reads stemma.json, every record file and the rule headings in rules.md.",
-    "limits": "Some record kinds have extra rules that are not checked yet. A report lists this as not checked when such a record is present.",
+    "limits": "For some record kinds, rules beyond the record shape are not checked. A report says so when such a record is present.",
     "findings": [
       {
         "reason": "record_unreadable",
@@ -341,18 +212,7 @@
     ]
   },
   {
-    "id": "restricted.leak",
-    "built": false,
-    "covers": "restricted site coordinates in project files"
-  },
-  {
-    "id": "source.changed",
-    "built": false,
-    "covers": "work that rests on a copy or source that has since changed"
-  },
-  {
     "id": "source.held",
-    "built": true,
     "summary": "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
     "limits": "It does not show that the text is a faithful reading of the copy, and for a text layer you supply it never compares the two. It does not show that a source supports a sentence. It reads citation records only.",
     "findings": [
@@ -429,15 +289,5 @@
         ]
       }
     ]
-  },
-  {
-    "id": "support.current",
-    "built": false,
-    "covers": "whether each cited claim has a current claim-support record"
-  },
-  {
-    "id": "takeover.removal",
-    "built": false,
-    "covers": "claims left without support by removing a citation"
   }
 ]

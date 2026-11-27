@@ -33,6 +33,9 @@ if (import.meta.main) {
   mkdirSync(join(release, "dist"));
   cpSync(built, join(release, "dist/stemma.js"));
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });
+  // The launcher is the only script the plugin ships.
+  mkdirSync(join(release, "scripts"));
+  cpSync(join(root, "scripts/stemma.sh"), join(release, "scripts/stemma.sh"));
   cpSync(join(root, "LICENSE"), join(release, "LICENSE"));
   cpSync(join(root, ".claude-plugin/plugin.json"), join(release, ".claude-plugin/plugin.json"));
   // Same marketplace as the repository's, but pointing at this tree.
