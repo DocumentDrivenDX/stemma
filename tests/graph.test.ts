@@ -223,6 +223,32 @@ describe("record text that looks like markup", () => {
   });
 });
 
+describe("the page holds what it was given and the explorer, and nothing else", () => {
+  const claim = (id: string, words: string) => ({ ...base(id, "claim"), text: words, role: "claim", review: { state: "unreviewed" } });
+  const kept = claim("clm-filteredkept001", "KEPT-WORDS");
+  const filtered = claim("clm-filteredgone001", "FILTERED-WORDS");
+  const template = "<t>__STEMMA_BANNER_JSON__|__STEMMA_MODULE_JSON__|__STEMMA_GRAPH_JSON__</t>";
+  const page = (records: object[]) => {
+    const out = exportGraph(loadCorpus(project(records)), { version: VERSION, template });
+    return { out, text: file(out, "explorer.html") };
+  };
+
+  test("US-094-AC5 nothing of a record that is not in the input is in the page", () => {
+    expect(page([kept, filtered]).text).toContain("FILTERED-WORDS");
+    const { out, text: made } = page([kept]);
+    expect(made).toContain("KEPT-WORDS");
+    for (const value of ["FILTERED-WORDS", filtered.id]) expect(made).not.toContain(value);
+    // Take the two exported files out of the page: the banner and the template are all that is left.
+    const rest = made.replace(file(out, "stemma.umf.json"), () => "__STEMMA_MODULE_JSON__").replace(file(out, "stemma.graph.json"), () => "__STEMMA_GRAPH_JSON__");
+    const banner = /^<t>([^|]*)\|/.exec(rest)![1]!;
+    expect(rest).toBe(template.replace("__STEMMA_BANNER_JSON__", () => banner));
+    expect(Object.keys(JSON.parse(banner)).sort()).toEqual([
+      "arras", "arras_view", "audience", "corpus_digest", "counts", "data_identity", "dropped_links", "exporter", "graph_sha256", "module_sha256",
+      "omissions", "project_id", "search_fold", "states", "warnings",
+    ]);
+  });
+});
+
 describe("invalid records", () => {
   test("stop the export, and warnings do not", () => {
     expect(() => make(loadCorpus(project([{ ...base("clm-invalidclaim01", "claim") }])))).toThrow(InvalidRecords);

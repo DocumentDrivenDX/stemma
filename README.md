@@ -55,6 +55,7 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - "Check the project and explain what is open."
 - "What does that book say on page 89?"
 - "Are any of my source files missing or changed?"
+- "Let me browse and search my evidence."
 
 ## Before you add material
 
@@ -88,6 +89,12 @@ PDFs and page images stay out of the repository.
 - Tracks comparisons and reviews of the text, such as a check of recognized text
   against another reading of the same page. They are reported as coverage; none
   is required.
+- Makes one offline page where you search your records and follow the links
+  between them in both directions, with or without diacritics. It marks records
+  that are unreviewed, rest on something retired, or have open findings from many
+  of the checks; it does not yet show the state of claim support. The page holds
+  your records' text, passages included, so anyone you give it to can read them.
+  It is not a reviewer copy.
 - Explains every finding: what is wrong, the evidence, why it matters, and what
   to do. Nothing is blocked. A project is called checked clean only when nothing
   is open, and a report lists any applicable check it could not run.

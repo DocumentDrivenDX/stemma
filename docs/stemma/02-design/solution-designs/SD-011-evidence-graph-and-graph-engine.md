@@ -165,6 +165,12 @@ The baseline is a disposable file under `.stemma/` that holds digests and subjec
 - **Interfaces**: CONTRACT-005 A to G.
 - **Owned by TDs**: US-088; viewing stories belong to SD-012.
 
+**Built so far**: the `author` export. `packages/graph` is pure and imports only
+`records` and `core`: it returns the files as text. `cli` composes it with
+`workspace`, which holds the git ignore rule and writes the files, so no `core`
+port was needed for it. The reviewer allow list and restricted-value scan are not
+built. The disposable index and engine are not built.
+
 A reviewer export can disclose a restricted site: a coordinate typed in prose is warned about and does not stop the export (CONTRACT-005 E). A site nobody marked restricted is exported as public. Both are reported, not prevented.
 
 ### Component: Graph engine (`packages/graph`, P1)

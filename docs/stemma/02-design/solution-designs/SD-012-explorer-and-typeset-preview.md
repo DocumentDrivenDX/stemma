@@ -134,8 +134,18 @@ defined by CONTRACT-006 D.
 - **Owned by TDs**: host page; record states; search.
 
 Search uses the `searchText` field because arras does not fold diacritics. The
-query needs the same folding; if the browser cannot apply it to a query, that is
-an arras change.
+query needs the same folding: the host wraps the static client's `moduleQuery`
+and folds the search text, so no arras change is needed for it.
+
+**Built so far** (record browser only). `packages/explorer` holds the host, a
+banner, and the template build; `packages/graph` fills the template. The host
+leaves the arras `location` property uncontrolled, and arras's own fragment
+routing works from a local file. arras node pages show states and the support
+notice as ordinary properties (CONTRACT-005 F); no Stemma view sits beside the
+browser, so composing one remains untried. The banner is styled with Tailwind
+without its reset, under a prefix. One style lets arras list badges wrap.
+Not built: the connected view, pages, preview, maps, and comments. Support
+states are not computed, so EXP-04 is partly met.
 
 ### Component: Connected view (arras contribution)
 
@@ -234,6 +244,8 @@ FEAT-012 has no Task Model; task names come from the UF-012 journeys.
 
 - [ ] No PRD User Needs row is mapped to a UF-012 task, because neither FEAT-012 nor the PRD links them.
 - [ ] The CONTRACT-005 J shapes are provisional; the command is `graph export --page`.
+- [ ] Search lists at most 50 results, and 50 of a type, from 20 types (CONTRACT-005 G). A citation record that names a key and no passage has no link to its source, because a key is not a reference field.
+- [ ] The record browser has run only in headless Chromium on one macOS system; other browsers, systems, and desktop hosts are untested.
 - [ ] Layout parity method is untested; until proven, no page is shown as matching.
 - [ ] A fresh-clone export without the author's image files lacks figure bytes; the page names what is missing.
 

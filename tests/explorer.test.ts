@@ -23,6 +23,16 @@ try {
 }
 afterAll(async () => browser?.close());
 
+test("US-094-AC1, US-090-AC6 the explorer Stemma wrote is TypeScript, bundled with the arras graph browser", async () => {
+  const written = [...new Bun.Glob("**/*").scanSync(join(ROOT, "packages/explorer/src"))].sort();
+  expect(written.filter((file) => !/\.(tsx?|css)$/.test(file))).toEqual([]);
+  expect(readFileSync(join(ROOT, "packages/explorer/src/host.tsx"), "utf8")).toContain('import { GraphBrowser } from "@documentdrivendx/arras-ui/browser";');
+  const { inputs } = await bundleHost();
+  expect(inputs.some((path) => /arras-ui\/dist\/browser\.js$/.test(path))).toBe(true);
+  // Of arras, only the browser and the static client and what they load.
+  expect(inputs.filter((path) => /arras-ui\/dist\/(index|shell|testkit|ArrasConsole)/.test(path))).toEqual([]);
+});
+
 test("every package whose code is in the page ships its license", async () => {
   const inputs = (await bundleHost()).inputs;
   const bundled = [...new Set(inputs.flatMap((path) => /.*node_modules\/((?:@[^/]+\/)?[^/]+)\//.exec(path)?.[1] ?? []))].sort();
@@ -202,6 +212,18 @@ describe.skipIf(!browser)("the explorer page from a local file", () => {
     const links = await list.getByRole("link").evaluateAll((found) => found.map((a) => a.getAttribute("href")!));
     expect(new Set(links.filter((href) => href.includes("cit-hubcitation"))).size).toBe(HUB);
   }, 60_000);
+
+  test("US-090-AC1 a record of every type opens", async () => {
+    const records = JSON.parse(out.files.find((f) => f.name === "stemma.graph.json")!.text).records as { type?: string; key?: string }[];
+    const one = new Map(records.filter((r) => r.type).map((r) => [r.type!, r.key!]));
+    expect(one.size).toBe(out.projection.types.length);
+    for (const [type, key] of one) {
+      await visit(type, key);
+      const heading = out.projection.entities.find((e) => e.type === type && e.key === key)!.properties.heading as string;
+      await main().getByRole("heading", { level: 1, name: heading, exact: true }).waitFor({ timeout: 10_000 });
+      await main().getByRole("article").getByText(key, { exact: true }).first().waitFor({ timeout: 10_000 });
+    }
+  }, 120_000);
 
   test("US-090-AC4 a record with a state shows it", async () => {
     const [id, states] = [...out.states.records].find(([key, found]) => key.startsWith("clm-") && found.includes("unreviewed"))!;

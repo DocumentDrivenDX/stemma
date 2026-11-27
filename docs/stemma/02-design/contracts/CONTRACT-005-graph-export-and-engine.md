@@ -54,21 +54,34 @@ fact.
 |---|---|
 | `stemma.umf.json` | Generated arras module: UMF core `0.10.0` with only the `umf.ddd` `0.1.0` and `arras.view` extensions |
 | `stemma.graph.json` | `arras.graph` version 1 file with `complete` true when no record type was dropped |
-| `arras-static.json` | arras static configuration naming the two files by relative path |
-| `stemma.export.json` | Manifest, schema `stemma.graph-export/0`: audience, scope, corpus digest, exporter and arras versions, SHA-256 of each other data file, omission counts by type and reason |
-| `explorer.html` | With `--page`: one self-contained page with the two texts inlined |
+| `arras-static.json` | arras static configuration naming the two files by relative path, for hosted delivery |
+| `stemma.states.json` | Record states (J), for exported records |
+| `stemma.export.json` | Manifest, schema `stemma.graph-export/0`: `audience`, `scope`, `corpus_digest`, `data_identity` (J), `exporter`, `arras`, `arras_view`, `search_fold`, SHA-256 of each other file (`files`), `counts`, `omissions[]` (type, reason, count), `dropped_links[]` (relationship, reason, count), `states` (computed, not computed, the checks used and those left out with why), `warnings[]` (code, message, records) |
+| `explorer.html` | With `--page`: one self-contained page with the module and graph texts inlined |
 
-The same corpus digest, exporter version, audience, and scope MUST produce
+The same data identity, exporter version, audience, and scope MUST produce
 byte-identical files. They hold no time, user, machine path, or git revision.
-The default output is `build/graph/<audience>/`.
+Every JSON file writes `<` as `\u003c`, so the page inlines the module and graph
+byte for byte and their digests match the manifest.
+The default output is `build/graph/<audience>/`. An export without `--page`
+removes an `explorer.html` already there.
 
 ### C. Never committed; rebuilt when needed
 
 Record files in the repository are canonical. The generated browser graph is not
-committed: `init` MUST ignore `build/`, `--out` MUST refuse a path that git does
-not ignore inside the project, and no command adds an export to git.
-`graph status` reports an existing export stale when the manifest's corpus
-digest or a file digest differs.
+committed: `init` MUST ignore `build/`, and no command adds an export to git.
+Every output directory, the default included, MUST be refused when:
+
+- it holds the project, or is under `records/`, `sources/`, `manuscript/`, or
+  `research/`;
+- it is in a git work tree, in the project or not, and git does not ignore every
+  file to be written there (git never ignores a tracked file), or git cannot say;
+- no git repository holds it, and it is inside the project but not under
+  `build/`.
+
+Links are followed before the test. A relative `--out` is relative to the
+project. `graph status` reports an existing export stale when the data identity,
+the exporter version, or a file digest differs.
 
 **A fresh clone** holds no graph files. To browse, the author:
 
@@ -97,6 +110,19 @@ application, database, or write path.
 | Hosted or locally served | The page fetches `arras-static.json` and the two files | Any static file host that answers `GET` and `HEAD` |
 | Single offline file | The page and both texts are built into one HTML file | Opens from the local file system with no network request; required for the reviewer package (FR-46) |
 
+**The Stemma host page.** The plugin ships a page template, built with Stemma
+from the host, arras, React, and their styles, with the licenses of that code.
+An export fills three `application/json` script elements: the banner data, the
+module, and the graph. Nothing is bundled on the author's machine. The page's
+content security policy is `default-src 'none'; script-src 'sha256-<script>';
+style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action
+'none'; base-uri 'none'`. arras routes in the URL fragment. The host folds the
+search text of each query under `search-fold` before arras reads it. A banner
+shows the project ID, audience, data identity, omission counts, the states not
+computed, warnings, and that support results are recorded model judgments. It
+says that a time arras shows is when the page was opened. A module or graph that
+does not load is reported with the file and record.
+
 **Author edits and the offline preview.** With no backend, a page cannot see
 files that change after it loads. After an edit the agent MUST rebuild the
 offline preview (export or build again) and tell the author to reload it. The reloaded page compiles Typst in the browser from the rebuilt manuscript data
@@ -114,7 +140,23 @@ refused by the profile; edits go to record files, followed by a new export.
 
 Filtering happens before any file is written; the page does no filtering.
 
-- Both audiences omit restricted store values, local paths, `legacy`, and `x`.
+- Both audiences omit restricted store values, local paths, `legacy`, and `x`
+  (the top-level extension object only; `Region.x` is a coordinate and stays).
+  Local paths are these fields: `LegacyField.native_path`,
+  `ImportBatch.original_name`, `LossItem.path`, `Image.file_path`,
+  `Chapter.manuscript_path`, `GoverningRecord.path`, and `PageEntry.file`; and
+  any value that begins as a path on a machine (`file:`, `~/`, a drive letter, a
+  network share, or a system directory such as `/Users/` or `/home/`). A path
+  written inside prose is not detected. `ImportBatch.blocks` is legacy content.
+- The graph holds no page text, part list of a source file, manuscript file,
+  research note, or standing rule. Each is counted.
+- A project record can wrongly hold restricted data. For a location whose
+  `sensitivity.class` is `restricted`, an export MUST emit its geometry only
+  when `release` is `area` and the geometry is a polygon. Otherwise it emits
+  none, and omits `content_sha256` values made from that record (its review
+  mark and annotations of it), counts them, and warns `restricted_in_project`.
+  The export is still written. The corpus digest and data identity cover every
+  record file, that one included.
 - `author` is for the author's own machine or private repository. It MAY include
   passage text.
 - `reviewer` MUST include only fields on its allow list. It omits source files
@@ -171,8 +213,31 @@ MUST say so. Saving a file from a page opened locally is untested.
 | Nested value | Flat string properties; repeated scalars as lists |
 | Decimal, partial date, coordinate, geometry | String |
 | `kind`, `type`, `version` fields | Renamed `recordKind`, `recordType`, `recordVersion`; arras reserves such names |
-| Multilingual text | Original, romanized, and translated properties, plus `searchText` folded under the versioned `search-fold` profile |
+| Multilingual text | The value, with original, romanized, and translated lists. The language and scheme of each other form are omitted and counted |
+| Repeated nested value | One list entry of `name: value` parts for each item; its references are also links. A list of integers is a list of strings |
 | Unrecognized field | Dropped and counted in the manifest |
+| Name that arras reserves | Prefixed `record`, as `recordCreatedAt` |
+
+Entity types, properties, relationships, and owned entry types (value types with
+a `lid` and a reference) come from the record schema. A module declares the
+types, properties, and relationships its graph uses.
+
+Stemma adds these properties. `heading` is the record's title in lists, made
+from its own fields. `searchText`, on searched types only, is the record's words,
+and for a source its keys and contributor names, folded under `search-fold`.
+`stemmaStates` is a read-only list of the record's states (J), present only when
+it has one. `stemmaNotice`, on a support record, says that it is a recorded model
+judgment and not verification; the type's label says so too.
+
+- The searched types, declared first and in this order, are `Source`, `Claim`,
+  `Passage`, `Note`, `Citation`, `Agent`, `Chapter`, `Construct`, `Method`,
+  `SupportRecord`, `Attestation`, `Inference`, `Annotation`, `SourceText`,
+  `Place`, `PlaceName`, `PlaceLocation`, `PlaceAssertion`, `Search`, and `Plan`.
+  Every other type declares an empty search list, or arras would search it.
+- View vocabulary `0.1.0` is pinned. Every single string field declares `text`
+  or `prose`; left alone, arras shows some as links or badges by their names, and
+  each badge field widens the search query. The `markdown` format and
+  `brand.wordmark` are never used.
 
 - Every property except `recordId` is optional, so records with missing fields load.
 - Keys fit `[A-Za-z0-9._:-]{1,128}`: `lid` MUST match `[0-9a-z]{1,32}`.
@@ -196,8 +261,12 @@ Limits at arras 0.8.1:
 | Relationship records have no readable properties; a link is identified by its triple | Link data and parallel links would be lost | Link records and owned entries become entities, adding nodes and hops |
 | ASCII keys; reserved names; integers only | Limits names and numbers | F |
 | One bad record fails the whole load | No partial graph | Generate together; test the load |
-| A relationship field returns at most 100 keys | Large hubs need paging | Page by listing the other type |
-| Search takes the first 50 matches per type in key order; no diacritic folding | Random keys make which matches appear arbitrary; accented terms can be missed | `searchText`; type filtering; upstream request |
+| A relationship field returns at most 100 keys | Large hubs need paging | The arras "Show more" lists the other type for the rest; all 150 links of a test record were reached in each direction |
+| A query searches 20 types and resolves 1,000 records | Other types are not searched | 20 searched types (F); others are reached by type lists and links |
+| A search takes the first 50 matches per type in key order and lists at most 50 in all; a query is 2 to 200 characters and at most 6 words; no diacritic folding | Matches past 50 are not listed; random keys make which appear arbitrary | `searchText` and a folded query; type filtering; upstream request |
+| A query selects at most 50 fields | A record with many fields or links needs several | arras splits its record-page queries |
+| A document's view terms are at most 128 KiB, a type's 16 KiB | A label on every field of the full schema does not load | Leave out what arras gives anyway; about 103 KB for the full schema, tested |
+| A list value is drawn as badges that do not wrap | Long list entries widen the page | A style in the host page lets them wrap |
 | Neighbourhood picture is one hop, at most 40 nodes; the console canvas draws at most 150 and is not in the static page | No book-scale connected view | Upstream (below) |
 | Support claim: Chromium on macOS, up to 1,024 nodes and 7.9 MB | Larger graphs and other browsers unclaimed | Chapter scope; measure before claiming |
 | Static page content security policy | Likely blocks WebAssembly and workers, needed for Typst preview | Stemma host page; confirm by test |
@@ -259,9 +328,22 @@ digests in the manifest. Shapes are provisional and minimal; the explorer and
 maps designs extend them in a later revision. The page computes no state or
 filtering of its own.
 
-The **data identity** is the SHA-256 of the corpus digest followed by the sorted
-manuscript file digests; pages show its first 12 characters. `graph status`
-compares it, so a manuscript edit makes an export stale.
+The **data identity** is the SHA-256 of the corpus digest and then each
+manuscript file's digest (SHA-256 of its bytes), in digest order, each followed
+by LF; pages show its first 12 characters. `graph status` compares it, so a
+manuscript edit makes an export stale.
+
+**States as built.** `unreviewed` (a cited claim or source that the check report
+counts as unreviewed or not admitted, and any record whose review mark does not
+apply, CONTRACT-001 G), `retired_link` (a reference to a retired record),
+`annotated`, and `open_finding`. The last two come only from checks whose inputs
+the data identity covers and that read no tool version or saved lookup:
+`record.valid`, `source.held`, `source.pages`, `source.labels`,
+`source.footnotes`, `source.changed`, `cite.key`, `bib.uncited`,
+`quote.present`, `quote.page`, `locator.extent`, and `number.present`. The
+manifest names the checks left out. `support_missing`, `support_stale`, and
+`support_unsupported` are not computed; the manifest and page say so, and a
+record with no state is not shown to be clear.
 
 | File (schema) | Content |
 |---|---|
@@ -291,7 +373,10 @@ compares it, so a manuscript edit makes an export stale.
 | Withheld source material found in a reviewer export | Removed from generated files; anything that cannot be removed is a `package.leak` finding and a warning; export written | no | The author checks the named part before sending it |
 | Restricted coordinate found by the scan | Warning with the location; export written | no | The author removes it or accepts the disclosure |
 | Export stale | `graph status` exits 1 | yes | Re-export |
-| `--out` names a path git would track | Exit 5; nothing written | no | Use an ignored path |
+| `--out` names a path git would track, or another refused place (C) | Exit 5; nothing written | no | Use an ignored path |
+| A restricted location holds more than was released | Geometry left out; `restricted_in_project` warning; export written; exit 1 | no | Move the value to the restricted store |
+| The installed copy lacks its page template | Exit 70; nothing written | no | Install Stemma again |
+| `--audience reviewer` or `--chapter` in this version | Exit 2, not implemented: a partial filter could disclose withheld text | no | None yet |
 | Graph beyond the measured size | Export succeeds with a warning and the counts | yes | Scope by chapter |
 | Browser refuses to load | The page names the failing file or record | no | Re-export; report |
 
@@ -326,12 +411,13 @@ output, and checks that a coordinate seeded in prose is warned about.
 
 | Element | Evidence | Not shown |
 |---|---|---|
-| Projection loads | A feasibility test loaded 99 nodes and 90 links from synthetic records after renaming `key` and `type`; arras merged duplicate links without a message | This mapping, the full schema, `reviewer` filtering |
-| Scale | The stock static browser loaded 10,000 synthetic nodes in about 0.28 s and 100,000 in 2.5 to 2.9 s, headless Chromium on one macOS system | Real note text, other browsers, desktop previews; arras claims far less |
-| Offline file | A Stemma-built single HTML file opened with no network requests (about 1.2 MB compressed at 10,000 nodes) | Larger sizes; other browsers |
-| arras limits | Read in arras source and contracts; the published 0.8.1 package surface (`loadStore`, `createStaticClient`) is from research reading | Re-verification against the pinned package |
+| Projection loads | The pinned 0.8.1 loader accepts the export of the worked example and of a synthetic project with every kind, field, and pair of linked types (44 types, 275 relationships) | A real author's project |
+| Author export, `graph export`, `graph status` | Local tests: byte determinism, omissions, restricted geometry, refusals, a fresh clone, and a run from the installed plugin | `reviewer` filtering; `--chapter` |
+| Offline page | In headless Chromium on one macOS system (Apple silicon), from a local file with the network off: search, diacritic search, links in both directions, Back, reload, 150 links on one record, hostile record text shown as text, no request, no console error. axe-core reported no violation on the arras home, list, and record views it was run on, or on the Stemma banner | Other browsers, systems, and desktop hosts; keyboard and screen-reader use by hand |
+| Scale | The stock static browser loaded 10,000 synthetic nodes in about 0.28 s and 100,000 in 2.5 to 2.9 s in an earlier feasibility test | This projection at that size, real note text; arras claims support for 1,024 nodes and 7.9 MB, past which an export warns |
+| arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
-| `GraphStore`, `--page`, fresh-clone rebuild, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
+| `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 
 ## Schema Basis
 
