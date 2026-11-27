@@ -153,3 +153,34 @@ US-090-AC4/AC5 are only partly met (no support records or stale computation
 yet). US-094-AC5 depends on FEAT-009 filtering. axe-core results on arras
 widgets are reported as observed. arras search returns the first 50 matches per
 type.
+
+## Spike result
+
+Run against `@documentdrivendx/arras-ui` 0.8.1 in headless Chromium, with a host
+page bundled into one file, under the page policy of amendment 9, opened from a
+local file. The design holds.
+
+- A small module renders, searches, follows a link in both directions, goes back
+  and reloads in place. `location` left uncontrolled: arras routes with the URL
+  fragment and keeps view state in the history entry. No non-file request and no
+  console error.
+- The module generated from `examples/coral-reefs` (104 entities, 11
+  relationships) loads and searches.
+- A synthetic project made from the record schema (every kind, field and pair of
+  linked types) with the 20 searched types present: a match in the last searched
+  type is found. A record page with 116 relationship sections opens; arras splits
+  its queries to stay within 50 fields.
+- One record with 150 links, inward and, separately, outward: arras returns 100
+  keys in the field and its "Show more" pages the rest by listing the other type.
+  All 150 are reachable in both directions.
+- One design change: arras caps the view terms of a document at 128 KiB. The full
+  schema (44 types, 275 relationships) came to 131,525 bytes with a label on
+  every field, and did not load. The exporter leaves out field labels and formats
+  that arras gives anyway, which brought it to about 103 KB.
+- arras also searches any type it can title unless the type declares an empty
+  search list, and adds one query fragment for each type with a badge field. The
+  exporter declares both explicitly.
+
+Limits that remain and weaken US-090 without making it fail: a search lists at
+most 50 results, and at most 50 of one type, in key order; a query is 2 to 200
+characters and at most 6 words.

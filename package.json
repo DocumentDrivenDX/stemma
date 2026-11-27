@@ -14,10 +14,14 @@
     "@playwright/test": "1.63.0",
     "@tailwindcss/cli": "4.3.5",
     "@types/bun": "1.4.5",
+    "@types/react": "19.3.0",
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "pdfjs-dist": "6.5.438"
+    "@documentdrivendx/arras-ui": "0.8.1",
+    "pdfjs-dist": "6.5.438",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   }
 }
