@@ -202,8 +202,8 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   that guards it reaching the agent's transcript or any process argument.
 - SRV-02. Every source view and the manuscript view must be given on request,
   with no size cap that leaves out text.
-- SRV-03. Browsing and search must answer as the offline explorer does, through
-  arras's own static client, with the same stated search limits.
+- SRV-03. Browsing must answer as the offline explorer does, through arras's own
+  static client. Search is the exception (SRV-08).
 - SRV-04. Data older than the record files, or given by any other program that
   answers at the server's address, must never be presented as current. While the server rebuilds after a change, the page must say so and show no
   earlier data.
@@ -217,6 +217,14 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   hour without use.
 - SRV-07. The installed plugin must run it with no further package or download
   beyond the pinned runtime.
+- SRV-08. A project is not limited to a few dozen results: significant projects
+  have thousands of sources. In the served explorer, every record shown that
+  matches a search must be reachable, with the true total, in ranked order, page
+  by page; no record type may be left unsearched; and every link of a record must
+  be reachable. Wherever fewer matches are listed than there are, the page must
+  say so with both numbers. The offline file keeps arras's limits and states
+  them.
+- SRV-09. A search request's cost and a served answer's size must be bounded.
 
 ### Non-Functional Requirements
 
@@ -238,6 +246,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 ## User Stories
 
 - [US-090 — Browse and search the evidence](../user-stories/US-090-browse-and-search-evidence.md)
+- [US-120 — Find any record in a large project](../user-stories/US-120-find-any-record-in-a-large-project.md)
 - [US-091 — See a large connected graph](../user-stories/US-091-see-a-large-connected-graph.md)
 - [US-092 — Trace a sentence to its evidence and back](../user-stories/US-092-trace-a-sentence-to-evidence.md)
 - [US-093 — Preview typeset pages while editing](../user-stories/US-093-preview-pages-while-editing.md)
@@ -307,8 +316,9 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
-- Opening or highlighting an original or page image, search beyond the arras
-  limits, and an MCP surface: later stages of ADR-012, not yet specified.
+- Opening or highlighting an original or page image, and an MCP surface: later
+  stages of ADR-012, not yet specified.
+- Searching source page text, manuscript files, or research notes.
 - Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).
 - Reviewer package contents and removal rules (FEAT-009).

@@ -235,7 +235,7 @@ modules, or the product owner for accepted risks.
 | TM-D-007 | Pathological content stalls citation formatting or Typst | 2 | 2 | 4 | `publish` | None specific |
 | TM-D-008 | Injected or oversized text makes the agent loop, spend, or stop | 2 | 2 | 4 | Author | Bounded excerpts |
 | TM-D-009 | The index is corrupt or stale | 1 | 2 | 2 | `graph` | Rebuilt from records |
-| TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds. Another user can still use up the connection limit while it connects; the author loses browsing, not data |
+| TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds, including a search's work and answer size (CONTRACT-005 M, rule 13). Another user can still use up the connection limit while it connects; the author loses browsing, not data |
 
 ### Elevation of Privilege
 

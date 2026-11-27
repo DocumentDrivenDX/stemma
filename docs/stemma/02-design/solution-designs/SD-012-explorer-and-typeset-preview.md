@@ -187,7 +187,15 @@ partly met.
 - **Responsibilities**: `server` owns the HTTP rules of CONTRACT-005 M, the launch file and browser opener, the use of the input scan, and the rebuild states; it knows nothing of records. `workspace` makes the stat scan, listing the inputs as `readProject` does. `graph` makes the served data with the export's own function, with no size cap and no page. A child process, composed in `cli`, builds it, loads it into arras's static loader, and answers with arras's static client. `explorer` has a second entry for the served page: it gets the secret, forwards the `ArrasClient` reads, asks for source and manuscript views when shown, and polls for changes. BR-1215, BR-1216.
 - **Requirements Addressed**: SRV-01 to SRV-07.
 - **Interfaces**: CONTRACT-005 M; `stemma.sourceview/0` and `stemma.manuscript/0` unchanged. The record browser, source panel, and manuscript view are the offline page's components.
-- **Not built**: search beyond the arras limits, originals, MCP, and a SQLite index (`GraphStore`).
+- **Not built**: originals, MCP, and a SQLite index (`GraphStore`).
+
+### Component: Served search (`graph`, `server`, `explorer`)
+
+- **Purpose**: Every record of a large project found and reachable.
+- **Responsibilities**: `graph` gives each entry of the served data its folded search text, with the projection's own rules. `server` matches, ranks, pages, and counts over that text in the snapshot's process, answers `/api/search`, answers arras's search query in arras's shape, and bounds answers. `explorer` raises that query's limit, and shows the Search view.
+- **Requirements Addressed**: SRV-08, SRV-09.
+- **Interfaces**: CONTRACT-005 M, "Search".
+- **Not built**: search of source page text, and an index (ADR-012).
 
 ### Component: Connected view (arras contribution)
 
@@ -272,6 +280,7 @@ encoding, and its packaged release used an older Typst than the pinned 0.15.1.
 | BRW-03, BRW-04 | Host page | BR-1209 | Request monitor; hostile record and comment fixtures |
 | BRW-05 | Preview data | BR-1201 | Filtered input; seeded absent source not found in the file |
 | SRV-01 to SRV-07 | Local server | CONTRACT-005 M, BR-1215, BR-1216 | One refusal test per rule; sockets; output, argument, and file search; same answers as in process; edit while open; browser flow; plugin check |
+| SRV-08, SRV-09 | Served search | CONTRACT-005 M, "Search" | Brute-force comparison on a synthetic project; every page; mixed scripts; every link of a large record in a browser; request and answer bounds |
 | BRW-06 | Export | CONTRACT-005 C | Fresh clone rebuild; git status clean |
 
 ### Experience Traceability

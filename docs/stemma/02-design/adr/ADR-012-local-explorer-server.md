@@ -36,10 +36,32 @@ which a program offers tools to an AI agent).
 The single offline file stays, unchanged in behaviour, for reviewer packages and
 for browsing without a server.
 
-Delivery is in stages. The server (`stemma browse`, CONTRACT-005 M) comes first.
-Search beyond the arras limits, originals, highlighting on originals, and MCP are
-later stages, each specified before it is built. None of them is built by this
-decision alone.
+Delivery is in stages. The server (`stemma browse`, CONTRACT-005 M) comes first,
+then search beyond the arras limits (M, "Search"). Originals, highlighting on
+originals, and MCP are later stages, each specified before it is built. None of
+them is built by this decision alone.
+
+## Search in the server
+
+The product owner requires that a project with thousands of sources is not
+limited to a few dozen results: every match must be reachable, with a true total.
+Stemma answers search itself, in the process that holds the snapshot, by reading
+each entry's folded search text, and answers arras's own search query from the
+same function. No arras code is changed.
+
+A SQLite full-text index was allowed and was tried first. The pinned Bun's
+`bun:sqlite` (SQLite 3.54.0) has FTS5 with a trigram tokenizer, which with case
+sensitivity on found exactly the substrings that a scan found for words of 3 or
+more code points, in Latin, Greek, Arabic, Japanese, and Thai test text. It
+finds nothing for 1 or 2 code points, which short words and much Chinese and
+Japanese need, and it fails on a text holding a NUL, so a scan would be needed
+beside it. Over the 79,020 entries of a synthetic project of 5,000 sources
+(35 million characters of search text, one macOS machine), a scan with ranking in
+TypeScript took 5 to 40 ms a search and nothing to build. SQLite took 1.5 s and
+82 MB more to build its index, under 1 ms to find a rare word, and 40 to 250 ms
+when thousands of entries had to be counted and ranked. So there is no index:
+nothing derived is written to disk or can be stale. This is not the FEAT-011
+engine, and it would be reconsidered for a project many times that size.
 
 ## Why We Chose This
 
@@ -93,7 +115,8 @@ holds the whole export in memory, and rebuilds it all after a change.
 
 **Drift signals to watch**: A rule weakened to make something work; a server that
 answers from data older than the record files; a request path that reaches the
-file system; any outbound request; a second implementation of arras behaviour.
+file system; any outbound request; a second implementation of arras behaviour
+beyond the search result's shape; a search that cuts results without saying so.
 
 ## Concern Impact
 

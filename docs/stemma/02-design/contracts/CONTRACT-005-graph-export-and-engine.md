@@ -315,9 +315,9 @@ Limits at arras 0.8.1:
 | Relationship records have no readable properties; a link is identified by its triple | Link data and parallel links would be lost | Link records and owned entries become entities, adding nodes and hops |
 | ASCII keys; reserved names; integers only | Limits names and numbers | F |
 | One bad record fails the whole load | No partial graph | Generate together; test the load |
-| A relationship field returns at most 100 keys | Large hubs need paging | The arras "Show more" lists the other type for the rest; all 150 links of a test record were reached in each direction |
-| A query searches 20 types and resolves 1,000 records | Other types are not searched | 20 searched types (F); others are reached by type lists and links |
-| A search takes the first 50 matches per type in key order and lists at most 50 in all; a query is 2 to 200 characters and at most 6 words; no diacritic folding | Matches past 50 are not listed; random keys make which appear arbitrary | `searchText` and a folded query; type filtering; upstream request |
+| A relationship field returns at most 100 keys | Large hubs need paging; the true count of a hub's links is not shown | The arras "Show more" lists the other type for the rest; all 150 links of a test record were reached in each direction |
+| A query searches 20 types and resolves 1,000 records | Other types are not searched | Offline: 20 searched types (F); others are reached by type lists and links. Served: Stemma's search covers every type (M) |
+| A search takes the first 50 matches per type in key order and lists at most 50 in all; a query is 2 to 200 characters and at most 6 words; no diacritic folding | Matches past 50 are not listed; random keys make which appear arbitrary | Offline: `searchText` and a folded query; type filtering. Served: Stemma's search, with a Search view that pages through every match (M). Upstream request |
 | A query selects at most 50 fields | A record with many fields or links needs several | arras splits its record-page queries |
 | A document's view terms are at most 128 KiB, a type's 16 KiB | A label on every field of the full schema does not load | Leave out what arras gives anyway; about 103 KB for the full schema, tested |
 | A list value is drawn as badges that do not wrap | Long list entries widen the page | A style in the host page lets them wrap |
@@ -332,6 +332,12 @@ Limits at arras 0.8.1:
 | Supported single-file or local-file build | arras, or Stemma host | FR-46 | Not blocking if Stemma builds the host |
 | Extension point for views and node-page sections | arras | FR-65 to FR-67 | Unknown until composition is tried |
 | Search folding and ranked candidate selection | arras | FR-64 | No; partial workaround |
+| Search paging: an `offset` or cursor on `_search`, a next page in the browser, and true total and per-type counts | arras | FR-64 | No; the served page has its own Search view (M) |
+| Result limit above 50 a caller can set, and a status line that states how many of how many are listed (0.8.1 says "the best 50 of each type" while listing at most 50 in all) | arras | FR-64 | No; the served page writes the numbers into the result's `text` |
+| Ranking before the cut: 0.8.1 cuts each type to its first 50 matches in key order, then ranks | arras | FR-64 | No; offline only |
+| Configurable query limits: 20 searched types, 2 to 200 characters, 6 words; one-character search for scripts without word spaces | arras | FR-64 | No; offline and in arras's box |
+| A public way for a host to supply its own search, in place of recognizing the browser's query text | arras | FR-64 | No; an arras upgrade can change the query, and a test fails if it does |
+| A true count for a relationship with more than 100 links, and paging of it without scanning the other type | arras | FR-64 | No |
 | Several types per relationship end; readable link properties | arras contracts | FR-63 fidelity | No; projection works without them |
 | A way to attach and save claim comments from a node page | arras extension point or Stemma view | Reviewer comments | Unknown until composition is tried |
 | Claims for larger graphs, other browsers, Windows | arras, or Stemma evidence | FR-64, FR-75 | Support claims only |
@@ -341,7 +347,8 @@ Stemma MUST NOT keep a private fork of the arras connected-graph view.
 ### H. `GraphStore` port
 
 The local server (M) does not implement this port and builds no index: it runs
-arras's own static loader and executor over an export held in memory.
+arras's own static loader and executor over an export held in memory, and its
+search reads that memory (ADR-012).
 
 The disposable index (M1) and the graph engine (FR-63, P1) implement the same
 read interface, so features do not change at the switch.
@@ -597,8 +604,8 @@ is unchanged and the page sends no request.
 ### M. The local server
 
 `browse` (CONTRACT-002 B; ADR-012) serves the explorer to a browser on the same
-computer. It serves the `author` audience only. This version has no search beyond
-the limits of G, opens no original, and has no MCP surface.
+computer. It serves the `author` audience only. Its search is Stemma's own, with
+no result limit ("Search" below). It opens no original and has no MCP surface.
 
 **What is served.** The author export of B, E, F, J, K, and L, made in memory
 from the record files by the same functions, with no size cap on source views or
@@ -607,11 +614,12 @@ the manuscript view, so no view is `not_exported` and no
 served page does not load the graph. All other omissions and warnings are the
 export's. Where the module's description or a warning tells the reader of an
 export what to do with it, the served one says the same of a served page. arras's pinned static loader loads the module and graph in the server,
-and its static client answers the reads. The page's `ArrasClient` forwards each
-read; for `moduleQuery` it sends the module name, query text, and variables
-unchanged, and gives arras the answer unchanged. The page folds search text
-before that, as the offline page does. Nothing is written in the project, no
-index is built, and `GraphStore` (H) is not implemented. An export directory is
+and its static client answers the reads, except arras's search query ("Search").
+The page's `ArrasClient` forwards each read; for `moduleQuery` it sends the
+module name, query text, and variables unchanged, but for the search query's
+`limit`, and gives arras the answer unchanged. The page folds search text before
+that, as the offline page does. Nothing is written in the project, no index is
+built, and `GraphStore` (H) is not implemented. An export directory is
 neither read nor written.
 
 **Processes.** The command holds the listener and the rules below. A child of it
@@ -631,7 +639,8 @@ the three assets are held in memory.
 | `POST /api/status` | `{}` | `{"state": "current" \| "rebuilding" \| "failed", "data_identity"?, "message"?}` |
 | `POST /api/boot` | `{}` | Banner data and the manuscript view's state |
 | `POST /api/arras` | `{"call"}` with `call` one of `version`, `viewer`, `meta`, `status`, `schemaCatalog`; or `{"call": "export", "request"}` | What arras's static client answers |
-| `POST /api/query` | `{"module", "query", "variables"?}` | What arras's `moduleQuery` answers, or its refusal |
+| `POST /api/query` | `{"module", "query", "variables"?}` | What arras's `moduleQuery` answers, or its refusal; for arras's search query, Stemma's answer in its shape |
+| `POST /api/search` | `{"text", "type"?, "offset", "limit"}` and nothing else | One page of Stemma's search ("Search") |
 | `POST /api/source-view` | `{"id"}` | The source view of that citation or passage, or none. The ID is only looked up in the snapshot |
 | `POST /api/manuscript` | `{}` | The manuscript view |
 
@@ -700,6 +709,80 @@ are refused in the page as the static profile refuses them.
     'none'`. The served page is its own template: its script and styles are
     separate files, with none inline.
 12. The server and its child make no outbound request.
+13. A request's cost and answer are bounded. A search reads each entry's search
+    text once, for at most 16 words of a text of at most 200 code points, and
+    lists at most 200 entries (500 in arras's shape). An answer to `query`,
+    `arras`, or `search` is at most 8 MiB; a larger one is not sent, and the call
+    is refused with `answer_too_large` (422). arras's own limits bound its other
+    queries. A source view and the manuscript view have no size cap: they are as
+    large as the records make them, and a request gets at most one.
+
+**Search.** The server searches every entry of every type in the served graph.
+An entry of a searched type (F) is searched by its `searchText`; every other
+entry by text made the same way from its heading and its own words, which no
+export file holds. The same function makes both, from the same fields, so
+nothing an export leaves out is searched.
+
+- A search takes a text of 1 to 200 code points as sent, which is folded under
+  `search-fold` and split at spaces into at most 16 words, and at least one.
+- An entry matches when every word occurs, as a run of characters, in its search
+  text. An entry whose record ID is the whole folded text, ignoring case, matches
+  too, and comes first.
+- Other matches are ranked by the sum over the words of: 4 when the word starts
+  a word of the heading, 3 when it is elsewhere in the heading, 2 when it starts
+  a word of the search text, and 1 otherwise. A word starts at the start of the
+  text or after a space. Equal ranks follow type declaration order, then key by
+  code point. The order is total, so for one snapshot the pages of a search
+  neither repeat nor skip an entry.
+- `/api/search` answers `text` (as folded), `total` (matches of the asked type,
+  or of all types), `all` (matches of all types), `counts` (for each type with a
+  match: `type`, `label`, `count`), `searched` (`entries` and `types`),
+  `offset`, and `hits`, each with `rank` (from 1), `type`, `type_label`, `key`,
+  `label` (the heading), and `excerpt`. An excerpt is at most 160 code points of
+  the search text, which is folded and so in lower case and without diacritics,
+  as parts each marked as matched or not; an entry found by its ID alone has
+  none. `offset` is a whole number from 0, `limit` from 1 to 200, and `type` a
+  type of the graph. Anything else is refused with `bad_request`.
+- Scripts written without spaces between words (Chinese, Japanese, Thai, Lao,
+  Khmer, and others): no words are separated, so a run typed without spaces must
+  occur unbroken, and runs separated by spaces must each occur. A single
+  character can be searched. The ranking's word starts are only the spaces and
+  starts the text has. Arabic vowel signs, Hebrew points, and Latin and Greek
+  diacritics are ignored, as `search-fold` defines; marks of other scripts are
+  not.
+- Not searched, since no entry holds it: source page text beyond what passages
+  quote, manuscript files, research notes, standing rules, retired and left-out
+  records, and what the export omits. The page says so.
+
+**arras's search box.** The server recognizes exactly the search query of the
+pinned arras and answers it from the same search, in arras's result shape. The
+page sets that query's `limit` to 200 (arras asks for 50). `counts` holds the
+true number of matches of each asked type, with `atLeast` false, so arras's type
+chips show true totals, and `notSearched` is empty. When more entries match than
+are listed, `text` says so with both numbers and names the Search view, and
+`truncated` is false, because arras's words for a cut answer ("the best 50 of
+each type") would be untrue. When the search is outside what arras itself
+accepts, arras's refusal is given. Any other query that names `_search` is
+refused, so that no search falls back to arras's limited one unseen. arras's box
+still takes 2 to 200 characters and at most 6 words.
+
+**The Search view.** The served page has a Search view beside the record browser,
+with its own routes, `#/search` and `#/search/<type or all>/<page>/<text>`. It
+shows the true total, the count for each type, 50 matches a page in rank order
+with their rank numbers, and moves to the first, previous, next, last, or any
+numbered page, so every match is reached. Each result opens its record in the
+record browser, and Back returns to the same page of results. The text is in the
+fragment, which no request carries, and so is in the browser's history. The view
+takes the text last typed in arras's box when opened from the record browser.
+The offline file has no Search view.
+
+**Links and lists.** Every link of a record is reached through arras unchanged:
+a relationship shows the first 20, "Show more" shows up to 100, and then
+"Show more" reads the rest of that relationship from the other type, 100 at a
+time, until none is left; arras counts such a relationship as "100 or more". A
+type's list is read 50 at a time with "Show next 50" to its end. The
+neighbourhood picture draws only some of a record's links; the lists beside it
+hold all.
 
 **Proofs.** Once a server stops, another program can take its port at once, and
 an open page would reach it. So each side shows the other, on every `POST`, that
@@ -860,6 +943,7 @@ running. It then removes the launch file and ends its child.
 | Graph beyond the measured size | Export succeeds with a warning and the counts | yes | Scope by chapter |
 | Browser refuses to load | The page names the failing file or record | no | Re-export; report |
 | A served request breaks a rule of M | Refused with a status and code; nothing is read from the snapshot | no | Open the page from `browse` |
+| A served answer would be larger than 8 MiB, or a search is outside its bounds (M) | `answer_too_large` or `bad_request`; nothing else is affected | no | Ask for less; use the Search view |
 | The inputs changed (M) | `index_stale` until rebuilt; the page says so | yes | Wait; the page loads again |
 | A rebuild fails (M) | State `failed` with what is wrong; no earlier data is served | after a change | Fix the project; run `check` |
 | The one-time code was already used (M) | The page says that another page or program opened the link first; the command has printed when it was opened | no | Stop `browse`, then run it again |

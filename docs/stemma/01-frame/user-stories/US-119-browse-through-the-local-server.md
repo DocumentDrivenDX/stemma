@@ -40,7 +40,7 @@ to the author's own page only.
 
 - [ ] **US-119-AC1** — Given a project, when the command runs, then a browser on the same computer shows the explorer, and nothing is written in the project.
 - [ ] **US-119-AC2** — Given a project whose offline file would cut source text, when she opens any passage, citation, or report quotation, then its text is there.
-- [ ] **US-119-AC3** — Given the same project, when she searches and opens records, then the served explorer answers as the offline one does.
+- [ ] **US-119-AC3** — Given the same project, when she opens records, follows links, and lists types, then the served explorer answers as the offline one does. Search is US-120.
 - [ ] **US-119-AC4** — Given an open page, when a record, source file, or report input changes, then no answer is given from the earlier data, the page says so, and afterwards it shows the new data.
 - [ ] **US-119-AC5** — Given a request with a wrong or missing host, origin, secret, content type, or request header, a used one-time code, a cross-origin fetch or form post, an unknown path or method, or a request too large or too slow, when it arrives, then it is refused and reads nothing.
 - [ ] **US-119-AC6** — Given a run, when its output, process arguments, and files are examined, then neither the secret nor, outside the private launch file, the one-time code is in them.
@@ -84,5 +84,5 @@ to the author's own page only.
 
 ## Out of Scope
 
-- Search beyond the arras limits, originals, and MCP.
+- Search beyond the arras limits (US-120), originals, and MCP.
 - Serving anyone on another computer, and a reviewer audience.

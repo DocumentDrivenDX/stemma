@@ -61,8 +61,8 @@ Each item states its acceptance criterion.
   only by its owner and removed after use, and the secret is in no file Stemma
   writes (CONTRACT-005 M, rules 8 and 9).
 - **SEC-036**: The local server listens on 127.0.0.1 only, serves a fixed set of
-  routes, lets no request name a file, bounds request size, time, and
-  connections, sends the headers and policy of CONTRACT-005 M, rules 10 and 11,
+  routes, lets no request name a file, bounds request size, time, connections,
+  the work of a search, and the size of an answer to a query or search, sends the headers and policy of CONTRACT-005 M, rules 10 and 11,
   writes nothing in the project, and makes no outbound request.
 - **SEC-037**: No request carries the code or the secret. The server accepts each
   signed call once, and the page uses no byte of an answer whose proof, bound to
