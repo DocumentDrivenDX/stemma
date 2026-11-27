@@ -33,8 +33,8 @@ work in progress elsewhere and wait until it reaches `main`.
 | 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, originals with highlighting where positions are certain (scans unmarked) and MCP on main; other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Faster export and complete paged search in `stemma browse` on main; export memory over 4 GB; offline page still limited |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
-| 28 | Several locations for an original | FR-98 | — | Not built |
-| 29 | Source text not held: report it, fetch and convert it again | FR-104 | 28 | Not built |
+| 28 | Several locations for an original | FR-98 | — | Built, with limits: a private copy is found locally by hash before any address is asked, not in the listed order; a supplied original counts only by hash; fall-through after a real refusal exercised only with faked fetches; explorer and excerpt views show only the retrieval address |
+| 29 | Source text not held: report it, fetch and convert it again | FR-104 | 28 | Built, with limits: supplied, typed, hand-corrected text, or text from other converter versions, may not be reproducible; a changed web page may not restore |
 | 30 | Technical sources: versions, repository files, findable places, exact code and tables, a page's own content, technical checks and citation forms, quoted code in builds | FR-99 to 103, 106 to 108 | 28 | Not built |
 | 31 | Records behind a report in one run | FR-105 (P1) | 2 | Not built |
 

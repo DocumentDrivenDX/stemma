@@ -44,8 +44,9 @@ repositories, and engineering write-ups. Many have no pages, many change, and
 some disappear. So the chain has to say which version was read, hold that text,
 say where the original can be found again, and give a place a reader can find.
 Today Stemma ties the text to the bytes that were read and records a version that
-is stated to it. Much of the rest is not built: the
-[PRD](../01-frame/prd.md) marks those requirements (FR-98 to FR-108).
+is stated to it. It also records several places an original can be had, and can
+fetch missing text again (FR-98 and FR-104, with limits). Much of the rest is not
+built: the [PRD](../01-frame/prd.md) says which of FR-98 to FR-108 are.
 
 Claude drives this for the author as one pipeline: capture the upstream sources,
 convert and reverify them, identify research questions and capture the relevant
@@ -101,9 +102,11 @@ the sources do not carry it. A script copies each quotation. The build writes th
 report with its notes and bibliography and says what is still open. The sources'
 full text sits in the author's project, which they need not publish. A copy of the
 project that does not hold some source's text says so and shows what could not be
-checked; fetching that text again from a recorded location is not built (FR-104).
-Nor are places a reader can find on a web page that has no pages (FR-101), code
-quoted line for line (FR-102, FR-108), or source files cited by commit and line
+checked. That text can be fetched again from a recorded location, or made from a
+copy the author gives, and is written only where it matches what the project
+recorded (FR-104; a page that has changed may no longer give it). Not built:
+places a reader can find on a web page that has no pages (FR-101), code quoted
+line for line (FR-102, FR-108), and source files cited by commit and line
 (FR-100).
 
 A scholar with a half-referenced manuscript in Word opens it with Stemma.
@@ -140,7 +143,8 @@ articles, and papers, and
 argument from scanned books and articles. An AI model made both, and no person
 has reviewed their records. Neither is a pilot, and neither shows that an author
 can use Stemma or that others need it. The PostgreSQL project is not checked
-clean. What it could not do is the source of much of FR-98 to FR-108.
+clean. What it could not do when it was made is the source of much of FR-98 to
+FR-108.
 
 ## Target Market
 
@@ -155,7 +159,7 @@ clean. What it could not do is the source of much of FR-98 to FR-108.
 
 | Value Proposition | Customer Benefit |
 |-------------------|------------------|
-| Rigorous reports and books from the sources a technical subject has | Documentation, specifications, papers, code, and engineering accounts can carry a footnoted argument. Several of these source forms are only partly supported or not built (FR-98 to FR-108) |
+| Rigorous reports and books from the sources a technical subject has | Documentation, specifications, papers, code, and engineering accounts can carry a footnoted argument. Several of these source forms are only partly supported or not built (FR-99 to FR-103 and FR-106 to FR-108) |
 | The whole research captured in the project | A cited claim traces to a passage of a source's text and to the original it came from, by hash, or is shown as unchecked. Anyone with a copy that holds that text can check it, even after the page has changed |
 | Scripted checks while the author works, rerun at every build | Citation failures surface early, with evidence and a suggested fix, and every build says whether any remain |
 | Takeover of existing manuscripts | Authors adopt Stemma without starting over |

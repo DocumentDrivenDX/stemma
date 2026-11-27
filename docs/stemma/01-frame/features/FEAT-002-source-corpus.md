@@ -92,21 +92,21 @@ STO-03 (FR-6, FR-86, P0, M1). A library source must be fetched only by a route t
 
 #### Locations and text not held
 
-LOC-01 (FR-98, P0, M1). One upstream record for one original, known by its hash, must be able to list several locations: the publisher's or live address, web-archive snapshots, other archival copies, and a private copy the author keeps. Each location is a reference; no copy at it may be stored in the repository. **Not built.**
+LOC-01 (FR-98, P0, M1). One upstream record for one original, known by its hash, must be able to list several locations: the publisher's or live address, web-archive snapshots, other archival copies, and a private copy the author keeps. Each location is a reference; no copy at it may be stored in the repository. **Built** (`source locate`). The explorer and excerpt views show only the address the original was retrieved from.
 
-LOC-02 (FR-98, P0, M1). A copy from a location must count as the original only when its bytes have the recorded hash. Other bytes, such as a re-rendered page or an archive's wrapper, must be reported as differing and never treated as the same. **Not built.**
+LOC-02 (FR-98, P0, M1). A copy from a location must count as the original only when its bytes have the recorded hash. Other bytes, such as a re-rendered page or an archive's wrapper, must be reported as differing and never treated as the same. **Built.**
 
-LOC-03 (FR-98, P0, M1). Naming a private location must write no local absolute path and no secret into the repository. **Not built.**
+LOC-03 (FR-98, P0, M1). Naming a private location must write no local absolute path and no secret into the repository. **Built**: a private copy is recorded by a label that can hold no path, and an address with a user name or password is refused in a location. An access token in an address's query is not recognized, and these rules do not apply to the retrieval address of an upstream record.
 
-LOC-04 (FR-98, FR-6, P0, M1). Fetching again, only when the author asks, must try the locations in their listed order, fall through to the next when one cannot be reached, is refused, or differs, and report what each gave. A refusal must not be worked around. **Not built.**
+LOC-04 (FR-98, FR-6, P0, M1). Fetching again, only when the author asks, must try the locations in their listed order, fall through to the next when one cannot be reached, is refused, or differs, and report what each gave. A refusal must not be worked around. **Built with limits**: the retrieval address is asked first, then each listed address. A private copy is not tried in that order: it is looked for locally by its hash before any address is asked. Going on after a real refusal has been exercised only with faked fetches.
 
-HLD-01 (FR-104, P0, M1). A source whose records and manifest are held and whose text is not must be reported as *source text not held here*, once for the source, with what rests on it. What needs the text must be reported as could not be checked: never as passing, and the absence never as damage. A check of whether a built report is current that needs the text must answer that it cannot tell. **Not built.**
+HLD-01 (FR-104, P0, M1). A source whose records and manifest are held and whose text is not must be reported as *source text not held here*, once for the source, with what rests on it. What needs the text must be reported as could not be checked: never as passing, and the absence never as damage. A check of whether a built report is current that needs the text must answer that it cannot tell. **Built.**
 
-HLD-02 (FR-104, FR-87, P0, M1). A source with only some parts missing, or with a part that does not match its digest, must still be reported as damaged. **Not built** as a distinction from text not held.
+HLD-02 (FR-104, FR-87, P0, M1). A source with only some parts missing, or with a part that does not match its digest, must still be reported as damaged. **Built.**
 
-HLD-03 (FR-104, FR-98, P0, M1). When the author asks, one command must fetch the original from a recorded location, or read one the author supplies, convert it with the recorded settings, and write the missing text only where it matches the manifest's part digests. **Not built.**
+HLD-03 (FR-104, FR-98, P0, M1). When the author asks, one command must fetch the original from a recorded location, or read one the author supplies, convert it with the recorded settings, and write the missing text only where it matches the manifest's part digests. **Built with limits** (`ingest --fetch`, `ingest --originals`): text that was supplied or typed, corrected or relabelled by hand, or made by other converter versions may not be reproducible.
 
-HLD-04 (FR-104, P0, M1). Where fetched bytes differ from the recorded original and the converted parts all match, the report must say both: the text is restored, and the fetched copy is not the recorded original. Where parts do not match, nothing may be written and the difference must be reported. **Not built.**
+HLD-04 (FR-104, P0, M1). Where fetched bytes differ from the recorded original and the converted parts all match, the report must say both: the text is restored, and the fetched copy is not the recorded original. Where parts do not match, nothing may be written and the difference must be reported. **Built.** Only bytes that a recorded address gives are used this way; a supplied file serves only when it is the recorded original.
 
 #### Technical sources
 
