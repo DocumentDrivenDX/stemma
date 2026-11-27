@@ -85,8 +85,8 @@ async function plain(base: string, path: string): Promise<boolean> {
   return true;
 }
 
-/** Every file of `size` bytes in a place, following no link, passing over names that begin with a dot. */
-async function* candidates(places: string[], size: number, most: number): AsyncGenerator<string> {
+/** Every file of `size` bytes in the places, following no link, passing over names that begin with a dot. `most` bounds one search over all of them. */
+async function* candidates(places: string[], size: number, most: number): AsyncGenerator<{ place: string; path: string }> {
   let looked = 0;
   for (const place of places) {
     const queue = [place];
@@ -94,7 +94,7 @@ async function* candidates(places: string[], size: number, most: number): AsyncG
       const path = queue[i]!;
       if (++looked > most) return;
       const stat = await lstatOf(path);
-      if (stat?.isFile() && stat.size === size) yield path;
+      if (stat?.isFile() && stat.size === size) yield { place, path };
       if (!stat?.isDirectory()) continue;
       const names: string[] = [];
       try {
@@ -135,15 +135,13 @@ export function createOriginals(root: string, places: string[], search = ORIGINA
         if (typeof got === "object") return { bytes: got };
       }
       last.delete(sha256);
-      for (const place of places) {
-        for await (const path of candidates([place], size, search.entries)) {
-          const got = await readExact(path, sha256, size);
-          if (typeof got === "object") {
-            last.set(sha256, { place, path });
-            return { bytes: got };
-          }
-          other ||= got === "other";
+      for await (const { place, path } of candidates(places, size, search.entries)) {
+        const got = await readExact(path, sha256, size);
+        if (typeof got === "object") {
+          last.set(sha256, { place, path });
+          return { bytes: got };
         }
+        other ||= got === "other";
       }
       return { refused: other ? "original_changed" : "original_not_held" };
     },

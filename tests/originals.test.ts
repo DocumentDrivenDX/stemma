@@ -12,6 +12,7 @@ import { readProject } from "@stemma/workspace";
 import { TAGS } from "../packages/core/src/browse-proof.ts";
 import { provedBytes } from "../packages/explorer/src/proof.ts";
 import { servedPdf } from "../packages/explorer/build.ts";
+import { statedSize } from "../packages/explorer/src/pdf-engine.ts";
 import { newNonce, raw, request, requestMac } from "./browse-http.ts";
 import { Browsing, endRuns, Run } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
@@ -205,6 +206,10 @@ describe("US-121-AC4 where originals are looked for", () => {
     linkSync(join(folder, "a.pdf"), join(folder, "c"));
     expect(await read(root, [folder], { entries: 2 })).toBe("original_not_held");
     expect(await read(root, [folder], { entries: 3 })).toBe("found");
+    // The bound is on one search, however many places it runs over.
+    const two = [folderOf({ "a.pdf": new Uint8Array(3) }), folderOf({ "b.pdf": BYTES })];
+    expect(await read(root, two, { entries: 3 })).toBe("original_not_held");
+    expect(await read(root, two, { entries: 4 })).toBe("found");
     const base = folderOf({ "kept/x": BYTES });
     expect((await originalPlaces(base, ["kept"])).places[0]!.endsWith("kept")).toBe(true);
   });
@@ -388,6 +393,21 @@ describe("US-121-AC5 what the server gives of originals", () => {
         expect([path, (await get(path)).status]).toEqual([path, 404]);
       }
     });
+  });
+});
+
+describe("US-121-AC3 the size an image states is read before it is decoded", () => {
+  const png = originalPng(0);
+  // A JPEG's start, one segment to pass over, and a progressive frame 700 wide and 900 high.
+  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 4, 1, 2, 0xff, 0xc2, 0, 11, 8, 0x03, 0x84, 0x02, 0xbc, 1, 1, 0x11, 0]);
+
+  test("from a PNG's header and a JPEG's frame, and from nothing else", () => {
+    expect(statedSize(png, "image/png")).toEqual({ width: 600, height: 800 });
+    expect(statedSize(jpeg, "image/jpeg")).toEqual({ width: 700, height: 900 });
+    for (const [bytes, type] of [[png, "image/jpeg"], [jpeg, "image/png"], [jpeg.slice(0, 10), "image/jpeg"], [png.slice(0, 20), "image/png"],
+      [new Uint8Array([0xff, 0xd8, 0xff, 0xda, 0, 2, 0, 0, 0, 0, 0, 0]), "image/jpeg"], [png, "image/tiff"]] as const) {
+      expect(statedSize(bytes, type)).toBeUndefined();
+    }
   });
 });
 
