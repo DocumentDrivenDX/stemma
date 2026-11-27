@@ -33,6 +33,19 @@ test("US-094-AC1, US-090-AC6 the explorer Stemma wrote is TypeScript, bundled wi
   expect(inputs.filter((path) => /arras-ui\/dist\/(index|shell|testkit|ArrasConsole)/.test(path))).toEqual([]);
 });
 
+test("without headless Chromium, the check's last word is that the explorer page was not tested in a browser", () => {
+  const note = (browsers: string | undefined) => {
+    const env = { PATH: process.env.PATH ?? "", HOME: temporary(), ...(browsers === undefined ? {} : { PLAYWRIGHT_BROWSERS_PATH: browsers }) };
+    const done = Bun.spawnSync([process.execPath, join(ROOT, "scripts/browser-note.ts")], { cwd: ROOT, env });
+    return [done.exitCode, done.stdout.toString()];
+  };
+  expect(note(temporary())).toEqual([0, expect.stringMatching(/^NOT TESTED IN A BROWSER: the explorer page\./)]);
+  if (browser) expect(note(process.env.PLAYWRIGHT_BROWSERS_PATH)).toEqual([0, ""]);
+  const script = readFileSync(join(ROOT, "scripts/dev.sh"), "utf8");
+  const check = script.slice(script.indexOf("\n  check)"), script.indexOf("\n  build)"));
+  expect(check.indexOf("run scripts/browser-note.ts")).toBeGreaterThan(check.indexOf("run test ./tests"));
+});
+
 test("every package whose code is in the page ships its license", async () => {
   const inputs = (await bundleHost()).inputs;
   const bundled = [...new Set(inputs.flatMap((path) => /.*node_modules\/((?:@[^/]+\/)?[^/]+)\//.exec(path)?.[1] ?? []))].sort();
@@ -261,7 +274,7 @@ describe.skipIf(!browser)("the explorer page from a local file", () => {
     expect(errors).toEqual([]);
   });
 
-  test("accessibility: Stemma's own part has no violation, and what axe reports in arras is listed", async () => {
+  test("accessibility: axe reports no violation on Stemma's banner or on the arras home, list and record views", async () => {
     await visit("Source", fixtureId("source"));
     await settled(/./);
     const mine = await new AxeBuilder({ page }).include("[aria-label='About this export']").analyze();
@@ -271,7 +284,7 @@ describe.skipIf(!browser)("the explorer page from a local file", () => {
       await page.goto(address!);
       await page.waitForTimeout(500);
       const all = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
-      console.log(`axe, arras ${name} view: ${all.violations.length === 0 ? "no violation" : all.violations.map((v) => `${v.id} (${v.impact}, ${v.nodes.length})`).join(", ")}`);
+      expect([name, all.violations.map((v) => `${v.id} (${v.impact}, ${v.nodes.length})`)]).toEqual([name, []]);
     }
   }, 60_000);
 

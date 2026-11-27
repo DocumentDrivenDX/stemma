@@ -52,7 +52,11 @@ case "${1:-check}" in
     run scripts/build.ts >/dev/null
     # Many tests run several commands in turn, so they get longer than the
     # 5-second default when workers share the machine.
-    run test ./tests --preload ./tests/cleanup.ts --parallel=4 --timeout=30000
+    status=0
+    run test ./tests --preload ./tests/cleanup.ts --parallel=4 --timeout=30000 || status=$?
+    # Last, so that skipped browser tests are not lost among the other lines.
+    run scripts/browser-note.ts
+    exit "$status"
     ;;
   build) run scripts/build.ts ;;
   example)
