@@ -75,6 +75,47 @@ step when it is wanted, in any later session; do not hold one back for another.
 4. **Assemble** the argument citing those passages. (Footnote generation and
    builds are not available yet; say so.)
 
+## No binary files in the repository
+
+A project holds text. Never copy, move, download, unpack or commit a binary file
+into the project: Word, PDF, EPUB, slide or spreadsheet files, archives, images.
+This covers every way material arrives: taking over an existing project, bringing
+in folders from another tool, archiving old drafts, and the author's own work.
+A request to import, copy or keep such files means:
+
+- **Leave the originals where they are**, unchanged. Do not make a second copy
+  in the project, not even in an `import/` or `archive/` folder. Tell the author
+  that the originals need their own backup.
+- **Convert what is to be read, kept or cited** with `source convert` or
+  `ingest`, reading the original from where it is (`--originals`). Each document
+  gets a source record, the author's own drafts included. The Markdown in
+  `sources/` is what the project stores and cites, tied to the original by hash.
+- **Use the built-in converter**, not another program or a script of your own,
+  for the formats it reads (DOCX, PDF, EPUB, HTML, Markdown, plain text). Say
+  what conversion leaves behind: for DOCX, comments, tracked deletions, page
+  numbers, running heads, images, automatic list and heading numbers, and
+  characters inserted as symbols.
+- **Pages.** What keeps a citation checkable is the page it is on and its exact
+  characters. A PDF becomes one Markdown file per page. A DOCX has no fixed
+  pages, so it becomes one file per section and is never given page numbers: do
+  not cite it by page, or work one out. When pages are needed, ask the author for
+  a PDF of the version they cite, exported from the word processor they use, and
+  convert that. The page breaks belong to that rendering: another program, font
+  or setting can move them, so the PDF's hash is what ties them, and the author
+  keeps that PDF with the original. Use `--auto-pages` or `source pages` for the
+  printed numbers. The DOCX's own conversion reads the characters as typed,
+  while a PDF's are read from the rendered layout: where exact words matter,
+  find them in the DOCX conversion too (`passage find`). Stemma cannot yet
+  compare a paged conversion with an unpaged one as a whole.
+- **For other formats**, such as images, slides or spreadsheets, record in a
+  research note what each is, its SHA-256 hash, and where the author says it is
+  held, without an absolute local path.
+
+If the author asks outright to commit a binary, say what that costs and let them
+decide. `check` reports binary files in the repository (`project.binary`);
+`init` makes git ignore the common document formats. In a project that already
+holds them, report this; do not delete files or rewrite git history unasked.
+
 ## Rules for source text and quotations
 
 - **Never produce, retype, complete, tidy, or correct source text**, and never

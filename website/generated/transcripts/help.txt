@@ -1,4 +1,4 @@
-stemma 0.0.8
+stemma 0.0.9
 The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version

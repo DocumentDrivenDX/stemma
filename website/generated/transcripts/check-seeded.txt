@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/seeded
 OPEN FINDINGS: 9 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 15 result(s) passed.
+Checked the whole project: 16 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.

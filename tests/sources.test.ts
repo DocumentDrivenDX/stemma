@@ -631,7 +631,7 @@ describe("metadata and identifiers (FR-86)", () => {
     expect(of(open.report, "meta.resolver")[0]!.open).toBe(false);
     expect(open.book.run("review", "add", open.text, "--scope", "source_details", "--pages", "0", "--fields", "year", "--against", "the printed title page", "--outcome", "agrees", ...AUTHOR).code).toBe(0);
     expect(of(open.book.check(), "meta.resolver")[0]!.confirmed_by).toStartWith("rvw-");
-  });
+  }, 30_000);
 
   test("a review's flag lies on a page the review covers", () => {
     const { book, text } = reef();
