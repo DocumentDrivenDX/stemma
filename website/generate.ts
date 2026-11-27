@@ -196,8 +196,9 @@ const walk = (dir: string, prefix = ""): string[] =>
  * font rendering, so a screenshot is current when the page it was captured from
  * is unchanged and the file is the one that capture wrote. No browser is needed.
  */
-export async function staleness(directory = GENERATED): Promise<string[]> {
-  const fresh = await generateText();
+/** What in `directory` differs from what the current code makes; `fresh` is that, if it was made already. */
+export async function staleness(directory = GENERATED, fresh?: Map<string, string>): Promise<string[]> {
+  fresh ??= await generateText();
   const problems: string[] = [];
   for (const [path, text] of fresh) {
     const file = join(directory, path);

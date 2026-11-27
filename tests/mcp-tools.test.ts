@@ -63,6 +63,8 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
     const secret = got.json.secret as string;
     expect(secret).toMatch(/^[A-Za-z0-9_-]{43}$/);
     const opened = await opening;
+    // A later open is let through 5 seconds after this one; what comes between counts towards them.
+    const openedAt = Date.now();
     expect(opened.data).toMatchObject({ address: launched.address, record: { type: "Citation", id: "cit-darwinreefs0001" } });
     expect(opened.data.link_opened_at).toMatch(/^\d\d:\d\d:\d\d$/);
     expect(opened.text).not.toContain("open-stemma");
@@ -95,7 +97,7 @@ describe("US-122-AC3, AC4, AC7, AC8: the tools on the worked example", () => {
     expect(readFileSync(lock, "utf8")).toBe(held);
 
     // A later open uses the same server and secret, with a new code; the used one stays used.
-    await Bun.sleep(5_100);
+    await Bun.sleep(Math.max(0, openedAt + 5_100 - Date.now()));
     const again = host.call("open", {});
     while (opener.launched()!.code === launched.code) await Bun.sleep(20);
     const next = opener.launched()!;
