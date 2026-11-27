@@ -179,13 +179,88 @@ Model-proposed parses MAY be added only as unreviewed records with a `model`
 actor, saved before any deterministic step reads them, and each parsed string MUST align to a
 span of the document text.
 
+**The Word reader** (items 1, 3, and 4; SD-015 BR-1502 and BR-1503). It takes
+the file's bytes and returns paragraphs in document order, comments, fields,
+tracked changes, reported items, and a disposition for every archive part. It
+writes nothing and fetches nothing. These rules are design assumptions until
+tests on files saved by real tools pass.
+
+- **Parts.** The main document is the one the package relationships name, and
+  its footnotes, endnotes, comments, and styles are those its own
+  relationships name. A file with no relationship part is read by Word's usual
+  names. Each part is exactly one of: **read** (the main document, notes, and
+  comments); **reported** (any other XML or text part, such as headers,
+  footers, document properties, custom data, charts, diagrams, a glossary, or
+  an imported chunk, whose text is reported and not converted); **not read**
+  (any other part, such as an image or embedded object, reported by name); or
+  **support** (package, relationship, style, numbering, setting, font, theme,
+  and comment-threading parts, which are taken to hold no document text and are
+  not examined for any).
+- **Revision view.** Insertions and move destinations are applied. Deletions,
+  move sources, and deleted table rows and cells are removed. A paragraph whose
+  paragraph mark is deleted or moved away joins the next paragraph of the same
+  container, which gives the joined paragraph its style. Current formatting is
+  used. Each tracked change is reported with its position and any stated author
+  and date. Removed text appears nowhere in the reading.
+- **Paragraphs.** A paragraph with only white space is left out, unless it
+  refers to a note. A tab becomes
+  a space, a page break a space, any other break a line break, and a
+  non-breaking hyphen `-`; an optional hyphen is left out. A note reference
+  adds no text; its place is kept with the paragraph, and the note's paragraphs
+  follow it. Footnotes and endnotes are each numbered from 1 in the order of
+  their first reference; these labels are Stemma's, not Word's printed marks.
+  A heading level comes from the paragraph's own outline level or else its
+  style or the styles it is based on (a built-in heading or title name, or an
+  outline level). A body paragraph whose style is named Caption is a caption;
+  a paragraph in a table is `table`, with its table, row, and cell. Other
+  headings and captions are read as body text. Hidden text set on the text
+  itself is read and reported; hiding set only by a style is not detected.
+- **Comments.** Every comment in the comments part is returned with its text,
+  any stated author and date, and the place its range or mark gives, with the
+  text in that range when it is in one paragraph. A comment with no place, or a
+  place with no comment, is said to be so.
+- **Fields.** A field's visible result is read as typed text. Its instruction
+  is never paragraph text. Each field is returned with its instruction, any
+  stored field data, and the place of its result. Zotero, Mendeley, EndNote,
+  Citavi, and Word's own citation and bibliography fields, citation content
+  controls, and Zotero citation bookmarks are named by kind. **No embedded
+  reference data is decoded yet** (item 2), and every such field says so.
+- **Reported content.** Text boxes, equations, symbol characters, text that
+  Word generates (list numbers, page numbers, dates), image descriptions and
+  other text held in attributes (WordArt text, link tooltips), embedded
+  objects, imported chunks, headers and footers, content-control placeholders,
+  notes that no read text refers to, and every element the reader does not know
+  are each reported with their part, a raw location, any text they hold, and,
+  where they sit in a read paragraph, their offset. Their text is not
+  converted. Where a file offers alternative forms of one element, the reader
+  takes the first form whose requirements it knows, otherwise the fallback, and
+  reports any other form whose text differs.
+- **Account.** Every non-white-space text value in every XML part the reader
+  examines ends in exactly one of: converted (paragraph or comment text),
+  removed by the revision view, reported (with an item, field, or comment),
+  layout (a number or keyword that places a drawing), or duplicate (a repeat,
+  in another offered form, of text already taken). The reading gives the
+  counts, and a value left over is an error that stops the reading. Attributes
+  are outside this count; only those named above are reported.
+- **Damage.** `docx_unreadable` is given for a file that is not a ZIP archive
+  (an encrypted or old binary Word file included), an encrypted, ZIP64,
+  damaged, or unsupported archive entry, a stated size that is false, an entry
+  name that is absolute, holds `..`, or occurs twice ignoring case, a missing
+  main document or relationship target that is needed, two notes or two
+  comments with one ID, XML that is not
+  well-formed or not UTF-8 or UTF-16, a document type declaration, or a field
+  that does not open and close in order. Entity references other than XML's
+  five and character references are not well-formed here.
+
 ### G. Untrusted input limits
 
 All codecs MUST treat input as hostile: refuse archive entries with absolute or
 parent paths; cap uncompressed size, entry count, nesting depth, and field
 length; disable XML DTD and external entity processing; never fetch a URL found
 in a file; and never interpret file text as instructions. Limits are published
-by `doctor`. Cap values are set by the takeover solution design.
+by `doctor`. Cap values are set by the takeover solution design. A cap is
+checked before the work it bounds is done where the size is stated in advance,
+and again while it is done, so a false statement cannot pass it.
 
 ### H. Author-date profile
 
@@ -426,7 +501,7 @@ edits one title and expects every other value to stay equal.
 |---|---|---|
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
-| Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
+| Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
 | Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis

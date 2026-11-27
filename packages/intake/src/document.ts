@@ -10,6 +10,10 @@ export interface Paragraph {
   headingLevel?: number;
   /** For a note, the label that marks it in the text. */
   note?: string;
+  /** Where this paragraph's text refers to notes. A reference adds no text. The matcher does not use it. */
+  noteRefs?: { at: number; location: "footnote" | "endnote"; note: string }[];
+  /** For a paragraph in a table, its table, row, and cell, each counted from 1. The matcher does not use it. */
+  table?: { table: number; row: number; cell: number };
 }
 
 /** One manuscript file. Paragraphs are in document order, each note after the paragraph that refers to it. */

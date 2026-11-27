@@ -46,7 +46,7 @@ Each step depends on the ones before it. All are in the pilot.
 
 | Order | Step | Requirements | Design status |
 |---|---|---|---|
-| 1 | Word reader | FR-71 | Designed; not built |
+| 1 | Word reader | FR-71 | Reading built (CONTRACT-003 F); embedded reference data detected, not decoded; no command uses it; no real saved file tested |
 | 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Built over a neutral document; some real entries go unread (CONTRACT-003, Proof Status) |
 | 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Built over a neutral document; some real citations are missed (CONTRACT-003, Proof Status) |
 | 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Designed; not built |
@@ -104,7 +104,12 @@ Each step depends on the ones before it. All are in the pilot.
 **Cons**: Stemma owns a partial Word reader; real files will surprise it.
 **Evaluation**: Selected. A package-free prototype read hand-built files only.
 
-**Selected Approach**: Approach 3, with pinned archive and XML parsing libraries chosen in technical design.
+**Selected Approach**: Approach 3. The reader adds no library. It has its own
+strict archive and XML readers, with the runtime's inflate and checksum. The
+converters' readers (`packages/extract`) were not reused: their tag reader
+accepts broken XML, so a truncated part would read as a whole one, and flattens
+deep nesting without saying so; their archive reader keeps the last of two
+entries with one name and has no entry-path or expansion-ratio check.
 
 **Architecture/ADR impact**: No change; `intake` owns Word and legacy formats.
 
@@ -182,7 +187,17 @@ These starting caps meet CONTRACT-003 G. They are design assumptions to test aga
 | XML nesting depth; library JSON or brace depth | 256; 64 |
 | One text value or library field | 1 MiB |
 | One embedded reference field after decoding | 8 MiB |
+| XML elements in one Word file; open fields inside one another | 3,000,000; 64 |
 | Library file size; entries | 100 MiB; 100,000 |
+
+For Word files: total uncompressed size is the sum of every entry's stated
+size, and the ratio is an entry's size over its packed size, both checked for
+every entry before any is expanded. The part cap and the ratio therefore apply
+to parts the reader does not expand too. A text value is one run of XML text,
+one attribute, or one paragraph's text. The 8 MiB cap, in place of the 1 MiB
+one, applies to embedded data: a field's whole instruction, its stored data, a
+content control's tag, and the drawing data Word keeps in `gfxdata`
+attributes. The caps on elements and open fields bound memory (assumption).
 
 ## System Decomposition
 
@@ -260,7 +275,7 @@ graph TD
 
 | Layer | Choice | Why | Alternatives Rejected |
 |---|---|---|---|
-| Word reading | Stemma reader over pinned archive and XML libraries | Accounting and limits are requirements | External document converter; model reading |
+| Word reading | Stemma reader with its own strict archive and XML readers over the pinned runtime | Accounting, limits, and refusing damaged files are requirements | External document converter; model reading; the converters' forgiving tag reader |
 | Reference binding | Fixed rules over library and prior citations | Repeatable; sends doubt to the author | Citation-parsing services and trained parsers: other runtimes, and research found weak footnote results |
 
 ## Traceability
@@ -308,7 +323,8 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 
 - [ ] **Some references are never checked.** Author-date citations in brackets that hold a year are now accounted for (BR-1523): unresolved ones are open findings, but left-unlinked ones are only listed. Citations with no bracketed year, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text with no listing or check beyond the notes. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
 - [ ] **Takeover starts with a long report.** Every extracted claim is unreviewed, incomplete, and unsupported at first. Grouping and clear next steps must keep the report usable; the pilot must measure it.
-- [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status). No Word reader feeds the profile yet.
+- [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status), which has its own rough Word conversion. The Word reader does not feed the profile yet.
+- [ ] The Word reader does not decode embedded reference data (INT-04). Each Zotero, Mendeley, EndNote, or other citation field is detected and returned raw, so INT-04 is not met.
 - [ ] Citations in tables are listed, not read, until the markup can carry them (PRD open question).
 - [ ] Whether check reports should count left-unlinked parentheses is open (PRD).
 - [ ] The pilot PDF formats Chicago notes; a manuscript that cites in author-date form may need another style (PRD open question; SD-008).
