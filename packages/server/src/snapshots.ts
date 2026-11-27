@@ -1,8 +1,9 @@
 // Which snapshot may answer (CONTRACT-005 M, "Freshness"). A call is answered
 // only after a scan of the inputs that began after the call arrived found
-// nothing changed. A change takes the snapshot out of service until its data
-// identity is computed again and, when that moved, a new one is built. This
-// knows nothing of records: the scan and the process that builds are given.
+// nothing changed. A change takes the snapshot out of service. It comes back
+// when its data identity, computed again, is unchanged; otherwise a new one is
+// built. This knows nothing of records: the scan and the process that builds are
+// given.
 
 /** An answer as it is sent: an HTTP status and a JSON body. */
 export interface Answer {
@@ -32,8 +33,8 @@ export interface SnapshotProcess {
 export interface Inputs<S> {
   scan(): Promise<S>;
   changed(since: S): Promise<boolean>;
-  /** Whether what the data identity does not cover is the same in both. */
-  alike(a: S, b: S): boolean;
+  /** Whether the data may be the same in both, so that computing its identity may spare a build. */
+  mayShowTheSame(a: S, b: S): boolean;
 }
 
 export type Verdict =
@@ -143,7 +144,7 @@ export class Snapshots<S> {
       // Before anything is read, so that a change during the work is seen afterwards.
       scan = await this.inputs.scan();
       const held = this.held;
-      if (held && this.inputs.alike(held.scan, scan)) {
+      if (held && this.inputs.mayShowTheSame(held.scan, scan)) {
         const identity = await held.process.identity();
         if (this.stopped) return;
         if (this.held === held && identity === held.built.data_identity) {

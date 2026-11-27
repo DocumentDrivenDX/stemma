@@ -695,14 +695,15 @@ are refused in the page as the static profile refuses them.
   `research/`, and `report/`.
 - Before it answers any `/api/` call but `session`, the server makes a stat scan
   of the inputs (name, kind, size, inode, and modification and change times, to
-  the nanosecond where the system keeps it) that started after the request
+  about a microsecond where the system keeps it) that started after the request
   arrived. Calls waiting together share one scan.
 - While the scan finds nothing changed, the answer is from the current snapshot.
 - When it finds a change, every call but `status` is refused with
-  `index_stale` (503) until a snapshot of the new files is current. The child
-  recomputes the data identity. When it is unchanged (and the research files are
-  the same set), the snapshot is kept. Otherwise a new child builds the whole
-  export again.
+  `index_stale` (503) until a snapshot of the new files is current. When the
+  data may be unchanged (the research files are the same set, and no file
+  outside `research/` and `report/` came, went, or changed size), the child
+  recomputes the data identity, and when that is unchanged the snapshot is kept.
+  Otherwise a new child builds the whole export again.
 - The scan a snapshot is compared with is the one made before its files were
   read, so a change during a build leads to another build.
 - A build that fails leaves state `failed` with what is wrong; nothing is served
@@ -808,6 +809,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |
 | Source views (K) | Tests over invented sources for every state, and the worked example: 4 citations and 125 passages highlighted, 748,172 bytes of source views in a 2.7 MB page, of which about 212 KB is page text repeated for passages that share a page. A synthetic page at the cap (8.0 MB of source views, 9.2 MB in all, 450 passages) opened in about 0.13 s and showed its first citation in about 0.04 s, in headless Chromium from a local file on one macOS system (Apple silicon) | A real large project; slower machines and other browsers; right-to-left and complex-script page text; keyboard and screen-reader use by hand |
 | Manuscript view (L) | Local tests over invented reports for broken, withheld, and hostile cases; the worked example's report (116 quotations, 80 note citations, and 19 bibliography entries all linked; 228,368 bytes, in a 3.0 MB page); headless Chromium from a local file on one macOS system (Apple silicon) | A real author's report; other browsers; keyboard and screen-reader use by hand |
+| Local server (M) | Local tests of each rule against raw requests, the built command, and headless Chromium on one macOS system (Apple silicon), with a hostile page on another loopback port and a name mapped to this computer; the installed plugin served the worked example. Worked example: ready in 2.6 s, rebuilt in 2.5 s after an edit, 7 ms a call for the scan; the holding process used up to 0.9 GB while building and 0.1 GB after. Synthetic project of 5,000 sources (172,873 inputs, 79,020 entries, no report): ready in 31 s, rebuilt in 32 s after an edit, 11 s after a touch that changed nothing; the scan adds about 0.2 s to each call (a search took 0.25 s; the page opened in 0.9 s); the holding process used up to 9.4 GB while building and 1.5 GB half a minute after (its resident size still showed 11.6 GB) | Linux and Windows, where the launch file, the opener, and the file modes are untried; desktop apps and the system's real opener; other browsers; a real author's project; a computer with 16 GB or less; a network file system; keyboard and screen-reader use by hand; any outside security review |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 

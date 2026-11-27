@@ -45,6 +45,7 @@ export function takeCode(): string | undefined {
   return code;
 }
 
+const LEAVING_MS = 3000;
 /** True while the browser is leaving the page, which ends its calls; that is not the server failing. */
 let leaving = false;
 window.addEventListener("beforeunload", () => (leaving = true));
@@ -74,7 +75,8 @@ export class Server {
       });
       json = (await response.json()) as Record<string, unknown>;
     } catch {
-      if (leaving) return new Promise(() => {});
+      // A page that is being left is gone before this wait ends. One that stayed after all goes on below.
+      if (leaving) await new Promise((resolve) => setTimeout(resolve, LEAVING_MS));
       // Whatever answers at this address next is not to be trusted with the secret.
       this.forget();
       throw new CallFailed("stopped", "Stemma's server cannot be reached.");

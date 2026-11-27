@@ -3,7 +3,7 @@
 // standard output or standard error.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { inputsChanged, researchFiles, scanInputs } from "@stemma/workspace";
+import { inputsChanged, mayShowTheSame, scanInputs } from "@stemma/workspace";
 import {
   type Assets, BuildFailure, type Built, createSession, type LaunchFile, listen, openInBrowser, type SnapshotEvent, Snapshots, spawnSnapshotProcess,
   writeLaunchFile,
@@ -82,7 +82,7 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
   dependencies.stop?.addEventListener("abort", () => ending("stopped"), { once: true });
 
   const snapshots = new Snapshots(
-    { scan: () => scanInputs(root), changed: (since) => inputsChanged(root, since), alike: (a, b) => researchFiles(a) === researchFiles(b) },
+    { scan: () => scanInputs(root), changed: (since) => inputsChanged(root, since), mayShowTheSame },
     () => spawnSnapshotProcess(command, root),
     (event) => tell(eventLine(event)),
   );

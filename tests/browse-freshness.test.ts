@@ -9,7 +9,7 @@ import { exportGraph, FILES, type ManuscriptPort, servedData } from "@stemma/gra
 import { manuscriptView } from "@stemma/publish";
 import { loadCorpus } from "@stemma/records";
 import { type Built, ProcessGone, type SnapshotProcess, Snapshots } from "@stemma/server";
-import { inputsChanged, readProject, researchFiles, scanInputs } from "@stemma/workspace";
+import { inputsChanged, mayShowTheSame, readProject, researchFiles, scanInputs } from "@stemma/workspace";
 import { VERSION } from "../packages/cli/src/context.ts";
 import { Browsing, childrenOf, endRuns } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
@@ -272,7 +272,7 @@ describe("US-119-AC4 which snapshot may answer", () => {
     const inputs = {
       scan: async () => ({ files, research }),
       changed: async (since: { files: number; research: string }) => since.files !== files || since.research !== research,
-      alike: (a: { research: string }, b: { research: string }) => a.research === b.research,
+      mayShowTheSame: (a: { research: string }, b: { research: string }) => a.research === b.research,
     };
     return { inputs, spawn, log, set: (n: number) => (files = n), hold: (on: boolean) => (held = on), release: () => gates.splice(0).forEach((g) => g()) };
   }
@@ -313,7 +313,7 @@ describe("US-119-AC4 which snapshot may answer", () => {
         if (slow) await new Promise<void>((resolve) => (open = resolve));
         return since !== seen;
       },
-      alike: () => true,
+      mayShowTheSame: () => true,
     }, p.spawn);
     await snapshots.start();
     slow = true;
@@ -334,7 +334,7 @@ describe("US-119-AC4 which snapshot may answer", () => {
   });
 
   test("a failed first build throws, and stop ends a build that is under way", async () => {
-    const failing = new Snapshots({ scan: async () => 0, changed: async () => false, alike: () => true },
+    const failing = new Snapshots({ scan: async () => 0, changed: async () => false, mayShowTheSame: () => true },
       () => ({ build: () => Promise.reject(new ProcessGone()), identity: async () => "", ask: async () => ({ status: 200, body: "" }), stop: () => {}, ended: Promise.resolve() }));
     await expect(failing.start()).rejects.toThrow(ProcessGone);
     const p = pretend();
@@ -348,6 +348,30 @@ describe("US-119-AC4 which snapshot may answer", () => {
     p.release();
     await expect(starting).rejects.toThrow("stopping");
   });
+
+  test("the identity is computed first only when the data may be the same", async () => {
+    const dir = project();
+    const record = recordOf(dir, "src-");
+    const was = readFileSync(record, "utf8");
+    mkdirSync(join(dir, "research"), { recursive: true });
+    writeFileSync(join(dir, "research/note.md"), "# A note\n");
+    const first = await scanInputs(dir);
+    const then = async (change: () => void) => {
+      const before = await scanInputs(dir);
+      change();
+      return mayShowTheSame(before, await scanInputs(dir));
+    };
+    // A touch, a research note rewritten, and a report's outputs rebuilt may leave the data as it was.
+    expect(await then(() => utimesSync(record, new Date(), new Date()))).toBe(true);
+    expect(await then(() => writeFileSync(join(dir, "research/note.md"), "# A longer note\n"))).toBe(true);
+    expect(await then(() => writeFileSync(join(dir, "report/report.md"), "rebuilt\n"))).toBe(true);
+    // A record that changed size, a file that came or went, and another set of research files cannot.
+    expect(await then(() => writeFileSync(record, `${was}\n`))).toBe(false);
+    expect(await then(() => writeFileSync(join(dir, "rules.md"), "# Rules\n"))).toBe(false);
+    expect(await then(() => rmSync(record))).toBe(false);
+    expect(await then(() => writeFileSync(join(dir, "research/another.md"), "# Another\n"))).toBe(false);
+    expect(mayShowTheSame(first, first)).toBe(true);
+  }, 60_000);
 
   test("the scan sees what readProject reads and ignores what it skips", async () => {
     const dir = project();
