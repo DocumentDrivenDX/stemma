@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-d5kc2bb1wa1898356j0j",
+  "kind": "claim",
+  "reason": "A paper by the implementers reports it. It is not independent, concerns an old release, and rests on particular benchmarks and hardware.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "The serializable implementation of PostgreSQL 9.1 performed close to snapshot isolation in its authors’ experiments."
+}

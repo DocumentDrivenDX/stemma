@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-zg4zm968e73e8n2et6cb",
+  "intake": "parsed",
+  "key": "ports2012",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "1861"
+  },
+  "passage": "psg-k2jy99wb0nbagcrv0km0",
+  "quotation": "Our experiments show that this serializable mode provides performance similar to snapshot isolation and considerably outperforms strict two-phase locking on read-intensive workloads",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "5698f5210ff4b571b3131bc82fab5641bea9cfe66900a91ad6d5f3835612592c",
+    "text": "Dan Ports and Kevin Grittner, writing about the implementation that appeared in PostgreSQL 9.1, report from their experiments: “Our experiments show that this serializable mode provides performance similar to snapshot isolation and considerably outperforms strict two-phase locking on read-intensive workloads”."
+  }
+}

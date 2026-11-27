@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-0mkp677a7y464v4berzr",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "49"
+  },
+  "passage": "psg-tb1c9y9hbvvb64yyw00m",
+  "quotation": "To avoid this, it is necessary to vacuum every table in every database at least once every two billion transactions.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "e47cf21ad45e9fa29b92238183c9609df5d0561953ccb5e28e4817bc72cdd59a",
+    "text": "“To avoid this, it is necessary to vacuum every table in every database at least once every two billion transactions.”"
+  }
+}

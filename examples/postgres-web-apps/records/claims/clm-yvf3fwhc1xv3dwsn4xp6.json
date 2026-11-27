@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-yvf3fwhc1xv3dwsn4xp6",
+  "kind": "claim",
+  "reason": "Both points are stated in the version 18 documentation.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Serializable isolation is available but is not the default, and applications that use it have to retry transactions."
+}

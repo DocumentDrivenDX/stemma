@@ -1,0 +1,54 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "PgBouncer"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.pgbouncer.org/features.html"
+      }
+    }
+  ],
+  "citation_key": "pgbouncer",
+  "contributions": [
+    {
+      "as_printed": {
+        "literal": "PgBouncer"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:25Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-y7k7tzzv3s40j0p1e5tq",
+  "intake": "parsed",
+  "kind": "source",
+  "rights": {
+    "license": "No licence statement found",
+    "permission_note": "No licence statement on https://www.pgbouncer.org/features.html or https://www.pgbouncer.org/, and no LICENSE file at the root of the pgbouncer/pgbouncer.github.io repository, looked for 2026-11-27. The licence of the PgBouncer program was not taken to cover the website. Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Features"
+  },
+  "type": "webpage"
+}

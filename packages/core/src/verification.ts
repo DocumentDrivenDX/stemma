@@ -63,6 +63,8 @@ export interface Coverage {
   stale_reviews: number;
   flags: number;
   runs: RunCoverage[];
+  /** Present when the text is not in this copy of the project, so nothing about it could be looked at. */
+  not_held?: boolean;
 }
 
 export function coverageOf(corpus: Corpus, text: LoadedText, tools: Record<string, string> = {}): Coverage {
@@ -96,11 +98,12 @@ export function coverageOf(corpus: Corpus, text: LoadedText, tools: Record<strin
   return {
     text: id, source: String(data.source), directory: text.directory,
     method: String(isObject(data.conversion) ? data.conversion.method : ""), parts: text.parts.length,
-    reviewed_by_person: whole.size, stale_reviews: stale, flags, runs,
+    reviewed_by_person: whole.size, stale_reviews: stale, flags, runs, ...(text.notHeld ? { not_held: true } : {}),
   };
 }
 
 export function coverageWords(c: Coverage): string {
+  if (c.not_held) return "its text is not held here";
   const compared = c.runs.filter((r) => r.current).map((r) =>
     `${r.method === "reconversion" ? "fresh conversion" : "second text"}: ${r.parts - r.differing_parts} of ${r.parts} parts agree`);
   return [

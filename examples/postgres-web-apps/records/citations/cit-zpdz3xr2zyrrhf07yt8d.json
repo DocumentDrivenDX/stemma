@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-zpdz3xr2zyrrhf07yt8d",
+  "intake": "parsed",
+  "key": "pg19notes",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "20"
+  },
+  "passage": "psg-fpv4amf110rbsd333831",
+  "quotation": "New REPACK command that reclaims disk space and reorganizes table contents, which can improve query performance. REPACK (CONCURRENTLY) allows repacking without blocking reads and writes to the table.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "946bd7386572daac77336e16303f34be893dbde658d3a9ea7775c79cedd991c2",
+    "text": "The release notes for PostgreSQL 19 now announce a new command for reclaiming space: “New REPACK command that reclaims disk space and reorganizes table contents, which can improve query performance. REPACK (CONCURRENTLY) allows repacking without blocking reads and writes to the table.”"
+  }
+}

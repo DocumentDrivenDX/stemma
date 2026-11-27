@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 646,
+      "index": 1,
+      "page_sha256": "0fb1b5825925706e1b7c32b3d0909c25d498142f7fbd9301de18216262877616",
+      "start": 538,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-dbht3j8za8ay73rvetk2",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "18"
+  },
+  "quote": {
+    "exact": "The update does not modify any columns referenced by the table's indexes, not including summarizing indexes."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-r7741gv5gb10aq6fv2bz",
+  "source_record_sha256": "424efd89f33dc9b7e9a2cedeb2ad8e9909b41c606c21e8f914355b7e600239ec",
+  "text": "txt-as7yx1dqj00zc85cb8pf"
+}

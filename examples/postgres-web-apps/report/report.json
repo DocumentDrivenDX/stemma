@@ -1,0 +1,441 @@
+{
+ "manuscript": "report.src",
+ "quotations": [
+  {
+   "id": "pavlo-good",
+   "cites": "pavlo2023",
+   "passages": [
+    {
+     "passage": "psg-cs3yegg6wgft25g2h9qx"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "iso-default",
+   "cites": "pg18isolation",
+   "passages": [
+    {
+     "passage": "psg-p1sp5sne61v4hyv6p30t"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "iso-retry",
+   "cites": "pg18isolation",
+   "passages": [
+    {
+     "passage": "psg-8jvhq3vazb1acmk1qc2c"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "ports-perf",
+   "cites": "ports2012",
+   "passages": [
+    {
+     "passage": "psg-k2jy99wb0nbagcrv0km0"
+    }
+   ],
+   "checked": "Page image of the stored PDF: quotation and printed page number compared by a model (claude-sonnet-5-5)."
+  },
+  {
+   "id": "json-prefer",
+   "cites": "pg18json",
+   "passages": [
+    {
+     "passage": "psg-h47f17a07mbvymw30cvf"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "json-lock",
+   "cites": "pg18json",
+   "passages": [
+    {
+     "passage": "psg-52bdyrvn4pf9vhz65d6z"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "arch-fork",
+   "cites": "pg18arch",
+   "passages": [
+    {
+     "passage": "psg-mfrftwxvgr0q3sd5nsz8"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "conn-max",
+   "cites": "pg18connections",
+   "passages": [
+    {
+     "passage": "psg-hwnx4e4a9c6n6m4jwspz"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pgb-breaks",
+   "cites": "pgbouncer",
+   "passages": [
+    {
+     "passage": "psg-qzhjq7hes0xpa5skb8jx"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-dead",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-96epkgwtr7xk88qnx6wn"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-space",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-cbtq2py4tyzk55757qfz"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-auto",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-wz6dkr1sm59cznsv71g4"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "hot-cost",
+   "cites": "pg18hot",
+   "passages": [
+    {
+     "passage": "psg-2307e9efgasgtsg2qkz7"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "hot-cond",
+   "cites": "pg18hot",
+   "passages": [
+    {
+     "passage": "psg-dbht3j8za8ay73rvetk2"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "hot-space",
+   "cites": "pg18hot",
+   "passages": [
+    {
+     "passage": "psg-0jzzvegm92gs30z8v74p"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pavlo-index",
+   "cites": "pavlo2023",
+   "passages": [
+    {
+     "passage": "psg-kkcfsb1hwa6w7a2ngfqy"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pavlo-bloat",
+   "cites": "pavlo2023",
+   "passages": [
+    {
+     "passage": "psg-h0ntab0cxr94k53ntsv5"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-xid",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-tb1c9y9hbvvb64yyw00m"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-readonly",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-cnneb21vnvpjn3gtcpt1"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "sentry-cause",
+   "cites": "sentry2015",
+   "passages": [
+    {
+     "passage": "psg-ck5an87zrkx8dpzzndwm"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "sentry-trunc",
+   "cites": "sentry2015",
+   "passages": [
+    {
+     "passage": "psg-402na0z2fkfnfnfzbxqw"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "sentry-away",
+   "cites": "sentry2015",
+   "passages": [
+    {
+     "passage": "psg-bwanpsczp20r4qyb1de4"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "vac-nosingle",
+   "cites": "pg18vacuum",
+   "passages": [
+    {
+     "passage": "psg-9njy4s9hp9wkdfvhmkms"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pg96-freeze",
+   "cites": "pg96notes",
+   "passages": [
+    {
+     "passage": "psg-hycxddpg12q802jx2qs6"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "rep-async",
+   "cites": "pg18standby",
+   "passages": [
+    {
+     "passage": "psg-y08ps9hf6nbkc8gwnz50"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "rep-delay",
+   "cites": "pg18standby",
+   "passages": [
+    {
+     "passage": "psg-fee5fg7pfq2061ba3bdr"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "rep-sync",
+   "cites": "pg18standby",
+   "passages": [
+    {
+     "passage": "psg-brtemwr44nsqk6nhnnz2"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "ha-nomulti",
+   "cites": "pg18ha",
+   "passages": [
+    {
+     "passage": "psg-59g5qqe8zdmvht506ymk"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "ha-partition",
+   "cites": "pg18ha",
+   "passages": [
+    {
+     "passage": "psg-33kt82823vktkxyw4bkn"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "notion-vacuum",
+   "cites": "notion2021",
+   "passages": [
+    {
+     "passage": "psg-00pvjc4gwhwmw05f28dx"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "notion-soft",
+   "cites": "notion2021",
+   "passages": [
+    {
+     "passage": "psg-kmv4ytexzzbw6aq5hbvn"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "figma-vacuum",
+   "cites": "figma2024",
+   "passages": [
+    {
+     "passage": "psg-cj2c6r3ptp5sxz7j2rta"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "figma-iops",
+   "cites": "figma2024",
+   "passages": [
+    {
+     "passage": "psg-4c6889m9kmd7sqkwr7vk"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "figma-nosql",
+   "cites": "figma2024",
+   "passages": [
+    {
+     "passage": "psg-db071bnkq9akp1esr4yh"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "figma-lose",
+   "cites": "figma2024",
+   "passages": [
+    {
+     "passage": "psg-zymf2tqz7twm518df057"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pavlo-worst",
+   "cites": "pavlo2023",
+   "passages": [
+    {
+     "passage": "psg-5ahgrh9m7qraddzpx5tp"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "wu-none",
+   "cites": "wu2017",
+   "passages": [
+    {
+     "passage": "psg-f28qhb50tksqhqeyk4jp"
+    }
+   ],
+   "checked": "Page image of the stored PDF: quotation and printed page number compared by a model (claude-sonnet-5-5)."
+  },
+  {
+   "id": "wu-delta",
+   "cites": "wu2017",
+   "passages": [
+    {
+     "passage": "psg-41w7smcqm0e270dty0dj"
+    }
+   ],
+   "checked": "Page image of the stored PDF: quotation and printed page number compared by a model (claude-sonnet-5-5)."
+  },
+  {
+   "id": "wu-tpcc",
+   "cites": "wu2017",
+   "passages": [
+    {
+     "passage": "psg-zryxnajrv4qhqq7tvk14"
+    }
+   ],
+   "checked": "Page image of the stored PDF: quotation and printed page number compared by a model (claude-sonnet-5-5)."
+  },
+  {
+   "id": "wu-peloton",
+   "cites": "wu2017",
+   "passages": [
+    {
+     "passage": "psg-40dgmq759162w1dx39kf"
+    }
+   ],
+   "checked": "Page image of the stored PDF: quotation and printed page number compared by a model (claude-sonnet-5-5)."
+  },
+  {
+   "id": "pg19-repack",
+   "cites": "pg19notes",
+   "passages": [
+    {
+     "passage": "psg-fpv4amf110rbsd333831"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "pg19-wait",
+   "cites": "pg19notes",
+   "passages": [
+    {
+     "passage": "psg-60zna773e29kaaarf1fy"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  },
+  {
+   "id": "notion-earlier",
+   "cites": "notion2021",
+   "passages": [
+    {
+     "passage": "psg-sttqqf9g9kxhcgcr7a1a"
+    }
+   ],
+   "checked": "Found, with white space collapsed, in a second text extraction of the stored HTML (Python’s HTML parser) by a script. No rendered web page was viewed."
+  }
+ ],
+ "verification": {
+  "preamble": [
+   "**Who checked.** Every quotation was copied from a stored conversion of its source by `stemma passage capture`. An AI model (claude-sonnet-5-5) chose the passages and read them in the converted text. It compared the five quotations from the two PDFs with images of their pages, and ran a script that looked for each of the other quotations in a second extraction of the same stored HTML. Neither shows that a quotation supports the sentence that uses it. **No person has reviewed any quotation, place, or bibliographic detail.**",
+   "**Places.** For the two conference papers the place is the printed page. For web documents, which have no pages, it is a paragraph number that Stemma counts through its conversion of the stored copy, page navigation included. It is not printed on the web page, and another capture of the same address may count differently."
+  ]
+ }
+}

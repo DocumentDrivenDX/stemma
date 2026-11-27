@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 759,
+      "index": 3,
+      "page_sha256": "da6f2dd1844ec30603fc05e0c5aec335eb7530291f81b7f9c56e1c0cd4878f0b",
+      "start": 638,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:02Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-kmv4ytexzzbw6aq5hbvn",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "43"
+  },
+  "quote": {
+    "exact": "Query performance and upkeep processes often begin to degrade well before a table reaches the maximum hardware-bound size"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "source_record_sha256": "fc8eb424dd22bb13609f3ad4f28aa1559a5cd690369dd564edffcbed46cca4af",
+  "text": "txt-r399jtz3g4qna2srbhje"
+}

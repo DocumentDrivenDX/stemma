@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-jm80w537jx4g4mheg17y",
+  "intake": "parsed",
+  "key": "sentry2015",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "133"
+  },
+  "passage": "psg-ck5an87zrkx8dpzzndwm",
+  "quotation": "One such problem caused a major outage of the hosted Sentry service earlier this week. That problem is Postgres’ transaction ID (XID).",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "71d69975d685e06a7f32f85b4f607c77394ba1bd1fe1291a373e8ca19aff9935",
+    "text": "David Cramer wrote: “One such problem caused a major outage of the hosted Sentry service earlier this week. That problem is Postgres’ transaction ID (XID).”"
+  }
+}

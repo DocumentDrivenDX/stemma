@@ -57,7 +57,10 @@ export async function buildReportCommand(options: Options, dir: string | undefin
   try {
     built = buildReport(corpus, spec, template, include);
   } catch (error) {
-    if (error instanceof ReportError) throw new CommandError(5, "report_input", `The report was not built: ${error.message}. Nothing was written.`, [rel]);
+    if (error instanceof ReportError) {
+      const told = options.check ? " Whether the report's files are current cannot be told." : "";
+      throw new CommandError(5, "report_input", `The report was not built: ${error.message}. Nothing was written.${told}`, [rel]);
+    }
     throw error;
   }
   const problems = built.problems.map((p) => `cite.format: ${p}`);

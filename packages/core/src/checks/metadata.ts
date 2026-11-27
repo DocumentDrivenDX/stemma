@@ -298,7 +298,7 @@ export function sourceMetaResults(corpus: Corpus, texts = new SourceTexts(corpus
   return describedSources(corpus, texts).filter((s) => texts.idsOf(idOf(s)!).length > 0).map((source) => {
     const base = [location("source_file", source.path), keyOf(source)];
     const { views } = texts.of(idOf(source)!);
-    if (views.length === 0) return result({ ...shared(check, source), outcome: "unverifiable", reason: "source_damaged", evidence: base });
+    if (views.length === 0) return result({ ...shared(check, source), outcome: "unverifiable", reason: texts.notHeld(texts.idsOf(idOf(source)!)) ? "text_not_held" : "source_damaged", evidence: base });
     const record = describe(source.data!);
     // The copy that bears the record out best is shown: a source may have several.
     const judged = views.map((v) => againstCopy(record, v)).sort((a, b) => score(a.statuses) - score(b.statuses))[0]!;

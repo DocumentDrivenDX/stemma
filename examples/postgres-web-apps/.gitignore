@@ -1,0 +1,32 @@
+.stemma/
+build/
+*.[pP][dD][fF]
+*.[dD][oO][cC]
+*.[dD][oO][cC][xX]
+*.[oO][dD][tT]
+*.[rR][tT][fF]
+*.[pP][aA][gG][eE][sS]
+*.[eE][pP][uU][bB]
+*.[mM][oO][bB][iI]
+*.[pP][pP][tT]
+*.[pP][pP][tT][xX]
+*.[kK][eE][yY]
+*.[xX][lL][sS]
+*.[xX][lL][sS][xX]
+*.[nN][uU][mM][bB][eE][rR][sS]
+*.[zZ][iI][pP]
+
+# ---------------------------------------------------------------------------
+# Converted text that this project holds but does not redistribute.
+# One line per source: its licence does not clearly permit republishing the full
+# text (see the table in README.md). To commit one after all, delete its line.
+# Each source's manifest (source.md), records, short quotations and citations
+# stay committed. `stemma ingest --fetch` fetches and converts these again (README.md).
+# ---------------------------------------------------------------------------
+sources/pgbouncer/sections/
+sources/ports2012/pages/
+sources/wu2017/pages/
+sources/sentry2015/sections/
+sources/notion2021/sections/
+sources/figma2024/sections/
+sources/pavlo2023/sections/

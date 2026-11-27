@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1971,
+      "index": 1,
+      "page_sha256": "b87b98adaaba84d01cbb9ebe6317d4505133aceef51e7889b1cdfae7e65ca20d",
+      "start": 1900,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:58Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-h47f17a07mbvymw30cvf",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "27"
+  },
+  "quote": {
+    "exact": "In general, most applications should prefer to store JSON data as jsonb"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-kvfq6m31x122sa7qgs53",
+  "source_record_sha256": "105c4b55790871d2b5183a4b03a24a7680050a0258872febf98431cde9f532b6",
+  "text": "txt-t7p2y2hxdtsg7e4whwp7"
+}

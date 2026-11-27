@@ -27,6 +27,7 @@ export { annotate, type AnnotationRequest, planAnnotation } from "./annotations.
 export { headingMatches, catalogueTitleMatches, imprintYears, misreadRoman } from "./checks/metadata.ts";
 export * from "./research.ts";
 export * from "./enrich.ts";
+export * from "./locations.ts";
 export * from "./states.ts";
 export * from "./source-view.ts";
 export * from "./original-pages.ts";

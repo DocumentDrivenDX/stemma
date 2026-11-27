@@ -1,0 +1,77 @@
+# The Cost of One Writer
+
+## PostgreSQL as a Web Application’s Default Database, and Where the Default Ends
+
+### Abstract
+
+This report asks when PostgreSQL is a sound default for a web application’s primary datastore. It argues that PostgreSQL 18 is one while the application’s writes fit comfortably on one primary server and someone attends to that server’s upkeep. The main costs follow from that single primary: a process for each connection, old row versions that must be reclaimed, finite transaction identifiers recycled by the same maintenance, and replication that copies writes without dividing them. Three operators’ accounts report trouble with this maintenance, in one case together with a limit on input and output, on large or heavily written databases. The accounts are few, self-selected and older than the current release, so they show where to look for the limit, not at what size an application will meet it.
+
+## 1. Question and evidence
+
+A default is sound if it serves the common case well and gives warning of the uncommon one. A sharp critic of PostgreSQL’s design grants the first point. In an article written with Bohan Zhang, Andy Pavlo describes the system in these words: {{q:pavlo-good}}[^pavlo-good]
+
+The version examined is PostgreSQL 18, read in its versioned documentation on 27 November 2026. PostgreSQL 19 had been released eight days earlier; its release notes are used only to show which limits are moving. The other evidence is the notes for PostgreSQL 9.6, the feature description of the connection pooler PgBouncer, two papers on concurrency control, the critique just quoted, and engineering accounts from Sentry, Notion and Figma. No measurements were made for this report.
+
+## 2. What the default includes
+
+Many of a web application’s defects are defects of concurrency. In PostgreSQL, {{q:iso-default}},[^iso-default] so an application that has chosen nothing does not have the strongest guarantee. That guarantee is available at the Serializable level, with a condition: {{q:iso-retry}}[^iso-retry] A whole transaction must be safe to run again. Dan Ports and Kevin Grittner, writing about the implementation that appeared in PostgreSQL 9.1, report from their experiments: {{q:ports-perf}}.[^ports-perf] These are implementers’ results on an old release. They do not predict how often a given application’s transactions will collide.
+
+A second common need is data whose shape is not settled. PostgreSQL has two JSON types, and its advice favors the binary one: {{q:json-prefer}}.[^json-prefer|The binary type can also be indexed. The sentence goes on to except specialized needs, such as reliance on the order of object keys.] A large JSON column is still one value in one row: {{q:json-lock}}[^json-lock] Requests that change unrelated parts of a large document therefore contend for it.
+
+## 3. A process for each connection
+
+The first limit is at the front door. {{q:arch-fork}}[^arch-fork] The number of connections is capped by a setting, and raising the cap is not free: {{q:conn-max}}[^conn-max] A web tier that grows by adding application instances, each holding connections of its own, presses on this cap.
+
+A common answer is a pooler, which shares fewer server connections among many clients. In PgBouncer’s transaction mode a client holds a server connection only while a transaction lasts, and the project states the price: {{q:pgb-breaks}}[^pgb-breaks] Its table of incompatible features includes session-level advisory locks, listening for notifications and several kinds of session setting and state. The pooler thus moves a rule into the application, which must not assume that two transactions share a session. The rule is easier to adopt at the start than to impose on code that already relies on session state. None of the material examined says how many connections a given server can sustain.
+
+## 4. Old row versions
+
+PostgreSQL lets readers and writers proceed together by keeping more than one version of a row. {{q:vac-dead}}[^vac-dead] An operation called vacuum reclaims the space later. Its ordinary form marks the space for reuse. {{q:vac-space}}[^vac-space] Vacuum normally runs by itself, and the documentation calls this enough for much ordinary use: {{q:vac-auto}}.[^vac-auto|The sentence goes on to point to the section on the automatic daemon; the next says its settings may need adjustment.] It says many installations, not all.
+
+Updates also cost work in indexes. {{q:hot-cost}}[^hot-cost] An optimization called heap-only tuples avoids new index entries when two conditions hold. In the documentation’s words, the first: {{q:hot-cond}} The second: {{q:hot-space}}[^hot-cond,hot-space|The first condition excepts what are called summarizing indexes, such as the built-in BRIN method.] Changing an indexed status or timestamp column therefore forgoes the saving. Pavlo and Zhang state the cost when an update does not qualify, writing of the work of adding entries to all of a table’s indexes: {{q:pavlo-index}}[^pavlo-index] They also write of dead versions that {{q:pavlo-bloat}}[^pavlo-bloat]
+
+## 5. A finite counter
+
+Vacuum has a second duty with a hard edge. Transaction identifiers are 32-bit numbers compared in a circle, and old row versions must be marked as frozen before the counter comes round. {{q:vac-xid}}[^vac-xid] PostgreSQL forces this work even where automatic vacuuming is otherwise disabled. If the work still falls too far behind, the server issues warnings and then stops assigning identifiers: {{q:vac-readonly}}[^vac-readonly] The design prevents silent data loss, but a web application that cannot record anything is, in large part, down.
+
+Sentry reported such an outage in 2015. David Cramer wrote: {{q:sentry-cause}}[^sentry-cause] The account says that the company had adjusted vacuum’s settings in order to avoid this situation, but it later concedes that they had been too lax: autovacuum_freeze_max_age had been set too high, only the default three autovacuum workers ran, and vacuuming was delayed far too much. An update adds that the 100 GB of memory dedicated to maintenance_work_mem was not in fact being used, since the relevant operations were internally limited to 1 GB. Service returned after the team emptied one very large table whose contents it could risk losing; as Cramer put it, {{q:sentry-trunc}}[^sentry-trunc] He also wrote that {{q:sentry-away}}[^sentry-away|A statement of intention made in 2015. No later account of what the company did was examined.]
+
+The account must be read with its date. According to the documentation of version 18, {{q:vac-nosingle}}[^vac-nosingle|Sentry’s account says that its only choice was to restart in single-user mode. The same page of the documentation still names single-user mode as the way to truncate or drop unneeded tables in this state, which is what Sentry did.] PostgreSQL 9.6, released in 2016, also reduced the work of the protective vacuum: {{q:pg96-freeze}}[^pg96-freeze] The length of Sentry’s outage should not be taken as a guide to a current system. What carries forward is narrower. The counter is still finite, and staying clear of its end still depends on maintenance keeping pace.
+
+## 6. One writer
+
+PostgreSQL can keep standby servers current by sending them its log of changes. The default favors speed over certainty: {{q:rep-async}}[^rep-async] The documentation estimates the delay before a change is visible on a standby in these terms: {{q:rep-delay}}[^rep-delay] The condition at the end matters. An application that writes to the primary and at once reads from a replica may not find what it wrote. A commit can instead be made to wait for standbys, even until they have applied it, and this can be chosen for individual transactions. The price is latency: {{q:rep-sync}}[^rep-sync]
+
+Standbys of one primary add places to read and a server to fail over to, but no second place to send the same writes. Other arrangements exist, among them logical replication in several directions and external tools, with their own demands for routing or conflict handling. One is absent. Of synchronous multimaster replication, in which every server accepts writes and passes them to the others before commit, the documentation says: {{q:ha-nomulti}}.[^ha-nomulti|The sentence continues: two-phase commit can be used to build it in application code or middleware.] Another way to spread writes is to split the data. {{q:ha-partition}}[^ha-partition] A query that spans the sets must then be assembled by the application or served from copies.
+
+Two accounts describe teams that took that road. Garrett Fidalgo wrote of Notion in 2021: {{q:notion-vacuum}}[^notion-vacuum] The greater worry, he adds, was exhausting transaction identifiers. His general lesson is that {{q:notion-soft}}.[^notion-soft] What Notion divided by workspace across many databases was the table of blocks, the basic unit of its data model, together with every table reachable from it through foreign keys; it routed queries in the application.
+
+Figma’s account, by Sammy Steele in 2024, describes a longer course. The company first worked to reduce processor use and added caching, read replicas and a division of tables among a dozen databases. Some tables then outgrew that remedy. {{q:figma-vacuum}}[^figma-vacuum] Writes pressed from another side: {{q:figma-iops}}[^figma-iops] The account states this second limit as one of the managed service Figma used. Because the earlier division could not split a table, the company set out to spread single tables across servers.
+
+Figma did not leave PostgreSQL. It judged a migration to another distributed database too risky for its deadline, and of non-relational stores it wrote: {{q:figma-nosql}}[^figma-nosql] These are reasons to stay that belong to an application already built; they do not show that PostgreSQL was the best first choice. Nor does the account treat the question as closed. It says that, once the company has won itself enough time, it will reassess its original approach of in-house horizontal sharding and, now that NewSQL stores have had longer to mature, weigh staying on that course against switching to an open-source or managed solution. The account is also plain about what splitting tables costs: {{q:figma-lose}}[^figma-lose] PostgreSQL can no longer enforce a transaction that crosses shards either. Other sharding designs make other trades, but here dividing a relational database changed what the application could assume. The first sharded table took the team about nine months.
+
+## 7. The case against the design
+
+The strongest objection to the default is that these troubles follow from a design that other systems avoid. Pavlo and Zhang say of PostgreSQL’s method of keeping row versions that {{q:pavlo-worst}}[^pavlo-worst|The article first appeared on the website of OtterTune, a company whose product for managing such problems it mentions.] Their grounds are that an update writes a whole new row, that dead and live versions share storage, that updates outside the favorable case touch every index, and that cleanup is hard to tune. The documentation confirms important parts of the mechanism. It does not rank PostgreSQL against other systems.
+
+Research comparing such designs gives a mixed answer. Yingjun Wu and colleagues, Andrew Pavlo among them, studied ways of storing row versions and classed PostgreSQL with systems that append each new version to the table. Of the schemes compared they write: {{q:wu-none}}[^wu-none] One result favors the critic. With rows of a hundred attributes, in reads and updates that each touched one, they report that {{q:wu-delta}}[^wu-delta|A delta scheme stores what an update changed in place of a whole new copy.] Another runs the other way. In a test based on the TPC-C benchmark, {{q:wu-tpcc}}[^wu-tpcc] Neither is a measurement of PostgreSQL. The authors built each scheme into one research system: {{q:wu-peloton}}[^wu-peloton|Peloton is an in-memory system. The appended versions in the first of these comparisons are chained newest first; the paper classes PostgreSQL as chaining oldest first, and reports that the order matters.]
+
+The objection therefore stands in a limited form. Where the workload is dominated by updates to heavily indexed rows, PostgreSQL’s storage design is a reason to test the expected update pattern before committing, and to watch how many updates take the heap-only path and whether vacuum keeps up. It is not shown here that another database would do better. Uber’s 2016 account of leaving PostgreSQL, often raised on this point, was not retrieved and is not relied on.
+
+## 8. Limits that move
+
+A judgment about limits ages. The 2016 change is one example. The release notes for PostgreSQL 19 now announce a new command for reclaiming space: {{q:pg19-repack}}[^pg19-repack] They also announce parallel autovacuum of a table’s indexes and a new order of priority for automatic vacuuming. For replicas, the list includes this: {{q:pg19-wait}}[^pg19-wait] As read for this report, they announce no end to the 32-bit transaction counter. The release was eight days old, and no account of it in production was examined.
+
+## 9. Conclusion
+
+The evidence supports PostgreSQL as a default, on conditions best written down when the default is taken. Plan for pooling early, and keep session state from spanning transactions. Monitor vacuum as part of the system, including the age of the oldest transaction identifiers and the growth of dead versions. Decide which reads may be stale and which commits must survive the loss of the primary. Watch the largest and most heavily written tables, where the operators’ accounts place the trouble. Treat dividing data among writers as a design change to begin while the server still has room; looking back, Notion’s account says that {{q:notion-earlier}}.[^notion-earlier]
+
+The default needs a different plan from the start where the requirement is already known to exceed it, as when several sites must all accept the same writes synchronously, or when the expected write volume is more than one server is known to carry. For workloads made mostly of updates to indexed rows, the verdict is open and calls for a test.
+
+Two kinds of evidence could change this assessment: a survey of how often applications of ordinary size meet these limits, since companies that write about scaling are no sample, and a controlled comparison of current databases on update-heavy work.
+
+## 10. Scope
+
+This is a reading of a small set of documents chosen for their bearing on the argument, not a survey. Documentation states how PostgreSQL is designed to behave and is not independent evidence of its behavior under load. The operators’ accounts are first-hand and unaudited, date from 2015 to 2024 and concern large systems. Figma and Notion describe running PostgreSQL on Amazon’s managed service, so some of their limits may be the provider’s. Managed services, distributed extensions of PostgreSQL, upgrades, failover tools, backup, cost and comparisons of features with other databases are not examined. Web documents without page numbers are cited by paragraph, counted through a stored copy from the top of each page, navigation included; the numbers do not appear on the pages. The two papers are cited by page.
+
+{{bibliography}}

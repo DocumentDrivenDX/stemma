@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-gkq1201f65nbes55f3h7",
+  "intake": "parsed",
+  "key": "wu2017",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "789"
+  },
+  "passage": "psg-41w7smcqm0e270dty0dj",
+  "quotation": "the delta scheme achieves ∼2× better performance than append-only and time-travel schemes because it uses less memory.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "5311f543e7aa323f4e164c186f5594678f51da7174cd66350d839ceefa84d7d5",
+    "text": "With rows of a hundred attributes, in reads and updates that each touched one, they report that “the delta scheme achieves ∼2× better performance than append-only and time-travel schemes because it uses less memory.”"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 697,
+      "index": 6,
+      "page_sha256": "c2638cc36080fc2fa52fc7adf25f32d0f997b93dde4e6d41579640793eab19df",
+      "start": 584,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:05:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-402na0z2fkfnfnfzbxqw",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "156"
+  },
+  "quote": {
+    "exact": "we made the decision that we were willing to risk all data in the table if it meant we could recover immediately."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-927xc3h01n3ns1ewxfjg",
+  "source_record_sha256": "a00eea12ddab5b2ccdac526212876a70e1b03024d2a656f5ca577c5c4861136c",
+  "text": "txt-f62s1msgvp2hxn56ekew"
+}

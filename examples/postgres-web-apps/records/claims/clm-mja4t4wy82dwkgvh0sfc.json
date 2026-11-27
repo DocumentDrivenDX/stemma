@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-mja4t4wy82dwkgvh0sfc",
+  "kind": "claim",
+  "reason": "The two documentation pages state the first half directly; the pooler project states the cost of its own mode.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "A PostgreSQL 18 server starts a process for each connection and sizes some resources from the connection cap. A transaction-mode pooler shares connections at the price of some session features."
+}

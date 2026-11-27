@@ -132,7 +132,7 @@ function runs(labels: Set<string>): { style: Style; first: number; last: number 
   return out;
 }
 
-type Reason = "outside_extent" | "outside_page_map" | "unparsable_locator" | "no_extent" | "page_not_mapped" | "record_unreadable";
+type Reason = "outside_extent" | "outside_page_map" | "unparsable_locator" | "no_extent" | "page_not_mapped" | "record_unreadable" | "text_not_held";
 interface Verdict { outcome: "pass" | "fail" | "unverifiable"; reason?: Reason; evidence: Evidence[] }
 
 const meta = (name: string, value: string): Evidence => ({ name, class: "metadata", value });
@@ -168,7 +168,9 @@ export function judgeLocator(texts: SourceTexts, source: JsonObject, locator: Js
     return { ...overall(wheres, "outside_extent"), evidence: [shown] };
   }
   const ids = texts.idsOf(String(source.id));
-  if (manifestsUnread(texts.corpus) || ids.some((id) => !texts.view(id))) return unverifiable("record_unreadable");
+  const unused = ids.filter((id) => !texts.view(id));
+  if (manifestsUnread(texts.corpus)) return unverifiable("record_unreadable");
+  if (unused.length > 0) return unverifiable(texts.notHeld(unused) ? "text_not_held" : "record_unreadable");
   const mapped = TERMS.has(term) ? mappedPlaces(texts, String(source.id), term) : undefined;
   if (!mapped || mapped.labels.size === 0) {
     const unpaged = (term === "page" || term === "folio") && ids.length > 0 && ids.every((id) => !texts.view(id)!.paged);

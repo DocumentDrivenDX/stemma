@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-2fyt7cvq5y12tszwrap4",
+  "kind": "claim",
+  "reason": "One company’s account of its own sharding design. Other designs make other trades.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Splitting tables across servers can take away guarantees the single server enforced."
+}

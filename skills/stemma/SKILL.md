@@ -3,8 +3,10 @@ name: stemma
 description: |
   Stemma skill, the single public entrypoint for researching and writing
   academically rigorous research reports and books with a checkable chain from
-  each original source to each citation. Engage on prompts to start a report or
-  book project; capture a source from a library or the author's own file and
+  each original source to each citation, technical research included:
+  documentation for a named version, release notes, papers and engineering
+  write-ups. Engage on prompts to start a report or book project; research a
+  technical subject; capture a source from a library or the author's own file and
   convert it to Markdown in the project; read PDF, EPUB, HTML, DOCX, Markdown,
   Project Gutenberg or plain text and its page numbers or chapters; find and
   capture quotations with their pages; record the citations in a manuscript;
@@ -19,6 +21,9 @@ argument-hint: "[intent or scope]"
 # Stemma
 
 Stemma helps an author create an academically rigorous research report or book.
+Technical research is a first use: its sources are documentation for a named
+version, release notes, papers and engineering write-ups, beside books and
+articles in any field.
 It keeps an unbroken chain from original source to citation to supported thesis:
 upstream record (hashes) → converted source files (digests, converter version) →
 passage address and digest → citation → claim → sentence in the output →
@@ -60,7 +65,10 @@ step when it is wanted, in any later session; do not hold one back for another.
 
 1. **Capture** the upstream sources: from a library by the access route it
    documents for automated use, or from files the author supplies. A refused
-   fetch is never worked around: ask the author to supply the file.
+   fetch is never worked around: ask the author to supply the file. An original
+   may have several locations (`source locate`): other addresses, and private
+   copies named by a label, never by a path. Record only locations you or the
+   author have seen exist. Only bytes with the recorded digest are the original.
 2. **Convert and reverify**: `ingest` converts each original to source files,
    compares a fresh conversion with them, makes catalogue lookups, and checks.
    Set up what each check needs (source records, upstream entries, identifiers,
@@ -252,13 +260,14 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 |---|---|
 | `init` | Create a project in the `--project` directory; overwrites nothing |
 | `record add <kind> --input <absolute file> --actor <person\|model\|software>:<name>` | Add a record, such as a `source`, `citation`, `claim`, or `note` |
-| `ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--refresh-lookups]` | Stages 1 and 2: capture the plan's entries, compare every source file with a fresh conversion of its original, make listed lookups (with `--fetch`), and check. Safe to run again |
+| `ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--refresh-lookups]` | Stages 1 and 2: capture the plan's entries, compare every source file with a fresh conversion of its original, make listed lookups (with `--fetch`), and check. With `--fetch` it asks each original's locations in turn. Where a copy of the project has a source file's manifest but none of its text ("not held", which is not damage), it writes the text again from the original, only if every part matches the manifest. Safe to run again |
 | `source convert <original> --source <id> --acquired-at <time> --actor <kind>:<name> [--auto-pages] [--origin <text>] [--identity <file>]` | Convert one file the author supplies |
 | `source convert --source <id> … --transcription <file>\|--text-layer <file> --method ocr\|manual [--tool <name> --tool-version <v>]` | Paper or page images: supplied recognized or typed text, with `--description` and `--held-at` for paper, `--image <file>` for page images |
 | `source capture <original> --acquired-at <time> --actor <kind>:<name> [--source <id>] [--origin <text>]` | Record an original before it has any text; running it again writes nothing |
 | `source enrich <id\|key> --actor <kind>:<name> --from <text> [--add-identifier <scheme>:<value>] [--set <name>=<value>] [--author "<Family, Given>"] [--replace]`, or `… --lookup <resolution id>` | Add library details; never replaces a recorded value without `--replace` |
 | `source tag <id\|key>... [--add <tag>] [--remove <tag>] [--from <text>] --actor <kind>:<name>` | Add and remove tags, plain or `namespace:name` |
 | `source list [--tag <tag\|namespace:>] [--stage record\|captured\|text] [--has identifiers\|lookup\|tags]` / `source history <id\|key>` | Find sources; show how one came to be as it is |
+| `source locate <upstream\|id\|key> --url <address> --kind publisher\|web_archive\|archive [--fetch]`, or `… --private <label> [--original <file>]`, with `--actor <kind>:<name>` | Add another place an original can be had from, and record whether it gave the same bytes. Changes only the upstream record |
 | `source pages <original> [--page-numbers <file>] [--out <file>]` / `source label <text id> --page-map <file>` | Propose page labels for review; set them |
 | `source verify <text id> --original <file>` / `source compare <text id> --with <file> --against <what>` | Record a comparison with the original, or with another text of the same pages |
 | `source seal <text id> --actor person:<name>` | Record edits a person made to page files |
@@ -539,6 +548,21 @@ which. Record in the source file's `identity` the values read from the copy, wit
 read. Give source records the identifiers a catalogue knows (`doi`, `ia`) and
 list their lookups. Never change a record only to make a check pass: if the copy
 or a catalogue disagrees, show the author both values.
+
+**Technical sources.** For documentation, release notes and anything else that
+changes, capture the version the author names and record it (`--source-version`,
+or `version` in a plan); never guess one.
+
+- **Code is not kept line for line.** Converting an HTML page turns preformatted
+  text (`<pre>`) into an ordinary paragraph: its line breaks and indentation are
+  collapsed into single spaces. Never present such a passage or quotation as an
+  exact code listing, command output or configuration file; tell the author, who
+  can check the original.
+- **Paragraph numbers on a web page.** A page with no pages or numbered chapters
+  is cited by a paragraph number counted over the whole captured page, menus,
+  sidebars and footers included. It is not printed on the page, and another
+  capture may count differently. Say so, and help a reader find the place by the
+  quoted words.
 
 **Image-only and paper sources.** Stemma has no recognition engine. If the
 author has a recognition tool, use its output with `--method ocr` and name it;

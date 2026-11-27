@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-bv1580z67661epzs7ntd",
+  "intake": "parsed",
+  "key": "pg19notes",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "25"
+  },
+  "passage": "psg-60zna773e29kaaarf1fy",
+  "quotation": "Support for “read-your-writes” consistency on standbys via the new WAIT command.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "b614d7e8828b6631a6a7f9462940a630faf1ffddd36d201a491c3ba5b25b793d",
+    "text": "For replicas, the list includes this: “Support for “read-your-writes” consistency on standbys via the new WAIT command.”"
+  }
+}

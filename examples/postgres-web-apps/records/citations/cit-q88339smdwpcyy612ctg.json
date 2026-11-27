@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-q88339smdwpcyy612ctg",
+  "intake": "parsed",
+  "key": "pavlo2023",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "32"
+  },
+  "passage": "psg-h0ntab0cxr94k53ntsv5",
+  "quotation": "write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "2f66a68d152888ec5fe143f7d9ee0c87f89053bc4a85f8cd392b97250140d930",
+    "text": "They also write of dead versions that “write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.”"
+  }
+}

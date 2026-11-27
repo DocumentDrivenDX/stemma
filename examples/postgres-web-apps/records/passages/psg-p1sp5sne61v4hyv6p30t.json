@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 3359,
+      "index": 1,
+      "page_sha256": "852e0935e6727a789cd047fbc347abb81f82c55f3b76d5538015cdc8be7bd0a4",
+      "start": 3314,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:57Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-p1sp5sne61v4hyv6p30t",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "36"
+  },
+  "quote": {
+    "exact": "Read Committed is the default isolation level"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-jzgwnaqrcsjhpegjbn7z",
+  "source_record_sha256": "54fe10bbf51e00534f03ccfadffcda0de410df16b98b33fcd2e9bf2c74fb49d5",
+  "text": "txt-0xfkkdp5tdxhf6p1b32v"
+}

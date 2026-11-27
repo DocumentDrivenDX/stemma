@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2639,
+      "index": 11,
+      "page_sha256": "8646b26c9b0526f3be7644c7bc9c64d015f8f16a9566c09c3bfe65cc7f6b42e6",
+      "start": 2524,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-40dgmq759162w1dx39kf",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "792"
+  },
+  "quote": {
+    "exact": "We then implemented them in the Peloton\nDBMS and evaluated them using OLTP workloads to highlight their\ntrade-offs."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-h7njqhwyqcz4hesxe37z",
+  "source_record_sha256": "9290b597129a789e7e5a7fa84505f5f1b6b2be29870015a004e199d25ad67365",
+  "text": "txt-a8vhfj4nsh105h8w3gf8"
+}

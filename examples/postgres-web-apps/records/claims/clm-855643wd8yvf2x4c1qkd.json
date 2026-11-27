@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-855643wd8yvf2x4c1qkd",
+  "kind": "claim",
+  "reason": "Release notes state what changed. No source here measures the effect in production, and version 19 was eight days old.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Recent releases have reduced or targeted some maintenance costs, so reports about older releases cannot be carried forward unchanged."
+}

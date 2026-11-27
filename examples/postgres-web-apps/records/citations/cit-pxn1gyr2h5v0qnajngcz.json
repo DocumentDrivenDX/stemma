@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-pxn1gyr2h5v0qnajngcz",
+  "intake": "parsed",
+  "key": "notion2021",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "41"
+  },
+  "passage": "psg-00pvjc4gwhwmw05f28dx",
+  "quotation": "For us, the inflection point arrived when the Postgres VACUUM process began to stall consistently, preventing the database from reclaiming disk space from dead tuples.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "858421e06330e89a5e00cad7744999a0001bd88d6764abf49168ed4e3eca670f",
+    "text": "Garrett Fidalgo wrote of Notion in 2021: “For us, the inflection point arrived when the Postgres VACUUM process began to stall consistently, preventing the database from reclaiming disk space from dead tuples.”"
+  }
+}

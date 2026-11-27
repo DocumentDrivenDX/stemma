@@ -18,12 +18,12 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 3. Citation store
-**Covered PRD Requirements**: FR-11, FR-12, FR-13, FR-14, FR-15
+**Covered PRD Requirements**: FR-11, FR-12, FR-13, FR-14, FR-15, FR-106
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
-The citation store is the project's official bibliography, held as Stemma records without an external reference manager (PRD FR-11). It provides citation keys and typed locators, and exchanges legacy libraries (FR-12 to FR-15).
+The citation store is the project's official bibliography, held as Stemma records without an external reference manager (PRD FR-11). It provides citation keys and typed locators, and exchanges legacy libraries (FR-12 to FR-15). It gives each kind of technical source its citation form (FR-106).
 
 ## Ideal Future State
 
@@ -43,6 +43,7 @@ An author reads and builds the whole bibliography from the project. Each in-text
 | Exchange | Can I bring libraries in and send them back? | Lossless same-format round trip |
 | Citing | How does the text point to a source and place? | Stable keys, typed locators, style setting |
 | Bibliography completeness | Is every listed work cited? | Report uncited entries |
+| Technical forms | How are software, standards, and versioned pages cited? | Hold what each form needs and format it |
 
 ## Requirements
 
@@ -84,6 +85,12 @@ BIB-02 (FR-15, P0, M1). Every build must report an uncited listed entry by name 
 
 BIB-03 (FR-15, P0, M1). The corpus may hold sources the book does not cite; they must not cause that failure.
 
+#### Technical citation forms
+
+FRM-01 (FR-106, P0, M2). Software, source code at a commit, datasets, specifications and standards (requests for comments among them), preprints at a version, documentation for a named release, and web pages, those by an organization included, must each have a note and bibliography form, with a record that holds what the form needs. **Not built** as stated: records of many types exist and the formatter accepts them; the set of forms is not defined.
+
+FRM-02 (FR-106, FR-38, P0, M2). citeproc-js must format these forms in the project's style, and they must be labelled unverified until examples are approved. **Not built**: none has been compared with a style manual.
+
 ### Non-Functional Requirements
 
 - **Reliability**: For each seeded round-trip library, a comparison of imported and re-exported information reports zero lost values and zero lost comments.
@@ -120,7 +127,7 @@ BIB-03 (FR-15, P0, M1). The corpus may hold sources the book does not cite; they
 
 - **Other features**: FEAT-002 for source files; FEAT-011 for records; FEAT-007 for the scripted checks and reports; FEAT-008 for formatting and building; FEAT-015 for takeover input.
 - **External services**: None required. Citation formatting depends on a pinned processor. Exact interfaces belong to Contract artifacts.
-- **PRD requirements**: FR-11 to FR-15 (P0, M1). The takeover pilot needs FR-15 in M1, because takeover lists the whole original reference list (FR-72).
+- **PRD requirements**: FR-11 to FR-15 (P0, M1) and FR-106 (P0, M2). The takeover pilot needs FR-15 in M1, because takeover lists the whole original reference list (FR-72).
 
 ## Out of Scope
 

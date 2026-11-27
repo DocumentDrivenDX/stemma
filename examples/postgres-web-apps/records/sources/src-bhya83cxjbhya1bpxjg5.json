@@ -1,0 +1,58 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Figma Blog"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/"
+      }
+    }
+  ],
+  "citation_key": "figma2024",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Steele",
+        "given": "Sammy"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-bhya83cxjbhya1bpxjg5",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2024-03-14"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "No licence statement found",
+    "permission_note": "No licence statement found on the article page, read 2026-11-27. Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "How Figma’s Databases Team Lived to Tell the Scale"
+  },
+  "type": "post-weblog"
+}

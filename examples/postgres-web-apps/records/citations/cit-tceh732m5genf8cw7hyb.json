@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-tceh732m5genf8cw7hyb",
+  "intake": "parsed",
+  "key": "pg18isolation",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "60"
+  },
+  "passage": "psg-8jvhq3vazb1acmk1qc2c",
+  "quotation": "This level emulates serial transaction execution for all committed transactions; as if transactions had been executed one after another, serially, rather than concurrently. However, like the Repeatable Read level, applications using this level must be prepared to retry transactions due to serialization failures.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "2ef35b131d3d3498cf036dc31a9b8a717d63ab31b71974342c3c0bd2f6c2a9c9",
+    "text": "That guarantee is available at the Serializable level, with a condition: “This level emulates serial transaction execution for all committed transactions; as if transactions had been executed one after another, serially, rather than concurrently. However, like the Repeatable Read level, applications using this level must be prepared to retry transactions due to serialization failures.”"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "body": "The implementers report that, in their experiments on the 9.1 implementation, serializable mode performed much like snapshot isolation and did considerably better than strict two-phase locking on read-heavy work.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-mabgf0awfak5k1kjzcqt",
+  "kind": "note",
+  "passages": [
+    "psg-k2jy99wb0nbagcrv0km0"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-8jrmssahm9f1stb929c7",
+  "type": "paraphrase"
+}

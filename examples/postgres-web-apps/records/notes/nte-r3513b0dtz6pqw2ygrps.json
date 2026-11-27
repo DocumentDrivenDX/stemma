@@ -1,0 +1,21 @@
+{
+  "body": "In Figma’s account, once tables are split across shards PostgreSQL can no longer enforce foreign keys or globally unique indexes.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-r3513b0dtz6pqw2ygrps",
+  "kind": "note",
+  "passages": [
+    "psg-zymf2tqz7twm518df057"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "type": "paraphrase"
+}

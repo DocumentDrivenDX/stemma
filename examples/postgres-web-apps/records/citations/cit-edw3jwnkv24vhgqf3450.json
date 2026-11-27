@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-edw3jwnkv24vhgqf3450",
+  "intake": "parsed",
+  "key": "pg18standby",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "48"
+  },
+  "passage": "psg-fee5fg7pfq2061ba3bdr",
+  "quotation": "Streaming replication is asynchronous by default (see Section 26.2.8), in which case there is a small delay between committing a transaction in the primary and the changes becoming visible in the standby. This delay is however much smaller than with file-based log shipping, typically under one second assuming the standby is powerful enough to keep up with the load.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "71e2e7f51172ce0b2cbbd984d333f0294552efca81f3752b7765c25e46b763fc",
+    "text": "The documentation estimates the delay before a change is visible on a standby in these terms: “Streaming replication is asynchronous by default (see Section 26.2.8), in which case there is a small delay between committing a transaction in the primary and the changes becoming visible in the standby. This delay is however much smaller than with file-based log shipping, typically under one second assuming the standby is powerful enough to keep up with the load.”"
+  }
+}

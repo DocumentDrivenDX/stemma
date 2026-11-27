@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-0k1b957qfvznvkvj6e4y",
+  "intake": "parsed",
+  "key": "notion2021",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "43"
+  },
+  "passage": "psg-kmv4ytexzzbw6aq5hbvn",
+  "quotation": "Query performance and upkeep processes often begin to degrade well before a table reaches the maximum hardware-bound size",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "79fa7c1b0be2de1a3001bbf0376da00c60b8050ec8152bc16f12158305f5c2d7",
+    "text": "His general lesson is that “Query performance and upkeep processes often begin to degrade well before a table reaches the maximum hardware-bound size”."
+  }
+}

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-129.5 -424.5 259 849" width="259" height="849" class="lini" role="img" aria-labelledby="dgm-chain-narrow-title dgm-chain-narrow-desc">
+  <title id="dgm-chain-narrow-title">From an original source to a footnote</title>
+  <desc id="dgm-chain-narrow-desc">7 links, each leading to the next: original source, upstream record, source files, passage, citation, claim, sentence and footnote.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-157.5" y="-452.5" width="315" height="905" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(0,-387.5)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Original source</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(0,-258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(0,-129)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Source files</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(0,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,129)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n6" transform="translate(0,258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Claim</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n7" style="stroke-width: 3" transform="translate(0,387.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Sentence and footnote</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M 0 -358.5 L 0 -290"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-286 -4.5,-295 4.5,-295"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 0 -229.5 L 0 -161"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-157 -4.5,-166 4.5,-166"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 0 -100.5 L 0 -32"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-28 -4.5,-37 4.5,-37"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M 0 28.5 L 0 97"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,101 -4.5,92 4.5,92"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 0 157.5 L 0 226"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,230 -4.5,221 4.5,221"/>
+    </g>
+    <g class="lini-link" data-from="visual.n6" data-to="visual.n7">
+      <path d="M 0 286.5 L 0 355"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,359 -4.5,350 4.5,350"/>
+    </g>
+  </g>
+</svg>

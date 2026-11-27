@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 26974,
+      "index": 1,
+      "page_sha256": "bb4de07b5f4ab7b5451a44fd5c1ff8fead8dbbdc47be3eaae58129ec3e317c6b",
+      "start": 26811,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:56Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-brtemwr44nsqk6nhnnz2",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "100"
+  },
+  "quote": {
+    "exact": "As a result, incautious use of synchronous replication will reduce performance for database applications because of increased response times and higher contention."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-01n2wr6cy5qmwqd6fc3t",
+  "source_record_sha256": "245572773c61b04711fbcfe687c31a753915b24684bb6302450afc5c18782f8a",
+  "text": "txt-5qewjb0e62fyn2pycfp5"
+}

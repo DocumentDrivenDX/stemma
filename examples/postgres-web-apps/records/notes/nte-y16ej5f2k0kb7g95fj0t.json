@@ -1,0 +1,23 @@
+{
+  "body": "Notion reports that vacuum began to stall on its single large database, that upkeep degrades before hardware limits, and that it waited until the database was strained before sharding.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-y16ej5f2k0kb7g95fj0t",
+  "kind": "note",
+  "passages": [
+    "psg-00pvjc4gwhwmw05f28dx",
+    "psg-kmv4ytexzzbw6aq5hbvn",
+    "psg-sttqqf9g9kxhcgcr7a1a"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "type": "paraphrase"
+}

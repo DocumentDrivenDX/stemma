@@ -1,0 +1,133 @@
+{
+  "against": "a fresh conversion of the original with the recorded settings",
+  "created": {
+    "at": "2026-11-27T18:02:37Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "run-j2vck0zyxcwpzh6m6p4k",
+  "independent": false,
+  "kind": "comparison_run",
+  "method": "reconversion",
+  "original_sha256": "29ea89b404b68db56c801abf0550cef46ec7e1ca94f07005811702f1c685850a",
+  "pages": [
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 0,
+      "sha256": "1ddec64c33dbec57b9aa42d83864f2dcf1fd076eec3dcbef4e247ef5ea79f0ae",
+      "words": 907
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 1,
+      "sha256": "d2d06c12a25d5e0c28033d11f5c71e2a5035cf3f7bc279a960a2e03e37c32e7e",
+      "words": 1018
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 2,
+      "sha256": "2f897d53153273fb31fdfcc21e2d1bd6a5a0bee7afeef1a442f01d2053409234",
+      "words": 985
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 3,
+      "sha256": "09142f03b15455c8d77a0fb8f25cbffc760dbd1232f18d2bff763f6f089132ae",
+      "words": 1070
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 4,
+      "sha256": "a74c1e3fbd49a69c03578b20acd215066e2abf4e97d97ebe2e00ed888b2d14ee",
+      "words": 1173
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 5,
+      "sha256": "eae44f28913fcc74a2648526df42703a1ced27f35af695747a52692ec76b5000",
+      "words": 1187
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 6,
+      "sha256": "d5f03c4aec5d0ea3df965db986ec27fa7ddefff4f3c7466168af5a65df372cf2",
+      "words": 1244
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 7,
+      "sha256": "759161f65be2b61e5bed049c78af26e685e53b945b28874d069ebf2f776f2dea",
+      "words": 1139
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 8,
+      "sha256": "b4823d9c1a00b86d73911ce602f62c1ba8fc39446c061002f48586c448ee7896",
+      "words": 1182
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 9,
+      "sha256": "141f757ef5d2ad9255585dee9b8651360e14655c8265c976aba185b327d787db",
+      "words": 1038
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 10,
+      "sha256": "90e649f9fd364577f90840d2df5a0764bb1ceab7e57b402b2a3b4dd794e08688",
+      "words": 892
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 11,
+      "sha256": "36b12e78673ff4d977636145a8ea482076fc776013f6582e2a2790516db4926a",
+      "words": 982
+    }
+  ],
+  "run": {
+    "at": "2026-11-27T18:02:37.953Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "source": "src-8jrmssahm9f1stb929c7",
+  "text": "txt-156d9jnzqm5sp5kn4v9x",
+  "tools": [
+    {
+      "name": "stemma-convert",
+      "version": "1"
+    },
+    {
+      "name": "pdfjs-dist",
+      "version": "6.5.438"
+    }
+  ]
+}

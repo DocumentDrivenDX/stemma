@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-v65hddewjgqh5afze4m9",
+  "intake": "parsed",
+  "key": "pg18ha",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "42"
+  },
+  "passage": "psg-33kt82823vktkxyw4bkn",
+  "quotation": "Data partitioning splits tables into data sets. Each set can be modified by only one server.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "91b7ba11a2a0057c7a97a8ceca1a2bb8fda702b9eaefd5c613a15a8cd35e7309",
+    "text": "“Data partitioning splits tables into data sets. Each set can be modified by only one server.”"
+  }
+}

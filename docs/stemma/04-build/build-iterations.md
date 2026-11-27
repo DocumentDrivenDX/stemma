@@ -33,6 +33,10 @@ work in progress elsewhere and wait until it reaches `main`.
 | 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report, `stemma browse`, originals with highlighting where positions are certain (scans unmarked) and MCP on main; other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Faster export and complete paged search in `stemma browse` on main; export memory over 4 GB; offline page still limited |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
+| 28 | Several locations for an original | FR-98 | — | Built, with limits: a private copy is found locally by hash before any address is asked, not in the listed order; a supplied original counts only by hash; fall-through after a real refusal exercised only with faked fetches; explorer and excerpt views show only the retrieval address |
+| 29 | Source text not held: report it, fetch and convert it again | FR-104 | 28 | Built, with limits: supplied, typed, hand-corrected text, or text from other converter versions, may not be reproducible; a changed web page may not restore |
+| 30 | Technical sources: versions, repository files, findable places, exact code and tables, a page's own content, technical checks and citation forms, quoted code in builds | FR-99 to 103, 106 to 108 | 28 | Not built |
+| 31 | Records behind a report in one run | FR-105 (P1) | 2 | Not built |
 
 ## Iteration 24: see a citation inline with its source
 
@@ -236,6 +240,34 @@ Before and after were both run on these projects.
   by a line-end hyphen and ligatures: 6 of 125 passage segments of the worked
   example were marked. Whether to show labelled estimates is the product
   owner's decision.
+
+## From the PostgreSQL worked example
+
+Met while a model made
+[the example](../../../examples/postgres-web-apps/README.md) on 2026-11-27.
+Missing capabilities are requirements FR-99 to FR-108. These are the smaller
+defects.
+
+Fixed:
+
+- `build report` cited a paragraph of an HTML page as a bare number that read as
+  a page. It now uses the passage's locator label and refuses mixed labels in one
+  quotation.
+- A quotation whose text was missing was reported as changed. It now says the
+  text cannot be read.
+
+Not fixed:
+
+- HTML conversion reads a footnote reference marker such as
+  `<a class="footnote">`, as on postgresql.org, as a note body, which raises a
+  `source.footnotes` finding.
+- Piping `ingest` into `head` ends in an `EPIPE` error with a stack trace.
+- Quotation marks inside a quotation stay double in notes. Not examined: whether
+  the fix is a rendering rule alone.
+- A rights field has no place to say where a licence statement was read. Rights
+  fields stay optional and gate nothing (FR-7).
+- A paper's first page got no printed label. Not examined: whether the page
+  prints one.
 
 ## Not completable by an agent alone
 

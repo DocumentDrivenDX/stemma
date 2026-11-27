@@ -2,7 +2,9 @@
 // that every part is present, in sequence and unchanged; that printed page
 // labels run as a book's would; and that note markers and notes pair.
 import { blockText, type Corpus, idOf, isRetired, type LoadedText, noteMarks, streamsOf } from "@stemma/records";
+import { activeWhere } from "../corpus-index.ts";
 import { result } from "../findings.ts";
+import { active } from "./bibliography.ts";
 import type { Evidence, Result } from "../report.ts";
 import { numberOf } from "./locators.ts";
 import { foldName } from "./metadata.ts";
@@ -22,6 +24,17 @@ export function pageResults(corpus: Corpus): Result[] {
   const check = "source.pages";
   return activeTexts(corpus).flatMap(([id, text]) => {
     const parts = meta("parts", `${text.parts.length} ${text.manifest.data!.paged === true ? "page files" : "section files"} present`);
+    if (text.notHeld) {
+      // Said here once, with how much rests on it.
+      const passages = new Set(activeWhere(corpus, "passage", "text", id).map(idOf));
+      const citations = active(corpus, "citation").filter((c) => passages.has(String(c.data!.passage))).length;
+      return [result({
+        ...common(check, text), outcome: "unverifiable", reason: "not_held", locus: id,
+        evidence: [at("source_text", text.manifest.path), meta("parts", `none of the ${text.damage.length} listed ${text.manifest.data!.paged === true ? "page files" : "section files"} is here`),
+          meta("rests_on_it", `${passages.size} passage(s) and ${citations} citation record(s) taken from this text cannot be checked`),
+          meta("fetch_again", `ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original`)],
+      })];
+    }
     if (text.damage.length > 0) {
       return text.damage.map((d) => result({
         ...common(check, text), outcome: "fail", reason: d.code, locus: `${id}#${d.code}#${d.path}#${d.detail ?? ""}`,

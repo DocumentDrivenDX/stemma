@@ -1,0 +1,22 @@
+{
+  "body": "The documentation advises the binary JSON type for most uses, and warns that updating any part of a stored document locks the whole row.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-0mssxhkm183d4wn7a17e",
+  "kind": "note",
+  "passages": [
+    "psg-h47f17a07mbvymw30cvf",
+    "psg-52bdyrvn4pf9vhz65d6z"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-kvfq6m31x122sa7qgs53",
+  "type": "paraphrase"
+}

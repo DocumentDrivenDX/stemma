@@ -1,0 +1,77 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "PostgreSQL 19 Documentation"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.postgresql.org/docs/19/release-19.html"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T18:08:31Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T18:08:31Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "issued",
+      "from": "the page's own line 'Release date: 2026-11-19' (captured copy, section 1)",
+      "value": "2026-11-19"
+    }
+  ],
+  "citation_key": "pg19notes",
+  "contributions": [
+    {
+      "as_printed": {
+        "literal": "PostgreSQL Global Development Group"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:25Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-mfaaxnw4et2z8359btzf",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2026-11-19"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "PostgreSQL License",
+    "permission_note": "Licence read at https://www.postgresql.org/docs/19/legalnotice.html and https://www.postgresql.org/about/licence/, 2026-11-27. Full text is committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Release 19"
+  },
+  "type": "webpage"
+}

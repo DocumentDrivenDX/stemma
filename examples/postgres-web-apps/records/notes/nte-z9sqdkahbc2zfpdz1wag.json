@@ -1,0 +1,22 @@
+{
+  "body": "PostgreSQL does not offer synchronous multimaster replication; in partitioning, only one server can modify each set.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-z9sqdkahbc2zfpdz1wag",
+  "kind": "note",
+  "passages": [
+    "psg-59g5qqe8zdmvht506ymk",
+    "psg-33kt82823vktkxyw4bkn"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-gf8p7mknx1fgq150x3k6",
+  "type": "paraphrase"
+}

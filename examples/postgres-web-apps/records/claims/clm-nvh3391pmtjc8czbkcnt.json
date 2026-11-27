@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-nvh3391pmtjc8czbkcnt",
+  "kind": "claim",
+  "reason": "Stated in the version 18 documentation. One 2015 operator report describes an outage of this kind on a much older release, whose recovery advice has since changed.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "If maintenance falls far enough behind transaction ID consumption, PostgreSQL 18 stops accepting commands that need new IDs, leaving read-only service."
+}

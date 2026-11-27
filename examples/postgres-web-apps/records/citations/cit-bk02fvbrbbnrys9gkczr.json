@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-bk02fvbrbbnrys9gkczr",
+  "intake": "parsed",
+  "key": "figma2024",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "97"
+  },
+  "passage": "psg-db071bnkq9akp1esr4yh",
+  "quotation": "However, we have a very complex relational data model built on top of our current Postgres architecture and NoSQL APIs don’t offer this kind of versatility. We wanted to keep our engineers focused on shipping great features and building new products instead of rewriting almost our entire backend application; NoSQL wasn’t a viable solution.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "0d34f43216d005b50ac297cdec840e46eb44c727d2764d1a3301f15f165e59b9",
+    "text": "It judged a migration to another distributed database too risky for its deadline, and of non-relational stores it wrote: “However, we have a very complex relational data model built on top of our current Postgres architecture and NoSQL APIs don’t offer this kind of versatility. We wanted to keep our engineers focused on shipping great features and building new products instead of rewriting almost our entire backend application; NoSQL wasn’t a viable solution.”"
+  }
+}

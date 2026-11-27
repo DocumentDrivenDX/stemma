@@ -210,7 +210,7 @@ function read(corpus: Corpus, spec: ReportSpec, template: string, include: strin
     // A broken quotation gives its citation no page: its locator may not be that of the cited work.
     return {
       ...(one.cites === undefined ? {} : { cites: one.cites }),
-      ...(one.built ? { locator: one.built.locator, text: one.built.text } : {}),
+      ...(one.built ? { locator: one.built.locator, label: one.built.label, text: one.built.text } : {}),
     };
   });
   const clusters = clustersOf(assembly.notes);

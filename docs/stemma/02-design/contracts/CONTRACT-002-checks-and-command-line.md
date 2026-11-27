@@ -19,7 +19,7 @@ ddx:
 **Contract ID**: CONTRACT-002
 **Type**: CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93
+**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93, FR-98, FR-104
 
 ## Purpose
 
@@ -64,7 +64,7 @@ absent (exit 4 if it cannot) and then runs
   `stemma.json`), `--format text|json` (default `text`), `--restricted-dir`.
 - No command calls a model, and no result depends on which model or host runs
   the agent. Only `resolve`, `ingest --fetch`, `ingest --plan` entries with an
-  address, and `research` fetches may use the network, and they send only the
+  address, `source locate --fetch`, and `research` fetches may use the network, and they send only the
   address or identifier and a user-agent naming Stemma and its version. Every
   other command MUST work offline.
 - On a Bun version other than the pinned one, a command exits 4. It
@@ -83,7 +83,7 @@ absent (exit 4 if it cannot) and then runs
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
 | `rules check` | Report malformed or duplicated rule headings in `rules.md` (CONTRACT-001 J) as `record.valid` results; `validate` includes it | M1 |
 | `migrate --list` / `migrate --apply <list digest>` | Move a project to a newer format (Data Design), only when the author asks. `--list` writes nothing and prints every file change and the review marks, support records, confirmations, and annotations that would end, with a digest of that list. `--apply` writes only when the digest still matches, otherwise exits 5 with `stale_input`. Neither prompts | With the first format change |
-| `ingest [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups] --actor <kind>:<name>` | Run stages 1 and 2 (Core Pipeline). For each plan entry not yet captured, take the original from the named file or fetch its address, record an `upstream`, and convert it with the entry's settings, proposing page labels from the printed numbers. For every upstream record, find the original by hash in `.stemma/originals/` and the `--originals` directories, or fetch it with `--fetch`; convert it again and record the comparison when no current one exists; with `--reconvert`, convert every one again, and record a comparison only where the result differs from the current one. With `--fetch`, make each lookup an upstream lists that has no saved response; `--refresh-lookups` makes all of them again. Then run `check` and print its report and coverage. A refused or failed fetch is reported with what to supply; nothing is retried another way | M1 |
+| `ingest [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups] --actor <kind>:<name>` | Run stages 1 and 2 (Core Pipeline). For each plan entry not yet captured, take the original from the named file or fetch its address, record an `upstream`, and convert it with the entry's settings, proposing page labels from the printed numbers. For every upstream record, find the original by hash in `.stemma/originals/` and the `--originals` directories, or fetch it with `--fetch` from the locations it lists (B2); restore a source file whose text is not held when the original is at hand (B2); convert it again and record the comparison when no current one exists; with `--reconvert`, convert every one again, and record a comparison only where the result differs from the current one. With `--fetch`, make each lookup an upstream lists that has no saved response; `--refresh-lookups` makes all of them again. Then run `check` and print its report and coverage. A refused or failed fetch is reported with what to supply; nothing is retried another way | M1 |
 | `source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]` | Propose a page map from the numbers printed in the pages' own text. It writes nothing in the project; `--out` writes a `PageSegment` list to a file that does not exist yet. Page-number data (an Internet Archive page-number file, or a list of `{"page_index", "label"}`) and labels stated inside the file are compared and reported; they label nothing on their own. A warning names labels that more than one page would carry | M1 |
 | `source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>] [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]... [--text-layer <file> \| --transcription <file>] [--method born_text\|text_layer\|markup\|ocr\|manual] [--recognition <text>] [--tool <name> --tool-version <version>] [--page-map <file> \| --auto-pages] [--page-numbers <file>] [--identity <file>] [--coverage-note <text>] [--note <text>] [--name <name>]` | Convert an original into a new source file (CONTRACT-007). Without an original file, a `physical` original needs `--description`, `--held-at`, and a transcription; page images (`--image`) need a transcription too. Text with nothing but white space, an encrypted or damaged file, or a limit passed (for a PDF, also its memory bound: B, "Reading a PDF") exits 5 and writes nothing. When a source file already holds the same original for another source, nothing is merged: the command exits 5 with `already_held`. `--auto-pages` applies the proposed runs, dropping a run whose labels a longer run also gives, and reports each dropped run | M1 |
 | `source label <text id> --page-map <file> --actor <kind>:<name>` | Replace a source file's page labels from a page map; text is unchanged | M1 |
@@ -97,6 +97,7 @@ absent (exit 4 if it cannot) and then runs
 | `cite format --input <file\|->` | Format notes in order and the bibliography from source records with citeproc-js and the pinned Chicago notes-and-bibliography style and locale (CONTRACT-006 G): input `{"notes": [[{"key", "locator", "label"?}], …]}`. A key that names no source is shown marked and reported as `cite.format` (exit 1); nothing is made up | M1 |
 | `build report [<dir>] [--check] [--pdf]` | Build the report in `<dir>` (default `report`) as CONTRACT-006 I defines: `report.md`, `report.typ`, `verification.md`, the evidence ledger `evidence.json` (CONTRACT-006 J), and with `--pdf` `report.pdf` typeset by the pinned Typst. `--check` writes nothing and exits 1 when a file differs from what the build gives. A quotation that cannot be copied as recorded stops the build and writes nothing (exit 5). `--pdf` fetches the pinned Typst into the plugin's data directory once and checks its SHA-256 before use; a refused or failed fetch exits 4 after the text files are written | M1 |
 | `source capture <original> [--source <id\|key>] --acquired-at <time> [--origin <text>] [--source-version <text>] --actor <kind>:<name>` | Record an original for a new or named source in an `upstream` record, and keep a copy in `.stemma/originals/`, without converting it. An original already held writes nothing unless another source is named. A later `source convert` of it must name the source (else `already_held`) and takes the time, origin, and version from that record; a conversion identical to one the source holds writes nothing | M1 |
+| `source locate <upstream id\|source id\|key> (--url <address> --kind publisher\|web_archive\|archive [--fetch] \| --private <label> [--original <file>]) [--note <text>] --actor <kind>:<name>` | Add a location to an upstream record, or compare one already listed (B2). A source is named only when it has one upstream record. It writes that upstream record and nothing else: no source file, passage, or other record changes. A location already listed is not added twice; its kind and note are kept. With `--fetch`, the address is requested once and the digest of what it gave is recorded; a refused or failed request leaves the location a reference and says so. With `--original`, the file is hashed and its digest recorded for the private copy; no path is recorded. Exit 1 when what was compared is not the original or could not be fetched | M1 |
 | `source enrich <id\|key> [--from <text>] [--add-identifier <scheme>:<value>]... [--set <name>=<value>]... [--author <name>]... [--replace] --actor <kind>:<name>` / `source enrich <id\|key> --lookup <resolution id> --actor <kind>:<name>` | Add library details to a source record and log each in its `changes`. Typed values need `--from`. A value that differs from a recorded one is listed as a disagreement and not written (exit 1) unless `--replace` is given. A saved lookup only fills absent title, authors, date, publisher, and container title; it does not take the date of a record of one volume of a set. Writes no source file | M1 |
 | `source tag <id\|key>... [--add <tag>]... [--remove <tag>]... [--from <text>] --actor <kind>:<name>` | Add and remove tags (CONTRACT-001 G) on one or more sources and log each. Any invalid tag or source writes nothing | M1 |
 | `source list [--tag <tag\|namespace:>]... [--stage record\|captured\|text] [--has identifiers\|lookup\|tags]...` | List non-retired sources that match every filter, with tag counts. The stage is how far a source has come: a record only, an original captured, or text held. It is no judgment and no finding | M1 |
@@ -201,6 +202,46 @@ is printed for a command's first reading only.
   Windows the bound is untested; where a system does not report that the
   process was killed, the command still stops, with exit 70.
 
+### B2. Locations and text that is not held (FR-98, FR-104)
+
+**Where `ingest` looks.** First by hash in `.stemma/originals/` and in the files
+and folders named with `--originals`, which needs no request; this is how a
+private copy is used. When it restores text from such a file and the upstream
+has `locations`, it says that no address was asked. Then,
+with `--fetch`, at the addresses: the upstream's `url`, then each entry of
+`locations` that has an address, in order, an address listed twice once. It
+stops at the first that gives bytes with the recorded digest, and keeps them in
+`.stemma/originals/`. For each address it says what happened: it gave the
+original; the request was refused or failed; the address answered another status
+than 200; or it gave different bytes, with their digest. Different bytes are
+never used as the original, whatever the location's `kind` or `compared` says. A
+refusal is not worked around: the same address is not asked again in another
+way, and nothing is changed about the request. Going on to the next location
+means asking another address that the author recorded. When no address gives the
+original, `ingest` names each private location by its label, with how to give
+the file (`--originals`). `ingest` does not change an upstream record; `source
+locate --fetch` records what a location gave. For an upstream with no
+`locations`, one address is tried, as before.
+
+**Restoring text.** For an upstream whose original is at hand and a source file
+of its source, made from that original, whose text is not held (CONTRACT-007 H),
+`ingest` converts the original again and writes the parts only if all of them
+have the digests the manifest records, whether or not `--fetch` was given. When
+the original is not at hand and `--fetch` was given, it converts what each
+address gave instead of the original, in the same order, and writes the parts
+under the same condition; bytes that are not of the recorded media type are not
+converted. When that restores the text, it says exactly that: the text is
+restored, and the fetched copy is not the recorded original. Those bytes are not
+kept, the upstream is not changed, and nothing is compared with them as the
+original. It says which it did. When it cannot, it writes nothing and reports why: what
+differed (which parts, and the tool versions recorded and current), or that the
+text was supplied and cannot be made from the original. A plan given with
+`--plan` also serves here, for the page map or page-number data of its entry for
+the same source and address. A source file with some parts missing or changed is
+damaged: `ingest` does not write to it. `build report --check` that stops for
+text it cannot read also says that whether the report's files are current cannot
+be told.
+
 ### B1. Unreviewed records and review marks
 
 **One rule.** A review mark applies only when `review.state` is `reviewed` and
@@ -263,11 +304,11 @@ reviewed or not.
 |---|---|---|---|
 | `record.valid` | FR-62 | CONTRACT-001 error | unreadable file |
 | `project.binary` | FR-84, FR-85 | A file outside `records/` and `sources/` that git tracks or would add is binary (a NUL byte in its first 8000 bytes, or a PDF or ZIP signature). Without git, every file outside hidden, `build/`, and `node_modules/` directories is read. A binary under `records/` or `sources/` is `record.valid`'s. One result for each file; one pass when there is none | none |
-| `source.held` | FR-9 | A cited source has no non-retired source file holding text (`no_source_file`, `no_text`) | an unreadable or damaged source file |
-| `source.pages` | FR-87 | A source file's part is missing, edited without sealing, unlisted, out of sequence, or its pages do not run `0` to the original's page count minus one | a part cannot be read |
+| `source.held` | FR-9 | A cited source has no non-retired source file holding text (`no_source_file`, `no_text`) | an unreadable or damaged source file, or one whose text is not held (`text_not_held`) |
+| `source.pages` | FR-87 | A source file's part is missing (while others are present), edited without sealing, unlisted, out of sequence, or its pages do not run `0` to the original's page count minus one | a part cannot be read, or no listed part is here (`not_held`, FR-98) |
 | `source.labels` | FR-87 | A printed label repeats, goes backwards, or advances further than the pages do, or a folio differs from its page's label | none |
 | `source.footnotes` | FR-87 | A note marker has no note on its page or section, or a note has no marker, unless the note is continued | none |
-| `source.original` | FR-85, FR-88 | A source file's original matches no upstream record of its source, or the current fresh conversion of the original differs from it, person corrections undone | the newest fresh conversion no longer applies to the parts or tool versions |
+| `source.original` | FR-85, FR-88 | A source file's original matches no upstream record of its source, or the current fresh conversion of the original differs from it, person corrections undone | the newest fresh conversion no longer applies to the parts or tool versions, or the text is not held (`text_not_held`, coverage) |
 | `source.changed` | FR-10, FR-90 | A note, claim, passage, or citation depends on a retired source file or source, on a passage whose pages or sections changed (`text_changed`), or on a passage whose `source_record_sha256` differs from the source's current bibliographic digest | a record it depends on cannot be read |
 | `cite.key` | FR-29 | A citation key matches no source | a source record is unreadable |
 | `bib.uncited` | FR-29, FR-15 | A source in `bibliography_include` is cited nowhere. Cited sources enter the built bibliography automatically, so no other entry can be uncited | no manuscript to read |
@@ -329,7 +370,25 @@ sentence left unfinished is not enough. These signs can be absent where nothing
 is missing, and then the jump stays a finding; they do not prove the original
 was complete when it was made into a file. `source.original` emits a result for a source file
 whose source has upstream records or that has a comparison run of its original.
-A source file whose parts fail `source.pages` is not used by other checks.
+A source file that does not pass `source.pages` is not used by other checks.
+
+**Text that is not held** (FR-104; CONTRACT-007 H). When every listed part of a
+source file is absent and its manifest is sound, `source.pages` gives one result
+for the source file, `unverifiable` with `not_held`, not one failure for each
+part. It says how many passages and citation records were taken from that text. It is never a pass and is not called damage. It names the command that
+fetches the text again. It is open, and no annotation dismisses it, so a project
+with text that is not held is never labelled `checked_clean`; an annotation can
+explain it. What rests on that text stays could-not-be-checked as for a damaged
+source file, with wording that says the text is not here: `source.held`
+(`text_not_held`), `meta.source` (`text_not_held`), `locator.extent`
+(`text_not_held`, when no source file of the source is damaged or unread),
+`quote.present`, `number.present`, and `source.changed`. `source.original` still
+fails `original_not_upstream`, which needs only the manifest; otherwise it is
+`unverifiable` (`text_not_held`) as coverage, whether or not a comparison is
+recorded: the same cause has its open finding in `source.pages`. The verification
+coverage of such a source file says its text is not here. A source file with
+some parts missing or changed keeps the damage failures, one for each. No result
+depends on why the text is not there.
 
 **Recognized text and review coverage.** Recognized text that no person has
 reviewed is not a finding. Reports state review coverage for each source file
@@ -859,6 +918,7 @@ commands, MUST NOT treat it as a reason to refuse or stop work.
 |---|---|---|---|
 | A check throws | That result is `unverifiable` with `check_error`; exit 70 | yes | Report the defect; never record a pass |
 | Report cannot be written | Exit 70; the build is reported as failed | yes | Fix the output path |
+| One of several locations refused, failed, or gave different bytes during `ingest` | Reported for that address; the next location is tried | yes | None when a later one gives the original |
 | No network or a refused request during `resolve` or `ingest` | No record written; dependants stay `unverifiable` or use the cached record and report its date | yes | Run again online |
 | Support input stale | `support record` saves nothing and exits 5 with `stale_input` | yes | Prepare again and rerun the verdict |
 | A digest given to `reviewed` is stale | That record is left unmarked and listed with `stale_input`; the others are marked; exit 5 | yes | Run `unreviewed list` and look at the record as it is now |
@@ -923,6 +983,8 @@ exits 1, and labels the build `open_findings`.
 | `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
 | This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, `graph export` for the `author` audience without `--chapter`, `graph status`, `browse` (its evidence and limits are in CONTRACT-005), `unreviewed list`, `reviewed`, `takeover` of a Word file without `--library` or `--again` (on invented files only), and `check` with `record.valid`, `claim.complete`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. `annotate` and annotations are built; `annotate list` is not, and nothing is redacted. Only `takeover` takes the project write lock | The other commands and checks; Linux, Windows; an author's real project |
+
+| Locations and text not held (B2, C) | Tests with invented sources and faked fetches on one macOS system; the PostgreSQL worked example's text was restored from its recorded addresses on one day | That a web address keeps giving the same bytes; restoring from supplied page maps in real use |
 
 ## Schema Basis
 

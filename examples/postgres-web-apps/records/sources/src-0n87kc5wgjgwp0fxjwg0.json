@@ -1,0 +1,54 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "PostgreSQL 18 Documentation"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.postgresql.org/docs/18/runtime-config-connection.html"
+      }
+    }
+  ],
+  "citation_key": "pg18connections",
+  "contributions": [
+    {
+      "as_printed": {
+        "literal": "PostgreSQL Global Development Group"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:25Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-0n87kc5wgjgwp0fxjwg0",
+  "intake": "parsed",
+  "kind": "source",
+  "rights": {
+    "license": "PostgreSQL License",
+    "permission_note": "Licence read at https://www.postgresql.org/docs/18/legalnotice.html (permission to use, copy, modify and distribute the software and its documentation, keeping the copyright notice) and https://www.postgresql.org/about/licence/, 2026-11-27. Full text is committed; the notice is reproduced in the project's NOTICE-PostgreSQL file."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Connections and Authentication"
+  },
+  "type": "webpage"
+}

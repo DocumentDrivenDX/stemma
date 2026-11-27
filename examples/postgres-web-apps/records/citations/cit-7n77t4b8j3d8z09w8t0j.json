@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-7n77t4b8j3d8z09w8t0j",
+  "intake": "parsed",
+  "key": "pg18ha",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "36"
+  },
+  "passage": "psg-59g5qqe8zdmvht506ymk",
+  "quotation": "PostgreSQL does not offer this type of replication",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "7178e3150b9868ebba9255502bf684ece7245cb72bff687c24684d6ec1ae751b",
+    "text": "Of synchronous multimaster replication, in which every server accepts writes and passes them to the others before commit, the documentation says: “PostgreSQL does not offer this type of replication”."
+  }
+}

@@ -10,8 +10,14 @@ export const FETCH_LIMITS = { bytes: 200 * 1024 * 1024, milliseconds: 300_000, r
 
 export class FetchRefused extends Error {}
 
-const privateAddress = (address: string): boolean => {
-  const v4 = /^(?:::ffff:)?(\d+)\.(\d+)\.\d+\.\d+$/i.exec(address);
+export const privateAddress = (address: string): boolean => {
+  // An IPv4 address written inside IPv6 (::ffff:7f00:1, ::7f00:1, 64:ff9b::7f00:1) is judged as the IPv4 address it reaches.
+  const embedded = /^(?:::(?:ffff:(?:0:)?)?|64:ff9b::)([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(address);
+  if (embedded) {
+    const [high, low] = [parseInt(embedded[1]!, 16), parseInt(embedded[2]!, 16)];
+    return privateAddress(`${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`);
+  }
+  const v4 =/^(?:::ffff:)?(\d+)\.(\d+)\.\d+\.\d+$/i.exec(address);
   if (v4) {
     const [a, b] = [Number(v4[1]), Number(v4[2])];
     return a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b < 128) || (a === 169 && b === 254)

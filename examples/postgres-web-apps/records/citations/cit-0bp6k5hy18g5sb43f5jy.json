@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-0bp6k5hy18g5sb43f5jy",
+  "intake": "parsed",
+  "key": "pavlo2023",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "36"
+  },
+  "passage": "psg-kkcfsb1hwa6w7a2ngfqy",
+  "quotation": "Unless the DBMS stores the new version in the same page as the previous version (HOT update), the system does this for every update.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "18719130eb306e90ee34ab212441b3b4f6f3d32fa15c984c2970d6b951b5c651",
+    "text": "Pavlo and Zhang state the cost when an update does not qualify, writing of the work of adding entries to all of a table’s indexes: “Unless the DBMS stores the new version in the same page as the previous version (HOT update), the system does this for every update.”"
+  }
+}

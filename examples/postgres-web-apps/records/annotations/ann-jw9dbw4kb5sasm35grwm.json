@@ -1,0 +1,27 @@
+{
+  "check": "meta.source",
+  "created": {
+    "at": "2026-11-27T18:12:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "effect": "explain",
+  "finding_key": "ca24987ff5530c3a86db2138633f269f86298cef7dfb2de8763e25a9db7cfaf6",
+  "id": "ann-jw9dbw4kb5sasm35grwm",
+  "item": {
+    "content_sha256": "ce79dad365bbb07d3daecfa61d934e21fe48548cd5391853bf867f8159374812",
+    "record": "src-qmw5m7hjrx4a41abv94v"
+  },
+  "kind": "annotation",
+  "reason": "The page's own title is the general 'PostgreSQL: Release Notes', and the parts taken as its title page are navigation. The converted text states 'E.25. Release 9.6' and 'Release date: 2016-09-29' in section 4. A model's reading, not a person's review.",
+  "schema": "stemma.record/0",
+  "written": {
+    "at": "2026-11-27T18:12:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  }
+}

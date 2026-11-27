@@ -10,7 +10,7 @@ import { once } from "../corpus-index.ts";
 import { coverageOf, coverageWords } from "../verification.ts";
 import { cited } from "./cited.ts";
 
-type Reason = "no_source_file" | "no_text" | "record_unreadable" | "source_damaged";
+type Reason = "no_source_file" | "no_text" | "record_unreadable" | "source_damaged" | "text_not_held";
 
 const at = (name: string, value: string): Evidence => ({ name, class: "location", value });
 const meta = (name: string, value: string): Evidence => ({ name, class: "metadata", value });
@@ -33,7 +33,7 @@ export function holding(texts: SourceTexts, source: string): { outcome: "pass" |
   // Every source file is looked at: a good one does not hide a damaged one.
   const damaged = ids.filter((id) => !texts.view(id));
   if (damaged.length > 0) {
-    return { outcome: "unverifiable", reason: "source_damaged", evidence: damaged.map((id) => at("source_text", corpus.texts.get(id)!.manifest.path)) };
+    return { outcome: "unverifiable", reason: texts.notHeld(damaged) ? "text_not_held" : "source_damaged", evidence: damaged.map((id) => at("source_text", corpus.texts.get(id)!.manifest.path)) };
   }
   const evidence: Evidence[] = [];
   let held = false;

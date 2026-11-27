@@ -1,0 +1,108 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Proceedings of the VLDB Endowment"
+      }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "10"
+      }
+    },
+    {
+      "name": "issue",
+      "value": {
+        "value": "7"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "781–92"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.vldb.org/pvldb/vol10/p781-Wu.pdf"
+      }
+    }
+  ],
+  "citation_key": "wu2017",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Wu",
+        "given": "Yingjun"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Arulraj",
+        "given": "Joy"
+      },
+      "lid": "a2",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Lin",
+        "given": "Jiexi"
+      },
+      "lid": "a3",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Xian",
+        "given": "Ran"
+      },
+      "lid": "a4",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Pavlo",
+        "given": "Andrew"
+      },
+      "lid": "a5",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-h7njqhwyqcz4hesxe37z",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2017"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "CC BY-NC-ND 4.0",
+    "permission_note": "Licence statement read on the first page of https://www.vldb.org/pvldb/vol10/p781-Wu.pdf, 2026-11-27. Treated as not redistributable (no derivatives; a converted text may be a derivative). Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "An Empirical Evaluation of In-Memory Multi-Version Concurrency Control"
+  },
+  "type": "article-journal"
+}

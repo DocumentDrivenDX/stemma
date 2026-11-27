@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-bzwtz15x4e56x8ze168v",
+  "kind": "claim",
+  "reason": "It follows from what the sources are: three engineering articles by operators of large systems, with no survey among the sources.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "objection",
+  "schema": "stemma.record/0",
+  "text": "Accounts of limits reached come from a few large companies that chose to write about them, and say little about the ordinary web application."
+}

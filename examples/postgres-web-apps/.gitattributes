@@ -1,0 +1,6 @@
+stemma.json text eol=lf
+rules.md text eol=lf
+records/** text eol=lf
+manuscript/** text eol=lf
+sources/** text eol=lf
+research/**/*.md text eol=lf

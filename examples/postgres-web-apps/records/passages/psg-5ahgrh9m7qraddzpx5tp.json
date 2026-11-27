@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1404,
+      "index": 1,
+      "page_sha256": "e1af3e9562b5f0ddb6ec74a0cf3f94f71c195b7c3236e440b84aa77d6f34654a",
+      "start": 1271,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:05:03Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-5ahgrh9m7qraddzpx5tp",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "6"
+  },
+  "quote": {
+    "exact": "its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "source_record_sha256": "c5f9ad6df398a5cdaed0c7bff8258b77c8af09809098219a348c7c2ff38c42a0",
+  "text": "txt-44w8mtetezbxysnrekak"
+}

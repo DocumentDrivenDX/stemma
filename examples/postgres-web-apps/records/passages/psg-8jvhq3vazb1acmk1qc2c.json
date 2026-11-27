@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 14724,
+      "index": 1,
+      "page_sha256": "852e0935e6727a789cd047fbc347abb81f82c55f3b76d5538015cdc8be7bd0a4",
+      "start": 14411,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:57Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-8jvhq3vazb1acmk1qc2c",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "60"
+  },
+  "quote": {
+    "exact": "This level emulates serial transaction execution for all committed transactions; as if transactions had been executed one after another, serially, rather than concurrently. However, like the Repeatable Read level, applications using this level must be prepared to retry transactions due to serialization failures."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-jzgwnaqrcsjhpegjbn7z",
+  "source_record_sha256": "54fe10bbf51e00534f03ccfadffcda0de410df16b98b33fcd2e9bf2c74fb49d5",
+  "text": "txt-0xfkkdp5tdxhf6p1b32v"
+}

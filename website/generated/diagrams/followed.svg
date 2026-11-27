@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-287 -166.5 574 333" width="574" height="333" class="lini" role="img" aria-labelledby="dgm-followed-title dgm-followed-desc">
+  <title id="dgm-followed-title">One documentation page, followed to a footnote</title>
+  <desc id="dgm-followed-desc">6 links, each leading to the next: a documentation page, upstream record, 3 files, one per section, passage: paragraph 22, citation: paragraph 22, footnote 12 in the report.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-315" y="-194.5" width="630" height="389" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(-157.5,-129.5)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A documentation page</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(157.5,-129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(-157.5,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(157.5,0)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">3 files, one per section</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(-157.5,129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n6" style="stroke-width: 3" transform="translate(157.5,129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Footnote 12 in the report</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M -36 -129.5 L 33 -129.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="37,-129.5 28,-125 28,-134"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 157.5 -101 L 157.5 -32"/>
+      <polygon class="lini-marker lini-marker-arrow" points="157.5,-28 153,-37 162,-37"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 36.5 0 L -33 0"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-37,0 -28,-4.5 -28,4.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M -157.5 28.5 L -157.5 97.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-157.5,101.5 -162,92.5 -153,92.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M -36.5 129.5 L 32.5 129.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,129.5 27.5,134 27.5,125"/>
+    </g>
+  </g>
+</svg>

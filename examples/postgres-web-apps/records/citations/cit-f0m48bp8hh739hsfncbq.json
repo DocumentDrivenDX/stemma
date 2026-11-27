@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-f0m48bp8hh739hsfncbq",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "71"
+  },
+  "passage": "psg-9njy4s9hp9wkdfvhmkms",
+  "quotation": "contrary to what was sometimes recommended in earlier releases, it is not necessary or desirable to stop the postmaster or enter single user-mode in order to restore normal operation.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "74a579e8e1d7b5035633ffcb312425643625910b0169c7f4754c4a611cceda4d",
+    "text": "According to the documentation of version 18, “contrary to what was sometimes recommended in earlier releases, it is not necessary or desirable to stop the postmaster or enter single user-mode in order to restore normal operation.”"
+  }
+}
