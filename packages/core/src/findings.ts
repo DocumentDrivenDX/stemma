@@ -342,6 +342,7 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   response_digest_mismatch: "the saved response does not match its digest",
   bad_address: "a passage address needs, for each part, a start before its end",
   bad_binding: "an annotation binds a sentence and its source, or one record, never both",
+  note_without_passage: "an extract or paraphrase note names no passage, so nothing shows where in its source it comes from; capture the passage (`passage capture`) and name it in `passages`, or make the note a comment if it is a remark of your own",
   front_matter_missing: "the file does not begin with a front matter block",
   front_matter_unreadable: "the front matter is not one readable JSON object",
   text_outside_block: "there is text before the first block line",
