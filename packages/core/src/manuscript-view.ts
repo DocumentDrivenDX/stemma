@@ -72,3 +72,32 @@ export const emptyManuscript = (state: "none" | "unavailable", why?: string): Ma
   schema: MANUSCRIPT_SCHEMA, state, ...(why === undefined ? {} : { why }),
   blocks: [], notes: [], quotations: {}, bibliography: [], works: {}, problems: [],
 });
+
+export interface Run { kind: "text" | "italic" | "link"; text: string }
+
+/** The Markdown subset of manuscript text and formatted citations, as the Typst output reads it: `*italic*` and bare web addresses. */
+export function inlineRuns(text: string): Run[] {
+  const runs: Run[] = [];
+  let at = 0;
+  for (const m of text.matchAll(/\*([^*]+)\*|https?:\/\/\S+?(?=[.,;)]?(?:\s|$))/g)) {
+    if (m.index > at) runs.push({ kind: "text", text: text.slice(at, m.index) });
+    runs.push(m[1] === undefined ? { kind: "link", text: m[0] } : { kind: "italic", text: m[1] });
+    at = m.index + m[0].length;
+  }
+  if (at < text.length) runs.push({ kind: "text", text: text.slice(at) });
+  return runs;
+}
+
+/**
+ * A quotation's words. Only the italics the report's list names are applied:
+ * any other asterisk is one of the source's own characters.
+ */
+export function quotationRuns(text: string, italic: string[] = []): Run[] {
+  let runs: Run[] = [{ kind: "text", text }];
+  for (const word of italic) {
+    const marked = `*${word}*`;
+    runs = runs.flatMap((run): Run[] => (run.kind !== "text" ? [run] : run.text.split(marked)
+      .flatMap((piece, i): Run[] => [...(i > 0 ? [{ kind: "italic" as const, text: word }] : []), ...(piece ? [{ kind: "text" as const, text: piece }] : [])])));
+  }
+  return runs;
+}

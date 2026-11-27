@@ -4,11 +4,13 @@
 import { createRoot } from "react-dom/client";
 import { GraphBrowser } from "@documentdrivendx/arras-ui/browser";
 import { createStaticClient, GraphLoadError, InvalidDocument, loadStore, staticSchemaApi } from "@documentdrivendx/arras-ui/static";
+import type { ManuscriptView } from "../../core/src/manuscript-view.ts";
 import type { SourceView } from "../../core/src/source-view.ts";
 import type { BannerData } from "../../graph/src/export.ts";
 import { Banner } from "./Banner.tsx";
 import { foldingClient } from "./client.ts";
-import { sourceRouteOf, useLocationOfBrowser } from "./route.ts";
+import { Manuscript } from "./Manuscript.tsx";
+import { manuscriptRouteOf, sourceRouteOf, useHash, useLocationOfBrowser } from "./route.ts";
 import { type GetSourceView, SourcePanel } from "./SourcePanel.tsx";
 
 const dataText = (id: string): string => document.getElementById(id)!.textContent!;
@@ -37,7 +39,7 @@ function inlinedViews(): GetSourceView {
 }
 
 /** The record browser, with the open citation's or passage's source beside it, or below it on a narrow screen. */
-function Explorer({ client, getView }: { client: ReturnType<typeof createStaticClient>; getView: GetSourceView }) {
+function Records({ client, getView }: { client: ReturnType<typeof createStaticClient>; getView: GetSourceView }) {
   const [at, onLocation] = useLocationOfBrowser();
   const route = sourceRouteOf(at, "stemma");
   return (
@@ -47,6 +49,22 @@ function Explorer({ client, getView }: { client: ReturnType<typeof createStaticC
       </div>
       {route ? <SourcePanel key={`${route.type}/${route.id}`} route={route} getView={getView} /> : null}
     </div>
+  );
+}
+
+/** The record browser, or the manuscript when the export holds a report, with the control that moves between them. */
+function Explorer({ client, getView, manuscript }: { client: ReturnType<typeof createStaticClient>; getView: GetSourceView; manuscript: ManuscriptView }) {
+  const hash = useHash();
+  if (manuscript.state === "none") return <Records client={client} getView={getView} />;
+  const route = manuscriptRouteOf(hash);
+  return (
+    <>
+      <nav aria-label="Views" className="stemma-views">
+        <a href="#/explore" aria-current={route ? undefined : "page"}>Records</a>
+        <a href="#/manuscript" aria-current={route ? "page" : undefined}>Manuscript</a>
+      </nav>
+      {route ? <Manuscript view={manuscript} route={route} getView={getView} /> : <Records client={client} getView={getView} />}
+    </>
   );
 }
 
@@ -60,7 +78,7 @@ async function start(): Promise<void> {
     root.render(
       <div className="stemma-page">
         <Banner data={banner} />
-        <Explorer client={client} getView={inlinedViews()} />
+        <Explorer client={client} getView={inlinedViews()} manuscript={JSON.parse(dataText("stemma-manuscript")) as ManuscriptView} />
       </div>,
     );
   } catch (error) {

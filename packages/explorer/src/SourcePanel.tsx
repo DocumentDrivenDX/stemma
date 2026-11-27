@@ -5,7 +5,7 @@
 // highlighted: it marks only the `quoted` text of a view that says
 // `highlighted`, and only when every view involved says so and is the one asked
 // for.
-import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 import type { PageSegment, SourceView, SourceViewState, ViewOriginal, WorkName } from "../../core/src/source-view.ts";
 import { splitControls } from "../../records/src/visible.ts";
 
@@ -14,7 +14,7 @@ export type GetSourceView = (id: string) => Promise<SourceView | undefined>;
 
 export interface SourceRoute { type: "Citation" | "Passage"; id: string }
 
-const STATES: Record<SourceViewState, string> = {
+export const STATES: Record<SourceViewState, string> = {
   highlighted: "Quotation highlighted",
   changed: "The text has changed",
   no_source_file: "No source file",
@@ -27,7 +27,7 @@ const STATES: Record<SourceViewState, string> = {
 };
 
 /** One piece of untrusted text, kept from reordering what is around it. */
-function Text({ value }: { value: string }) {
+export function Text({ value }: { value: string }) {
   return (
     <span dir="auto" style={{ unicodeBidi: "isolate" }}>
       {splitControls(value).map((piece, i) => ("text" in piece
@@ -38,7 +38,7 @@ function Text({ value }: { value: string }) {
 }
 
 /** A link only for a web address; anything else is text. Nothing is loaded until the reader follows it. */
-function Address({ url }: { url: string }) {
+export function Address({ url }: { url: string }) {
   let web = false;
   try {
     web = ["http:", "https:"].includes(new URL(url).protocol);
@@ -158,12 +158,13 @@ const Nothing = ({ state, why }: { state: SourceViewState; why: string }): React
   </div>
 );
 
-interface Loaded { view: SourceView | undefined; passages: (SourceView | undefined)[]; failed?: string }
+export interface Loaded { view: SourceView | undefined; passages: (SourceView | undefined)[]; failed?: string }
 
-async function load(route: SourceRoute, get: GetSourceView): Promise<Loaded> {
-  const view = await get(route.id);
+/** The view asked for, with the passage views it points to. `getOwn` answers the ID itself, and `get` its passages. */
+export async function load(asked: { id: string; kind: SourceView["kind"] }, getOwn: GetSourceView, get: GetSourceView = getOwn): Promise<Loaded> {
+  const view = await getOwn(asked.id);
   // A view of anything but the record that is open is no view of it.
-  if (!view || view.id !== route.id || view.kind !== route.type.toLowerCase()) return { view: undefined, passages: [] };
+  if (!view || view.id !== asked.id || view.kind !== asked.kind) return { view: undefined, passages: [] };
   if (view.kind === "passage") return { view, passages: [view] };
   const passages = view.state === "highlighted"
     ? await Promise.all(view.passages.map(async (p) => {
@@ -174,54 +175,76 @@ async function load(route: SourceRoute, get: GetSourceView): Promise<Loaded> {
   return { view, passages };
 }
 
-/** Give it a key of the record's ID, so that nothing loaded for one record is ever shown for another. */
-export function SourcePanel({ route, getView }: { route: SourceRoute; getView: GetSourceView }) {
-  const [loaded, setLoaded] = useState<{ id: string; found: Loaded }>();
-  const box = useRef<HTMLElement>(null);
+/** What a view says, with the text of its passages. Nothing is marked unless every view involved says `highlighted`. */
+export function ViewBody({ found }: { found: Loaded & { view: SourceView } }) {
+  const view = found.view;
+  const highlighted = view.state === "highlighted";
+  return (
+    <>
+      {highlighted ? <p><strong>{STATES.highlighted}.</strong> <Text value={view.why} /></p> : <Nothing state={view.state} why={view.why} />}
+      {view.work ? <Work label={view.kind === "passage" ? "Source" : "Cited work"} work={view.work} /> : null}
+      {view.work?.part_of ? <Work label="Part of" work={view.work.part_of} /> : null}
+      {view.citation?.key === undefined ? null : <p><strong>Citation key:</strong> <Text value={view.citation.key} /></p>}
+      {view.locator ? <p><strong>{view.kind === "citation" ? "Cited place" : "Place"}:</strong> <Text value={`${view.locator.label} ${view.locator.value}`} /></p> : null}
+      {view.citation?.sentence === undefined ? null : <Quoted label="Citing sentence" value={view.citation.sentence} />}
+      {view.citation?.quotation === undefined ? null : <Quoted label="Quotation as the citation records it" value={view.citation.quotation} />}
+      {highlighted ? found.passages.map((passage, i) => (
+        !passage ? <p key={i} role="note">This export holds no view of the passage, so nothing is highlighted.</p>
+          : passage.state === "highlighted" && passage.source_text ? <Passage key={passage.id} passage={passage} link={view.kind !== "passage"} />
+            : <Nothing key={passage.id} state={passage.state} why={passage.why} />
+      )) : view.passages.map((p) => (
+        <p key={p.passage}><a className="st:underline" href={`#/explore/stemma/Passage/${encodeURIComponent(p.passage)}`}>Passage record <Text value={p.passage} /></a></p>
+      ))}
+    </>
+  );
+}
+
+/** What was loaded for `key`, and never what was loaded for another. */
+export function useLoaded<T>(key: string, make: () => Promise<T>, failed: (error: string) => T): T | undefined {
+  const [loaded, setLoaded] = useState<{ key: string; found: T }>();
   useEffect(() => {
     let current = true;
-    load(route, getView).then(
-      (found) => current && setLoaded({ id: route.id, found }),
-      (error: unknown) => current && setLoaded({ id: route.id, found: { view: undefined, passages: [], failed: String(error) } }),
+    make().then(
+      (found) => current && setLoaded({ key, found }),
+      (error: unknown) => current && setLoaded({ key, found: failed(String(error)) }),
     );
     return () => {
       current = false;
     };
-  }, [route.id, route.type, getView]);
-  const found = loaded?.id === route.id ? loaded.found : undefined;
-  // The highlight is brought into the panel's view without moving the record beside it.
+    // What is made depends on the key alone.
+  }, [key]);
+  return loaded?.key === key ? loaded.found : undefined;
+}
+
+/** The highlight is brought into the panel's view without moving what is beside it. */
+export function useShownMark(box: RefObject<HTMLElement | null>, found: unknown): void {
   useEffect(() => {
     const panel = box.current;
     const mark = panel?.querySelector("mark");
     if (panel && mark) panel.scrollTop += mark.getBoundingClientRect().top - panel.getBoundingClientRect().top - panel.clientHeight / 4;
   }, [found]);
+}
+
+export const ViewsFailed = ({ error }: { error: string }) => <p role="alert">The source views could not be read, which is a Stemma defect: <Text value={error} /></p>;
+
+/** Give it a key of the record's ID, so that nothing loaded for one record is ever shown for another. */
+export function SourcePanel({ route, getView }: { route: SourceRoute; getView: GetSourceView }) {
+  const box = useRef<HTMLElement>(null);
+  const found = useLoaded<Loaded>(
+    `${route.type}/${route.id}`,
+    () => load({ id: route.id, kind: route.type === "Citation" ? "citation" : "passage" }, getView),
+    (failed) => ({ view: undefined, passages: [], failed }),
+  );
+  useShownMark(box, found);
   const view = found?.view;
-  const highlighted = view?.state === "highlighted";
   return (
     <section ref={box} className="stemma-source st:p-3 st:text-sm st:leading-5" aria-label="In the source" tabIndex={0} data-record={route.id} data-state={view?.state}>
       <h2 className="st:text-base st:font-semibold">In the source</h2>
-      {!found ? <p>Loading.</p> : found.failed !== undefined ? <p role="alert">The source views could not be read, which is a Stemma defect: <Text value={found.failed} /></p> : !view ? (
+      {!found ? <p>Loading.</p> : found.failed !== undefined ? <ViewsFailed error={found.failed} /> : !view ? (
         <p role="note">
           This export holds no source view of this record, so nothing is highlighted. It, or something it rests on, may be retired. <code>excerpt</code> with its ID says why.
         </p>
-      ) : (
-        <>
-          {highlighted ? <p><strong>{STATES.highlighted}.</strong> <Text value={view.why} /></p> : <Nothing state={view.state} why={view.why} />}
-          {view.work ? <Work label={view.kind === "passage" ? "Source" : "Cited work"} work={view.work} /> : null}
-          {view.work?.part_of ? <Work label="Part of" work={view.work.part_of} /> : null}
-          {view.citation?.key === undefined ? null : <p><strong>Citation key:</strong> <Text value={view.citation.key} /></p>}
-          {view.locator ? <p><strong>{view.kind === "citation" ? "Cited place" : "Place"}:</strong> <Text value={`${view.locator.label} ${view.locator.value}`} /></p> : null}
-          {view.citation?.sentence === undefined ? null : <Quoted label="Citing sentence" value={view.citation.sentence} />}
-          {view.citation?.quotation === undefined ? null : <Quoted label="Quotation as the citation records it" value={view.citation.quotation} />}
-          {highlighted ? found.passages.map((passage, i) => (
-            !passage ? <p key={i} role="note">This export holds no view of the passage, so nothing is highlighted.</p>
-              : passage.state === "highlighted" && passage.source_text ? <Passage key={passage.id} passage={passage} link={view.kind !== "passage"} />
-                : <Nothing key={passage.id} state={passage.state} why={passage.why} />
-          )) : view.passages.map((p) => (
-            <p key={p.passage}><a className="st:underline" href={`#/explore/stemma/Passage/${encodeURIComponent(p.passage)}`}>Passage record <Text value={p.passage} /></a></p>
-          ))}
-        </>
-      )}
+      ) : <ViewBody found={{ ...found, view }} />}
     </section>
   );
 }

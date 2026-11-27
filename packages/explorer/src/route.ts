@@ -31,3 +31,48 @@ export function useLocationOfBrowser(): [ExploreLocation | undefined, (to: Explo
   const onLocation = useCallback((to: ExploreLocation) => setAt(to), []);
   return [at, onLocation];
 }
+
+// The manuscript's own routes. The record browser is not mounted on them, so
+// arras's routing never reads one.
+export type ManuscriptRoute =
+  | { kind: "text" }
+  | { kind: "quotation"; id: string }
+  | { kind: "citation"; note: number; index: number }
+  | { kind: "source"; id: string };
+
+export function manuscriptHref(route: ManuscriptRoute): string {
+  if (route.kind === "text") return "#/manuscript";
+  const rest = route.kind === "citation" ? `${route.note}/${route.index}` : encodeURIComponent(route.id);
+  return `#/manuscript/${route.kind}/${rest}`;
+}
+
+/** The manuscript route a fragment names, or nothing when it is the record browser's. */
+export function manuscriptRouteOf(hash: string): ManuscriptRoute | undefined {
+  const [first, second, third, fourth, ...more] = hash.replace(/^#\/?/, "").split("/");
+  if (first !== "manuscript") return undefined;
+  const text: ManuscriptRoute = { kind: "text" };
+  if (more.length > 0 || !third) return text;
+  if (second === "citation") {
+    return /^\d+$/.test(third) && /^\d+$/.test(fourth ?? "") ? { kind: "citation", note: Number(third), index: Number(fourth) } : text;
+  }
+  if ((second !== "quotation" && second !== "source") || fourth !== undefined) return text;
+  try {
+    return { kind: second, id: decodeURIComponent(third) };
+  } catch {
+    return text;
+  }
+}
+
+export function useHash(): string {
+  const [hash, setHash] = useState(() => window.location.hash);
+  useEffect(() => {
+    const update = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", update);
+    window.addEventListener("popstate", update);
+    return () => {
+      window.removeEventListener("hashchange", update);
+      window.removeEventListener("popstate", update);
+    };
+  }, []);
+  return hash;
+}
