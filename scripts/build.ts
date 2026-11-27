@@ -1,6 +1,6 @@
 // Bundles the command line to dist/stemma.js and assembles the release tree
-// dist/release/ that a local marketplace can install. dist/ is not committed.
-import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+// dist/release/ that the organization marketplace publishes. dist/ is not committed.
+import { cpSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { isBuiltin } from "node:module";
 import { join } from "node:path";
 
@@ -52,9 +52,5 @@ if (import.meta.main) {
   cpSync(join(root, "scripts/stemma.sh"), join(release, "scripts/stemma.sh"));
   cpSync(join(root, "LICENSE"), join(release, "LICENSE"));
   cpSync(join(root, ".claude-plugin/plugin.json"), join(release, ".claude-plugin/plugin.json"));
-  // Same marketplace as the repository's, but pointing at this tree.
-  const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"), "utf8"));
-  marketplace.plugins[0].source = "./";
-  writeFileSync(join(release, ".claude-plugin/marketplace.json"), `${JSON.stringify(marketplace, null, 2)}\n`);
   console.log(`built ${built}\nrelease tree ${release}`);
 }

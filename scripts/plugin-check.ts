@@ -1,17 +1,16 @@
 // Installs the plugin from a marketplace into a fresh HOME and
 // CLAUDE_CONFIG_DIR with no bun on the search path, then lets the plugin set
-// itself up and run. The marketplace is the repository's own entry with one
-// change, an address: it installs a version tag of a local git repository laid
-// out as the distribution repository is to be. The Claude command-line tool is a test harness
-// only; it signs in nowhere and makes no model call. Nothing is published.
+// itself up and run. The marketplace is a local directory laid out like
+// DocumentDrivenDX/plugins and filled by the publish script. The Claude
+// command-line tool is a test harness only; it signs in nowhere and makes no
+// model call. Nothing is published.
 //   ./scripts/dev.sh plugin-check
 // Setup fetches the pinned Bun from the npm registry. STEMMA_BUN_ARCHIVE may
 // name a local copy of that archive instead.
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { pathToFileURL } from "node:url";
-import { releaseInto } from "./release-repo.ts";
+import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { makePdf } from "../tests/pdf.ts";
 
 const root = join(import.meta.dir, "..");
@@ -53,35 +52,28 @@ function run(command: string[], expected = 0, cwd = base): string {
 if (Bun.spawnSync(["/bin/sh", "-c", "command -v bun"], { env }).exitCode === 0) fail("bun is on the clean search path");
 console.log(`Isolated profile: ${config}\nSearch path: ${env.PATH} (no bun on it)`);
 
-// The distribution repository as it would be published, as a local one.
-const origin = join(base, "stemma-dist.git");
-const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"), "utf8"));
-const source = marketplace.plugins[0].source;
-const version = JSON.parse(readFileSync(join(root, ".claude-plugin/plugin.json"), "utf8")).version;
-if (source.ref !== `v${version}` || marketplace.plugins[0].version !== version) {
-  fail("the marketplace entry, its tag and the plugin manifest do not carry one version");
-}
-releaseInto(origin, release, source.ref, { ...process.env, ...env });
-// The one change from what would be published: the repository's address.
-source.url = pathToFileURL(origin).href;
-const front = join(base, "front");
+// A local stand-in for the organization marketplace, filled as a release fills it.
+const front = join(base, "plugins");
 mkdirSync(join(front, ".claude-plugin"), { recursive: true });
-writeFileSync(join(front, ".claude-plugin/marketplace.json"), `${JSON.stringify(marketplace, null, 2)}\n`);
+writeFileSync(join(front, ".claude-plugin/marketplace.json"), `${JSON.stringify({
+  name: MARKETPLACE, owner: { name: "DocumentDrivenDX" },
+  plugins: [{ name: "stemma", description: "Stemma, as built here.", source: PLUGIN_SOURCE }],
+}, null, 2)}\n`);
+publishInto(front, release);
 
 for (const tree of [root, release]) {
   run([claude, "plugin", "validate", join(tree, ".claude-plugin/plugin.json")]);
-  run([claude, "plugin", "validate", join(tree, ".claude-plugin/marketplace.json")]);
 }
-// The command line takes no file: address for a marketplace, so its entry is
-// added from a directory; the plugin itself is cloned from the repository's branch.
+run([claude, "plugin", "validate", join(front, ".claude-plugin/marketplace.json")]);
+const id = `stemma@${MARKETPLACE}`;
 run([claude, "plugin", "marketplace", "add", front]);
-run([claude, "plugin", "install", "stemma@stemma"]);
+run([claude, "plugin", "install", id]);
 const listed = JSON.parse(run([claude, "plugin", "list", "--json"])) as { id: string; installPath: string; enabled: boolean; errors?: unknown[] }[];
-const entry = listed.find((p) => p.id === "stemma@stemma") ?? fail("stemma@stemma is not listed");
+const entry = listed.find((p) => p.id === id) ?? fail(`${id} is not listed`);
 if (!entry.enabled || entry.errors?.length) fail("the plugin is listed as disabled or with errors");
 const installed = entry.installPath;
 if (relative(config, installed).startsWith("..")) fail("the installed copy is outside the isolated profile");
-run([claude, "plugin", "details", "stemma@stemma"]);
+run([claude, "plugin", "details", id]);
 
 const skills = readdirSync(join(installed, "skills"));
 if (skills.length !== 1 || skills[0] !== "stemma") fail(`expected one skill, found ${skills.join(", ")}`);
@@ -93,7 +85,7 @@ console.log(`\nInstalled command line matches the build: sha256 ${sha(bundle)}`)
 
 // What the skill tells Claude to run. The data directory stands in for the one
 // the host substitutes for ${CLAUDE_PLUGIN_DATA}.
-const data = join(config, "plugins/data/stemma-stemma");
+const data = join(config, `plugins/data/stemma-${MARKETPLACE}`);
 const launcher = ["/bin/sh", join(installed, "scripts/stemma.sh"), data];
 run([...launcher, "setup"]);
 const again = run([...launcher, "setup"]);
@@ -130,10 +122,10 @@ if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.te
 
 console.log(`
 PASSED on this machine with the Claude command-line tool: both manifests validate, the
-plugin installs from a marketplace whose entry installs a version tag of a local stand-in
-for the distribution repository, into an empty profile with one skill, and with no bun on the search path the
+plugin installs from a local stand-in for the DocumentDrivenDX marketplace
+into an empty profile with one skill, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
-no native module. The warnings the PDF library printed are shown above as they came. Not checked: installation from GitHub (nothing is published), the desktop
+no native module. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);

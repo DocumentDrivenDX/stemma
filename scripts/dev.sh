@@ -11,7 +11,8 @@
 #   ./scripts/dev.sh preview       build the website and serve it on 127.0.0.1
 #   ./scripts/dev.sh browsers      fetch the pinned headless Chromium into .tools/
 #   ./scripts/dev.sh e2e           build the website and run the Playwright tests
-#   ./scripts/dev.sh release-repo  build, then commit the release tree to .tools/stemma-dist.git
+#   ./scripts/dev.sh publish-plugin <dir>  build, then copy the plugin into a
+#                                  checkout of DocumentDrivenDX/plugins (no push)
 set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
@@ -42,12 +43,12 @@ case "${1:-check}" in
   build) run scripts/build.ts ;;
   demo) run scripts/build.ts >/dev/null && run scripts/demo.ts ;;
   plugin-check) run scripts/build.ts >/dev/null && run scripts/plugin-check.ts ;;
-  release-repo) run scripts/build.ts >/dev/null && run scripts/release-repo.ts ;;
+  publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;
   docs) run website/generate.ts ;;
   docs-check) run website/generate.ts --check ;;
   site) run website/build.ts ;;
   preview) run website/build.ts && run website/preview.ts ;;
   browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;
   e2e) run website/build.ts && run --bun node_modules/.bin/playwright test --config website/playwright.config.ts ;;
-  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|site|preview|browsers|e2e|release-repo" >&2; exit 2 ;;
+  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
 esac

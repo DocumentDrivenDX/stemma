@@ -17,8 +17,12 @@ Pre-release.
 Installing the plugin is the only installation there is. The plugin and Claude
 set up everything else themselves.
 
-Stemma is not published to a marketplace, so there is no install command to
-give here.
+Install it from the DocumentDrivenDX marketplace with Claude Code:
+
+```sh
+claude plugin marketplace add DocumentDrivenDX/plugins
+claude plugin install stemma@documentdrivendx
+```
 
 On first use Claude fetches a pinned copy of the Bun runtime, checks it against a
 digest shipped in the plugin, and keeps it in the plugin's own data directory. It
@@ -66,10 +70,10 @@ are not read yet: quotations and pages are checked from citation records.
 ## Where it has been tried
 
 On one Mac with Apple silicon: the checks, reading PDFs (synthetic ones and one
-old scan with a text layer), and installation through the
-marketplace entry with the Claude command-line tool, using a local stand-in for
-the distribution repository. The Claude desktop app, a live Claude session using
-the skill, Windows, and Linux are untested. Setup on Windows needs Git Bash.
+old scan with a text layer), and installation from the DocumentDrivenDX
+marketplace on GitHub with the Claude command-line tool (version 0.0.1). The
+Claude desktop app, a live Claude session using the skill, Windows, and Linux are
+untested. Setup on Windows needs Git Bash.
 
 Stemma is for material that may be sent to a language model. It holds back no
 individual source.
@@ -77,7 +81,7 @@ individual source.
 ## Layout
 
 ```text
-.claude-plugin/   plugin and marketplace manifests
+.claude-plugin/   the plugin manifest
 skills/stemma/    the single public skill
 packages/         the command line inside the plugin, and its libraries
 scripts/          the plugin's launcher, and tools for building the plugin

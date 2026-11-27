@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { chmodSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { bundle } from "../scripts/build.ts";
-import { releaseInto } from "../scripts/release-repo.ts";
+import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "../scripts/publish-plugin.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 let plugin = "";
@@ -80,11 +80,35 @@ describe.skipIf(process.platform === "win32")("the plugin's launcher", () => {
 
 describe("what is released", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/plugin.json"), "utf8"));
-  const entry = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/marketplace.json"), "utf8")).plugins[0];
 
-  test("the marketplace entry installs a version tag of the distribution repository, with the plugin's version", () => {
-    expect(entry.source).toEqual({ source: "url", url: "https://github.com/DocumentDrivenDX/stemma-dist.git", ref: `v${manifest.version}` });
-    expect(entry.version).toBe(manifest.version);
+  /** A directory laid out like the organization marketplace, with another plugin in it. */
+  function marketplace(source = PLUGIN_SOURCE): string {
+    const dir = temporary();
+    mkdirSync(join(dir, ".claude-plugin"));
+    writeFileSync(join(dir, ".claude-plugin/marketplace.json"), JSON.stringify({ name: MARKETPLACE, plugins: [{ name: "stemma", source }] }));
+    mkdirSync(join(dir, "plugins/other"), { recursive: true });
+    writeFileSync(join(dir, "plugins/other/keep"), "untouched");
+    return dir;
+  }
+
+  /** A release tree holding a manifest at `version` and one file. */
+  function releaseTree(version: string, body: string): string {
+    const dir = temporary();
+    mkdirSync(join(dir, ".claude-plugin"));
+    writeFileSync(join(dir, ".claude-plugin/plugin.json"), JSON.stringify({ name: "stemma", version }));
+    writeFileSync(join(dir, "a"), body);
+    return dir;
+  }
+
+  test("publishing writes only plugins/stemma, and only into a marketplace that lists it there", () => {
+    const dir = marketplace();
+    const listed = readFileSync(join(dir, ".claude-plugin/marketplace.json"), "utf8");
+    expect(publishInto(dir, releaseTree(manifest.version, "one"))).toEqual({ version: manifest.version, changed: true });
+    expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("one");
+    expect(readFileSync(join(dir, "plugins/other/keep"), "utf8")).toBe("untouched");
+    expect(readFileSync(join(dir, ".claude-plugin/marketplace.json"), "utf8")).toBe(listed);
+    expect(() => publishInto(marketplace("./elsewhere"), releaseTree("1.0.0", "one"))).toThrow("must be named");
+    expect(() => publishInto(temporary(), releaseTree("1.0.0", "one"))).toThrow("no marketplace file");
   });
 
   test("the launcher, the command line and the package name one Bun version", () => {
@@ -109,17 +133,13 @@ describe("what is released", () => {
     expect(tracked.filter((f) => f.startsWith("dist/") || f.endsWith("stemma.js"))).toEqual([]);
   });
 
-  test("a released version's tag is never moved to other content", () => {
-    const base = temporary();
-    const tree = join(base, "tree");
-    const repository = join(base, "dist.git");
-    mkdirSync(tree);
-    writeFileSync(join(tree, "a"), "one");
-    const env = { PATH: process.env.PATH ?? "", HOME: base, GIT_AUTHOR_NAME: "t", GIT_AUTHOR_EMAIL: "t@example.invalid", GIT_COMMITTER_NAME: "t", GIT_COMMITTER_EMAIL: "t@example.invalid" };
-    const first = releaseInto(repository, tree, "v1", env);
-    expect(releaseInto(repository, tree, "v1", env)).toEqual({ commit: first.commit, changed: false });
-    writeFileSync(join(tree, "a"), "two");
-    expect(() => releaseInto(repository, tree, "v1", env)).toThrow("new version");
-    expect(releaseInto(repository, tree, "v2", env).changed).toBe(true);
+  test("a published version is never replaced with other content", () => {
+    const dir = marketplace();
+    publishInto(dir, releaseTree("1.0.0", "one"));
+    expect(publishInto(dir, releaseTree("1.0.0", "one"))).toEqual({ version: "1.0.0", changed: false });
+    expect(() => publishInto(dir, releaseTree("1.0.0", "two"))).toThrow("new version");
+    expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("one");
+    expect(publishInto(dir, releaseTree("1.0.1", "two")).changed).toBe(true);
+    expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("two");
   });
 });

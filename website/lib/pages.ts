@@ -96,14 +96,14 @@ const ASKS: [string, string][] = [
 function install(): string {
   return `<h1>Install and ask Claude</h1>
 <p class="lead">Installing the plugin is the only installation there is. The plugin and Claude set up everything else themselves.</p>
-<p class="note">Stemma is not published to a marketplace, so this page gives no install command. Installation through the plugin's marketplace entry has been tried with the Claude command-line tool on one Mac, using a local stand-in for the distribution repository. The Claude desktop app, Windows and Linux are untested.</p>
+<p>Install it from the DocumentDrivenDX marketplace with Claude Code:</p>
+${excerpt("Commands to type in a terminal.", "claude plugin marketplace add DocumentDrivenDX/plugins\nclaude plugin install stemma@documentdrivendx")}
+<p class="note">These commands were run against GitHub with the Claude command-line tool on one Mac (Stemma 0.0.1). The Claude desktop app, Windows and Linux are untested.</p>
 <h2>What happens on first use</h2>
 <p>Claude fetches a pinned copy of the Bun runtime from the npm registry, checks it against a digest shipped in the plugin, and keeps it in the plugin's own data directory. It changes no system or shell setting, and Claude's usual permission prompts apply. If setup fails or you decline it, Claude says that nothing was checked, and your writing carries on.</p>
 <h2>What to ask Claude</h2>
 ${table("Requests", ["You ask", "Stemma does"], ASKS.map(([ask, does]) => [`&ldquo;${escape(ask)}&rdquo;`, escape(does)]))}
-<p class="note">The commands behind these requests are tested. A live Claude session following the plugin's skill has not been tested.</p>
-<h2>Your copies stay yours</h2>
-<p>Copies of sources and their text go to a private store outside your project, never into it. Backing that store up is your job. Stemma is for material that may be sent to a language model: it holds back no individual source.</p>`;
+<p class="note">The commands behind these requests are tested. A live Claude session following the plugin's skill has not been tested.</p>`;
 }
 
 function checksPage(): string {

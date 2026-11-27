@@ -220,7 +220,8 @@ describe("exit codes (CONTRACT-002 I)", () => {
   });
 
   test("version and doctor report the pinned runtime and how it was started", () => {
-    expect(JSON.parse(stemma(["version", "--format", "json"]).out)).toEqual({ bun_pinned: "1.4.5", stemma: "0.0.1" });
+    const released = JSON.parse(readFileSync(join(import.meta.dir, "../.claude-plugin/plugin.json"), "utf8")).version;
+    expect(JSON.parse(stemma(["version", "--format", "json"]).out)).toEqual({ bun_pinned: "1.4.5", stemma: released });
     const doctor = JSON.parse(stemma(["doctor", "--format", "json"]).out);
     expect(Object.values(doctor.start_flags)).toEqual([true, true, true]);
     expect(stemma(["doctor"], ["--no-install"]).out).toContain("WARNING");
