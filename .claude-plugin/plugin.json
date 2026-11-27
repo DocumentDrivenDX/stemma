@@ -1,6 +1,6 @@
 {
   "name": "stemma",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Research and write books with citations checked by scripts against your own stored copies, with plain-language reports. Claude sets up what the plugin needs.",
   "author": {
     "name": "DocumentDrivenDX",

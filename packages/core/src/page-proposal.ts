@@ -149,3 +149,26 @@ export function parsePageNumbers(bytes: Uint8Array): Map<number, string> {
   }
   return out;
 }
+
+/**
+ * The runs applied without a person choosing: the longest first, leaving out any
+ * run whose labels a kept run already gives. Pages of a dropped run stay without
+ * a label rather than take a doubtful one.
+ */
+export function autoSegments(proposal: Proposal): { segments: PageSegment[]; dropped: PageSegment[] } {
+  const taken = new Set<string>();
+  const kept: PageSegment[] = [];
+  const dropped: PageSegment[] = [];
+  for (const run of [...proposal.runs].sort((a, b) => b.seen - a.seen || a.segment.first_index - b.segment.first_index)) {
+    const { segment } = run;
+    const start = segment.style === "arabic" ? Number(segment.first_label) : fromRoman(segment.first_label!)!;
+    const labels = Array.from({ length: segment.last_index - segment.first_index + 1 }, (_, i) => `${segment.style} ${start + i}`);
+    if (labels.some((l) => taken.has(l))) dropped.push(segment);
+    else {
+      for (const label of labels) taken.add(label);
+      kept.push(segment);
+    }
+  }
+  const order = (a: PageSegment, b: PageSegment) => a.first_index - b.first_index;
+  return { segments: kept.sort(order), dropped: dropped.sort(order) };
+}

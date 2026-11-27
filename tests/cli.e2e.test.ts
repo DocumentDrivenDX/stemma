@@ -44,8 +44,10 @@ describe("seeded and clean fixtures", () => {
       "record.valid fail rule_id_duplicate rules.md",
       "record.valid fail unknown_field src-fixture0invalid01",
       "record.valid unverifiable record_unreadable records/agents/agt-fixture0broken001.json",
-      "source.held fail no_copy cit-fixture0good00001",
-    ]);
+      "source.held fail no_source_file cit-fixture0good00001",
+      "meta.resolver unverifiable no_lookup src-fixture0harbour01",
+      "meta.resolver unverifiable no_lookup src-fixture0orphan001",
+    ].sort());
   });
 
   test("US-022-AC1 an unknown citation key fails, showing the key and where it is", () => {
@@ -102,7 +104,7 @@ describe("seeded and clean fixtures", () => {
   test("the text report explains in plain language", () => {
     const run = stemma(["check", "--project", fixture("seeded")]);
     expect(run.code).toBe(1);
-    for (const part of ["OPEN FINDINGS", "Nothing is blocked", "Why it matters:", "What to do:", "ghost2020", "NOT CHECKED"]) {
+    for (const part of ["OPEN FINDINGS", "Nothing is blocked", "Why it matters:", "What to do:", "ghost2020"]) {
       expect(run.out).toContain(part);
     }
     expect(run.out).not.toContain("12.34567");

@@ -103,20 +103,14 @@ const native = files.filter((f) => /\.(node|dylib|so|dll)$/i.test(f) || f.includ
 if (native.length > 0) fail(`the installed plugin holds native modules or packages: ${native.slice(0, 5).join(", ")}`);
 console.log(`\nInstalled plugin: ${files.length} files and directories, none a native module, and no node_modules.`);
 const reading = join(base, "reading");
-const store = join(base, "store");
 run([...launcher, "init", "--project", reading]);
 const pdf = join(base, "invented.pdf");
 writeFileSync(pdf, makePdf({ pages: [["\u6e2f\u306e\u901a\u884c\u7a0e"]], font: "japanese" }));
-const added = run([...launcher, "source", "add", pdf, "--project", reading, "--store-dir", store, "--actor", "software:plugin-check", "--acquired-at", "2026-01-05T09:00:00Z"]);
-const capture = /recorded it as (cap-[0-9a-z]+)/.exec(added)?.[1] ?? fail("no capture was recorded");
-const extracted = run([...launcher, "source", "text", capture, "--project", reading, "--store-dir", store, "--actor", "software:plugin-check"]);
-if (!extracted.includes("pdfjs-dist 6.5.438")) fail("the installed copy did not read the PDF");
-if (extracted.includes("cMapUrl") || extracted.includes("standardFontDataUrl")) fail("the packaged font or character-map data was not found");
-const sourceId = /source: (src-[0-9a-z]+)/.exec(added)![1]!;
-const saved = readdirSync(join(reading, "records/extractions"));
-const record = JSON.parse(readFileSync(join(reading, "records/extractions", saved[0]!), "utf8"));
-const textFile = join(store, "sha256", record.text_sha256.slice(0, 2), record.text_sha256);
-if (!readFileSync(textFile, "utf8").includes("\u6e2f\u306e\u901a\u884c\u7a0e")) fail(`the text of ${sourceId} did not come out of the PDF`);
+const added = run([...launcher, "source", "convert", pdf, "--project", reading, "--actor", "software:plugin-check", "--acquired-at", "2026-01-05T09:00:00Z"]);
+const directory = /to (sources\/[a-z0-9-]+)\//.exec(added)?.[1] ?? fail("no source file was written");
+if (!added.includes("method text_layer")) fail("the installed copy did not read the PDF");
+if (added.includes("cMapUrl") || added.includes("standardFontDataUrl")) fail("the packaged font or character-map data was not found");
+if (!readFileSync(join(reading, directory, "pages/p0000.md"), "utf8").includes("\u6e2f\u306e\u901a\u884c\u7a0e")) fail("the text did not come out of the PDF");
 
 if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.test(name))) fail("something was written to the home directory");
 

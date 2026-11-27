@@ -2239,6 +2239,12 @@
      "scalarType": "string",
      "allowedValues": [
       {
+       "string": "page_image"
+      },
+      {
+       "string": "source_marker"
+      },
+      {
        "string": "printed_sequence"
       },
       {

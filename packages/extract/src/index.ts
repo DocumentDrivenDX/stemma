@@ -8,9 +8,19 @@
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+/** One piece of text with its place: x and y of its baseline start, its width, and its size. */
+export interface PdfItem { text: string; x: number; y: number; width: number; size: number }
+
+export interface PdfLine { items: PdfItem[]; text: string }
+
 export interface PdfText {
   /** One string per file page, in file order. A page with no text layer is empty. */
   pages: string[];
+  /** The same text divided into lines, with the place of each piece. */
+  lines: PdfLine[][];
+  widths: number[];
+  /** What the file states about itself. */
+  info: { title?: string; author?: string; producer?: string; creator?: string };
   /** The labels the file itself states for its pages, if it states any. Not proof of printed numbers. */
   embeddedLabels?: string[];
   tool: { name: "pdfjs-dist"; version: string };
@@ -36,6 +46,9 @@ export function assetDirectory(): string {
   if (existsSync(join(shipped, "cmaps"))) return shipped;
   return dirname(Bun.resolveSync("pdfjs-dist/package.json", import.meta.dir));
 }
+
+/** The pinned PDF library; a test checks it against what the library reports. */
+export const PDFJS_VERSION = "6.5.438";
 
 export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = assetDirectory()): Promise<PdfText> {
   for (const name of ["cmaps", "standard_fonts"]) {
@@ -63,6 +76,8 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
     const document = await task.promise;
     if (document.numPages > limits.pages) throw new PdfUnreadable("too_many_pages");
     const pages: string[] = [];
+    const lines: PdfLine[][] = [];
+    const widths: number[] = [];
     let size = 0;
     for (let number = 1; number <= document.numPages; number++) {
       if (Date.now() - started > limits.milliseconds) throw new PdfUnreadable("too_slow");
@@ -78,11 +93,28 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
       size += Buffer.byteLength(text) + 1;
       if (size > limits.text_bytes) throw new PdfUnreadable("too_much_text");
       pages.push(text);
+      const pageLines: PdfLine[] = [{ items: [], text: "" }];
+      for (const item of content.items) {
+        if (!("str" in item)) continue;
+        const line = pageLines.at(-1)!;
+        const piece = item.str.replace(/[\f\0]/g, " ");
+        line.text += piece;
+        if (piece !== "") {
+          const [a, b, , d, x, y] = item.transform as number[];
+          line.items.push({ text: piece, x: x!, y: y!, width: item.width, size: Math.hypot(a!, b!) || Math.abs(d!) });
+        }
+        if (item.hasEOL) pageLines.push({ items: [], text: "" });
+      }
+      lines.push(pageLines.filter((l) => l.text.trim() !== ""));
+      widths.push(page.view[2]! - page.view[0]!);
       page.cleanup();
     }
     const labels = await document.getPageLabels();
+    const stated = ((await document.getMetadata()).info ?? {}) as Record<string, unknown>;
+    const info = Object.fromEntries((["Title", "Author", "Producer", "Creator"] as const)
+      .flatMap((k) => (typeof stated[k] === "string" && (stated[k] as string).trim() ? [[k.toLowerCase(), (stated[k] as string).trim()]] : [])));
     return {
-      pages,
+      pages, lines, widths, info,
       ...(labels ? { embeddedLabels: labels } : {}),
       tool: { name: "pdfjs-dist", version: pdfjs.version },
     };
@@ -95,3 +127,7 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
     await task.destroy();
   }
 }
+
+export * from "./convert.ts";
+export * from "./model.ts";
+export { parseTranscription } from "./transcription.ts";

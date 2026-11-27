@@ -296,3 +296,25 @@ function editDistance(a: string, b: string): number {
   }
   return row[b.length]!;
 }
+
+/**
+ * A passage's words as a quotation prints them: only the approved line-end join,
+ * soft-hyphen removal, and runs of white space made one space. No character is
+ * otherwise changed.
+ */
+export function renderQuotation(exact: string): string {
+  let out = "";
+  for (let i = 0; i < exact.length; ) {
+    const char = exact[i]!;
+    if (char === "-" || char === "‐" || char === SOFT_HYPHEN) {
+      const next = joinAfter(exact, i);
+      if (next !== undefined) {
+        i = next;
+        continue;
+      }
+    }
+    if (char !== SOFT_HYPHEN) out += char;
+    i++;
+  }
+  return out.replace(/\s+/g, " ").trim();
+}

@@ -1,8 +1,8 @@
 // `retire` (CONTRACT-002 B; CONTRACT-001 C): removal sets `retired` and the file
 // stays. What rested on a retired record is then listed by source.changed.
-import { canonical, type Corpus, idOf, isObject, isRetired } from "@stemma/records";
+import { canonical, type Corpus, idOf, isObject, isRetired, serializeManifest, splitFrontMatter } from "@stemma/records";
 import { type Actor, InvalidInput } from "./operations.ts";
-import type { RecordWrite } from "./sources.ts";
+import type { RecordWrite } from "./capture.ts";
 
 export interface RetireRequest { ids: string[]; reason: string; replaced_by?: string; actor: Actor; now: Date }
 
@@ -25,6 +25,10 @@ export function planRetire(corpus: Corpus, request: RetireRequest): RecordWrite[
       stamp: { at: request.now.toISOString().replace(/\.\d+Z$/, "Z"), by: { ...request.actor } }, reason,
       ...(replaced_by === undefined ? {} : { replaced_by }),
     };
-    return { id, path: file.path, text: canonical({ ...file.data, retired }) };
+    const next = { ...file.data, retired };
+    if (file.data.kind !== "source_text") return { id, path: file.path, text: canonical(next) };
+    // Retiring a source file rewrites only its manifest.
+    const split = splitFrontMatter(new TextDecoder().decode(file.bytes));
+    return { id, path: file.path, text: serializeManifest(next, "problem" in split ? "" : split.body) };
   });
 }

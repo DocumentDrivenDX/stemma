@@ -32,28 +32,49 @@ export function findCoordinates(line: string): number[] {
   return spans.map(([start]) => start).sort((a, b) => a - b);
 }
 
-export function scannedFiles(corpus: Corpus): SourceFile[] {
-  const files: SourceFile[] = [corpus.settings, ...corpus.records, ...(corpus.rules ? [corpus.rules] : []), ...corpus.manuscript];
-  return files.sort((a, b) => compareCodePoints(a.path, b.path));
+/** Files scanned as one unit each. A source file's parts are reported together. */
+export function scannedGroups(corpus: Corpus): { subject: string; files: SourceFile[] }[] {
+  const single: SourceFile[] = [corpus.settings, ...corpus.records.filter((f) => !f.path.startsWith("sources/")), ...(corpus.rules ? [corpus.rules] : []), ...corpus.manuscript];
+  const grouped = new Map<string, SourceFile[]>(single.map((f) => [f.path, [f]]));
+  for (const file of corpus.sources) {
+    const [, name, ...rest] = file.path.split("/");
+    const subject = rest.length > 0 ? `sources/${name}` : file.path;
+    grouped.set(subject, [...(grouped.get(subject) ?? []), file]);
+  }
+  return [...grouped].sort(([a], [b]) => compareCodePoints(a, b))
+    .map(([subject, files]) => ({ subject, files: files.sort((a, b) => compareCodePoints(a.path, b.path)) }));
 }
 
 export function coordinateResults(corpus: Corpus): Result[] {
   const check = "coordinate.stray";
-  return scannedFiles(corpus).flatMap((file) => {
-    const evidence = [{ name: "file", class: "location" as const, value: file.path }];
-    let text: string;
-    try {
-      if (!file.bytes) throw new Error("unreadable");
-      text = new TextDecoder("utf-8", { fatal: true }).decode(file.bytes);
-    } catch {
-      return [result({ check, outcome: "unverifiable", reason: "file_unreadable", subject: file.path, locus: file.path, evidence })];
+  return scannedGroups(corpus).flatMap(({ subject, files }): Result[] => {
+    const grouped = files.length > 1 || files[0]!.path !== subject;
+    const unreadable: string[] = [];
+    const found = files.flatMap((file) => {
+      let text: string;
+      try {
+        if (!file.bytes) throw new Error("unreadable");
+        text = new TextDecoder("utf-8", { fatal: true }).decode(file.bytes);
+      } catch {
+        unreadable.push(file.path);
+        return [];
+      }
+      return text.split("\n").flatMap((line, i) => findCoordinates(line).map((column) => ({ file: file.path, line: i + 1, column: column + 1 })));
+    });
+    const evidence = [{ name: "file", class: "location" as const, value: subject }];
+    const out: Result[] = unreadable.map((path) => result({ check, outcome: "unverifiable", reason: "file_unreadable", subject: path, locus: path, evidence: [{ name: "file", class: "location", value: path }] }));
+    if (found.length === 0) return out.length > 0 ? out : [result({ check, outcome: "pass", subject, locus: subject, evidence })];
+    if (grouped) {
+      // One result for a source file, with every position, so that one cause is one finding.
+      return [...out, result({
+        check, outcome: "fail", reason: "coordinate_text", subject, locus: subject,
+        evidence: [...evidence, { name: "count", class: "metadata", value: `${found.length} position(s)` },
+          { name: "positions", class: "location", value: found.map((at) => `${at.file.slice(subject.length + 1)} line ${at.line}, column ${at.column}`).join("; ") }],
+      })];
     }
-    const found = text.split("\n").flatMap((line, i) => findCoordinates(line).map((column) => ({ line: i + 1, column: column + 1 })));
-    if (found.length === 0) return [result({ check, outcome: "pass", subject: file.path, locus: file.path, evidence })];
-    return found.map((at, ordinal) =>
-      result({
-        check, outcome: "fail", reason: "coordinate_text", subject: file.path, locus: `${file.path}#${ordinal}`,
-        evidence: [...evidence, { name: "position", class: "location", value: `line ${at.line}, column ${at.column}` }],
-      }));
+    return [...out, ...found.map((at, ordinal) => result({
+      check, outcome: "fail", reason: "coordinate_text", subject, locus: `${subject}#${ordinal}`,
+      evidence: [...evidence, { name: "position", class: "location", value: `line ${at.line}, column ${at.column}` }],
+    }))];
   });
 }

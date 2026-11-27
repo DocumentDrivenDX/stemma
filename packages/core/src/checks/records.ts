@@ -6,7 +6,9 @@ import type { Evidence, Result } from "../report.ts";
 export function subjectOf(file: LoadedFile): string {
   const id = idOf(file);
   // The ID names the subject only when it is this file's own well-formed ID.
-  const owns = id !== undefined && isRecordId(String(file.data!.kind), id) && file.path.endsWith(`/${id}.json`);
+  // A source file's record is its manifest, whose directory name need not be the ID.
+  const kind = String(file.data?.kind);
+  const owns = id !== undefined && isRecordId(kind, id) && (kind === "source_text" ? /^sources\/[^/]+\/source\.md$/.test(file.path) : file.path.endsWith(`/${id}.json`));
   return owns ? id : file.path;
 }
 

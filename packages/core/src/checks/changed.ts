@@ -1,11 +1,13 @@
-// source.changed (CONTRACT-002 C; SD-002 BR-212): a note, claim or citation
-// rests on a copy, text or source that has since been replaced or retired, or
-// on a passage anchored before the source's details changed. It is computed from
-// the records each time and stores nothing. Damaged or missing stored files are
-// source.held's finding.
+// source.changed (CONTRACT-002 C; SD-002 BR-212): a note, claim, passage or
+// citation rests on a source file or source that has since been retired, on a
+// passage whose pages have changed, or on one selected before the source's
+// details changed. It is computed from the records each time and stores nothing.
+// Damaged source files are source.pages' finding.
 import { citationKeys, type Corpus, digest, idOf, isObject, isRetired, type JsonObject, type LoadedFile, SOURCE_BINDING_FIELDS } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
+import { SourceTexts } from "../matching/texts.ts";
+import { textAt } from "../passages.ts";
 import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
@@ -13,13 +15,14 @@ import { itemOf, subjectOf } from "./records.ts";
 export const sourceBinding = (source: JsonObject): string =>
   digest(Object.fromEntries(SOURCE_BINDING_FIELDS.flatMap((f) => (source[f] === undefined ? [] : [[f, source[f]]]))));
 
-interface Change { reason: "depends_on_retired" | "source_details_changed"; record: LoadedFile; what: string; through: string[] }
+interface Change { reason: "depends_on_retired" | "text_changed" | "source_details_changed"; record: LoadedFile; what: string; through: string[] }
 
 interface Walk { changes: Change[]; reached: number; unread: boolean }
 
 const list = (value: unknown): string[] => (value === undefined ? [] : [value].flat().map(String));
 
 function walker(corpus: Corpus) {
+  const texts = new SourceTexts(corpus);
   const links = active(corpus, "attestation");
   const unreadable = new Set(corpus.records.filter((f) => f.state !== "ok").map((f) => f.path.replace(/^.*\//, "").replace(/\.json$/, "")));
 
@@ -35,15 +38,18 @@ function walker(corpus: Corpus) {
     }
     const data = file.data!;
     const kind = String(data.kind);
-    if (["capture", "extraction", "source"].includes(kind)) {
+    if (["source_text", "source"].includes(kind)) {
       walk.reached++;
       if (isRetired(data)) walk.changes.push({ reason: "depends_on_retired", record: file, what: `retired ${kind}`, through });
     }
     const next = (ids: string[]) => ids.forEach((to) => follow(to, walk, through.length === 0 || through.at(-1) !== id ? [...through, id] : through, seen));
-    if (kind === "extraction") next(list(data.capture));
-    if (kind === "capture") next(list(data.source));
+    if (kind === "source_text") next(list(data.source));
     if (kind === "passage") {
-      next([...list(data.extraction), ...list(data.capture), ...list(data.source)]);
+      const now = textAt(texts, data);
+      if (now.state === "changed") {
+        walk.changes.push({ reason: "text_changed", record: file, what: `the text at index ${now.index} changed after passage ${id} was captured`, through: [...through, id] });
+      } else if (now.state === "unavailable") walk.unread = true;
+      next([...list(data.text), ...list(data.source)]);
       const source = corpus.byId.get(String(data.source));
       if (source?.data?.kind === "source" && typeof data.source_record_sha256 === "string" && data.source_record_sha256 !== sourceBinding(source.data)) {
         walk.changes.push({ reason: "source_details_changed", record: source, what: `source details changed since passage ${id} was anchored`, through: [...through, id] });
@@ -56,11 +62,11 @@ function walker(corpus: Corpus) {
 
 export interface Dependant { file: LoadedFile; walk: Walk; source?: string }
 
-/** Every note, claim and citation that rests on a source, with what has changed under it. */
+/** Every passage, note, claim and citation that rests on a source, with what has changed under it. */
 export function dependants(corpus: Corpus): Dependant[] {
   const follow = walker(corpus);
   const out: Dependant[] = [];
-  for (const kind of ["note", "claim"]) {
+  for (const kind of ["passage", "note", "claim"]) {
     for (const file of active(corpus, kind)) {
       const walk: Walk = { changes: [], reached: 0, unread: false };
       follow(idOf(file)!, walk, [], new Set());
@@ -78,20 +84,21 @@ export function dependants(corpus: Corpus): Dependant[] {
         && (key !== undefined ? citationKeys(f.data).includes(key) : idOf(f) === citation.data!.source));
     }
     for (const claim of list(citation.data!.claims)) follow(claim, walk, [], seen);
+    for (const passage of list(citation.data!.passage)) follow(passage, walk, [], seen);
     const source = sources.length === 1 ? idOf(sources[0]!) : undefined;
     if (source) {
       follow(source, walk, [], seen);
-      // A citation names no copy. It is taken to rest on the copies and texts its source
-      // had while the citation existed: those retired after the citation was recorded.
-      const since = String(isObject(citation.data!.created) ? citation.data!.created.at : "");
-      const captures = corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "capture" && f.data.source === source);
-      const texts = corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "extraction" && captures.some((c) => idOf(c) === f.data!.capture));
-      for (const record of [...captures, ...texts]) {
-        walk.reached++;
-        const retired = record.data!.retired;
-        if (!isObject(retired) || !isObject(retired.stamp) || Date.parse(String(retired.stamp.at)) < Date.parse(since)) continue;
-        if (!walk.changes.some((c) => c.record === record)) {
-          walk.changes.push({ reason: "depends_on_retired", record, what: `retired ${String(record.data!.kind)}`, through: [source] });
+      // A citation with no passage names no source file. It is taken to rest on those its
+      // source had while the citation existed: the ones retired after it was recorded.
+      if (citation.data!.passage === undefined) {
+        const since = String(isObject(citation.data!.created) ? citation.data!.created.at : "");
+        for (const record of corpus.records.filter((f) => f.state === "ok" && f.data?.kind === "source_text" && f.data.source === source)) {
+          walk.reached++;
+          const retired = record.data!.retired;
+          if (!isObject(retired) || !isObject(retired.stamp) || Date.parse(String(retired.stamp.at)) < Date.parse(since)) continue;
+          if (!walk.changes.some((c) => c.record === record)) {
+            walk.changes.push({ reason: "depends_on_retired", record, what: "retired source file", through: [source] });
+          }
         }
       }
     }
@@ -119,8 +126,8 @@ export function changedResults(corpus: Corpus): Result[] {
     }
     const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
       ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
-    const reason = walk.changes.some((c) => c.reason === "depends_on_retired") ? "depends_on_retired"
-      : walk.changes.length > 0 ? "source_details_changed" : walk.unread ? "record_unreadable" : undefined;
+    const reason = (["depends_on_retired", "text_changed", "source_details_changed"] as const).find((r) => walk.changes.some((c) => c.reason === r))
+      ?? (walk.unread ? "record_unreadable" : undefined);
     return result({
       check, outcome: walk.changes.length > 0 ? "fail" : walk.unread ? "unverifiable" : "pass", ...(reason ? { reason } : {}),
       subject: subjectOf(file), locus: idOf(file) ?? file.path, evidence, item: itemOf(file),

@@ -98,9 +98,8 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "required": true
   },
-  "extraction": {
-   "type": "string",
-   "required": true
+  "text": {
+   "type": "string"
   }
  },
  "RecheckResult": {
@@ -350,16 +349,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string"
   }
  },
- "PositionSelector": {
-  "start": {
-   "type": "integer",
-   "required": true
-  },
-  "end": {
-   "type": "integer",
-   "required": true
-  }
- },
  "Region": {
   "page_index": {
    "type": "integer",
@@ -412,6 +401,8 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   "evidence": {
    "type": "string",
    "values": [
+    "page_image",
+    "source_marker",
     "printed_sequence",
     "embedded_label",
     "author_statement"
@@ -426,35 +417,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   "version": {
    "type": "string",
    "required": true
-  }
- },
- "ExtractionQuality": {
-  "method": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "text_layer",
-    "ocr",
-    "manual",
-    "born_text"
-   ]
-  },
-  "level": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "good",
-    "partial",
-    "poor",
-    "unassessed"
-   ]
-  },
-  "scripts": {
-   "type": "string",
-   "many": true
-  },
-  "note": {
-   "type": "string"
   }
  },
  "SentenceBinding": {
@@ -476,7 +438,7 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "required": true
   },
-  "capture_sha256": {
+  "text_sha256": {
    "type": "string",
    "many": true
   }
@@ -507,9 +469,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   },
   "mapped_sha256": {
    "type": "string"
-  },
-  "value_blob_sha256": {
-   "type": "string"
   }
  },
  "LegacyEntry": {
@@ -535,9 +494,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "value": "LegacyField"
    },
    "many": true
-  },
-  "entry_text_blob_sha256": {
-   "type": "string"
   }
  },
  "LegacyBlock": {
@@ -558,9 +514,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   "ordinal": {
    "type": "integer",
    "required": true
-  },
-  "text_blob_sha256": {
-   "type": "string"
   }
  },
  "LossItem": {
@@ -891,178 +844,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string"
   }
  },
- "Capture": {
-  "schema": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "stemma.record/0"
-   ]
-  },
-  "id": {
-   "type": "string",
-   "required": true
-  },
-  "created": {
-   "type": {
-    "value": "Stamp"
-   },
-   "required": true
-  },
-  "changed": {
-   "type": {
-    "value": "Stamp"
-   }
-  },
-  "retired": {
-   "type": {
-    "value": "Retirement"
-   }
-  },
-  "legacy": {
-   "type": {
-    "value": "LegacyEntry"
-   },
-   "many": true
-  },
-  "kind": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "capture"
-   ]
-  },
-  "source": {
-   "type": "string",
-   "required": true
-  },
-  "sha256": {
-   "type": "string",
-   "required": true
-  },
-  "size": {
-   "type": "integer",
-   "required": true
-  },
-  "media_type": {
-   "type": "string",
-   "required": true
-  },
-  "origin": {
-   "type": "string",
-   "required": true
-  },
-  "acquired_at": {
-   "type": "date-time",
-   "required": true
-  },
-  "source_version": {
-   "type": "string"
-  },
-  "admitted_by": {
-   "type": {
-    "value": "Actor"
-   },
-   "required": true
-  },
-  "url": {
-   "type": "string"
-  },
-  "shelfmark": {
-   "type": "string"
-  }
- },
- "Extraction": {
-  "schema": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "stemma.record/0"
-   ]
-  },
-  "id": {
-   "type": "string",
-   "required": true
-  },
-  "created": {
-   "type": {
-    "value": "Stamp"
-   },
-   "required": true
-  },
-  "changed": {
-   "type": {
-    "value": "Stamp"
-   }
-  },
-  "retired": {
-   "type": {
-    "value": "Retirement"
-   }
-  },
-  "legacy": {
-   "type": {
-    "value": "LegacyEntry"
-   },
-   "many": true
-  },
-  "kind": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "extraction"
-   ]
-  },
-  "capture": {
-   "type": "string",
-   "required": true
-  },
-  "capture_sha256": {
-   "type": "string",
-   "required": true
-  },
-  "tool": {
-   "type": {
-    "value": "ToolRef"
-   },
-   "required": true
-  },
-  "normalization_profile": {
-   "type": "string",
-   "required": true
-  },
-  "text_sha256": {
-   "type": "string",
-   "required": true
-  },
-  "text_size": {
-   "type": "integer",
-   "required": true
-  },
-  "pages": {
-   "type": {
-    "value": "PageSegment"
-   },
-   "many": true
-  },
-  "quality": {
-   "type": {
-    "value": "ExtractionQuality"
-   },
-   "required": true
-  },
-  "page_spans": {
-   "type": {
-    "value": "PageSpan"
-   },
-   "many": true
-  },
-  "metadata": {
-   "type": {
-    "value": "HeldMetadata"
-   }
-  }
- },
  "Passage": {
   "schema": {
    "type": "string",
@@ -1108,28 +889,11 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "required": true
   },
-  "capture": {
-   "type": "string",
-   "required": true
-  },
-  "extraction": {
-   "type": "string",
-   "required": true
-  },
-  "text_sha256": {
-   "type": "string",
-   "required": true
-  },
   "quote": {
    "type": {
     "value": "QuoteSelector"
    },
    "required": true
-  },
-  "position": {
-   "type": {
-    "value": "PositionSelector"
-   }
   },
   "region": {
    "type": {
@@ -1149,6 +913,16 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   },
   "source_record_sha256": {
    "type": "string"
+  },
+  "text": {
+   "type": "string",
+   "required": true
+  },
+  "anchor": {
+   "type": {
+    "value": "PageAnchor"
+   },
+   "many": true
   }
  },
  "Note": {
@@ -1758,6 +1532,9 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "resolved",
     "confirmed"
    ]
+  },
+  "passage": {
+   "type": "string"
   }
  },
  "Place": {
@@ -2306,10 +2083,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "required": true
   },
-  "capture_sha256": {
-   "type": "string",
-   "required": true
-  },
   "model": {
    "type": "string",
    "required": true
@@ -2359,6 +2132,10 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "value": "Stamp"
    },
    "required": true
+  },
+  "page_sha256": {
+   "type": "string",
+   "many": true
   }
  },
  "Annotation": {
@@ -2766,6 +2543,22 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "value": "BibField"
    },
    "many": true
+  },
+  "identifier": {
+   "type": {
+    "value": "Identifier"
+   }
+  },
+  "url": {
+   "type": "string"
+  },
+  "response": {
+   "type": "string"
+  },
+  "found": {
+   "type": {
+    "value": "TextIdentity"
+   }
   }
  },
  "ImportBatch": {
@@ -2913,35 +2706,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string"
   }
  },
- "PageSpan": {
-  "page_index": {
-   "type": "integer",
-   "required": true
-  },
-  "start": {
-   "type": "integer",
-   "required": true
-  },
-  "end": {
-   "type": "integer",
-   "required": true
-  }
- },
- "HeldMetadata": {
-  "title": {
-   "type": "string"
-  },
-  "contributors": {
-   "type": "string",
-   "many": true
-  },
-  "issued": {
-   "type": "string"
-  },
-  "venue": {
-   "type": "string"
-  }
- },
  "CandidateOrigin": {
   "source": {
    "type": "string",
@@ -2995,97 +2759,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   },
   "checkpoints": {
    "type": "integer"
-  }
- },
- "Confirmation": {
-  "schema": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "stemma.record/0"
-   ]
-  },
-  "id": {
-   "type": "string",
-   "required": true
-  },
-  "created": {
-   "type": {
-    "value": "Stamp"
-   },
-   "required": true
-  },
-  "changed": {
-   "type": {
-    "value": "Stamp"
-   }
-  },
-  "retired": {
-   "type": {
-    "value": "Retirement"
-   }
-  },
-  "legacy": {
-   "type": {
-    "value": "LegacyEntry"
-   },
-   "many": true
-  },
-  "kind": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "confirmation"
-   ]
-  },
-  "source": {
-   "type": "string",
-   "required": true
-  },
-  "capture": {
-   "type": "string",
-   "required": true
-  },
-  "page_indexes": {
-   "type": "integer",
-   "required": true,
-   "many": true
-  },
-  "page_basis": {
-   "type": "string",
-   "required": true,
-   "values": [
-    "title_page",
-    "equivalent"
-   ]
-  },
-  "fields": {
-   "type": "string",
-   "required": true,
-   "many": true,
-   "values": [
-    "contributions",
-    "title",
-    "issued",
-    "venue"
-   ]
-  },
-  "source_record_sha256": {
-   "type": "string",
-   "required": true
-  },
-  "capture_sha256": {
-   "type": "string",
-   "required": true
-  },
-  "note": {
-   "type": "string"
-  },
-  "confirmed": {
-   "type": {
-    "value": "Stamp"
-   },
-   "required": true
   }
  },
  "Plan": {
@@ -3886,10 +3559,6 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "image"
    ]
   },
-  "blob_sha256": {
-   "type": "string",
-   "required": true
-  },
   "figure_id": {
    "type": "string"
   },
@@ -3911,6 +3580,13 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string"
   },
   "alt": {
+   "type": "string"
+  },
+  "file_sha256": {
+   "type": "string",
+   "required": true
+  },
+  "file_path": {
    "type": "string"
   }
  },
@@ -3979,13 +3655,749 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    },
    "required": true
   }
+ },
+ "TextIdentity": {
+  "title": {
+   "type": "string"
+  },
+  "subtitle": {
+   "type": "string"
+  },
+  "contributors": {
+   "type": "string",
+   "many": true
+  },
+  "issued": {
+   "type": "string"
+  },
+  "edition": {
+   "type": "string"
+  },
+  "publisher": {
+   "type": "string"
+  },
+  "place": {
+   "type": "string"
+  },
+  "venue": {
+   "type": "string"
+  },
+  "identifiers": {
+   "type": {
+    "value": "Identifier"
+   },
+   "many": true
+  },
+  "title_pages": {
+   "type": "integer",
+   "many": true
+  },
+  "basis": {
+   "type": "string"
+  }
+ },
+ "OriginalFile": {
+  "sha256": {
+   "type": "string",
+   "required": true
+  },
+  "size": {
+   "type": "integer",
+   "required": true
+  },
+  "media_type": {
+   "type": "string",
+   "required": true
+  },
+  "index": {
+   "type": "integer"
+  }
+ },
+ "Original": {
+  "form": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "file",
+    "page_images",
+    "physical"
+   ]
+  },
+  "files": {
+   "type": {
+    "value": "OriginalFile"
+   },
+   "many": true
+  },
+  "page_count": {
+   "type": "integer"
+  },
+  "description": {
+   "type": "string"
+  },
+  "held_at": {
+   "type": "string"
+  },
+  "obtained_from": {
+   "type": "string",
+   "required": true
+  },
+  "acquired_at": {
+   "type": "date-time",
+   "required": true
+  },
+  "version": {
+   "type": "string"
+  }
+ },
+ "TextConversion": {
+  "method": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "born_text",
+    "text_layer",
+    "markup",
+    "ocr",
+    "manual"
+   ]
+  },
+  "tools": {
+   "type": {
+    "value": "ToolRef"
+   },
+   "many": true
+  },
+  "recognition": {
+   "type": "string"
+  },
+  "level": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "unassessed",
+    "good",
+    "fair",
+    "poor"
+   ]
+  },
+  "scripts": {
+   "type": "string",
+   "many": true
+  },
+  "note": {
+   "type": "string"
+  }
+ },
+ "PageEntry": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "file": {
+   "type": "string",
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  }
+ },
+ "SourceText": {
+  "schema": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "stemma.record/0"
+   ]
+  },
+  "id": {
+   "type": "string",
+   "required": true
+  },
+  "created": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "changed": {
+   "type": {
+    "value": "Stamp"
+   }
+  },
+  "retired": {
+   "type": {
+    "value": "Retirement"
+   }
+  },
+  "legacy": {
+   "type": {
+    "value": "LegacyEntry"
+   },
+   "many": true
+  },
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "source_text"
+   ]
+  },
+  "source": {
+   "type": "string",
+   "required": true
+  },
+  "identity": {
+   "type": {
+    "value": "TextIdentity"
+   }
+  },
+  "original": {
+   "type": {
+    "value": "Original"
+   },
+   "required": true
+  },
+  "conversion": {
+   "type": {
+    "value": "TextConversion"
+   },
+   "required": true
+  },
+  "paged": {
+   "type": "boolean",
+   "required": true
+  },
+  "coverage": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "all",
+    "partial"
+   ]
+  },
+  "coverage_note": {
+   "type": "string"
+  },
+  "pages": {
+   "type": {
+    "value": "PageEntry"
+   },
+   "many": true
+  }
+ },
+ "SourcePage": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "label_status": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "labelled",
+    "none",
+    "unreadable",
+    "undetermined",
+    "unpaged"
+   ]
+  },
+  "section": {
+   "type": "string"
+  },
+  "chapter": {
+   "type": "string"
+  },
+  "label": {
+   "type": "string"
+  },
+  "label_basis": {
+   "type": "string",
+   "values": [
+    "printed_sequence",
+    "embedded_label",
+    "source_marker",
+    "page_image",
+    "author_statement"
+   ]
+  },
+  "method": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "born_text",
+    "text_layer",
+    "markup",
+    "ocr",
+    "manual"
+   ]
+  },
+  "level": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "unassessed",
+    "good",
+    "fair",
+    "poor"
+   ]
+  },
+  "columns": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "1",
+    "2",
+    "undetermined"
+   ]
+  },
+  "undetermined": {
+   "type": "string",
+   "many": true,
+   "values": [
+    "paragraphs",
+    "headings",
+    "footnotes",
+    "block-quotes",
+    "tables",
+    "captions",
+    "figures",
+    "running-heads",
+    "folio",
+    "reading-order"
+   ]
+  },
+  "note": {
+   "type": "string"
+  }
+ },
+ "AuxiliaryFile": {
+  "role": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "page_numbers"
+   ]
+  },
+  "url": {
+   "type": "string",
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  },
+  "size": {
+   "type": "integer",
+   "required": true
+  }
+ },
+ "LookupRequest": {
+  "resolver": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "crossref",
+    "internet_archive",
+    "gutenberg"
+   ]
+  },
+  "identifier": {
+   "type": {
+    "value": "Identifier"
+   },
+   "required": true
+  }
+ },
+ "Upstream": {
+  "schema": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "stemma.record/0"
+   ]
+  },
+  "id": {
+   "type": "string",
+   "required": true
+  },
+  "created": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "changed": {
+   "type": {
+    "value": "Stamp"
+   }
+  },
+  "retired": {
+   "type": {
+    "value": "Retirement"
+   }
+  },
+  "legacy": {
+   "type": {
+    "value": "LegacyEntry"
+   },
+   "many": true
+  },
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "upstream"
+   ]
+  },
+  "source": {
+   "type": "string",
+   "required": true
+  },
+  "url": {
+   "type": "string"
+  },
+  "retrieved_at": {
+   "type": "date-time",
+   "required": true
+  },
+  "retrieved_by": {
+   "type": {
+    "value": "Actor"
+   },
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  },
+  "size": {
+   "type": "integer",
+   "required": true
+  },
+  "media_type": {
+   "type": "string",
+   "required": true
+  },
+  "version": {
+   "type": "string"
+  },
+  "identifiers": {
+   "type": {
+    "value": "Identifier"
+   },
+   "many": true
+  },
+  "auxiliary": {
+   "type": {
+    "value": "AuxiliaryFile"
+   },
+   "many": true
+  },
+  "lookups": {
+   "type": {
+    "value": "LookupRequest"
+   },
+   "many": true
+  },
+  "note": {
+   "type": "string"
+  }
+ },
+ "PageAnchor": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "page_sha256": {
+   "type": "string",
+   "required": true
+  },
+  "stream": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "main",
+    "notes"
+   ]
+  },
+  "start": {
+   "type": "integer",
+   "required": true
+  },
+  "end": {
+   "type": "integer",
+   "required": true
+  }
+ },
+ "ReviewedPage": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  }
+ },
+ "ReviewFlag": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "reading": {
+   "type": "string",
+   "required": true
+  },
+  "suggested": {
+   "type": "string"
+  },
+  "note": {
+   "type": "string"
+  }
+ },
+ "TextReview": {
+  "schema": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "stemma.record/0"
+   ]
+  },
+  "id": {
+   "type": "string",
+   "required": true
+  },
+  "created": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "changed": {
+   "type": {
+    "value": "Stamp"
+   }
+  },
+  "retired": {
+   "type": {
+    "value": "Retirement"
+   }
+  },
+  "legacy": {
+   "type": {
+    "value": "LegacyEntry"
+   },
+   "many": true
+  },
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "text_review"
+   ]
+  },
+  "source": {
+   "type": "string",
+   "required": true
+  },
+  "text": {
+   "type": "string",
+   "required": true
+  },
+  "scope": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "whole_page",
+    "passage",
+    "quotations",
+    "page_number",
+    "source_details"
+   ]
+  },
+  "pages": {
+   "type": {
+    "value": "ReviewedPage"
+   },
+   "many": true
+  },
+  "passage": {
+   "type": "string"
+  },
+  "fields": {
+   "type": "string",
+   "many": true
+  },
+  "against": {
+   "type": "string",
+   "required": true
+  },
+  "original_sha256": {
+   "type": "string"
+  },
+  "reviewed": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "outcome": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "agrees",
+    "corrected",
+    "disagrees",
+    "flagged"
+   ]
+  },
+  "flags": {
+   "type": {
+    "value": "ReviewFlag"
+   },
+   "many": true
+  },
+  "note": {
+   "type": "string"
+  },
+  "source_record_sha256": {
+   "type": "string"
+  }
+ },
+ "ReadingDifference": {
+  "reading": {
+   "type": "string",
+   "required": true
+  },
+  "other": {
+   "type": "string",
+   "required": true
+  }
+ },
+ "PageAgreement": {
+  "index": {
+   "type": "integer",
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  },
+  "agreement_permille": {
+   "type": "integer",
+   "required": true
+  },
+  "words": {
+   "type": "integer",
+   "required": true
+  },
+  "differing_words": {
+   "type": "integer",
+   "required": true
+  },
+  "differences": {
+   "type": {
+    "value": "ReadingDifference"
+   },
+   "many": true
+  }
+ },
+ "ComparisonRun": {
+  "schema": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "stemma.record/0"
+   ]
+  },
+  "id": {
+   "type": "string",
+   "required": true
+  },
+  "created": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "changed": {
+   "type": {
+    "value": "Stamp"
+   }
+  },
+  "retired": {
+   "type": {
+    "value": "Retirement"
+   }
+  },
+  "legacy": {
+   "type": {
+    "value": "LegacyEntry"
+   },
+   "many": true
+  },
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "comparison_run"
+   ]
+  },
+  "source": {
+   "type": "string",
+   "required": true
+  },
+  "text": {
+   "type": "string",
+   "required": true
+  },
+  "method": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "reconversion",
+    "supplied_text"
+   ]
+  },
+  "independent": {
+   "type": "boolean",
+   "required": true
+  },
+  "tools": {
+   "type": {
+    "value": "ToolRef"
+   },
+   "many": true
+  },
+  "against": {
+   "type": "string",
+   "required": true
+  },
+  "other_sha256": {
+   "type": "string"
+  },
+  "original_sha256": {
+   "type": "string"
+  },
+  "run": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "pages": {
+   "type": {
+    "value": "PageAgreement"
+   },
+   "many": true
+  }
  }
 };
 export const KIND_TYPES: Record<string, string> = {
  "source": "Source",
  "agent": "Agent",
- "capture": "Capture",
- "extraction": "Extraction",
  "passage": "Passage",
  "note": "Note",
  "claim": "Claim",
@@ -4008,7 +4420,6 @@ export const KIND_TYPES: Record<string, string> = {
  "review_comment": "ReviewComment",
  "resolution": "Resolution",
  "import_batch": "ImportBatch",
- "confirmation": "Confirmation",
  "plan": "Plan",
  "checkpoint_input": "CheckpointInput",
  "authorship_mark": "AuthorshipMark",
@@ -4021,7 +4432,11 @@ export const KIND_TYPES: Record<string, string> = {
  "audit_finding": "AuditFinding",
  "review_baseline": "ReviewBaseline",
  "image": "Image",
- "conversion": "Conversion"
+ "conversion": "Conversion",
+ "source_text": "SourceText",
+ "upstream": "Upstream",
+ "text_review": "TextReview",
+ "comparison_run": "ComparisonRun"
 };
 export const REFERENCES: Record<string, string[]> = {
  "source.created.import": [
@@ -4054,36 +4469,6 @@ export const REFERENCES: Record<string, string[]> = {
  "agent.legacy.import": [
   "import_batch"
  ],
- "capture.created.import": [
-  "import_batch"
- ],
- "capture.changed.import": [
-  "import_batch"
- ],
- "capture.retired.stamp.import": [
-  "import_batch"
- ],
- "capture.legacy.import": [
-  "import_batch"
- ],
- "capture.source": [
-  "source"
- ],
- "extraction.created.import": [
-  "import_batch"
- ],
- "extraction.changed.import": [
-  "import_batch"
- ],
- "extraction.retired.stamp.import": [
-  "import_batch"
- ],
- "extraction.legacy.import": [
-  "import_batch"
- ],
- "extraction.capture": [
-  "capture"
- ],
  "passage.created.import": [
   "import_batch"
  ],
@@ -4098,12 +4483,6 @@ export const REFERENCES: Record<string, string[]> = {
  ],
  "passage.source": [
   "source"
- ],
- "passage.capture": [
-  "capture"
- ],
- "passage.extraction": [
-  "extraction"
  ],
  "passage.quoted_from.source": [
   "source"
@@ -4459,8 +4838,6 @@ export const REFERENCES: Record<string, string[]> = {
   "construct",
   "note",
   "agent",
-  "capture",
-  "extraction",
   "passage",
   "attestation",
   "inference",
@@ -4479,7 +4856,6 @@ export const REFERENCES: Record<string, string[]> = {
   "review_comment",
   "resolution",
   "import_batch",
-  "confirmation",
   "plan",
   "checkpoint_input",
   "authorship_mark",
@@ -4492,10 +4868,14 @@ export const REFERENCES: Record<string, string[]> = {
   "audit_finding",
   "review_baseline",
   "image",
-  "conversion"
+  "conversion",
+  "source_text",
+  "upstream",
+  "text_review",
+  "comparison_run"
  ],
- "annotation.compared.extraction": [
-  "extraction"
+ "annotation.compared.text": [
+  "source_text"
  ],
  "annotation.written.import": [
   "import_batch"
@@ -4596,12 +4976,6 @@ export const REFERENCES: Record<string, string[]> = {
  "search.candidate_origins.source": [
   "source"
  ],
- "confirmation.source": [
-  "source"
- ],
- "confirmation.capture": [
-  "capture"
- ],
  "plan.chapter": [
   "chapter"
  ],
@@ -4656,8 +5030,6 @@ export const REFERENCES: Record<string, string[]> = {
  "ai_activity.records": [
   "source",
   "agent",
-  "capture",
-  "extraction",
   "passage",
   "note",
   "claim",
@@ -4680,7 +5052,6 @@ export const REFERENCES: Record<string, string[]> = {
   "review_comment",
   "resolution",
   "import_batch",
-  "confirmation",
   "plan",
   "checkpoint_input",
   "authorship_mark",
@@ -4693,19 +5064,17 @@ export const REFERENCES: Record<string, string[]> = {
   "audit_finding",
   "review_baseline",
   "image",
-  "conversion"
+  "conversion",
+  "source_text",
+  "upstream",
+  "text_review",
+  "comparison_run"
  ],
  "source.retired.replaced_by": [
   "source"
  ],
  "agent.retired.replaced_by": [
   "agent"
- ],
- "capture.retired.replaced_by": [
-  "capture"
- ],
- "extraction.retired.replaced_by": [
-  "extraction"
  ],
  "passage.retired.replaced_by": [
   "passage"
@@ -4771,24 +5140,6 @@ export const REFERENCES: Record<string, string[]> = {
   "resolution"
  ],
  "import_batch.retired.replaced_by": [
-  "import_batch"
- ],
- "confirmation.created.import": [
-  "import_batch"
- ],
- "confirmation.changed.import": [
-  "import_batch"
- ],
- "confirmation.retired.stamp.import": [
-  "import_batch"
- ],
- "confirmation.retired.replaced_by": [
-  "confirmation"
- ],
- "confirmation.legacy.import": [
-  "import_batch"
- ],
- "confirmation.confirmed.import": [
   "import_batch"
  ],
  "plan.created.import": [
@@ -5015,5 +5366,92 @@ export const REFERENCES: Record<string, string[]> = {
  ],
  "project.bibliography_include": [
   "source"
+ ],
+ "source_text.created.import": [
+  "import_batch"
+ ],
+ "source_text.changed.import": [
+  "import_batch"
+ ],
+ "source_text.retired.stamp.import": [
+  "import_batch"
+ ],
+ "source_text.legacy.import": [
+  "import_batch"
+ ],
+ "source_text.retired.replaced_by": [
+  "source_text"
+ ],
+ "source_text.source": [
+  "source"
+ ],
+ "upstream.created.import": [
+  "import_batch"
+ ],
+ "upstream.changed.import": [
+  "import_batch"
+ ],
+ "upstream.retired.stamp.import": [
+  "import_batch"
+ ],
+ "upstream.legacy.import": [
+  "import_batch"
+ ],
+ "upstream.retired.replaced_by": [
+  "upstream"
+ ],
+ "upstream.source": [
+  "source"
+ ],
+ "text_review.created.import": [
+  "import_batch"
+ ],
+ "text_review.changed.import": [
+  "import_batch"
+ ],
+ "text_review.retired.stamp.import": [
+  "import_batch"
+ ],
+ "text_review.legacy.import": [
+  "import_batch"
+ ],
+ "text_review.retired.replaced_by": [
+  "text_review"
+ ],
+ "text_review.source": [
+  "source"
+ ],
+ "comparison_run.created.import": [
+  "import_batch"
+ ],
+ "comparison_run.changed.import": [
+  "import_batch"
+ ],
+ "comparison_run.retired.stamp.import": [
+  "import_batch"
+ ],
+ "comparison_run.legacy.import": [
+  "import_batch"
+ ],
+ "comparison_run.retired.replaced_by": [
+  "comparison_run"
+ ],
+ "comparison_run.source": [
+  "source"
+ ],
+ "citation.passage": [
+  "passage"
+ ],
+ "passage.text": [
+  "source_text"
+ ],
+ "text_review.text": [
+  "source_text"
+ ],
+ "text_review.passage": [
+  "passage"
+ ],
+ "comparison_run.text": [
+  "source_text"
  ]
 };

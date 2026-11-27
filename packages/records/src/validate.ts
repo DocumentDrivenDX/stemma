@@ -1,8 +1,9 @@
 // CONTRACT-001 shape and the rules this version enforces. Problems carry codes
 // and field paths only, never record values.
 import { type Json, type JsonObject, normalizeSentence, sha256 } from "./json.ts";
-import { isRecordId, KINDS } from "./kinds.ts";
-import { checkPageSegments, checkPageSpans, type PageProblem } from "./pages.ts";
+import { isRecordId, KINDS, recordPath } from "./kinds.ts";
+import type { PageProblem } from "./pages.ts";
+import type { FormatProblem } from "./sourcefile.ts";
 import { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generated.ts";
 
 export type ProblemCode =
@@ -10,7 +11,8 @@ export type ProblemCode =
   | "bad_digest" | "bad_id" | "unknown_kind" | "bad_citation_key" | "duplicate_citation_key" | "duplicate_id"
   | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
-  | "number_not_integer" | "bad_size" | "missing_page_spans" | "capture_digest_mismatch" | PageProblem;
+  | "number_not_integer" | "bad_size" | "bad_original" | "bad_page_label" | "bad_part" | "model_verification"
+  | "response_digest_mismatch" | "bad_address" | FormatProblem | PageProblem;
 
 export interface Problem {
   reason: "record_invalid" | "record_misplaced" | "reference_dangling" | "unknown_field";
@@ -120,13 +122,33 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
       });
     }
   }
-  if (record.kind === "capture" || record.kind === "extraction") {
-    const field = record.kind === "capture" ? "size" : "text_size";
-    if (typeof record[field] === "number" && (record[field] as number) < 0) problems.push(invalid("bad_size", `/${field}`));
+  const size = (value: Json | undefined, field: string) => {
+    if (typeof value === "number" && value < 0) problems.push(invalid("bad_size", field));
+  };
+  if (record.kind === "upstream") size(record.size, "/size");
+  if (record.kind === "source_text" && isObject(record.original)) {
+    const { form, files, description, held_at: held } = record.original;
+    const list = Array.isArray(files) ? files : [];
+    list.forEach((f, i) => size(isObject(f) ? f.size : undefined, `/original/files/${i}/size`));
+    // A digital original is tied by its digest; a physical one by what it is and where it is held.
+    if (form === "physical" ? list.length > 0 || typeof description !== "string" || typeof held !== "string" : list.length === 0) {
+      problems.push(invalid("bad_original", "/original"));
+    }
   }
-  if (record.kind === "extraction") {
-    for (const { code, index } of checkPageSegments(record.pages ?? [])) problems.push(invalid(code, `/pages/${index}`));
-    for (const index of checkPageSpans(record.page_spans ?? [])) problems.push(invalid("bad_page_spans", `/page_spans/${index}`));
+  if (record.kind === "text_review") {
+    const reviewed = isObject(record.reviewed) && isObject(record.reviewed.by) ? record.reviewed.by.kind : undefined;
+    // A model's review is a flag, never a person's verification.
+    if (reviewed === "model" && record.outcome !== "flagged") problems.push(invalid("model_verification", "/outcome"));
+  }
+  if (record.kind === "resolution" && typeof record.response === "string" && typeof record.response_sha256 === "string"
+    && sha256(record.response) !== record.response_sha256) {
+    problems.push(invalid("response_digest_mismatch", "/response_sha256"));
+  }
+  if (record.kind === "passage") {
+    const anchor = Array.isArray(record.anchor) ? record.anchor : [];
+    if (anchor.length === 0 || anchor.some((a) => !isObject(a) || !(Number(a.end) > Number(a.start)) || Number(a.start) < 0)) {
+      problems.push(invalid("bad_address", "/anchor"));
+    }
   }
   if (record.kind === "citation" && isObject(record.sentence)) {
     const { text, sha256: stated } = record.sentence;
@@ -145,11 +167,14 @@ export function validateRecord(record: Json, path: string): Validation {
   const references: Reference[] = [];
   if (!isObject(record)) return { problems: [invalid("not_an_object", "")], references };
   const kind = typeof record.kind === "string" ? record.kind : "";
-  if (!Object.hasOwn(KINDS, kind)) return { problems: [invalid("unknown_kind", "/kind")], references };
+  const manifest = path.startsWith("sources/");
+  if (!Object.hasOwn(KINDS, kind) || manifest !== (kind === "source_text")) {
+    return { problems: [invalid("unknown_kind", "/kind")], references };
+  }
   checkShape(KIND_TYPES[kind]!, record, "", kind, problems, references);
   if (typeof record.id === "string") {
     if (!isRecordId(kind, record.id)) problems.push(invalid("bad_id", "/id"));
-    const expected = `records/${KINDS[kind]!.directory}/${record.id}.json`;
+    const expected = manifest ? path : recordPath(kind, record.id);
     if (path !== expected) {
       const problem: Problem = { reason: "record_misplaced", code: "wrong_location", field: "/id" };
       if (isRecordId(kind, record.id)) problem.target = expected;
@@ -158,6 +183,19 @@ export function validateRecord(record: Json, path: string): Validation {
   }
   checkRules(record, problems);
   return { problems, references };
+}
+
+/** A part's front matter (CONTRACT-007 D). `paged` comes from its manifest. */
+export function validatePart(front: Json, paged: boolean): Problem[] {
+  const problems: Problem[] = [];
+  checkShape("SourcePage", front, "", "source_page", problems, []);
+  if (!isObject(front)) return problems;
+  const { label_status: status, label, label_basis: basis } = front;
+  const bad = (field: string) => problems.push(invalid("bad_page_label", field));
+  if ((status === "labelled") !== (typeof label === "string" && label !== "")) bad("/label");
+  if ((status === "unpaged") === paged) bad("/label_status");
+  if ((status === "labelled" || status === "none" || status === "unreadable") !== (basis !== undefined)) bad("/label_basis");
+  return problems;
 }
 
 export function validateProject(settings: Json): Validation {

@@ -5,7 +5,8 @@ import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFile
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { canonical, PROJECT_FORMAT, PROJECT_SCHEMA, type ProjectContent, type SourceFile } from "@stemma/records";
 
-export * from "./store.ts";
+export * from "./fetch.ts";
+export * from "./originals.ts";
 
 export function findProject(start: string): string | undefined {
   for (let dir = resolve(start); ; dir = dirname(dir)) {
@@ -50,6 +51,7 @@ export function readProject(root: string): ProjectContent {
   const content: ProjectContent = {
     settings: sourceFile(root, "stemma.json"),
     records: listFiles(root, "records"),
+    sources: listFiles(root, "sources"),
     manuscript: listFiles(root, "manuscript"),
   };
   if (existsSync(join(root, "rules.md"))) content.rules = sourceFile(root, "rules.md");
@@ -111,7 +113,7 @@ Write each rule under a level-two heading with a number that is never reused,
 for example "RULE-001 Spell the town as the charter does".
 `;
 
-const ATTRIBUTES = ["stemma.json", "rules.md", "records/**", "manuscript/**"].map((p) => `${p} text eol=lf`);
+const ATTRIBUTES = ["stemma.json", "rules.md", "records/**", "manuscript/**", "sources/**"].map((p) => `${p} text eol=lf`);
 const IGNORED = [".stemma/", "build/"];
 
 function addLines(root: string, path: string, lines: string[]): boolean {
@@ -122,6 +124,19 @@ function addLines(root: string, path: string, lines: string[]): boolean {
   if (missing.length === 0) return false;
   appendFileSync(full, `${present && !present.endsWith("\n") ? "\n" : ""}${missing.join("\n")}\n`);
   return true;
+}
+
+/**
+ * Writes a new source directory: every part first, then the manifest, so that a
+ * source file is seen only once it is whole. An existing directory is never
+ * overwritten.
+ */
+export function writeSourceDirectory(root: string, directory: string, files: { path: string; text: string }[]): void {
+  if (existsSync(join(root, directory))) throw new UnsafePath(`${directory} already exists`);
+  const manifest = `${directory}/source.md`;
+  for (const file of files.filter((f) => f.path !== manifest)) writeProjectFile(root, file.path, file.text);
+  const last = files.find((f) => f.path === manifest);
+  if (last) writeProjectFile(root, last.path, last.text);
 }
 
 export class AlreadyInitialized extends Error {}

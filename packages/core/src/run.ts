@@ -5,16 +5,21 @@ import { coordinateResults } from "./checks/coordinates.ts";
 import { changedResults } from "./checks/changed.ts";
 import { heldResults } from "./checks/held.ts";
 import { locatorResults } from "./checks/locators.ts";
+import { identifierResults, resolverResults, sourceMetaResults } from "./checks/metadata.ts";
 import { notRun } from "./checks/not-run.ts";
-import { quoteResults } from "./checks/quotes.ts";
+import { numberResults } from "./checks/numbers.ts";
+import { originalResults } from "./checks/original.ts";
+import { quotePageResults, quoteResults } from "./checks/quotes.ts";
+import { activeTexts, footnoteResults, labelResults, pageResults } from "./checks/structure.ts";
+import { SourceTexts } from "./matching/texts.ts";
+import { coverageOf } from "./verification.ts";
 import { fileResults, rulesResults } from "./checks/records.ts";
 import { result, sortResults } from "./findings.ts";
 import type { NotRun, ReportBody, Result, Summary, Unreviewed } from "./report.ts";
 import { QUOTE_PROFILE } from "./matching/quote-fold.ts";
-import { type BlobReader, NO_STORE } from "./store.ts";
 
 export function recordResults(corpus: Corpus): Result[] {
-  return [corpus.settings, ...corpus.records].flatMap(fileResults).concat(rulesResults(corpus));
+  return [corpus.settings, ...corpus.records, ...corpus.partFiles].flatMap(fileResults).concat(rulesResults(corpus));
 }
 
 /** A check that throws is reported as unverifiable, never dropped or passed. */
@@ -53,23 +58,38 @@ export function label(results: Result[], skipped: NotRun[]): ReportBody["label"]
   return results.some((r) => r.open) || skipped.some((n) => n.reason === "not_implemented") ? "open_findings" : "checked_clean";
 }
 
+export interface CheckContext {
+  texts: SourceTexts;
+  /** The versions of the tools this program has, which decide whether a recorded comparison is current. */
+  tools: Record<string, string>;
+}
+
 /** The checks this version runs. The check reference on the website is generated from this. */
-export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, blobs: BlobReader, read: Set<string>) => Result[]> = {
+export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckContext) => Result[]> = {
   "record.valid": recordResults,
+  "source.held": (c, x) => heldResults(c, x.texts),
+  "source.pages": pageResults,
+  "source.labels": labelResults,
+  "source.footnotes": footnoteResults,
+  "source.original": (c, x) => originalResults(c, x.tools),
+  "source.changed": changedResults,
   "cite.key": citeKeyResults,
   "bib.uncited": uncitedResults,
-  "source.held": heldResults,
-  "source.changed": changedResults,
-  "quote.present": quoteResults,
-  "locator.extent": locatorResults,
+  "quote.present": (c, x) => quoteResults(c, x.texts),
+  "quote.page": (c, x) => quotePageResults(c, x.texts),
+  "locator.extent": (c, x) => locatorResults(c, x.texts),
+  "meta.source": (c, x) => sourceMetaResults(c, x.texts),
+  "meta.resolver": (c, x) => resolverResults(c, x.texts),
+  "id.resolves": (c, x) => identifierResults(c, x.texts),
+  "number.present": (c, x) => numberResults(c, x.texts),
   "coordinate.stray": coordinateResults,
 };
 
-export function runChecks(corpus: Corpus, tools: Record<string, string>, blobs: BlobReader = NO_STORE): { body: ReportBody; errors: string[] } {
+export function runChecks(corpus: Corpus, tools: Record<string, string>): { body: ReportBody; errors: string[] } {
   const errors: string[] = [];
-  const read = new Set<string>();
+  const context: CheckContext = { texts: new SourceTexts(corpus), tools };
   const results = sortResults(Object.entries(IMPLEMENTED_CHECKS)
-    .flatMap(([check, run]) => guarded(check, corpus, (c) => run(c, blobs, read), errors)));
+    .flatMap(([check, run]) => guarded(check, corpus, (c) => run(c, context), errors)));
   const skipped = notRun(corpus);
   const unreviewed = unreviewedItems(corpus);
   const count = (test: (r: Result) => boolean) => results.filter(test).length;
@@ -79,7 +99,7 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>, blobs: 
     unverifiable: count((r) => r.outcome === "unverifiable"),
     open: count((r) => r.open),
     dismissed: 0,
-    confirmed: 0,
+    confirmed: count((r) => r.confirmed_by !== undefined),
     unreviewed: unreviewed.length,
     could_not_check: count((r) => r.outcome === "unverifiable"),
     not_implemented: skipped.filter((n) => n.reason === "not_implemented").length,
@@ -93,12 +113,12 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>, blobs: 
       manuscript: corpus.manuscript
         .map((f) => ({ path: f.path, sha256: f.bytes ? sha256(f.bytes) : "unreadable" }))
         .sort((a, b) => compareCodePoints(a.path, b.path)),
-      blobs: [...read].sort(),
       profiles: results.some((r) => r.check === "quote.present") ? [QUOTE_PROFILE] : [],
     },
     tools,
     results,
     not_run: skipped,
+    verification: activeTexts(corpus).map(([, text]) => coverageOf(corpus, text, tools)),
     unreviewed,
     redaction: "none",
     label: label(results, skipped),

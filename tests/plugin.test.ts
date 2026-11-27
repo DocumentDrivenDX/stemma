@@ -55,7 +55,7 @@ describe.skipIf(process.platform === "win32")("the plugin's launcher", () => {
     const cwd = temporary();
     writeFileSync(join(cwd, "bunfig.toml"), 'preload = ["./bad.ts"]\n');
     writeFileSync(join(cwd, "bad.ts"), 'require("node:fs").writeFileSync("ran", "x");\n');
-    writeFileSync(join(cwd, ".env"), `STEMMA_STORE_DIR=${cwd}\n`);
+    writeFileSync(join(cwd, ".env"), `STEMMA_RESTRICTED_DIR=${cwd}\n`);
     const data = ready();
     const done = launch([data, "doctor", "--format", "json"], {}, cwd);
     expect(done.code).toBe(0);

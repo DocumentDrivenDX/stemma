@@ -2,9 +2,12 @@
 // is invented. Fonts are named, never embedded, so reading them exercises the
 // font and character-map data that ships with the plugin.
 
+/** A line with its own place or size, or made of pieces such as a raised note marker. */
+export interface PdfLineSpec { segments: { text: string; size?: number; rise?: number }[]; x?: number; y?: number; size?: number }
+
 export interface PdfOptions {
   /** Printed lines of each page; an empty list is a page with no text. */
-  pages: string[][];
+  pages: (string | PdfLineSpec)[][];
   /** A page-label dictionary body, for example `/Nums [0 << /S /r >> 1 << /S /D >>]`. */
   labels?: string;
   /**
@@ -38,7 +41,13 @@ export function makePdf(options: PdfOptions): Uint8Array {
     objects[font - 1] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
   }
   const kids = options.pages.map((lines) => {
-    const stream = lines.map((line, i) => `BT /F1 10 Tf 40 ${760 - i * 20} Td ${(japanese ? ucs2 : latin)(line)} Tj ET`).join("\n");
+    const encode = japanese ? ucs2 : latin;
+    const stream = lines.map((line, i) => {
+      if (typeof line === "string") return `BT /F1 10 Tf 40 ${760 - i * 20} Td ${encode(line)} Tj ET`;
+      const size = line.size ?? 10;
+      const pieces = line.segments.map((s) => `/F1 ${s.size ?? size} Tf ${s.rise ?? 0} Ts ${encode(s.text)} Tj`).join(" ");
+      return `BT ${line.x ?? 40} ${line.y ?? 760 - i * 20} Td ${pieces} ET`;
+    }).join("\n");
     const content = add(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
     return add(`<< /Type /Page /Parent ${tree} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${content} 0 R >>`);
   });

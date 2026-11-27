@@ -1,11 +1,13 @@
 // locator.extent (CONTRACT-002 C; SD-007 BR-715): a cited page or other locator
 // falls inside the work. A recorded extent for the locator's term governs;
-// otherwise, for pages and folios, the page map of the source's stored copy.
-// It tests range only: not that a quotation or a claim is on the cited page.
-import { type Corpus, fromRoman, idOf, isObject, type Json, type JsonObject, type LoadedFile, pageLabels, type PageSegment, toRoman } from "@stemma/records";
+// otherwise the printed pages, chapters or paragraphs of the source's files.
+// It tests range only: quote.page tests where quoted words are.
+import { type Corpus, fromRoman, idOf, isObject, type Json, type JsonObject, type LoadedFile, toRoman } from "@stemma/records";
+import { SourceTexts } from "../matching/texts.ts";
+import { manifestsUnread } from "./held.ts";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
-import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
+import { hasManuscript, resolveCitations } from "./bibliography.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
 type Style = "arabic" | "roman_lower" | "roman_upper";
@@ -52,27 +54,25 @@ export function citedPages(locator: Json | undefined): string[] | undefined {
   return labels;
 }
 
-export interface MappedPages {
+export interface Mapped {
   labels: Set<string>;
-  /** The extraction records whose page maps gave the labels. */
+  /** The source files whose parts gave the labels. */
   from: LoadedFile[];
-  /** File pages, in those extractions, that have no label. */
+  /** Pages, in those source files, that have no label. */
   unmapped: number;
 }
 
-/** The printed labels of the page maps of a source's non-retired copies. */
-export function mappedPages(corpus: Corpus, source: string): MappedPages {
-  const captures = new Set(active(corpus, "capture").filter((c) => c.data!.source === source).map(idOf));
-  const out: MappedPages = { labels: new Set(), from: [], unmapped: 0 };
-  for (const extraction of active(corpus, "extraction")) {
-    if (!captures.has(String(extraction.data!.capture))) continue;
-    const pages = extraction.data!.pages;
-    const labels = pageLabels(Array.isArray(pages) ? (pages as unknown as PageSegment[]) : []);
-    if (labels.size === 0) continue;
-    for (const label of labels.values()) out.labels.add(label);
-    const spans = extraction.data!.page_spans;
-    out.unmapped = Math.max(out.unmapped, (Array.isArray(spans) ? spans.length : 0) - labels.size);
-    out.from.push(extraction);
+/** The printed page labels, chapters, or paragraph numbers of a source's source files. */
+export function mappedPlaces(texts: SourceTexts, source: string, term: string): Mapped {
+  const out: Mapped = { labels: new Set(), from: [], unmapped: 0 };
+  for (const view of texts.of(source).views) {
+    const found = term === "chapter" ? view.parts.flatMap((p) => p.chapter ?? [])
+      : term === "paragraph" ? (view.paged ? [] : view.parts.flatMap((p) => p.paragraphs.map((_, i) => String(p.firstParagraph + i))))
+      : view.paged ? view.parts.flatMap((p) => p.label ?? []) : [];
+    if (found.length === 0) continue;
+    for (const label of found) out.labels.add(label);
+    if (term === "page" || term === "folio") out.unmapped = Math.max(out.unmapped, view.parts.filter((p) => p.label === undefined).length);
+    out.from.push(view.loaded.manifest);
   }
   return out;
 }
@@ -139,7 +139,9 @@ function overall(wheres: Where[], outside: Reason): { outcome: Verdict["outcome"
   return { outcome: "pass" };
 }
 
-export function judgeLocator(corpus: Corpus, source: JsonObject, locator: JsonObject): Verdict {
+const TERMS = new Set(["page", "folio", "chapter", "paragraph"]);
+
+export function judgeLocator(texts: SourceTexts, source: JsonObject, locator: JsonObject): Verdict {
   const term = String(locator.label);
   const value = String(locator.value);
   const recorded = (Array.isArray(source.extents) ? source.extents : []).filter(isObject).filter((e) => e.label === term);
@@ -157,13 +159,18 @@ export function judgeLocator(corpus: Corpus, source: JsonObject, locator: JsonOb
     });
     return { ...overall(wheres, "outside_extent"), evidence: [shown] };
   }
-  if (corpus.records.some((f) => f.state !== "ok" && /^records\/(extractions|captures)\//.test(f.path))) return unverifiable("record_unreadable");
-  const mapped = PAGE_TERMS.has(term) ? mappedPages(corpus, String(source.id)) : undefined;
-  if (!mapped || mapped.labels.size === 0) return unverifiable("no_extent");
-  const evidence: Evidence[] = [
-    meta("extent", `printed pages ${describeLabels(mapped.labels)} (mapped in your stored copy)`),
-    ...mapped.from.map((e): Evidence => ({ name: "extraction_file", class: "location", value: e.path })),
-    ...(mapped.unmapped > 0 ? [meta("pages_without_a_label", `${mapped.unmapped} page(s) of the stored file`)] : []),
+  const ids = texts.idsOf(String(source.id));
+  if (manifestsUnread(texts.corpus) || ids.some((id) => !texts.view(id))) return unverifiable("record_unreadable");
+  const mapped = TERMS.has(term) ? mappedPlaces(texts, String(source.id), term) : undefined;
+  if (!mapped || mapped.labels.size === 0) {
+    const unpaged = (term === "page" || term === "folio") && ids.length > 0 && ids.every((id) => !texts.view(id)!.paged);
+    return unverifiable("no_extent", ...(unpaged ? [meta("problem", "the source's text here has no pages, so a page number cannot be checked against it")] : []));
+  }
+  const name = term === "chapter" ? "chapters" : term === "paragraph" ? "paragraphs" : "printed pages";
+  const evidence = [
+    meta("extent", `${name} ${describeLabels(mapped.labels)} (in your source files)`),
+    ...mapped.from.map((e): Evidence => ({ name: "source_text", class: "location", value: e.path })),
+    ...(mapped.unmapped > 0 ? [meta("pages_without_a_label", `${mapped.unmapped} page(s)`)] : []),
   ];
   const ranges = runs(mapped.labels);
   const wheres = locatorParts(value, locator.end, mapped.labels).map((part): Where => {
@@ -176,13 +183,13 @@ export function judgeLocator(corpus: Corpus, source: JsonObject, locator: JsonOb
 export const locatorCitations = (corpus: Corpus) =>
   hasManuscript(corpus) ? [] : resolveCitations(corpus).filter(({ citation }) => isObject(citation.data!.locator));
 
-export function locatorResults(corpus: Corpus): Result[] {
+export function locatorResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   return locatorCitations(corpus).flatMap(({ citation, key, matches }) => {
     if (matches.length !== 1) return [];
     const data = citation.data!;
     const locator = data.locator as JsonObject;
     const source = matches[0]!;
-    const verdict = judgeLocator(corpus, source.data!, locator);
+    const verdict = judgeLocator(texts, source.data!, locator);
     const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
       ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
     const shown = typeof locator.end === "string" ? `${String(locator.value)} to ${locator.end}` : String(locator.value);

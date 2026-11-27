@@ -10,12 +10,19 @@ function explain(message: string, why: string, suggestions: string[], fixes: str
 }
 
 const RECORD_WHY = "Every other check reads these files. A broken record can hide a citation problem or create a false one.";
-const HELD_WHY = "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.";
-const INTEGRITY_WHY = "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.";
+const HELD_WHY = "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.";
+const STRUCTURE_WHY = "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.";
+const LABEL_WHY = "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.";
+const NOTE_WHY = "A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.";
+const ORIGINAL_WHY = "The chain from the original to your citation rests on the source file being what the original gives.";
+const META_WHY = "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.";
+const ID_WHY = "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.";
+const NUMBER_WHY = "A figure attributed to a source that does not hold it misreports the source.";
 const KEY_WHY = "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.";
 const CHANGED_WHY = "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.";
 const QUOTE_WHY = "Readers take quoted words to be the source's own. Words the source does not hold misreport it.";
-const UNCOMPARED_WHY = "Until the quotation can be compared with your copy's text, it is unchecked.";
+const UNCOMPARED_WHY = "Until the quotation can be compared with the source's text, it is unchecked.";
+const PAGE_WHY = "A reader who turns to the cited place and does not find the words cannot check them.";
 const LOCATOR_WHY = "A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.";
 const UNLOCATED_WHY = "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.";
 const CHECK_FAILED = explain("The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
@@ -38,9 +45,9 @@ export const TEMPLATES = {
     "A record breaks a rule of the record format.", RECORD_WHY,
     ["Correct the field named in the evidence, then run `check` again."]),
   "record.valid:record_misplaced": explain(
-    "A file under records/ is not where its record belongs (file name or directory does not match).",
+    "A file under records/ or sources/ does not belong there: a name or directory that does not match, or a file such as a binary that a project does not hold.",
     "References and tools find records by ID, directory and file name.",
-    ["Rename or move the file as the evidence shows, or move a file that is not a record out of records/."]),
+    ["Rename or move the file as the evidence shows, or move a file that does not belong out of the project. Originals are not kept in the repository."]),
   "record.valid:reference_dangling": explain(
     "A record points at a record that is missing or is of the wrong kind.",
     "The link between your evidence and its source is broken, so anything relying on it cannot be traced.",
@@ -97,91 +104,187 @@ export const TEMPLATES = {
   "bib.uncited:check_error": explain(
     "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
     ["Report the defect together with the Stemma version."]),
-  "source.held:no_copy": explain(
-    "A cited source has no stored copy, so this citation is unchecked.", HELD_WHY,
-    ["Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."],
-    ["add_copy", "remove_citation"]),
+  "source.held:no_source_file": explain(
+    "A cited source has no source file in the project, so this citation is unchecked.", HELD_WHY,
+    ["Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile."], ["capture_source", "remove_citation"]),
   "source.held:no_text": explain(
-    "A cited source has a stored copy but no extracted text, so this citation is unchecked.", HELD_WHY,
-    ["Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is, and a PDF's own text layer is read page by page. For a scan with no text in it, supply recognized text with a form feed after each page (`--text-layer <file>`); Stemma recognizes no characters in page images."],
-    ["add_text"]),
+    "A cited source's files hold no text, so this citation is unchecked.", HELD_WHY,
+    ["Capture a copy of the source whose text can be read, or supply a transcription."], ["capture_source"]),
   "source.held:record_unreadable": explain(
-    "Whether you hold this cited source could not be checked: at least one capture or extraction record cannot be read.",
-    "The unreadable file may be the record of the stored copy or of its text.",
-    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
-  "source.held:copy_missing": explain(
-    "A stored copy could not be checked: its file is not in the content store used here.", INTEGRITY_WHY,
-    ["The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest."],
-    ["restore_copy"]),
-  "source.held:copy_altered": explain(
-    "A stored copy no longer matches its recorded digest, so it is not treated as the copy that was added.", INTEGRITY_WHY,
-    ["Restore the file from your backup, or add the original file again. If the source itself changed, add it as a new copy."],
-    ["restore_copy"]),
-  "source.held:text_missing": explain(
-    "The extracted text of a stored copy could not be checked: it is not in the content store used here.", INTEGRITY_WHY,
-    ["Point `--store-dir` at the store that holds it, or restore it from your backup. `store verify` lists every missing digest."],
-    ["restore_text"]),
-  "source.held:text_altered": explain(
-    "The stored text of a copy no longer matches its recorded digest, so it is not used.", INTEGRITY_WHY,
-    ["Restore the text from your backup, or attach the text again as a new extraction."], ["restore_text"]),
-  "source.held:text_inconsistent": explain(
-    "An extraction record does not fit its stored text (its size or page spans disagree with it), so it is not used.", INTEGRITY_WHY,
-    ["Retire this extraction and attach the text again as a new one. An extraction is never edited."], ["add_text"]),
-  "source.held:check_error": explain(
-    "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
-    ["Report the defect together with the Stemma version."]),
+    "Whether this cited source's text is here could not be checked: a source file's manifest cannot be read.", HELD_WHY,
+    ["Repair the unreadable file first (see the record.valid finding), then run `check` again."]),
+  "source.held:source_damaged": explain(
+    "A cited source has a source file that is damaged, so it is not used and this citation is unchecked.", HELD_WHY,
+    ["See the source.pages and record.valid findings on that source file. Restore it from git, or record your own edit with `source seal`."], ["restore_source"]),
+  "source.held:check_error": CHECK_FAILED,
+  "source.pages:part_missing": explain(
+    "A page or section file that the manifest lists is missing.", STRUCTURE_WHY,
+    ["Restore the file from git."], ["restore_source"]),
+  "source.pages:part_edited": explain(
+    "A page or section file differs from the digest its manifest records.", STRUCTURE_WHY,
+    ["If you meant to edit it, record the edit with `source seal <text id> --actor person:<name>`. Otherwise restore it from git."], ["restore_source"]),
+  "source.pages:part_unlisted": explain(
+    "A page or section file is in the source directory but not in its manifest.", STRUCTURE_WHY,
+    ["Remove the file, or convert the source again."], ["restore_source"]),
+  "source.pages:part_unreadable": explain(
+    "A page or section file cannot be read.", STRUCTURE_WHY,
+    ["Restore the file from git."], ["restore_source"]),
+  "source.pages:part_index": explain(
+    "A page or section file's place does not agree with its name or its manifest.", STRUCTURE_WHY,
+    ["Restore the files from git; their order is part of what is checked."], ["restore_source"]),
+  "source.pages:part_sequence": explain(
+    "The manifest does not list the pages or sections in sequence.", STRUCTURE_WHY,
+    ["Restore the manifest from git."], ["restore_source"]),
+  "source.pages:page_count": explain(
+    "The pages of the source file do not match the number of pages in the original.", STRUCTURE_WHY,
+    ["Restore the missing pages from git, or convert the original again. A source file that holds only some pages must say so."], ["restore_source"]),
+  "source.pages:part_invalid": explain(
+    "A source file's manifest or a part breaks the source file format, so its completeness could not be checked.", STRUCTURE_WHY,
+    ["See the record.valid finding and correct it."], ["restore_source"]),
+  "source.pages:check_error": CHECK_FAILED,
+  "source.labels:label_repeated": explain(
+    "Two pages in sequence carry the same printed label.", LABEL_WHY,
+    ["Look at the page images. Correct the page map (`source label`), or leave a page without a label if its number is not established."], ["relabel"]),
+  "source.labels:label_backwards": explain(
+    "Printed page labels go backwards.", LABEL_WHY,
+    ["Look at the page images. A second numbering bound into one file can do this: label only the pages of the work you cite."], ["relabel"]),
+  "source.labels:label_jump": explain(
+    "Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.", LABEL_WHY,
+    ["Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`)."], ["relabel"]),
+  "source.labels:folio_differs": explain(
+    "A page number printed on a page differs from the label recorded for that page.", LABEL_WHY,
+    ["Look at the page image and correct whichever is wrong."], ["relabel"]),
+  "source.labels:check_error": CHECK_FAILED,
+  "source.footnotes:marker_without_note": explain(
+    "A note marker in the text has no note on its page or section.", NOTE_WHY,
+    ["Compare the page with the original. The note may continue from or onto another page, or the conversion may have lost it."]),
+  "source.footnotes:note_without_marker": explain(
+    "A note has no marker in the text of its page or section.", NOTE_WHY,
+    ["Compare the page with the original. If the note continues from an earlier page, mark its block continued."]),
+  "source.footnotes:check_error": CHECK_FAILED,
+  "source.original:original_not_upstream": explain(
+    "A source file was converted from an original that none of the source's upstream records names.", ORIGINAL_WHY,
+    ["Check which original is right. Record its upstream (`ingest --plan`), or retire this source file."]),
+  "source.original:conversion_differs": explain(
+    "A fresh conversion of the original does not give the committed text, after a person's corrections are undone.", ORIGINAL_WHY,
+    ["Look at the differing readings. If a person edited the words, mark the change as a correction; otherwise restore the file, or convert the original again and retire this one."]),
+  "source.original:comparison_stale": explain(
+    "The text or the tools changed after the last fresh conversion was compared, so it no longer says anything.", ORIGINAL_WHY,
+    ["Run `source verify <text id> --original <file>`, or `ingest` with the originals."], ["verify_original"]),
+  "source.original:check_error": CHECK_FAILED,
   "source.changed:depends_on_retired": explain(
-    "This rests on a copy, text or source that has since been replaced or retired.", CHANGED_WHY,
+    "This rests on a source file or source that has since been replaced or retired.", CHANGED_WHY,
     ["Compare what you took from it with what replaced it, then correct or retire this item if it no longer holds. Stemma cannot yet record that you have looked, so the finding stays listed."]),
+  "source.changed:text_changed": explain(
+    "The text of a page or section changed after a passage this rests on was captured from it.", CHANGED_WHY,
+    ["Look at the page, capture the passage again, and retire the old passage and anything copied from it that no longer holds."]),
   "source.changed:source_details_changed": explain(
-    "The source's details changed after a passage this rests on was anchored.", CHANGED_WHY,
-    ["Check that the passage still belongs to the source as it is now recorded. Anchor it again as a new passage if it does."]),
+    "The source's details changed after a passage this rests on was captured.", CHANGED_WHY,
+    ["Check that the passage still belongs to the source as it is now recorded, and capture it again if it does."]),
   "source.changed:record_unreadable": explain(
-    "Whether what this rests on has changed could not be checked: a record it depends on cannot be read.", CHANGED_WHY,
-    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
+    "Whether what this rests on has changed could not be checked: something it depends on cannot be read.", CHANGED_WHY,
+    ["Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."]),
   "source.changed:check_error": CHECK_FAILED,
   "quote.present:near_match": explain(
-    "A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.", QUOTE_WHY,
-    ["Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences."],
-    ["correct_quotation"]),
+    "A quotation is not in the source's text as written. A passage close to it is; both are shown.", QUOTE_WHY,
+    ["Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences."], ["capture_passage"]),
   "quote.present:absent": explain(
-    "A quotation was not found in your stored copy's text.", QUOTE_WHY,
-    ["Find the words on the page and correct the quotation, or remove the quotation marks if these are your words or a paraphrase. If the page does hold these words, the stored text is wrong there, or it is a different edition: attach a better text or add the copy you quoted. Words that run across a page break can also be missed, because running heads come between them."],
-    ["correct_quotation", "add_copy"]),
+    "A quotation was not found in the source's text.", QUOTE_WHY,
+    ["Find the words (`passage find`) and capture them, or remove the quotation marks if these are your words or a paraphrase. If the page does hold these words, the source text is wrong there, or it is a different edition: record that, or capture the copy you quoted."], ["capture_passage", "capture_source"]),
+  "quote.present:passage_differs": explain(
+    "A passage record no longer matches the words at its address.", QUOTE_WHY,
+    ["Do not edit the record's words. Capture the passage again from the source text and retire this one."], ["capture_passage"]),
+  "quote.present:citation_differs": explain(
+    "A citation made from a passage no longer says what the passage says: its quotation or locator was changed.", QUOTE_WHY,
+    ["Add the citation again from the passage, so that both are copied, and retire this one."], ["capture_passage"]),
   "quote.present:text_unavailable": explain(
-    "A quotation could not be compared: the stored text of its source cannot be used here.", UNCOMPARED_WHY,
-    ["See the source.held finding. Add a copy and attach its text, point `--store-dir` at the store that holds it, or restore it from your backup."],
-    ["add_copy", "add_text"]),
+    "A quotation could not be compared: the text of its source cannot be used here.", UNCOMPARED_WHY,
+    ["See the source.held and source.pages findings, then capture or repair the source's text."], ["capture_source"]),
   "quote.present:poor_quality": explain(
-    "A quotation was not found, but the only stored text is marked poor, so this does not show that the source lacks it.", UNCOMPARED_WHY,
-    ["Look at the page itself, or attach a better text."], ["add_text"]),
+    "A quotation was not found, but the only text is marked poor, so this does not show that the source lacks it.", UNCOMPARED_WHY,
+    ["Look at the page itself, or capture a better text."], ["capture_source"]),
   "quote.present:anchor_not_found": explain(
-    "A note extract could not be compared: none of the passages it is anchored to can be found in stored text.", UNCOMPARED_WHY,
-    ["See the findings on its passages, and anchor the note to a passage that is in the stored text."]),
+    "A note extract could not be compared: none of the passages it is anchored to can be found in the source text.", UNCOMPARED_WHY,
+    ["See the findings on its passages, and anchor the note to a passage that is in the text."]),
   "quote.present:check_error": CHECK_FAILED,
+  "quote.page:wrong_page": explain(
+    "The quoted words are in the source, but not where the citation says.", PAGE_WHY,
+    ["Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied."], ["repoint", "capture_passage"]),
+  "quote.page:partly_on_page": explain(
+    "The quotation runs beyond what the citation names, for example over a page break.", PAGE_WHY,
+    ["Cite every page the words lie on, as a captured passage does."], ["repoint", "capture_passage"]),
+  "quote.page:place_unknown": explain(
+    "Where the quoted words lie could not be compared with the locator: that part of the text has no such page label, chapter or paragraph.", PAGE_WHY,
+    ["Establish the page labels (`source pages`, `source label`) from what shows them, or cite a locator the source's text has."], ["relabel"]),
+  "quote.page:check_error": CHECK_FAILED,
   "locator.extent:outside_extent": explain(
     "A citation's locator is outside the extent recorded for the work.", LOCATOR_WHY,
-    ["Check the locator against the work and correct it. If the recorded extent is wrong, correct the source record."],
-    ["repoint"]),
+    ["Check the locator against the work and correct it. If the recorded extent is wrong, correct the source record."], ["repoint"]),
   "locator.extent:outside_page_map": explain(
-    "A cited page is outside the printed pages mapped in your stored copy.", LOCATOR_WHY,
-    ["Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one)."],
-    ["repoint", "add_copy"]),
+    "A cited page, chapter or paragraph is outside those in your source files.", LOCATOR_WHY,
+    ["Check the number against the source and correct it. If it is right, your source file holds only part of the work or leaves that page without a label."], ["repoint", "capture_source"]),
   "locator.extent:page_not_mapped": explain(
-    "A cited page falls between mapped pages, on a page the page map gives no label, so it could not be checked.", UNLOCATED_WHY,
-    ["Look at the page in your copy. If its number can be established, attach the text again with a page map that includes it and says what shows the label."],
-    ["add_text"]),
+    "A cited page falls between labelled pages, on a page with no established label, so it could not be checked.", UNLOCATED_WHY,
+    ["Look at the page. If its number can be established, add it to the page map and run `source label`."], ["relabel"]),
   "locator.extent:no_extent": explain(
-    "A locator could not be checked: no extent is recorded for it, and no page map covers its numbering.", UNLOCATED_WHY,
-    ["For pages, attach your copy's text with a page map (`source pages` proposes one from the printed numbers). For another kind of locator, record the work's extent on the source, taken from the work itself."],
-    ["add_text"]),
+    "A locator could not be checked: no extent is recorded for it, and no source file has its numbering.", UNLOCATED_WHY,
+    ["For pages, label your source file's pages; a source with no pages cannot check a page number. For another kind of locator, record the work's extent on the source, taken from the work itself."], ["relabel"]),
   "locator.extent:unparsable_locator": explain(
     "A locator is not written in a form that can be compared with the work's pages or extent.", UNLOCATED_WHY,
     ["Write it as the printed label, or as a range with both ends in full, such as 41-43. Otherwise check it by hand."]),
   "locator.extent:record_unreadable": explain(
-    "A locator could not be checked: at least one capture or extraction record cannot be read.", UNLOCATED_WHY,
-    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
+    "A locator could not be checked: a source file of this source cannot be read or is damaged.", UNLOCATED_WHY,
+    ["See the record.valid and source.pages findings, repair the source file, then run `check` again."]),
   "locator.extent:check_error": CHECK_FAILED,
+  "meta.source:mismatch": explain(
+    "The source record disagrees with what the captured copy states about itself.", META_WHY,
+    ["Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one."], ["correct_record", "capture_source"]),
+  "meta.source:source_damaged": explain(
+    "The source's details could not be compared with a copy: its source file is damaged.", META_WHY,
+    ["See the source.pages finding and repair the source file."], ["restore_source"]),
+  "meta.source:not_found_in_copy": explain(
+    "Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.", META_WHY,
+    ["Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity."], ["confirm_details", "correct_record"]),
+  "meta.source:nothing_to_compare": explain(
+    "The source record has no title, so its details could not be compared with the copy.", META_WHY,
+    ["Record the title from the work itself."], ["correct_record"]),
+  "meta.source:check_error": CHECK_FAILED,
+  "meta.resolver:mismatch": explain(
+    "The source record disagrees with a saved catalogue lookup.", META_WHY,
+    ["Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference."], ["correct_record"]),
+  "meta.resolver:no_lookup": explain(
+    "The source's details have not been compared with any catalogue: no lookup is saved.", META_WHY,
+    ["Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."], ["resolve"]),
+  "meta.resolver:lookup_silent": explain(
+    "A saved lookup states no title, so nothing could be compared with it.", META_WHY,
+    ["Look the work up by another identifier, or have a person confirm the details."], ["resolve", "confirm_details"]),
+  "meta.resolver:check_error": CHECK_FAILED,
+  "id.resolves:no_lookup": explain(
+    "An identifier on the source record has not been looked up.", ID_WHY,
+    ["Run `resolve` for it. This version looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be checked."], ["resolve"]),
+  "id.resolves:not_found": explain(
+    "A catalogue did not find the work this identifier should name.", ID_WHY,
+    ["Check the identifier against the work and correct or remove it."], ["correct_record"]),
+  "id.resolves:other_work": explain(
+    "An identifier resolves to a work with a different title.", ID_WHY,
+    ["Check which is wrong: the identifier or the record's title."], ["correct_record"]),
+  "id.resolves:lookup_silent": explain(
+    "The saved lookup states no title, or the record has none, so the identifier could not be compared.", ID_WHY,
+    ["Check the identifier by hand."]),
+  "id.resolves:lookup_error": explain(
+    "The saved lookup is a response that could not be read.", ID_WHY,
+    ["Run `resolve` again."], ["resolve"]),
+  "id.resolves:check_error": CHECK_FAILED,
+  "number.present:figure_absent": explain(
+    "A figure in a sentence that cites this source was not found in the source's text.", NUMBER_WHY,
+    ["Find the figure in the source and correct the sentence, or move the figure to a sentence that does not attribute it to this source. A converted or recognized text can also be wrong: look at the page."]),
+  "number.present:several_citations": explain(
+    "A sentence with a figure cites more than one source, so which one holds the figure could not be judged.", NUMBER_WHY,
+    ["Check the figure by hand, or split the citation."]),
+  "number.present:text_unavailable": explain(
+    "A figure could not be compared: the source has no usable text.", NUMBER_WHY,
+    ["Capture or repair the source's text."], ["capture_source"]),
+  "number.present:check_error": CHECK_FAILED,
   "coordinate.stray:coordinate_text": explain(
     "Text in a project file looks like a map coordinate. The value is not repeated here.", COORDINATE_WHY,
     ["Look at the position in the evidence. If it is a sensitive site, remove the value from the file (git history may still hold it). If it is public or not a coordinate, you need do nothing."]),
@@ -215,18 +318,28 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   sentence_not_normalized: "the sentence text has extra or unusual white space",
   unknown_field: "the field is not part of the record format",
   wrong_location: "the file name or directory does not match the record",
-  stray_file: "the file is not a .json record",
+  stray_file: "the file is not a .json record, a source manifest, or one of its page or section files",
   reference_missing: "no record has this ID",
   reference_wrong_kind: "the record with this ID is of a kind that is not allowed here",
   null_value: "null is not allowed; leave the field out",
   number_not_integer: "numbers must be whole and within the safe range; write others as strings",
   bad_size: "a size cannot be below zero",
-  bad_page_range: "a page-map segment has an impossible or overlapping range of file pages",
+  bad_page_range: "a page-map segment has an impossible or overlapping range of pages",
   bad_page_labels: "a page-map segment's labels do not fit its numbering style or its number of pages",
   label_evidence_missing: "a page-map segment gives printed labels without saying what evidence they come from",
-  bad_page_spans: "page spans must be in page order, must not overlap, and must not end before they start",
-  missing_page_spans: "an extraction of a PDF must say where each page's text starts and ends",
-  capture_digest_mismatch: "the extraction names other bytes than the copy its capture holds",
+  bad_original: "a digital original is tied by digest and size, and a physical one by a description and where it is held",
+  bad_page_label: "a page's label, its status, and how it was determined do not agree",
+  bad_part: "the part is not in the source file format",
+  model_verification: "a model's review can only flag; it is never a person's verification",
+  response_digest_mismatch: "the saved response does not match its digest",
+  bad_address: "a passage address needs, for each part, a start before its end",
+  front_matter_missing: "the file does not begin with a front matter block",
+  front_matter_unreadable: "the front matter is not one readable JSON object",
+  text_outside_block: "there is text before the first block line",
+  unknown_annotation: "an annotation is not one the source file format defines, or is not closed",
+  unknown_role: "a block's role is not one the source file format defines",
+  raw_angle: "a < in source text must be written as an entity, so that source text cannot form an annotation",
+  correction_not_by_person: "a correction names a person; source text is not corrected by a model or script",
 };
 
 export const problemTemplate = (problem: Problem): TemplateId => `record.valid:${problem.reason}`;

@@ -2,8 +2,9 @@
 export const KINDS: Record<string, { prefix: string; directory: string }> = Object.fromEntries(
   (
     [
-      ["source", "src-", "sources"], ["agent", "agt-", "agents"], ["capture", "cap-", "captures"],
-      ["extraction", "ext-", "extractions"], ["passage", "psg-", "passages"], ["note", "nte-", "notes"],
+      ["source", "src-", "sources"], ["agent", "agt-", "agents"], ["source_text", "txt-", ""],
+      ["upstream", "ups-", "upstreams"], ["text_review", "rvw-", "text-reviews"], ["comparison_run", "run-", "comparison-runs"],
+      ["passage", "psg-", "passages"], ["note", "nte-", "notes"],
       ["claim", "clm-", "claims"], ["attestation", "att-", "attestations"], ["inference", "inf-", "inferences"],
       ["construct", "con-", "constructs"], ["method", "mth-", "methods"], ["chapter", "chp-", "chapters"],
       ["citation", "cit-", "citations"], ["intake_item", "itm-", "intake-items"],
@@ -13,7 +14,7 @@ export const KINDS: Record<string, { prefix: string; directory: string }> = Obje
       ["search", "sch-", "searches"], ["decision", "dec-", "decisions"],
       ["support_record", "sup-", "support-records"], ["annotation", "ann-", "annotations"],
       ["resolution", "res-", "resolutions"], ["import_batch", "imp-", "imports"],
-      ["confirmation", "cnf-", "confirmations"], ["plan", "pln-", "plans"],
+      ["plan", "pln-", "plans"],
       ["checkpoint_input", "ckp-", "checkpoint-inputs"], ["authorship_mark", "aum-", "authorship-marks"],
       ["ai_activity", "act-", "ai-activities"], ["voice_profile", "vop-", "voice-profiles"],
       ["voice_example", "vex-", "voice-examples"], ["governing_record", "gvr-", "governing-records"],
@@ -28,7 +29,9 @@ export const RECORD_SCHEMA = "stemma.record/0";
 export const PROJECT_SCHEMA = "stemma.project/0";
 export const PROJECT_FORMAT = 0;
 
+/** A source text's record is its manifest, whose directory name carries no meaning (CONTRACT-007 A). */
 export function recordPath(kind: string, id: string): string {
+  if (kind === "source_text") throw new Error("a source text is a manifest, not a file under records/");
   return `records/${KINDS[kind]!.directory}/${id}.json`;
 }
 
@@ -38,7 +41,9 @@ export function isRecordId(kind: string, id: string): boolean {
 }
 
 /** Kinds for which this version checks every CONTRACT-001 rule it knows to apply. */
-export const FULLY_CHECKED_KINDS = new Set(["source", "citation", "agent", "capture", "extraction"]);
+export const FULLY_CHECKED_KINDS = new Set([
+  "source", "citation", "agent", "source_text", "upstream", "text_review", "comparison_run", "passage", "resolution",
+]);
 
 /** The source fields that `SourceBinding.record_sha256` covers (CONTRACT-001 E). */
 export const SOURCE_BINDING_FIELDS = [

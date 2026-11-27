@@ -1,7 +1,10 @@
 // Loading a whole project from file bytes, and the rules that span records.
 import { canonical, compareCodePoints, decodeUtf8, digest, type Json, type JsonObject, JsonUnreadable, parseJson, sha256 } from "./json.ts";
 import { PROJECT_FORMAT, PROJECT_SCHEMA, RECORD_SCHEMA } from "./kinds.ts";
-import { isObject, type Problem, type Reference, validateProject, validateRecord } from "./validate.ts";
+import {
+  type Block, fileDigest, parseBlocks, partFile, serializeManifest, serializePart, SOURCE_DIRECTORY_NAME, splitFrontMatter,
+} from "./sourcefile.ts";
+import { isObject, type Problem, type Reference, validatePart, validateProject, validateRecord } from "./validate.ts";
 
 export interface SourceFile {
   /** Project-relative, with `/` separators. */
@@ -70,13 +73,46 @@ export function loadFile(file: SourceFile, type: "record" | "project"): LoadedFi
 export interface ProjectContent {
   settings: SourceFile;
   records: SourceFile[];
+  /** Every file under sources/. */
+  sources: SourceFile[];
   rules?: SourceFile;
   manuscript: SourceFile[];
+}
+
+/** One part of a source file: a page, or a section of a source with no pages. */
+export interface LoadedPart {
+  index: number;
+  path: string;
+  front: JsonObject;
+  blocks: Block[];
+}
+
+/** Why a source file's parts cannot be relied on (CONTRACT-007 H; `source.pages`). */
+export interface Damage {
+  code: "part_missing" | "part_edited" | "part_unlisted" | "part_unreadable" | "part_index" | "part_sequence" | "page_count";
+  path: string;
+  detail?: string;
+}
+
+export interface LoadedText {
+  /** The manifest, which is also in `records`. */
+  manifest: LoadedFile;
+  /** `sources/<name>`. */
+  directory: string;
+  parts: LoadedPart[];
+  damage: Damage[];
+  /** Intact, with nothing wrong in its manifest's or parts' form: checks may use the text. */
+  usable: boolean;
 }
 
 export interface Corpus {
   settings: LoadedFile;
   records: LoadedFile[];
+  /** Part files, for record.valid. */
+  partFiles: LoadedFile[];
+  /** Source files by the ID of their manifest. */
+  texts: Map<string, LoadedText>;
+  sources: SourceFile[];
   /** Readable records by ID. */
   byId: Map<string, LoadedFile>;
   rules?: SourceFile;
@@ -130,30 +166,151 @@ function checkReferences(file: LoadedFile, byId: Map<string, LoadedFile>, unread
   }
 }
 
-/**
- * An extraction names the bytes it read. It must be the copy its capture holds,
- * and an extraction of a PDF must say where each page lies in its text.
- */
-function checkExtractions(records: LoadedFile[], byId: Map<string, LoadedFile>): void {
-  for (const file of records) {
-    if (file.state !== "ok" || file.data?.kind !== "extraction") continue;
-    const capture = byId.get(String(file.data.capture));
-    if (capture?.data?.kind !== "capture") continue;
-    const add = (code: "capture_digest_mismatch" | "missing_page_spans", field: string) =>
-      file.problems.push({ reason: "record_invalid", code, field, target: capture.path });
-    if (file.data.capture_sha256 !== capture.data.sha256) add("capture_digest_mismatch", "/capture_sha256");
-    const spans = file.data.page_spans;
-    if (capture.data.media_type === "application/pdf" && !(Array.isArray(spans) && spans.length > 0)) {
-      add("missing_page_spans", "/page_spans");
+const blocking = (problems: Problem[]): boolean => problems.some((p) => p.reason === "record_invalid");
+
+const textOf = (file: SourceFile): string | undefined => {
+  if (!file.bytes) return undefined;
+  try {
+    return decodeUtf8(file.bytes);
+  } catch {
+    return undefined;
+  }
+};
+
+function loadManifest(file: SourceFile): { loaded: LoadedFile } {
+  const base: LoadedFile = { path: file.path, state: "unreadable", formattable: false, problems: [], references: [] };
+  if (file.bytes) base.bytes = file.bytes;
+  const text = textOf(file);
+  if (text === undefined) return { loaded: { ...base, unreadable: file.bytes ? "not_utf8" : "cannot_open" } };
+  const split = splitFrontMatter(text);
+  if ("problem" in split) return { loaded: { ...base, unreadable: "syntax" } };
+  if (newerVersion(split.front.schema, RECORD_SCHEMA.split("/")[0]!)) return { loaded: { ...base, state: "version_unsupported" } };
+  const validation = validateRecord(split.front, file.path);
+  return {
+    loaded: {
+      ...base, state: "ok", data: split.front, formattable: true,
+      canonical: text.replace(/\r\n/g, "\n") === serializeManifest(split.front, split.body),
+      problems: validation.problems, references: validation.references,
+    },
+  };
+}
+
+function loadPart(file: SourceFile, paged: boolean): { loaded: LoadedFile; part?: LoadedPart } {
+  const base: LoadedFile = { path: file.path, state: "unreadable", formattable: false, problems: [], references: [] };
+  if (file.bytes) base.bytes = file.bytes;
+  const text = textOf(file);
+  if (text === undefined) return { loaded: { ...base, unreadable: file.bytes ? "not_utf8" : "cannot_open" } };
+  const split = splitFrontMatter(text);
+  if ("problem" in split) return { loaded: { ...base, unreadable: "syntax" } };
+  const { blocks, problems: grammar } = parseBlocks(split.body, split.bodyLine);
+  const problems: Problem[] = [
+    ...validatePart(split.front, paged),
+    ...grammar.map((g): Problem => ({ reason: "record_invalid", code: g.code, field: `line ${g.line}` })),
+  ];
+  const loaded: LoadedFile = {
+    ...base, state: "ok", formattable: grammar.length === 0, problems,
+    canonical: grammar.length > 0 || text.replace(/\r\n/g, "\n") === serializePart(split.front, blocks),
+  };
+  return { loaded, part: { index: Number(split.front.index), path: file.path, front: split.front, blocks } };
+}
+
+function loadText(directory: string, files: Map<string, SourceFile>, manifest: LoadedFile): { text: LoadedText; partFiles: LoadedFile[]; strays: SourceFile[] } {
+  const data = manifest.data ?? {};
+  const paged = data.paged === true;
+  const damage: Damage[] = [];
+  const parts: LoadedPart[] = [];
+  const partFiles: LoadedFile[] = [];
+  const listed = new Set<string>();
+  const entries = (Array.isArray(data.pages) ? data.pages : []).filter(isObject);
+  let previous = -1;
+  for (const entry of entries) {
+    const index = Number(entry.index);
+    const path = `${directory}/${String(entry.file)}`;
+    if (index <= previous || (!paged && index !== previous + 1)) damage.push({ code: "part_sequence", path, detail: `index ${index} after ${previous}` });
+    previous = index;
+    if (String(entry.file) !== partFile(paged, index)) damage.push({ code: "part_index", path, detail: `listed as index ${index}` });
+    const file = files.get(path);
+    listed.add(path);
+    if (!file) {
+      damage.push({ code: "part_missing", path, detail: `index ${index}` });
+      continue;
+    }
+    const { loaded, part } = loadPart(file, paged);
+    partFiles.push(loaded);
+    const text = textOf(file);
+    if (text === undefined || fileDigest(text) !== entry.sha256) damage.push({ code: "part_edited", path, detail: `index ${index}` });
+    if (!part) damage.push({ code: "part_unreadable", path });
+    else {
+      if (part.index !== index) damage.push({ code: "part_index", path, detail: `the part says index ${part.index}` });
+      parts.push({ ...part, index });
     }
   }
+  const original = isObject(data.original) ? data.original : {};
+  if (paged && data.coverage === "all" && typeof original.page_count === "number") {
+    const have = new Set(entries.map((e) => Number(e.index)));
+    const missing = Array.from({ length: Math.min(original.page_count, 100_000) }, (_, i) => i).filter((i) => !have.has(i));
+    if (missing.length > 0 || have.size !== original.page_count) {
+      damage.push({
+        code: "page_count", path: manifest.path,
+        detail: `the original has ${original.page_count} pages and ${have.size} are listed${missing.length > 0 ? `; missing index ${missing.slice(0, 20).join(", ")}` : ""}`,
+      });
+    }
+  }
+  const strays: SourceFile[] = [];
+  for (const [path, file] of files) {
+    if (listed.has(path) || path === manifest.path) continue;
+    if (/^(pages\/p|sections\/s)\d{4,}\.md$/.test(path.slice(directory.length + 1))) {
+      damage.push({ code: "part_unlisted", path });
+      partFiles.push(loadPart(file, paged).loaded);
+    } else strays.push(file);
+  }
+  const usable = manifest.state === "ok" && !blocking(manifest.problems) && damage.length === 0 && partFiles.every((f) => f.state === "ok" && !blocking(f.problems));
+  return { text: { manifest, directory, parts, damage, usable }, partFiles, strays };
+}
+
+/** Source directories, their manifests and parts, and files that do not belong. */
+function loadSources(sources: SourceFile[]) {
+  const directories = new Map<string, Map<string, SourceFile>>();
+  const strays: SourceFile[] = [];
+  for (const file of sources) {
+    const [, name, ...rest] = file.path.split("/");
+    if (rest.length === 0 || !SOURCE_DIRECTORY_NAME.test(name!)) strays.push(file);
+    else {
+      const directory = `sources/${name}`;
+      directories.set(directory, (directories.get(directory) ?? new Map()).set(file.path, file));
+    }
+  }
+  const manifests: LoadedFile[] = [];
+  const texts: LoadedText[] = [];
+  const partFiles: LoadedFile[] = [];
+  for (const [directory, files] of [...directories].sort(([a], [b]) => compareCodePoints(a, b))) {
+    const source = files.get(`${directory}/source.md`);
+    if (!source) {
+      strays.push(...files.values());
+      continue;
+    }
+    const { loaded } = loadManifest(source);
+    manifests.push(loaded);
+    if (loaded.state !== "ok") continue;
+    const made = loadText(directory, files, loaded);
+    texts.push(made.text);
+    partFiles.push(...made.partFiles);
+    strays.push(...made.strays);
+  }
+  const stray = strays.map((file): LoadedFile => ({
+    path: file.path, state: "stray", formattable: false, references: [],
+    problems: [{ reason: "record_misplaced", code: "stray_file", field: "" }], ...(file.bytes ? { bytes: file.bytes } : {}),
+  }));
+  return { manifests, texts, partFiles, stray };
 }
 
 export function loadCorpus(content: ProjectContent): Corpus {
   const settings = loadFile(content.settings, "project");
-  const records = [...content.records]
-    .sort((a, b) => compareCodePoints(a.path, b.path))
-    .map((file) => loadFile(file, "record"));
+  const found = loadSources(content.sources);
+  const records = [
+    ...content.records.map((file) => loadFile(file, "record")),
+    ...found.manifests, ...found.stray,
+  ].sort((a, b) => compareCodePoints(a.path, b.path));
   const byId = new Map<string, LoadedFile>();
   const unreadableIds = new Set<string>();
   for (const file of records) {
@@ -169,18 +326,21 @@ export function loadCorpus(content: ProjectContent): Corpus {
   }
   checkKeys(records.filter((f) => f.state === "ok" && f.data?.kind === "source"));
   for (const file of [settings, ...records]) checkReferences(file, byId, unreadableIds);
-  checkExtractions(records, byId);
-  const corpus: Corpus = { settings, records, byId, manuscript: content.manuscript };
+  const texts = new Map(found.texts.flatMap((t) => (idOf(t.manifest) ? [[idOf(t.manifest)!, t] as const] : [])));
+  const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript };
   if (content.rules) corpus.rules = content.rules;
   return corpus;
 }
 
 /** CONTRACT-001 E. An unreadable file has no canonical form, so its bytes are digested. */
 export function corpusDigest(corpus: Corpus): string {
-  const lines: [string, string][] = [corpus.settings, ...corpus.records].map((file) => [
+  const lines: [string, string][] = [corpus.settings, ...corpus.records.filter((f) => !f.path.startsWith("sources/"))].map((file) => [
     file.path,
     file.data ? digest(file.data) : file.bytes ? sha256(file.bytes) : "unreadable",
   ]);
+  for (const file of corpus.sources) {
+    lines.push([file.path, file.bytes ? fileDigest(new TextDecoder().decode(file.bytes)) : "unreadable"]);
+  }
   if (corpus.rules) {
     const text = corpus.rules.bytes ? new TextDecoder().decode(corpus.rules.bytes).replace(/\r\n?/g, "\n") : "unreadable";
     lines.push([corpus.rules.path, sha256(text)]);

@@ -1,52 +1,53 @@
-// quote.present (CONTRACT-002 D; SD-007 BR-705 to BR-710): a quotation is in
-// the stored text of the cited source, apart from the owner-approved
-// differences. It covers the quotations of citation records, note extracts, and
-// the quotations of passages that a note, attestation or support record uses.
-// It says nothing about the cited page, and a match against recognized text
-// shows agreement with that text only.
-import { type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
+// quote.present and quote.page (CONTRACT-002 D; SD-007 BR-705 to BR-715).
+// quote.present: a quotation is in the cited source's text, apart from the
+// owner-approved differences; a passage's words are the words at its address;
+// and a citation made from a passage still says what the passage says.
+// quote.page: the words are on the cited pages, or in the cited chapter or
+// paragraph. A match against recognized text shows agreement with that text only.
+import { canonical, type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
 import { result } from "../findings.ts";
-import { type Closest, findClosest, findQuotation, FOLD_WORDS, type Found, QUOTE_PROFILE, type Within } from "../matching/quote-fold.ts";
-import { labelOf, type StoredText, StoredTexts } from "../matching/stored.ts";
+import { type Closest, findClosest, findQuotation, FOLD_WORDS, type Found, QUOTE_PROFILE, renderQuotation, type Within } from "../matching/quote-fold.ts";
+import { paragraphNumbers, placeOf, SourceTexts, type StreamName, type TextView } from "../matching/texts.ts";
+import { addressText, textAt } from "../passages.ts";
 import type { Evidence, Result } from "../report.ts";
-import { type BlobReader } from "../store.ts";
 import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
-import { citedPages } from "./locators.ts";
+import { citedPages, locatorParts, numberOf } from "./locators.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
 const CHECK = "quote.present";
 
 const at = (name: string, value: string): Evidence => ({ name, class: "location", value });
 const meta = (name: string, value: string): Evidence => ({ name, class: "metadata", value });
-const stored = (name: string, value: string): Evidence => ({ name, class: "source_text", value });
+const sourceText = (name: string, value: string): Evidence => ({ name, class: "source_text", value });
 
-/** Where to look for a quotation in one stored text. */
-interface Search { text: StoredText; within?: Within }
+/** Where to look for a quotation in one stream of one source file. */
+interface Search { view: TextView; stream: StreamName; within?: Within }
 
 type Verdict =
   | { outcome: "pass"; evidence: Evidence[] }
-  | { outcome: "fail"; reason: "near_match" | "absent"; evidence: Evidence[] }
-  | { outcome: "unverifiable"; reason: "text_unavailable" | "poor_quality" | "anchor_not_found" | "record_unreadable"; evidence: Evidence[] };
+  | { outcome: "fail"; reason: "near_match" | "absent" | "passage_differs" | "citation_differs"; evidence: Evidence[] }
+  | { outcome: "unverifiable"; reason: "text_unavailable" | "poor_quality" | "anchor_not_found"; evidence: Evidence[] };
 
 function place(search: Search, start: number, end: number): Evidence[] {
-  const { text } = search;
-  const pages = text.pagesOf(start, end);
+  const { view, stream } = search;
+  const indexes = view.partsOf(stream, start, end);
   return [
-    at("extraction_file", text.extraction.path),
-    ...(pages.length > 0 ? [at("found_on", pages.map((p) => labelOf(text, p)).join("; "))] : []),
-    meta("text_method", `${text.method}, quality ${text.level}`),
+    at("source_text", view.loaded.manifest.path),
+    at("found_on", `${indexes.map((i) => placeOf(view, i)).join("; ")}${stream === "notes" ? ", in a note" : ""}`),
+    at("address", addressText(view.id, view.address(stream, start, end))),
+    meta("text_method", `${view.method}, quality ${view.level}`),
   ];
 }
 
 /**
- * One quotation against the texts that may hold it. A pass names how it was
- * compared; anything else shows the closest stored text where one is close.
+ * One quotation against the streams that may hold it. A pass names how it was
+ * compared; anything else shows the closest source text where one is close.
  */
-export function compareQuotation(quotation: string, searches: Search[], skipped: number): Verdict & { found?: { text: StoredText; pages: number[]; match: Found } } {
+export function compareQuotation(quotation: string, searches: Search[], skipped: number): Verdict {
   const profile = meta("profile", QUOTE_PROFILE);
   let found: { search: Search; match: Found } | undefined;
   for (const search of searches) {
-    const match = findQuotation(search.text.folded(), quotation, search.within);
+    const match = findQuotation(search.view.folded(search.stream), quotation, search.within);
     if (match && (!found || (found.match.match === "normalized" && match.match === "exact"))) found = { search, match };
   }
   if (found) {
@@ -56,68 +57,67 @@ export function compareQuotation(quotation: string, searches: Search[], skipped:
       evidence: [
         meta("match", match.match), profile,
         ...(match.folds.length > 0 ? [meta("differences_allowed", match.folds.map((f) => FOLD_WORDS[f]).join("; "))] : []),
-        ...match.joined.map((word) => stored("joined_at_line_end", word)),
-        ...(match.match === "normalized" ? [stored("stored_text", search.text.text.slice(match.start, match.end))] : []),
+        ...match.joined.map((word) => sourceText("joined_at_line_end", word)),
+        ...(match.match === "normalized" ? [sourceText("source_passage", search.view.streams[search.stream].text.slice(match.start, match.end))] : []),
         ...place(search, match.start, match.end),
       ],
-      found: { text: search.text, pages: search.text.pagesOf(match.start, match.end), match },
     };
   }
   if (searches.length === 0) return { outcome: "unverifiable", reason: "text_unavailable", evidence: [profile] };
   let closest: { search: Search; span: Closest } | undefined;
   for (const search of searches) {
-    const span = findClosest(search.text.folded(), quotation, search.within);
+    const span = findClosest(search.view.folded(search.stream), quotation, search.within);
     if (span && (!closest || span.distance < closest.span.distance)) closest = { search, span };
   }
   const shown = closest ? [
-    stored("stored_text", closest.search.text.text.slice(closest.span.start, closest.span.end)),
+    sourceText("source_passage", closest.search.view.streams[closest.search.stream].text.slice(closest.span.start, closest.span.end)),
     ...place(closest.search, closest.span.start, closest.span.end),
-  ] : [meta("closest", "no stored passage is close enough to show")];
+  ] : [meta("closest", "no passage of the source text is close enough to show")];
   const evidence = [meta("match", closest?.span.near ? "near" : "none"), profile, ...shown,
-    ...(skipped > 0 ? [meta("not_searched", `${skipped} other stored text(s) of this source could not be used`)] : [])];
+    ...(skipped > 0 ? [meta("not_searched", `${skipped} other source file(s) of this source could not be used`)] : [])];
   // A text that could not be searched, or only poor text, cannot show that the words are absent.
-  if (searches.every((s) => s.text.level === "poor")) return { outcome: "unverifiable", reason: "poor_quality", evidence };
+  if (searches.every((s) => s.view.level === "poor")) return { outcome: "unverifiable", reason: "poor_quality", evidence };
   if (closest?.span.near) return { outcome: "fail", reason: "near_match", evidence };
   if (skipped > 0) return { outcome: "unverifiable", reason: "text_unavailable", evidence };
   return { outcome: "fail", reason: "absent", evidence };
 }
 
-const unreadable = (corpus: Corpus): boolean =>
-  corpus.records.some((f) => f.state !== "ok" && /^records\/(extractions|captures)\//.test(f.path));
+const searchesOf = (views: TextView[]): Search[] =>
+  views.flatMap((view) => (["main", "notes"] as const).filter((s) => view.streams[s].text !== "").map((stream) => ({ view, stream })));
 
-function searchSource(corpus: Corpus, texts: StoredTexts, source: string): { searches: Search[]; skipped: number } {
-  const all = texts.extractionsOf(source).map((e) => texts.of(e));
-  const searches = all.flatMap((text) => (typeof text === "string" ? [] : [{ text }]));
-  return { searches, skipped: all.length - searches.length + (unreadable(corpus) ? 1 : 0) };
+/** The passage's words are the words at its address, copied unchanged. */
+function passageVerdict(texts: SourceTexts, passage: JsonObject): Verdict {
+  const quote = isObject(passage.quote) && typeof passage.quote.exact === "string" ? passage.quote.exact : "";
+  const now = textAt(texts, passage);
+  if (now.state === "unavailable") return { outcome: "unverifiable", reason: "text_unavailable", evidence: [meta("profile", QUOTE_PROFILE)] };
+  if (now.state === "changed") {
+    return { outcome: "fail", reason: "passage_differs", evidence: [meta("problem", `the page or section at index ${now.index} changed after the passage was captured`)] };
+  }
+  if (now.text !== quote) {
+    return {
+      outcome: "fail", reason: "passage_differs",
+      evidence: [meta("problem", "the words recorded are not the words at the passage's address"), sourceText("source_passage", now.text)],
+    };
+  }
+  return {
+    outcome: "pass",
+    evidence: [meta("match", "exact"), meta("profile", QUOTE_PROFILE), at("source_text", now.view.loaded.manifest.path),
+      at("found_on", now.indexes.map((i) => placeOf(now.view, i)).join("; ")), meta("text_method", `${now.view.method}, quality ${now.view.level}`)],
+  };
 }
 
-/** The part of a passage's extraction it points at, or why it cannot be shown. */
-function anchor(texts: StoredTexts, passage: JsonObject, corpus: Corpus):
-  { verdict: Verdict; span?: { text: StoredText; start: number; end: number } } {
-  const extraction = corpus.byId.get(String(passage.extraction));
-  const quote = isObject(passage.quote) && typeof passage.quote.exact === "string" ? passage.quote.exact : "";
-  const text = extraction?.data?.kind === "extraction" ? texts.of(extraction) : "text_unusable";
-  if (typeof text === "string" || passage.text_sha256 !== text.extraction.data!.text_sha256) {
-    return { verdict: { outcome: "unverifiable", reason: "text_unavailable", evidence: [meta("profile", QUOTE_PROFILE)] } };
+/** How a citation made from a passage departs from it, if it does. */
+function departures(corpus: Corpus, citation: JsonObject): Evidence[] | undefined {
+  if (citation.passage === undefined) return undefined;
+  const passage = corpus.byId.get(String(citation.passage))?.data;
+  if (passage?.kind !== "passage" || !isObject(passage.quote)) return undefined;
+  const expected = renderQuotation(String(passage.quote.exact));
+  const out: Evidence[] = [];
+  if (citation.quotation !== expected) out.push(sourceText("passage_quotation", expected));
+  if (citation.locator === undefined || canonical(citation.locator) !== canonical(passage.locator)) {
+    out.push(meta("passage_locator", isObject(passage.locator) ? `${String(passage.locator.label)} ${String(passage.locator.value)}` : "none"));
   }
-  const position = isObject(passage.position) ? passage.position : undefined;
-  const within: Within | undefined = position
-    ? (s) => s.start >= text.unit(Number(position.start)) && s.end <= text.unit(Number(position.end)) : undefined;
-  const verdict = compareQuotation(quote, [{ text, ...(within ? { within } : {}) }], 0);
-  if (verdict.outcome === "pass") return { verdict, span: { text, start: verdict.found!.match.start, end: verdict.found!.match.end } };
-  if (within) {
-    const elsewhere = findQuotation(text.folded(), quote);
-    if (elsewhere) {
-      return {
-        verdict: {
-          outcome: "fail", reason: "absent",
-          evidence: [meta("match", "none"), meta("profile", QUOTE_PROFILE),
-            meta("problem", "the words are in this text, but not at the position the passage records"), ...place({ text }, elsewhere.start, elsewhere.end)],
-        },
-      };
-    }
-  }
-  return { verdict };
+  return out.length > 0 ? out : undefined;
 }
 
 function usedPassages(corpus: Corpus): LoadedFile[] {
@@ -125,6 +125,7 @@ function usedPassages(corpus: Corpus): LoadedFile[] {
   for (const note of active(corpus, "note")) for (const id of [note.data!.passages].flat()) used.add(String(id));
   for (const link of active(corpus, "attestation")) used.add(String(link.data!.evidence));
   for (const record of active(corpus, "support_record")) used.add(String(record.data!.passage));
+  for (const record of active(corpus, "citation")) used.add(String(record.data!.passage));
   return active(corpus, "passage").filter((p) => used.has(idOf(p)!));
 }
 
@@ -133,10 +134,12 @@ export const quotationCitations = (corpus: Corpus) =>
   hasManuscript(corpus) ? [] : resolveCitations(corpus).filter(({ citation }) => typeof citation.data!.quotation === "string");
 
 export const quotationSubjects = (corpus: Corpus): number =>
-  quotationCitations(corpus).length + usedPassages(corpus).length + active(corpus, "note").filter((n) => n.data!.type === "extract").length;
+  quotationCitations(corpus).length + active(corpus, "passage").length + active(corpus, "note").filter((n) => n.data!.type === "extract").length;
 
-export function quoteResults(corpus: Corpus, blobs: BlobReader, read: Set<string> = new Set()): Result[] {
-  const texts = new StoredTexts(corpus, blobs, read);
+const sentenceOf = (data: JsonObject) => isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
+  ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
+
+export function quoteResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   const results: Result[] = [];
 
   for (const { citation, key, matches } of quotationCitations(corpus)) {
@@ -145,27 +148,17 @@ export function quoteResults(corpus: Corpus, blobs: BlobReader, read: Set<string
     const source = idOf(matches[0]!)!;
     const data = citation.data!;
     const quotation = data.quotation as string;
-    const { searches, skipped } = searchSource(corpus, texts, source);
-    const verdict = compareQuotation(quotation, searches, skipped);
-    const evidence: Evidence[] = [
-      at("citation_file", citation.path),
-      meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
-      { name: "cited_text", class: "manuscript", value: quotation },
-      ...verdict.evidence,
-    ];
-    // Information only: the quotation check does not test the cited page.
-    const cited = citedPages(data.locator);
-    if (verdict.found && cited) {
-      const found = verdict.found.pages.map((p) => verdict.found!.text.labels.get(p));
-      if (found.every((label) => label !== undefined) && found.length > 0 && !found.some((label) => cited.includes(label!))) {
-        evidence.push(meta("cited_page_differs", `found on printed page ${found.join(", ")}; the citation gives ${cited.join(", ")}`));
-      }
-    }
-    const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-      ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
+    const { views, unusable } = texts.of(source);
+    const departed = departures(corpus, data);
+    const verdict: Verdict = departed
+      ? { outcome: "fail", reason: "citation_differs", evidence: departed }
+      : compareQuotation(quotation, searchesOf(views), unusable);
+    const sentence = sentenceOf(data);
     results.push(result({
       check: CHECK, outcome: verdict.outcome, ...("reason" in verdict ? { reason: verdict.reason } : {}),
-      subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#quotation`, source, evidence,
+      subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#quotation`, source,
+      evidence: [at("citation_file", citation.path), meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
+        { name: "cited_text", class: "manuscript", value: quotation }, ...verdict.evidence],
       item: itemOf(citation), ...(sentence ? { sentence } : {}),
     }));
   }
@@ -174,28 +167,119 @@ export function quoteResults(corpus: Corpus, blobs: BlobReader, read: Set<string
     results.push(result({
       check: CHECK, outcome: verdict.outcome, ...("reason" in verdict ? { reason: verdict.reason } : {}),
       subject: subjectOf(file), locus: `${idOf(file) ?? file.path}#${locus}`, source: String(file.data!.source),
-      evidence: [at("record_file", file.path), { name: "cited_text", class: "source_text", value: cited }, ...verdict.evidence],
+      evidence: [at("record_file", file.path), sourceText("cited_text", cited), ...verdict.evidence],
       item: itemOf(file),
     }));
   };
 
   for (const passage of usedPassages(corpus)) {
-    const quote = isObject(passage.data!.quote) ? String(passage.data!.quote.exact) : "";
-    record(passage, anchor(texts, passage.data!, corpus).verdict, quote, "passage");
+    record(passage, passageVerdict(texts, passage.data!), isObject(passage.data!.quote) ? String(passage.data!.quote.exact) : "", "passage");
   }
 
   // A note extract is searched only in the passages it is anchored to.
   for (const note of active(corpus, "note").filter((n) => n.data!.type === "extract")) {
     const body = String(note.data!.body);
-    const anchors = [note.data!.passages ?? []].flat().flatMap((id) => {
-      const passage = corpus.byId.get(String(id));
-      const span = passage?.data?.kind === "passage" ? anchor(texts, passage.data, corpus).span : undefined;
-      return span ? [span] : [];
+    const searches = [note.data!.passages ?? []].flat().flatMap((id): Search[] => {
+      const passage = corpus.byId.get(String(id))?.data;
+      const now = passage?.kind === "passage" ? textAt(texts, passage) : undefined;
+      if (now?.state !== "ok") return [];
+      const found = findQuotation(now.view.folded(now.stream), now.text);
+      return found ? [{ view: now.view, stream: now.stream, within: (s) => s.start >= found.start && s.end <= found.end }] : [];
     });
-    const verdict: Verdict = anchors.length === 0
+    record(note, searches.length === 0
       ? { outcome: "unverifiable", reason: "anchor_not_found", evidence: [meta("profile", QUOTE_PROFILE)] }
-      : compareQuotation(body, anchors.map((a) => ({ text: a.text, within: (s) => s.start >= a.start && s.end <= a.end })), 0);
-    record(note, verdict, body, "extract");
+      : compareQuotation(body, searches, 0), body, "extract");
   }
   return results;
+}
+
+interface Occurrence { view: TextView; stream: StreamName; start: number; end: number }
+
+function occurrences(views: TextView[], quotation: string, most = 50): Occurrence[] {
+  const out: Occurrence[] = [];
+  for (const { view, stream } of searchesOf(views)) {
+    let after = -1;
+    while (out.length < most) {
+      let found = findQuotation(view.folded(stream), quotation, (s) => s.start > after);
+      if (!found) break;
+      for (let earlier; (earlier = findQuotation(view.folded(stream), quotation, (s) => s.start > after && s.start < found!.start)); ) found = earlier;
+      after = found.start;
+      out.push({ view, stream, start: found.start, end: found.end });
+    }
+  }
+  return out;
+}
+
+type Where = "covered" | "partly" | "elsewhere" | "unknown";
+
+const sameNumber = (a: string, b: string) => {
+  const [x, y] = [numberOf(a.toUpperCase()) ?? numberOf(a.toLowerCase()), numberOf(b.toUpperCase()) ?? numberOf(b.toLowerCase())];
+  return x && y ? x.value === y.value : a.toLowerCase() === b.toLowerCase();
+};
+
+/** Where one occurrence lies against what a locator cites. */
+function whereIs(o: Occurrence, term: string, cited: string[]): Where {
+  const parts = o.view.partsOf(o.stream, o.start, o.end).map((i) => o.view.part(i)!);
+  const among = (found: string[], same: (a: string, b: string) => boolean): Where => {
+    const inside = found.filter((f) => cited.some((c) => same(c, f))).length;
+    return inside === found.length ? "covered" : inside > 0 ? "partly" : "elsewhere";
+  };
+  if (term === "page" || term === "folio") {
+    if (!o.view.paged || parts.some((p) => p.label === undefined)) return "unknown";
+    return among(parts.map((p) => p.label!), (a, b) => a === b);
+  }
+  if (term === "chapter") {
+    return parts.some((p) => p.chapter === undefined) ? "unknown" : among(parts.map((p) => p.chapter!), sameNumber);
+  }
+  if (term === "paragraph" && o.stream === "main" && !o.view.paged) {
+    const numbers = parts.flatMap((p) => {
+      const span = o.view.streams.main.spans.find((s) => s.index === p.index)!;
+      return paragraphNumbers(p, o.start - span.start, o.end - span.start).map(String);
+    });
+    return numbers.length === 0 ? "unknown" : among(numbers, (a, b) => a === b);
+  }
+  return "unknown";
+}
+
+/** The labels a locator cites, for the terms this check reads. */
+function citedLabels(locator: JsonObject): string[] | undefined {
+  const term = String(locator.label);
+  if (term === "page" || term === "folio") return citedPages(locator);
+  if (term !== "chapter" && term !== "paragraph") return undefined;
+  return locatorParts(String(locator.value), locator.end).flatMap((p) => {
+    const [a, b] = [Number(p.first), Number(p.last)];
+    return p.first !== p.last && Number.isInteger(a) && Number.isInteger(b) && b >= a && b - a < 100
+      ? Array.from({ length: b - a + 1 }, (_, i) => String(a + i)) : [p.first, ...(p.last === p.first ? [] : [p.last])];
+  });
+}
+
+export const pageQuotations = (corpus: Corpus) => quotationCitations(corpus)
+  .filter(({ citation }) => isObject(citation.data!.locator) && ["page", "folio", "chapter", "paragraph"].includes(String(citation.data!.locator.label)));
+
+export function quotePageResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
+  return pageQuotations(corpus).flatMap(({ citation, key, matches }) => {
+    if (matches.length !== 1) return [];
+    const source = idOf(matches[0]!)!;
+    const data = citation.data!;
+    const locator = data.locator as JsonObject;
+    const cited = citedLabels(locator);
+    const found = occurrences(texts.of(source).views, data.quotation as string);
+    // Words that are not found are quote.present's finding; an unreadable locator is locator.extent's.
+    if (!cited || found.length === 0) return [];
+    const judged = found.map((o) => ({ o, where: whereIs(o, String(locator.label), cited) }));
+    const best = (["covered", "partly", "elsewhere", "unknown"] as const).find((w) => judged.some((j) => j.where === w))!;
+    const shown = judged.filter((j) => j.where === best).slice(0, 5);
+    const sentence = sentenceOf(data);
+    const outcome = best === "covered" ? "pass" : best === "unknown" ? "unverifiable" : "fail";
+    const reason = best === "partly" ? "partly_on_page" : best === "elsewhere" ? "wrong_page" : best === "unknown" ? "place_unknown" : undefined;
+    return [result({
+      check: "quote.page", outcome, ...(reason ? { reason } : {}), subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#page`, source,
+      evidence: [
+        at("citation_file", citation.path), meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
+        { name: "locator", class: "manuscript", value: `${String(locator.label)} ${String(locator.value)}` },
+        ...shown.flatMap((j) => place(j.o, j.o.start, j.o.end).slice(0, 3)),
+      ],
+      item: itemOf(citation), ...(sentence ? { sentence } : {}),
+    })];
+  });
 }

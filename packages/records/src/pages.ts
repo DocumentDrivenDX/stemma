@@ -1,6 +1,6 @@
-// Page maps and page spans of an extraction (CONTRACT-001 G, "Extraction and
-// passages"). A page gets a printed label only from a segment that names its
-// evidence; no label is ever worked out from a file position alone.
+// Page maps (CONTRACT-001 PageSegment), as `source pages` proposes them and
+// `source label` applies them. A page gets a printed label only from a segment
+// that names its evidence; no label is ever worked out from a file position alone.
 import type { Json } from "./json.ts";
 
 export const LABEL_STYLES = ["arabic", "roman_lower", "roman_upper", "explicit", "unnumbered"] as const;
@@ -11,10 +11,8 @@ export interface PageSegment {
   style: (typeof LABEL_STYLES)[number];
   first_label?: string;
   labels?: string[];
-  evidence?: "printed_sequence" | "embedded_label" | "author_statement";
+  evidence?: "printed_sequence" | "embedded_label" | "source_marker" | "page_image" | "author_statement";
 }
-
-export interface PageSpan { page_index: number; start: number; end: number }
 
 const ROMAN: [number, string][] = [
   [1000, "m"], [900, "cm"], [500, "d"], [400, "cd"], [100, "c"], [90, "xc"], [50, "l"], [40, "xl"], [10, "x"], [9, "ix"],
@@ -54,7 +52,7 @@ function firstNumber(style: string, label: unknown): number | undefined {
   return label === label.toUpperCase() ? fromRoman(label.toLowerCase()) : undefined;
 }
 
-export type PageProblem = "bad_page_range" | "bad_page_labels" | "label_evidence_missing" | "bad_page_spans";
+export type PageProblem = "bad_page_range" | "bad_page_labels" | "label_evidence_missing";
 
 const isIndex = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0;
 const asObject = (value: Json): Record<string, Json> =>
@@ -85,26 +83,6 @@ export function checkPageSegments(pages: Json): { code: PageProblem; index: numb
     if (evidence === undefined) add("label_evidence_missing");
   });
   return problems;
-}
-
-/** Spans are in page order, do not overlap, and lie inside a text of `length` code points when it is known. */
-export function checkPageSpans(spans: Json, length?: number): number[] {
-  if (!Array.isArray(spans)) return [];
-  const bad: number[] = [];
-  let page = -1;
-  let end = 0;
-  spans.forEach((entry, index) => {
-    const span = asObject(entry);
-    const ok = isIndex(span.page_index) && isIndex(span.start) && isIndex(span.end)
-      && span.page_index > page && span.start >= end && span.end >= span.start
-      && (length === undefined || span.end <= length);
-    if (!ok) bad.push(index);
-    else {
-      page = span.page_index as number;
-      end = span.end as number;
-    }
-  });
-  return bad;
 }
 
 /** The printed label of each mapped file page. Pages in no segment have none. */

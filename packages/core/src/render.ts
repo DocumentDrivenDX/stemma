@@ -1,6 +1,7 @@
 // The plain-language text form of a report. One cause is shown once with the
 // items it affects (CONTRACT-002 C).
 import { CHECK_DESCRIPTIONS } from "./checks/not-run.ts";
+import { type Coverage, coverageWords } from "./verification.ts";
 import type { Result, ReportBody } from "./report.ts";
 
 export function groupResults(results: Result[]): Result[][] {
@@ -35,24 +36,27 @@ export function renderFindings(results: Result[]): string[] {
   return lines;
 }
 
-/**
- * What a passing quotation check cannot show, said where it applies: a word
- * joined at a line end can hide a hyphen that belongs to it, and the check does
- * not test the cited page.
- */
+/** What a passing quotation check cannot show: a word joined at a line end can hide a hyphen that belongs to it. */
 function quotationNotes(results: Result[]): string[] {
-  const passed = results.filter((r) => r.check === "quote.present" && r.outcome === "pass");
-  const value = (r: Result, name: string) => r.evidence.filter((e) => e.name === name).map((e) => e.value);
+  const joined = results.filter((r) => r.check === "quote.present" && r.outcome === "pass")
+    .flatMap((r) => r.evidence.filter((e) => e.name === "joined_at_line_end").map((e) => `   - ${printable(r.subject)}: ${printable(e.value)}`));
+  return joined.length === 0 ? [] : [
+    "", "For information, not a finding: these quotations matched after joining a word the source text splits at a line end.",
+    "If the hyphen belongs to the word, the quotation should keep it: look at the page.", ...joined];
+}
+
+/** Review coverage and what comparisons found, with both readings. These are figures, not findings. */
+export function renderCoverage(body: { verification: Coverage[] }, most = 3): string[] {
   const lines: string[] = [];
-  const joined = passed.flatMap((r) => value(r, "joined_at_line_end").map((word) => `   - ${printable(r.subject)}: ${printable(word)}`));
-  if (joined.length > 0) {
-    lines.push("", "For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.",
-      "If the hyphen belongs to the word, the quotation should keep it: look at the page.", ...joined);
-  }
-  const elsewhere = passed.flatMap((r) => value(r, "cited_page_differs").map((note) => `   - ${printable(r.subject)}: ${printable(note)}`));
-  if (elsewhere.length > 0) {
-    lines.push("", "For information, not a finding: these quotations are in the source, but not on the page the citation gives.",
-      "The quotation check does not test the cited page. Check the page number.", ...elsewhere);
+  for (const c of body.verification) {
+    lines.push(`   - ${c.directory} (${c.method}): ${coverageWords(c)}`);
+    for (const run of c.runs.filter((r) => r.current && r.differing_parts > 0)) {
+      lines.push(`       compared with ${printable(run.against)}${run.independent ? "" : " (not independent of the conversion)"}: ${(run.agreement_permille / 10).toFixed(1)}% of words agree`);
+      for (const d of run.disagreements.slice(0, most)) {
+        lines.push(`         index ${d.index}: here "${printable(d.reading)}" / there "${printable(d.other)}"`);
+      }
+      if (run.disagreements.length > most) lines.push(`         and more: see \`coverage ${c.text}\``);
+    }
   }
   return lines;
 }
@@ -65,9 +69,11 @@ export function renderReport(body: ReportBody): string {
       "CHECKED CLEAN: the checks found nothing open.",
       "This does not mean that the book is correct. It covers only what is in these project files.");
   } else {
+    // The headline counts what is open; a confirmed result is listed apart.
+    const open = (outcome: string) => body.results.filter((r) => r.open && r.outcome === outcome).length;
     const parts = [
-      `${summary.fail} problem(s)`,
-      `${summary.unverifiable} could not be checked`,
+      `${open("fail")} problem(s)`,
+      `${open("unverifiable")} could not be checked`,
       `${summary.not_implemented} kind(s) of check this version does not run`,
     ];
     lines.push(`OPEN FINDINGS: ${parts.join(", ")}. Nothing is blocked.`);
@@ -75,7 +81,15 @@ export function renderReport(body: ReportBody): string {
   lines.push(`Checked the whole project: ${summary.pass} result(s) passed.`);
   lines.push(...renderFindings(body.results));
   lines.push(...quotationNotes(body.results));
-  const missing = body.not_run.filter((n) => n.reason === "not_implemented");
+  const confirmed = body.results.filter((r) => r.confirmed_by !== undefined);
+  if (confirmed.length > 0) {
+    lines.push("", "For information: these could not be compared and a person confirmed the details. They are confirmed by the author, not verified.");
+    for (const r of confirmed) lines.push(`   - ${r.subject} [${r.check}] review ${r.confirmed_by}`);
+  }
+  if (body.verification.length > 0) {
+    lines.push("", "For information, not findings: what has been compared with and reviewed for each source file.", ...renderCoverage(body));
+  }
+  const missing = body.not_run;
   if (missing.length > 0) {
     lines.push(
       "", "NOT CHECKED: this version does not run these, so the project is not called checked clean.",

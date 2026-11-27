@@ -47,16 +47,21 @@ describe("explanations", () => {
 });
 
 describe("label", () => {
-  test("a not_implemented check counts as open; input_absent does not", () => {
-    expect(label([], [{ check: "source.held", reason: "input_absent" }])).toBe("checked_clean");
-    expect(label([], [{ check: "source.held", reason: "not_implemented" }])).toBe("open_findings");
+  test("a check that applies and cannot run counts as open", () => {
+    expect(label([], [])).toBe("checked_clean");
+    expect(label([], [{ check: "quote.self", reason: "not_implemented" }])).toBe("open_findings");
   });
 
-  test("a cited source with no copy is open, and unbuilt checks of cited sources stay listed", () => {
+  test("FR-86 only checks that apply are run or listed; a cited source with nothing captured is open", () => {
     const body = run("cited");
-    expect(body.results.filter((r) => r.open).map((r) => [r.check, r.reason_code])).toEqual([["source.held", "no_copy"]]);
+    expect(body.results.filter((r) => r.open).map((r) => [r.check, r.reason_code]))
+      .toEqual([["meta.resolver", "no_lookup"], ["source.held", "no_source_file"]]);
     expect(body.label).toBe("open_findings");
-    expect(body.not_run.filter((n) => n.reason === "not_implemented").map((n) => n.check)).toEqual(["meta.resolver", "number.present"]);
+    expect(body.not_run).toEqual([]);
+    for (const absent of ["source.pages", "meta.source", "quote.present", "locator.extent", "number.present", "id.resolves"]) {
+      expect(body.results.map((r) => r.check)).not.toContain(absent);
+    }
+    expect(renderReport(body)).not.toContain("NOT CHECKED");
   });
 
   test("record kinds whose extra rules are not checked keep the label open", () => {

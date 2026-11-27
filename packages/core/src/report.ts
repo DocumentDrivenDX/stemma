@@ -1,4 +1,6 @@
 // The stemma.check-report/0 shapes (CONTRACT-002 C and E).
+import type { Coverage } from "./verification.ts";
+
 export type Outcome = "pass" | "fail" | "unverifiable";
 
 export interface Evidence { name: string; class: "source_text" | "manuscript" | "metadata" | "location"; value: string }
@@ -19,10 +21,13 @@ export interface Result {
   why: string;
   suggestions: string[];
   annotations: { id: string; effect: string }[];
+  /** A person's source-details review that covers what could not be compared. */
+  confirmed_by?: string;
   open: boolean;
 }
 
-export interface NotRun { check: string; reason: "input_absent" | "not_implemented" }
+/** A check that applies to the project and that this version cannot run. */
+export interface NotRun { check: string; reason: "not_implemented" }
 
 export interface Unreviewed { record: string; kind: string; reason: "unreviewed" | "not_admitted"; locations: string[] }
 
@@ -35,10 +40,12 @@ export interface ReportBody {
   mode: "work";
   scope: "all";
   changed: string[];
-  inputs: { corpus_sha256: string; manuscript: { path: string; sha256: string }[]; blobs: string[]; profiles: string[] };
+  inputs: { corpus_sha256: string; manuscript: { path: string; sha256: string }[]; profiles: string[] };
   tools: Record<string, string>;
   results: Result[];
   not_run: NotRun[];
+  /** What has been compared with and reviewed for each source file. Not findings. */
+  verification: Coverage[];
   unreviewed: Unreviewed[];
   redaction: "none";
   label: "checked_clean" | "open_findings";
