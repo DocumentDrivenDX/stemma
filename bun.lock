@@ -46,6 +46,9 @@
     "packages/extract": {
       "name": "@stemma/extract",
     },
+    "packages/intake": {
+      "name": "@stemma/intake",
+    },
     "packages/publish": {
       "name": "@stemma/publish",
       "dependencies": {
@@ -143,6 +146,8 @@
     "@stemma/core": ["@stemma/core@workspace:packages/core"],
 
     "@stemma/extract": ["@stemma/extract@workspace:packages/extract"],
+
+    "@stemma/intake": ["@stemma/intake@workspace:packages/intake"],
 
     "@stemma/publish": ["@stemma/publish@workspace:packages/publish"],
 

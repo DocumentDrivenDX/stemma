@@ -20,6 +20,7 @@
       "@stemma/records": ["./packages/records/src/index.ts"],
       "@stemma/core": ["./packages/core/src/index.ts"],
       "@stemma/extract": ["./packages/extract/src/index.ts"],
+      "@stemma/intake": ["./packages/intake/src/index.ts"],
       "@stemma/workspace": ["./packages/workspace/src/index.ts"],
       "@stemma/cite": ["./packages/cite/src/index.ts"],
       "@stemma/publish": ["./packages/publish/src/index.ts"]

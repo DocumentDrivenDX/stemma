@@ -1,6 +1,5 @@
 // Converters and the source-file format (CONTRACT-007), on invented originals.
 import { describe, expect, test } from "bun:test";
-import { deflateRawSync } from "node:zlib";
 import {
   type Block, decodeText, encodeText, parseBlocks, serializePart, splitFrontMatter, streamsOf, textDigest,
 } from "@stemma/records";
@@ -9,6 +8,7 @@ import {
 } from "@stemma/extract";
 import { mediaType } from "@stemma/workspace";
 import { renderQuotation } from "@stemma/core";
+import { zip } from "./helpers.ts";
 import { makePdf, type PdfLineSpec } from "./pdf.ts";
 
 const bytes = (text: string) => new TextEncoder().encode(text);
@@ -17,41 +17,6 @@ const mainOf = (converted: Converted) => converted.parts.map((p) => streamsOf(p.
 const roles = (converted: Converted) => blocksOf(converted).map((b) => b.role);
 /** The part files a conversion gives, as written. */
 const written = (converted: Converted) => converted.parts.map((p) => serializePart({ index: p.index }, p.blocks)).join("\u0000");
-
-/** A ZIP archive holding the given entries, deflated. */
-function zip(entries: Record<string, string>, stated?: number): Uint8Array {
-  const locals: Buffer[] = [];
-  const central: Buffer[] = [];
-  let offset = 0;
-  for (const [name, text] of Object.entries(entries)) {
-    const raw = Buffer.from(text);
-    const packed = name === "mimetype" ? raw : deflateRawSync(raw);
-    const method = name === "mimetype" ? 0 : 8;
-    const local = Buffer.alloc(30);
-    local.writeUInt32LE(0x04034b50, 0);
-    local.writeUInt16LE(method, 8);
-    local.writeUInt32LE(packed.length, 18);
-    local.writeUInt32LE(raw.length, 22);
-    local.writeUInt16LE(Buffer.byteLength(name), 26);
-    const entry = Buffer.alloc(46);
-    entry.writeUInt32LE(0x02014b50, 0);
-    entry.writeUInt16LE(method, 10);
-    entry.writeUInt32LE(packed.length, 20);
-    entry.writeUInt32LE(stated ?? raw.length, 24);
-    entry.writeUInt16LE(Buffer.byteLength(name), 28);
-    entry.writeUInt32LE(offset, 42);
-    locals.push(local, Buffer.from(name), packed);
-    central.push(entry, Buffer.from(name));
-    offset += 30 + Buffer.byteLength(name) + packed.length;
-  }
-  const directory = Buffer.concat(central);
-  const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0);
-  end.writeUInt16LE(Object.keys(entries).length, 10);
-  end.writeUInt32LE(directory.length, 12);
-  end.writeUInt32LE(offset, 16);
-  return new Uint8Array(Buffer.concat([...locals, directory, end]));
-}
 
 describe("the source file format", () => {
   test("SEC-032 text that imitates annotations stays text, and escaping round-trips", () => {

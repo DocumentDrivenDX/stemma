@@ -47,8 +47,8 @@ Each step depends on the ones before it. All are in the pilot.
 | Order | Step | Requirements | Design status |
 |---|---|---|---|
 | 1 | Word reader | FR-71 | Designed; not built |
-| 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Designed here; untested |
-| 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Designed here; untested |
+| 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Built over a neutral document; some real entries go unread (CONTRACT-003, Proof Status) |
+| 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Built over a neutral document; some real citations are missed (CONTRACT-003, Proof Status) |
 | 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Designed; not built |
 | 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | Designed; no version reads the copy yet |
 | 6 | Usable first report | FR-93 | Designed here; usability unmeasured |
@@ -146,7 +146,7 @@ Shapes are CONTRACT-001. There is no round or session entity.
 
 **Reference lists and author-date citations** (the profile is CONTRACT-003 H)
 
-- **BR-1521** — List reading: every paragraph of a detected list is an entry, read or unread, kept as found and carried forward by BR-1520. A list serves only the chapters of its own file.
+- **BR-1521** — List reading: every body paragraph of a detected list, other than a subheading, is an entry, read or unread, kept as found and carried forward by BR-1520. A list serves only the chapters of its own file.
 - **BR-1522** — One match: an author-date citation links only when exactly one read entry in its chapter's list has the same authors, year, and suffix, and no unread entry could be the one meant. `et al.` forms and single-author forms never match each other's entries. Other lists and libraries supply candidates only. This is an exception to BR-1511 for author-date forms: the matched thing is a list entry, and the source follows from that entry's own binding.
 - **BR-1523** — Account: every bracketed year outside a list ends as linked, unresolved, or left unlinked with a reason. An unknown shape is left unlinked, never skipped. The intake check that the counts add up fails the import if they do not.
 - **BR-1524** — Whole brackets: a parenthesis becomes markup only when every part is a citation form, so the writer never has to split the author's text. Otherwise it stays as typed and is listed.
@@ -308,7 +308,7 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 
 - [ ] **Some references are never checked.** Author-date citations in brackets that hold a year are now accounted for (BR-1523): unresolved ones are open findings, but left-unlinked ones are only listed. Citations with no bracketed year, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text with no listing or check beyond the notes. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
 - [ ] **Takeover starts with a long report.** Every extracted claim is unreviewed, incomplete, and unsupported at first. Grouping and clear next steps must keep the report usable; the pilot must measure it.
-- [ ] How a reference list is detected in a Word file is untested, as is the whole author-date profile.
+- [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status). No Word reader feeds the profile yet.
 - [ ] Citations in tables are listed, not read, until the markup can carry them (PRD open question).
 - [ ] Whether check reports should count left-unlinked parentheses is open (PRD).
 - [ ] The pilot PDF formats Chicago notes; a manuscript that cites in author-date form may need another style (PRD open question; SD-008).
