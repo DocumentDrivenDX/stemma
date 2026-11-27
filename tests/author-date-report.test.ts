@@ -73,6 +73,24 @@ describe("author-date developer script", () => {
     expect(done.stdout).not.toContain("STAND-IN");
   });
 
+  test("lists entries with a long surname form to look at", () => {
+    const long = zip({ "word/document.xml": `<w:document><w:body>
+      ${p(run("(Adair and Stone 2017)"))}
+      ${p(run("References"))}
+      ${p(run("Adair, J., and Bea Mary Lee Stone. 2017. Rivers."))}
+    </w:body></w:document>` });
+    const made = JSON.parse(report([{ file: "l.docx", bytes: long }]).text);
+    expect(made.entriesWithLongSurnameForm.map((e: any) => [e.paragraph, e.authors, e.longer, e.linkedItems]))
+      .toEqual([[2, ["Adair", "Stone"], { 1: ["Lee Stone", "Mary Lee Stone"] }, 1]]);
+    expect(made.entriesWithBracketedNote).toEqual([]);
+    const dir = temporary();
+    const input = join(dir, "l.docx");
+    writeFileSync(input, long);
+    const done = spawnSync(process.execPath, [join(ROOT, "scripts/author-date-report.ts"), "--out", join(dir, "l.json"), input], { encoding: "utf8" });
+    expect(done.stdout).toContain("entries with a long surname form to look at 1, citation items linked to them 1\n");
+    expect(done.stdout).not.toContain("Adair");
+  });
+
   test("writes only the report, outside any repository, over nothing, and prints no manuscript text", () => {
     const dir = temporary();
     const input = join(dir, "in.docx");

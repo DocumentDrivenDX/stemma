@@ -7,11 +7,16 @@ import { isCapitalWord, isConnector, isInitials, isName, isParticle, MONTHS, SEN
 
 export type Layout = "after_authors" | "near_end";
 export type UnreadReason = "no_year" | "authors" | "year_place" | "repeated_author" | "several_entries";
-export type EntryFlag = "line_break" | "several_entries" | "continuation" | "bracketed_note";
+export type EntryFlag = "line_break" | "several_entries" | "continuation" | "bracketed_note" | "long_surname_form";
 
 export interface Authors {
   /** Family names in order. A whole name is the only element. */
   authors: string[];
+  /**
+   * By an author's position: longer forms of a family name whose beginning cannot
+   * be told from the text, as `Other Family` beside `Family`.
+   */
+  longer?: Record<number, string[]>;
   /** A corporate author, or a single name with no comma and no initials. */
   whole: boolean;
   /** For a whole name printed as an abbreviation, the full name in brackets after it. */
@@ -98,8 +103,15 @@ interface Natural {
   family: string;
   /** Initials show it to be a person: `I. Family`, or `Given I. Family`. */
   initials: boolean;
-  /** Two or more written-out words stand before the last, so the family name may be longer. */
-  unsureFamily: boolean;
+  /** Longer forms the family name may have, shortest first. */
+  longer: string[];
+}
+
+/** The family name with each written-out word before it added, while a given name or initial is left. */
+function longerForms(parts: string[], from: number): string[] {
+  const forms: string[] = [];
+  for (let at = from - 1; at > 0 && !BARE_INITIALS.test(parts[at]!); at--) forms.push(parts.slice(at).join(" "));
+  return forms;
 }
 
 /** `Given Family`, `I. Family`, or `I. Given Family`. */
@@ -111,14 +123,12 @@ function naturalOrder(segment: string): Natural | undefined {
   const given = parts.slice(0, from);
   if (given.length === 0) return undefined;
   const family = parts.slice(from).join(" ");
-  if (isGiven(given.join(" "))) {
-    const unsureFamily = given.length > 1 && given.slice(-2).every((w) => !isInitials(w));
-    return { family, initials: given.some(isInitials), unsureFamily };
-  }
+  const longer = longerForms(parts, from);
+  if (isGiven(given.join(" "))) return { family, initials: given.some(isInitials), longer };
   // `I. Given Family` has the shape of a title more often than `I. Family` does, so its initials show nothing alone.
   // `y` joins the two parts of one surname.
   if (!initialsThenGiven(given.join(" ")) || JOINERS.has(fold(given.at(-1)!)) || /^y\s/.test(family)) return undefined;
-  return { family, initials: false, unsureFamily: false };
+  return { family, initials: false, longer };
 }
 
 /** Words that only the full name after an abbreviation may hold between its words. */
@@ -151,9 +161,8 @@ const CUT_SHORT = /,?\s*(?<![\p{L}])(?:et al\.?|and others)$/u;
 /**
  * All of `text` read as a list of authors, or nothing. `beforeYear` says the year
  * follows this text directly, so no title can be part of it, and allows two more forms.
- * `anySplit` reads a later family name of unknown length, only to tell that an entry is there.
  */
-function parseAuthors(text: string, beforeYear = false, anySplit = false): Authors | undefined {
+function parseAuthors(text: string, beforeYear = false): Authors | undefined {
   let rest = text.trim();
   const cutShort = CUT_SHORT.test(rest);
   if (cutShort) rest = rest.replace(CUT_SHORT, "");
@@ -173,6 +182,7 @@ function parseAuthors(text: string, beforeYear = false, anySplit = false): Autho
   const givenReads = (g: string) => isGiven(g) || (beforeYear && initialsThenGiven(g) && (separators[1]?.includes(",") ?? true));
   if (!family || !given || joins(separators[0]) || !isFamily(family) || !givenReads(given)) return undefined;
   const authors = [family];
+  const longer: Record<number, string[]> = {};
   for (let i = 2; i < segments.length; i++) {
     const segment = segments[i]!;
     if (SUFFIX_NAME.test(segment)) continue;
@@ -186,27 +196,30 @@ function parseAuthors(text: string, beforeYear = false, anySplit = false): Autho
     // Two capitalized words after a comma may be a title. Only initials, `and`
     // here or later in the series, or `et al.` before the year show that they name a person.
     if (!natural || !(natural.initials || (beforeYear && cutShort) || separators.slice(i - 1).some(joins))) return undefined;
-    if (natural.unsureFamily && !anySplit) return undefined;
+    if (natural.longer.length > 0) longer[authors.length] = natural.longer;
     authors.push(natural.family);
   }
   const firstGiven = citableGiven(given);
-  return { authors, whole: false, cutShort, ...(firstGiven.length > 0 ? { firstGiven } : {}) };
+  return {
+    authors, whole: false, cutShort,
+    ...(Object.keys(longer).length > 0 ? { longer } : {}), ...(firstGiven.length > 0 ? { firstGiven } : {}),
+  };
 }
 
 /** The text before a year form, read as authors. */
-function authorsBefore(text: string, anySplit = false): Authors | undefined {
+function authorsBefore(text: string): Authors | undefined {
   let before = withoutEditorMarks(text).replace(/[\s([,:;]+$/u, "");
   const last = words(before).at(-1) ?? "";
   if (last.endsWith(".") && !isInitials(last) && !/(?:et al|Jr|Sr)\.$/.test(before)) before = before.slice(0, -1);
-  return parseAuthors(before, true, anySplit);
+  return parseAuthors(before, true);
 }
 
 const rangeFollows = (text: string, year: YearForm): boolean => /^\s*[-‐‑–—/]\s*(?:\d|present)/.test(text.slice(year.end));
 
-function yearAfterAuthors(text: string, anySplit = false): EntryReading | undefined {
+function yearAfterAuthors(text: string): EntryReading | undefined {
   const year = yearForms(text)[0];
   if (!year || year.start === 0 || rangeFollows(text, year)) return undefined;
-  const authors = authorsBefore(text.slice(0, year.start), anySplit);
+  const authors = authorsBefore(text.slice(0, year.start));
   return authors ? { status: "read", ...authors, year: year.year, suffix: year.suffix, layout: "after_authors" } : undefined;
 }
 
@@ -290,7 +303,7 @@ function holdsAnotherEntry(text: string): boolean {
     // The full stop of an initial ends no sentence.
     if (!m[0].includes("\n") && /(?<![\p{L}])\p{Lu}\.$/u.test(text.slice(0, m.index + 1))) continue;
     const rest = text.slice(m.index + m[0].length);
-    const reading = yearAfterAuthors(rest, true);
+    const reading = yearAfterAuthors(rest);
     if (reading?.status === "read" && !reading.whole && /^[^,]+,\s*(?:\p{Lu}\.|\p{Lu}\p{Ll})/u.test(rest)) return true;
   }
   return false;
@@ -363,6 +376,8 @@ export function readReferenceLists(document: Document): ReferenceList[] {
     if (reading.status === "unread" && reading.why === "several_entries") flags.push("several_entries");
     if (reading.status === "unread" && previous && continues(paragraph.text)) flags.push("continuation");
     if (BRACKETED_NOTE.test(paragraph.text)) flags.push("bracketed_note");
+    // Two authors with no separator can read as one with several longer surname forms.
+    if (reading.status === "read" && Object.values(reading.longer ?? {}).some((forms) => forms.length > 1)) flags.push("long_surname_form");
     let couldBe = paragraph.text;
     // A wrapped line that adds a name or a year is read with the line before it.
     if (flags.includes("continuation") && addsToEntry(paragraph.text)) couldBe = `${previous!.asFound} ${paragraph.text}`;
