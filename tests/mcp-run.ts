@@ -3,7 +3,7 @@
 // by `endMcp` if one is left.
 import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { temporary } from "./helpers.ts";
+import { temporary, within } from "./helpers.ts";
 
 const live = new Set<McpHost>();
 export async function endMcp(): Promise<void> {
@@ -104,7 +104,7 @@ export class McpHost {
   async end(signal?: NodeJS.Signals, ms = 15_000): Promise<number> {
     if (signal) this.child.kill(signal);
     else this.child.stdin.end();
-    const code = await Promise.race([this.child.exited, Bun.sleep(ms).then(() => undefined)]);
+    const code = await within(this.child.exited, ms);
     if (code === undefined) throw new Error(`still running after ${ms} ms.\nstderr: ${this.stderr}`);
     await this.drained;
     return code;

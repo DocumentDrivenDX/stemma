@@ -5,6 +5,19 @@ import { crc32, deflateRawSync } from "node:zlib";
 
 export const ROOT = join(import.meta.dir, "..");
 
+/**
+ * The promise's value, or undefined after `ms`. The timer is cleared either way:
+ * one left waiting keeps a script such as plugin-check running until it fires.
+ */
+export async function within<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([promise, new Promise<undefined>((resolve) => (timer = setTimeout(resolve, ms, undefined)))]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const made: string[] = [];
 /** Removes every temporary directory made so far; tests/cleanup.ts calls it. */
 export function removeTemporaries(): void {
