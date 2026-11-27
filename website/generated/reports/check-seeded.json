@@ -820,7 +820,7 @@
     "tools": {
       "bun": "1.4.5",
       "sqlite": "(removed)",
-      "stemma": "0.0.2"
+      "stemma": "0.0.3"
     },
     "unreviewed": []
   },
