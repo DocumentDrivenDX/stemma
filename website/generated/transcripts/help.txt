@@ -1,24 +1,38 @@
-stemma 0.0.3
+stemma 0.0.4
 The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version
   doctor
   init --project <dir>
-  record add <kind> --input <file|-> [--actor <person|model|software>:<name>]
+  ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups]
+  source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
+  source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
+             [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...
+             [--transcription <file> | --text-layer <file>] [--method born_text|text_layer|markup|ocr|manual]
+             [--recognition <text>] [--tool <name> --tool-version <version>] [--page-map <file> | --auto-pages]
+             [--page-numbers <file>] [--identity <file>] [--coverage-note <text>] [--note <text>] [--name <name>]
+  source label <text id> --page-map <file> --actor <kind>:<name>
+  source seal <text id> --actor person:<name> [--note <text>]
+  source verify <text id> --original <file> --actor <kind>:<name>
+  source compare <text id> --with <text file> --against <text> [--independent] --actor <kind>:<name>
+  review add <text id> --scope whole_page|passage|quotations|page_number|source_details --against <text>
+             --outcome agrees|corrected|disagrees|flagged --actor <kind>:<name> [--pages <indexes>]
+             [--passage <id>] [--fields <list>] [--flag "<index>|<reading>|<suggestion>|<note>"]...
+             [--original-sha256 <hex>] [--note <text>]
+  review list [<text id>]
+  coverage [<text id>]
+  passage find --source <id> <words>
+  passage capture --address <address> --actor <kind>:<name>
+  record add <kind> --input <file|-> [--actor <kind>:<name>]
+  resolve <source id>... --actor <kind>:<name> [--via crossref|internet_archive --identifier <value>]
   validate [paths]
   fmt [paths]
   rules check
   check [--changed | --all]
-  source add <file> --acquired-at <time> --actor <kind>:<name> [--source <id>] [--origin <text>]
-             [--source-version <text>] [--unpublished yes|no] [--community-restricted yes|no] [--license <text>]
-  source pages <capture id> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
-  source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>]
-             [--method text_layer|ocr|manual] [--tool <name> --tool-version <version>] [--note <text>]
   excerpt --source <id> --pages <printed pages> | --passage <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
-  store verify [--unreferenced]
 
-Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json,
---store-dir <dir> (private content store; else STEMMA_STORE_DIR, else a per-user directory)
+Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
+Only ingest --fetch, ingest --refresh-lookups and resolve use the network.
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.

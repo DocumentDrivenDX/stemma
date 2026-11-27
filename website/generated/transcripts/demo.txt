@@ -1,6 +1,5 @@
-Stemma demo. All names and sources are invented.
+Stemma demo. All names and sources are invented. Nothing uses the network.
 DEMO is a fresh temporary directory
-STEMMA_STORE_DIR is set to $DEMO/store, the private content store, outside the project.
 "stemma" below is the command line inside the plugin. In use, Claude runs it for the author.
 
 =============== 1. Create a project and record two sources
@@ -11,11 +10,12 @@ Created a Stemma project in $DEMO/book
   wrote .gitattributes
   wrote .gitignore
   wrote stemma.json
+The project holds the full text of its sources: anyone who can read the repository can read them, so publishing it publishes them.
 [exit 0]
 
-$ stemma record add source --input $DEMO/harbour.json --actor person:demo-author --project $DEMO/book
-Added src-demo0harbour01
-  records/sources/src-demo0harbour01.json
+$ stemma record add source --input $DEMO/ledger.json --actor person:demo-author --project $DEMO/book
+Added src-demo0ledger001
+  records/sources/src-demo0ledger001.json
 No record problems found.
 [exit 0]
 
@@ -44,7 +44,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 =============== 3. Check: the seeded errors are reported and explained
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 4 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 14 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
@@ -59,30 +59,39 @@ Checked the whole project: 14 result(s) passed.
    What to do: Correct the key in the citation, or add a source record with that key (or add it to the right source's key_aliases).
    - cit-demo0toll00002
        citation file: records/citations/cit-demo0toll00002.json
-       key: hartwel1998
+       key: ledgr1911
        sentence: The toll was doubled in the following century.
 
-3. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
+3. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0ledger001
+       source file: records/sources/src-demo0ledger001.json
+       key: ledger1911
+
+4. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0orphan001
+       source file: records/sources/src-demo0orphan001.json
+       key: orphan1990
+
+5. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
    Why it matters: Digests, review marks and diffs depend on one exact form. No value is wrong because of this alone.
    What to do: Run `fmt` on the file. It rewrites the layout and changes no value.
    - stemma.json
        file: stemma.json
 
-4. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held]
-   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
-   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+6. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
    - cit-demo0toll00001
        citation file: records/citations/cit-demo0toll00001.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - whether cited figures appear in the stored source text  [number.present]
+       key: ledger1911
+       source file: records/sources/src-demo0ledger001.json
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0harbour01 (not admitted)
+   - src-demo0ledger001 (not admitted)
 
 The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
@@ -97,173 +106,138 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 2 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 17 result(s) passed.
 
-1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held, 2 places]
-   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
-   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0ledger001
+       source file: records/sources/src-demo0ledger001.json
+       key: ledger1911
+
+2. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held, 2 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
    - cit-demo0toll00001
        citation file: records/citations/cit-demo0toll00001.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
+       key: ledger1911
+       source file: records/sources/src-demo0ledger001.json
    - cit-demo0toll00002
        citation file: records/citations/cit-demo0toll00002.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - whether cited figures appear in the stored source text  [number.present]
+       key: ledger1911
+       source file: records/sources/src-demo0ledger001.json
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0harbour01 (not admitted)
+   - src-demo0ledger001 (not admitted)
 
 The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
-=============== 5. A paper-only book: add its scan. A scan alone is not checkable
+=============== 5. A scan alone is not text. Its recognized text enters as such, page by page, labelled as recognized
 
-$ stemma source add $DEMO/materials/ledger-scan.pdf --source src-demo0harbour01 --origin my own scan --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/book
-Stored the copy and recorded it as cap-random0001.
-  source: src-demo0harbour01
-  sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11 (439 bytes, application/pdf)
-  store: $DEMO/store (stored and verified)
-  origin: my own scan
-  acquired at: 2026-01-05T09:00:00Z
-  version: unknown
-  added by: person demo-author (a record of what was said, not proof)
-  wrote records/captures/cap-random0001.json
-The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
+$ stemma source pages $DEMO/materials/ledger-scan.pdf --project $DEMO/book
+Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
+Require stack:
+- <plugin root>/dist/stemma.js".
+Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
+Warning: Cannot polyfill `Path2D`, rendering may be broken.
+Proposed page map, for review. Nothing in the project was changed. The file has 1 pages.
+A run is proposed where at least 3 pages, and at least 50% of the run, show the expected number in the first or last 3 lines of their text. No label comes from a page's position alone.
+No run of printed numbers was found, so no page is labelled.
+  left without a label: 0
+Look at the page images at the ends of each run and at any page that differs. A person may edit the file; a label that rests on a person's word has the evidence author_statement.
+Add --out <file> to save the proposed map.
+[exit 0]
+
+$ stemma source convert $DEMO/materials/ledger-scan.pdf --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --origin "my own scan" --source src-demo0ledger001 --text-layer $DEMO/materials/ledger-text-layer.txt --method ocr --tool invented-ocr --tool-version 1.0 --page-map $DEMO/materials/ledger-page-map.json --project $DEMO/book
+Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
+Require stack:
+- <plugin root>/dist/stemma.js".
+Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
+Warning: Cannot polyfill `Path2D`, rendering may be broken.
+Wrote the source file txt-random0001 to sources/ledger1911/
+  source: src-demo0ledger001
+  original: sha256 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11 (439 bytes, application/pdf); it is not kept in the project
+  4 page file(s); method ocr, quality unassessed
+  pages with a printed label: 3 of 4
+  note: The text was supplied; Stemma did not make it and did not compare it with the original.
+The text was not compared with the original beyond this conversion.
 Stemma holds back no source: any source in this project may be sent to a hosted model.
-Next: attach its text with `source text cap-random0001`.
 No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 19 result(s) passed.
+OPEN FINDINGS: 0 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 27 result(s) passed.
 
-1. PROBLEM: A cited source has a stored copy but no extracted text, so this citation is unchecked.  [source.held, 2 places]
-   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
-   What to do: Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is, and a PDF's own text layer is read page by page. For a scan with no text in it, supply recognized text with a form feed after each page (`--text-layer <file>`); Stemma recognizes no characters in page images.
-   - cit-demo0toll00001
-       citation file: records/citations/cit-demo0toll00001.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-       capture file: records/captures/cap-random0001.json
-       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
-   - cit-demo0toll00002
-       citation file: records/citations/cit-demo0toll00002.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-       capture file: records/captures/cap-random0001.json
-       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0ledger001
+       source file: records/sources/src-demo0ledger001.json
+       key: ledger1911
 
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - authors, titles and dates against your stored copies  [meta.source]
-   - whether cited figures appear in the stored source text  [number.present]
+2. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-demo0ledger001
+       source file: records/sources/src-demo0ledger001.json
+       key: ledger1911
+       source text: sources/ledger1911/source.md
+       title page parts: index 0, 1
+       title in record: An invented harbour ledger
+       title result: not found in what the copy states or in its title page text
+       year in record: 1911
+       year result: not found in what the copy states or in its title page text
+       not found: title, year
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/ledger1911 (ocr): 0 of 4 parts reviewed whole by a person
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0harbour01 (not admitted)
+   - src-demo0ledger001 (not admitted)
 
 The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
-=============== 6. Attach the scan's text layer, page by page, with a page map that states its evidence
+The copy's text never shows the title. A person who looks at the title page can record that, at any time.
 
-$ stemma source text cap-random0001 --actor person:demo-author --text-layer $DEMO/materials/ledger-text-layer.txt --page-map $DEMO/materials/ledger-page-map.json --method ocr --project $DEMO/book
-Saved the text as ext-random0001.
-  method: ocr, quality unassessed
-  sha256: 57304e80db7078658b8a866a5a51ce06925b96121a100bf59647bab92d77e748 (143 bytes)
-  pages: 4, split at the form feeds in the text
-  without a printed label (file page indexes, from 0): 2. No label is worked out from a page's position.
-  wrote records/extractions/ext-random0001.json
-Stemma did not make this text and did not compare it with the copy, page by page or at all: that it is the copy's text, with the pages in step, rests on what you supplied.
+$ stemma review add txt-random0001 --scope source_details --pages 0 --fields title,year --against "the ledger's title page" --outcome agrees --actor person:demo-author --project $DEMO/book
+Recorded rvw-random0001: a person's review. It stays current while what it covered is unchanged, and records what was said; it is not proof.
 No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 23 result(s) passed.
+OPEN FINDINGS: 0 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 29 result(s) passed.
 
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - authors, titles and dates against your stored copies  [meta.source]
-   - whether cited figures appear in the stored source text  [number.present]
+1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0ledger001
+       source file: records/sources/src-demo0ledger001.json
+       key: ledger1911
+
+For information: these could not be compared and a person confirmed the details. They are confirmed by the author, not verified.
+   - src-demo0ledger001 [meta.source] review rvw-random0001
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/ledger1911 (ocr): 0 of 4 parts reviewed whole by a person
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0harbour01 (not admitted)
+   - src-demo0ledger001 (not admitted)
 
 The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
-No finding is left. The project is still NOT called checked clean, on purpose: it cites
-a source, and some checks of cited sources are not run (listed under NOT CHECKED).
-Those count as open.
+What is left is real: this invented work is in no catalogue, so its details cannot be compared with one.
+It stays listed. The recognized text is reported as a coverage figure, not as a finding.
 
-=============== 7. Without the store, nothing passes by default: could not check
-
-$ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 2 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 21 result(s) passed.
-
-1. COULD NOT CHECK: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 2 places]
-   Why it matters: The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.
-   What to do: The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest.
-   - cit-demo0toll00001
-       citation file: records/citations/cit-demo0toll00001.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-       capture file: records/captures/cap-random0001.json
-       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
-   - cit-demo0toll00002
-       citation file: records/citations/cit-demo0toll00002.json
-       key: hartwell1998
-       source file: records/sources/src-demo0harbour01.json
-       capture file: records/captures/cap-random0001.json
-       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - authors, titles and dates against your stored copies  [meta.source]
-   - whether cited figures appear in the stored source text  [number.present]
-
-For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0harbour01 (not admitted)
-
-Content store looked in: $DEMO/store (chosen by STEMMA_STORE_DIR). It is private and not part of the repository; where its files are absent or changed, nothing about them was checked.
-The whole project is checked each time.
-Full report: $DEMO/book/.stemma/reports/check.json
-[exit 1]
-
-$ stemma store verify --project $DEMO/book
-Content store: $DEMO/store (chosen by STEMMA_STORE_DIR; this directory does not exist)
-2 blob(s) named by records: 0 present and matching, 2 not.
-  MISSING 57304e80db7078658b8a866a5a51ce06925b96121a100bf59647bab92d77e748
-      named by records/extractions/ext-random0001.json
-  MISSING 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
-      named by records/captures/cap-random0001.json
-Why it matters: checks that need these files report that they could not check.
-What to do: restore them from your backup of the store, or add the same files again.
-The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
-[exit 1]
-
-$ stemma store verify --project $DEMO/book
-Content store: $DEMO/store (chosen by STEMMA_STORE_DIR)
-2 blob(s) named by records: 2 present and matching, 0 not.
-The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
-[exit 0]
-
-=============== 8. A PDF with a text layer: Stemma reads it and proposes page numbers for review
+=============== 6. A born-digital PDF: one command captures it, converts it page by page, compares and checks
 
 $ stemma init --project $DEMO/quoting-book
 Created a Stemma project in $DEMO/quoting-book
@@ -271,6 +245,7 @@ Created a Stemma project in $DEMO/quoting-book
   wrote .gitattributes
   wrote .gitignore
   wrote stemma.json
+The project holds the full text of its sources: anyone who can read the repository can read them, so publishing it publishes them.
 [exit 0]
 
 $ stemma record add source --input $DEMO/levy.json --actor person:demo-author --project $DEMO/quoting-book
@@ -279,62 +254,81 @@ Added src-demo0levybook1
 No record problems found.
 [exit 0]
 
-$ stemma source add $DEMO/materials/harbour-book.pdf --source src-demo0levybook1 --origin an invented file --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/quoting-book
-Stored the copy and recorded it as cap-random0002.
-  source: src-demo0levybook1
-  sha256: f862c1d4412707c6237362e2ac321c226aea386f7ec07aeb63f9ec130e0db3d8 (2429 bytes, application/pdf)
-  store: $DEMO/store (stored and verified)
-  origin: an invented file
-  acquired at: 2026-01-05T09:00:00Z
-  version: unknown
-  added by: person demo-author (a record of what was said, not proof)
-  wrote records/captures/cap-random0002.json
-The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
-Stemma holds back no source: any source in this project may be sent to a hosted model.
-Next: attach its text with `source text cap-random0002`.
-No record problems found.
-[exit 0]
-
-$ stemma source pages cap-random0002 --out $DEMO/page-map.json --project $DEMO/quoting-book
-Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
-Require stack:
-- <plugin root>/dist/stemma.js".
-Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
-Warning: Cannot polyfill `Path2D`, rendering may be broken.
-Proposed page map, for review. Nothing in the project was changed. The file has 6 pages.
-A run is proposed where at least 3 pages, and at least 50% of the run, show the expected number in the first or last 3 lines of their text. No label comes from a page's position alone.
-  file indexes 1-5: printed 1 onwards (arabic). Number seen on 4 of 5 pages.
-    not seen in the text at indexes 3
-  left without a label: 0
-Before using it, look at the page images at the ends of each run and at any page that differs. A person or Claude may edit the file; a label that rests on a person's word has the evidence author_statement.
-Wrote the proposed map to $DEMO/page-map.json. Attach it with: source text cap-random0002 --page-map <that file>.
-[exit 0]
-
 The PDF library's warnings are shown as it prints them: the plugin ships no native drawing module, and reading text draws nothing.
 
-$ stemma source text cap-random0002 --actor person:demo-author --page-map $DEMO/page-map.json --project $DEMO/quoting-book
+$ stemma ingest --plan $DEMO/plan.json --actor person:demo-author --project $DEMO/quoting-book
 Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
 - <plugin root>/dist/stemma.js".
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
-Saved the text as ext-random0002.
-  method: text_layer, quality unassessed
-  sha256: 8131e04627d54a1d5c251b812c597ee7d919bb8a96c622896f7a62a58ad14f1d (362 bytes)
-  pages: 6, split at the form feeds in the text
-  without a printed label (file page indexes, from 0): 0. No label is worked out from a page's position.
-  wrote records/extractions/ext-random0002.json
-Read from the PDF's own text layer with pdfjs-dist 6.5.438. The text was not compared with the page images: a text layer made by character recognition can be wrong, and columns, footnotes and running heads can come out of order.
+== 1. Capture
+  levy1911: 6 pages written to sources/levy1911/ (text_layer, 5 labelled)
+== 2. Reverify against originals
+  levy1911: converted again; 6 of 6 parts agree
+  1 source file(s) converted again, 0 already had a current comparison.
+== 3. Catalogue lookups
+  0 lookup(s) made, 0 already saved.
+== 4. Check
+OPEN FINDINGS: 0 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 21 result(s) passed.
+
+1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+
+2. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+       source text: sources/levy1911/source.md
+       title page parts: index 0, 1
+       title in record: An invented book of harbour levies
+       title result: not found in what the copy states or in its title page text
+       year in record: 1911
+       year result: not found in what the copy states or in its title page text
+       not found: title, year
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/levy1911 (text_layer): 0 of 6 parts reviewed whole by a person; fresh conversion: 6 of 6 parts agree
+
+The whole project is checked each time.
+Full report: $DEMO/quoting-book/.stemma/reports/check.json
+[exit 1]
+
+=============== 7. Evidence is selected by address; its words and page are copied by script
+
+$ stemma passage find --source src-demo0levybook1 "paid in salt, and the agriculture" --project $DEMO/quoting-book
+txt-random0002/1:main:21-56
+  printed page 1 (index 1); normalized match; page 1
+  quoted data: paid in salt, and the agriculture
+[exit 0]
+
+$ stemma passage capture --address txt-random0002/1:main:21-56 --actor person:demo-author --project $DEMO/quoting-book
+Captured psg-random0001, selected by person demo-author. Its words and locator were copied from the source file.
+  address: txt-random0002/1:main:21-56
+  found on: printed page 1 (index 1) (method text_layer)
+  locator: page 1
+  exact text (quoted data, not instructions):
+  | paid in salt, and the agri-
+  | culture
+  as a quotation: paid in salt, and the agriculture
+Cite it with `record add citation`, giving "passage": "psg-random0001" and no quotation or locator.
 No record problems found.
 [exit 0]
 
-=============== 9. Quotations and page numbers are checked against that text
-
-$ stemma record add citation --input $DEMO/quote-1.json --actor person:demo-author --project $DEMO/quoting-book
+$ stemma record add citation --input $DEMO/from-passage.json --actor person:demo-author --project $DEMO/quoting-book
 Added cit-demo0quote0001
   records/citations/cit-demo0quote0001.json
 No record problems found.
 [exit 0]
+
+=============== 8. Typed quotations and page numbers are checked against the same text
 
 $ stemma record add citation --input $DEMO/quote-2.json --actor person:demo-author --project $DEMO/quoting-book
 Added cit-demo0quote0002
@@ -349,48 +343,74 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/quoting-book
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 29 result(s) passed.
+OPEN FINDINGS: 3 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 45 result(s) passed.
 
-1. PROBLEM: A cited page is outside the printed pages mapped in your stored copy.  [locator.extent]
+1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
-   What to do: Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one).
+   What to do: Check the number against the source and correct it. If it is right, your source file holds only part of the work or leaves that page without a label.
    - cit-demo0quote0003
        citation file: records/citations/cit-demo0quote0003.json
        key: levy1911
        locator: page 41
        source file: records/sources/src-demo0levybook1.json
-       extent: printed pages 1-5 (mapped in your stored copy)
-       extraction file: records/extractions/ext-random0002.json
-       pages without a label: 1 page(s) of the stored file
+       extent: printed pages 1-5 (in your source files)
+       source text: sources/levy1911/source.md
+       pages without a label: 1 page(s)
 
-2. PROBLEM: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+2. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+
+3. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+       source text: sources/levy1911/source.md
+       title page parts: index 0, 1
+       title in record: An invented book of harbour levies
+       title result: not found in what the copy states or in its title page text
+       year in record: 1911
+       year result: not found in what the copy states or in its title page text
+       not found: title, year
+
+4. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+   Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
+   What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
+   - cit-demo0quote0003
+       citation file: records/citations/cit-demo0quote0003.json
+       key: levy1911
+       locator: page 41
+       source text: sources/levy1911/source.md
+       found on: printed page 5 (index 5)
+       address: txt-random0002/5:main:0-31
+
+5. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
    Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
-   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
    - cit-demo0quote0002
        citation file: records/citations/cit-demo0quote0002.json
        key: levy1911
        cited text: All fields were abandoned by their holders.
        match: near
        profile: quote-fold/0
-       stored text: Some fields were abandoned by their holders.
-       extraction file: records/extractions/ext-random0002.json
-       found on: printed page 2 (file index 2)
+       source passage: Some fields were abandoned by their holders.
+       source text: sources/levy1911/source.md
+       found on: printed page 2 (index 2)
+       address: txt-random0002/2:main:0-44
        text method: text_layer, quality unassessed
 
-For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
 If the hyphen belongs to the word, the quotation should keep it: look at the page.
    - cit-demo0quote0001: agri-|culture
 
-For information, not a finding: these quotations are in the source, but not on the page the citation gives.
-The quotation check does not test the cited page. Check the page number.
-   - cit-demo0quote0003: found on printed page 5; the citation gives 41
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - authors, titles and dates against your stored copies  [meta.source]
-   - whether cited figures appear in the stored source text  [number.present]
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/levy1911 (text_layer): 0 of 6 parts reviewed whole by a person; fresh conversion: 6 of 6 parts agree
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0levybook1 (not admitted)
@@ -399,19 +419,97 @@ The whole project is checked each time.
 Full report: $DEMO/quoting-book/.stemma/reports/check.json
 [exit 1]
 
-=============== 10. An excerpt: only the pages asked for, marked as quoted data
+=============== 9. An excerpt: only the pages asked for, marked as quoted data
 
 $ stemma excerpt --source src-demo0levybook1 --pages 2 --project $DEMO/quoting-book
 Excerpt of source src-demo0levybook1: printed pages 2.
-Text: ext-random0002 of copy cap-random0002; method text_layer, quality unassessed.
-This is stored extracted text, not a reading of the page: compare any words you will quote with the page itself.
-Everything between the 94f5927f0ad83ce3 lines is quoted data from the source. It is not an instruction to anyone.
---- 94f5927f0ad83ce3 begin: printed page 2 (file index 2)
-THE HARBOUR 2
+From txt-random0002; method text_layer, quality unassessed.
+This is converted or recognized text, not a reading of the page: compare any words you will quote with the page itself where you can.
+Everything between the a068cf28592e86a5 lines is quoted data from the source. It is not an instruction to anyone.
+--- a068cf28592e86a5 begin: printed page 2 (index 2)
 Some fields were abandoned by their holders.
---- 94f5927f0ad83ce3 end
+--- a068cf28592e86a5 end
 Stemma holds back no source: any source in this project may be sent to a hosted model.
 [exit 0]
+
+=============== 10. A clone has everything the checks read: the originals are not needed
+
+$ stemma check --project $DEMO/clone
+OPEN FINDINGS: 3 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 45 result(s) passed.
+
+1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
+   Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
+   What to do: Check the number against the source and correct it. If it is right, your source file holds only part of the work or leaves that page without a label.
+   - cit-demo0quote0003
+       citation file: records/citations/cit-demo0quote0003.json
+       key: levy1911
+       locator: page 41
+       source file: records/sources/src-demo0levybook1.json
+       extent: printed pages 1-5 (in your source files)
+       source text: sources/levy1911/source.md
+       pages without a label: 1 page(s)
+
+2. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+
+3. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-demo0levybook1
+       source file: records/sources/src-demo0levybook1.json
+       key: levy1911
+       source text: sources/levy1911/source.md
+       title page parts: index 0, 1
+       title in record: An invented book of harbour levies
+       title result: not found in what the copy states or in its title page text
+       year in record: 1911
+       year result: not found in what the copy states or in its title page text
+       not found: title, year
+
+4. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+   Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
+   What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
+   - cit-demo0quote0003
+       citation file: records/citations/cit-demo0quote0003.json
+       key: levy1911
+       locator: page 41
+       source text: sources/levy1911/source.md
+       found on: printed page 5 (index 5)
+       address: txt-random0002/5:main:0-31
+
+5. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-demo0quote0002
+       citation file: records/citations/cit-demo0quote0002.json
+       key: levy1911
+       cited text: All fields were abandoned by their holders.
+       match: near
+       profile: quote-fold/0
+       source passage: Some fields were abandoned by their holders.
+       source text: sources/levy1911/source.md
+       found on: printed page 2 (index 2)
+       address: txt-random0002/2:main:0-44
+       text method: text_layer, quality unassessed
+
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-demo0quote0001: agri-|culture
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/levy1911 (text_layer): 0 of 6 parts reviewed whole by a person; fresh conversion: 6 of 6 parts agree
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0levybook1 (not admitted)
+
+The whole project is checked each time.
+Full report: $DEMO/clone/.stemma/reports/check.json
+[exit 1]
 
 =============== 11. What checked clean looks like: sources recorded, nothing cited
 
@@ -421,11 +519,12 @@ Created a Stemma project in $DEMO/reading-list
   wrote .gitattributes
   wrote .gitignore
   wrote stemma.json
+The project holds the full text of its sources: anyone who can read the repository can read them, so publishing it publishes them.
 [exit 0]
 
-$ stemma record add source --input $DEMO/harbour.json --actor person:demo-author --project $DEMO/reading-list
-Added src-demo0harbour01
-  records/sources/src-demo0harbour01.json
+$ stemma record add source --input $DEMO/ledger.json --actor person:demo-author --project $DEMO/reading-list
+Added src-demo0ledger001
+  records/sources/src-demo0ledger001.json
 No record problems found.
 [exit 0]
 

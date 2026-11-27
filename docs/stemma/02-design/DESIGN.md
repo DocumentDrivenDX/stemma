@@ -321,9 +321,10 @@ that. The design page speaks to maintainers and may be technical.
 
 Coverage is complete for what works: the research cycle and one round of it in
 detail, where material is kept and what may reach a model, every check with what
-a pass does not show, what is not checked, and the worked example from the source
-record to a run with the private copy, deliberate mistakes, and a run without
-it.
+a pass does not show, what is not checked, and the worked example from its works
+and one original, through source files and citations, to the check with its open
+findings and deliberate mistakes. Pages about the worked example may explain the
+tool; sentences shown as the author's scholarship hold only the scholarship.
 
 The one installation it may describe is
 installing the plugin; it states install commands only once they have been shown
@@ -347,10 +348,10 @@ short comparable values. Dark follows the system setting or
 Command transcripts, JSON reports, the check list, and screenshots under
 `website/generated/` come from real runs (`./scripts/dev.sh docs`) of the demo and
 the test fixtures. The local test run fails when they are stale or when a website
-file holds a local path. The worked example's runs that need its private copy are
-under `website/recorded/` (`./scripts/dev.sh record-example <store>`). A test
-compares them with a fresh run only where the store is present, and is skipped
-elsewhere; the site says they cannot be rebuilt without the copy. A screenshot counts as current when the page it was
+file holds a local path. The worked example's runs that the site shows are under
+`website/recorded/` (`./scripts/dev.sh record-example`). The example holds its
+source files, so a test compares them with a fresh run on any machine. A
+screenshot counts as current when the page it was
 captured from is unchanged; its pixels are not compared between machines.
 Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,
 off-site requests, links, light and dark, 320 and 375 pixel widths, keyboard

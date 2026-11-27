@@ -1,7 +1,7 @@
 // The page list, kept apart from the page bodies so that the browser tests,
 // which may run under a different loader, can read it on its own.
 export const PAGES = [
-  { file: "index.html", nav: "What Stemma is", title: "Stemma", description: "Create academically rigorous research reports and books with Claude. Stemma checks citations against your own stored copies. Pre-release." },
+  { file: "index.html", nav: "What Stemma is", title: "Stemma", description: "Create academically rigorous research reports and books with Claude. Stemma checks citations and quotations against the sources in your project. Pre-release." },
   { file: "how.html", nav: "How it works", title: "How it works", description: "The research cycle with Stemma, step by step, and where your material lives." },
   { file: "install.html", nav: "Get started", title: "Get started", description: "Install the Stemma plugin, then ask Claude in plain words." },
   { file: "checks.html", nav: "Checks", title: "What gets checked", description: "What each check looks at and what passing it does not tell you." },

@@ -5,8 +5,8 @@
     "width": 880,
     "title": "check: the first three findings in the test fixture",
     "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
-    "input_sha256": "95ec77f6a520b91e421fd814ddcf5caa4341e1b38d2c0cc7cb9222dd9e471c76",
-    "png_sha256": "3ea6f6154672c6185fc3bfcbf890f83a15f75d1ca547a47d31e13fd4cfb9b75d"
+    "input_sha256": "dcf58e307cead17d26d70280d5d561469bb5fc8b471bd1ebba9a7550618c6775",
+    "png_sha256": "460c423bf5fec04fc937a18f5b0ce0b0aba8af5bba5477dc802f50337ae7ff73"
   },
   {
     "file": "check-findings-dark.png",
@@ -14,8 +14,8 @@
     "width": 880,
     "title": "check: the first three findings in the test fixture",
     "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
-    "input_sha256": "81a22f4eca78e1069f46369256d4a1c9ab0ea3314aabf5462a39ec4fef9f7736",
-    "png_sha256": "abf50b99a136b0932e0167a99c571ca05684203e4c3243ce687ed3a5b7eb3275"
+    "input_sha256": "07f85c1339864ce6143f0d57072b3b9f9f91fd9c1c874c1648cb51c9014ac539",
+    "png_sha256": "df524715f37f77f1c7e195a1a9f29b9758fb78e5e47e33e90672b609b93b4c40"
   },
   {
     "file": "check-findings-phone.png",
@@ -23,26 +23,26 @@
     "width": 375,
     "title": "check: findings at phone width",
     "alt": "The same findings wrapped to a narrow page.",
-    "input_sha256": "3e7df64b1091083eb5d2626b83282d523b1c9ed332ab15dbc82549516f671cf0",
-    "png_sha256": "8713ca5d174961dde0e85f8787bfc70421142009cfab0dabb18ef272bb241edd"
+    "input_sha256": "d2ae2ebe865b42baeb52f8b3166be671ba4b211226c4afe753fe4df6cd043b33",
+    "png_sha256": "e8d80dd8e11dc3bc7ad83831b223899a685ac2a990ffebaf927d23012f93b844"
   },
   {
     "file": "demo-first-check.png",
     "appearance": "light",
     "width": 880,
     "title": "check: a mistyped citation key",
-    "alt": "Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form.",
-    "input_sha256": "bb92dfc7d99a019f64e11a3987d27e8b7e4dae94adc73d432958e77f973d9dfc",
-    "png_sha256": "bee51feef4e3ae880176d5e9b386bf07340c5eca5c8123d344c4ba4628e783b1"
+    "alt": "Output of stemma check in the demo: an uncited source, a citation key no source holds, a file not in canonical form, a cited source that is not in the project, and details not yet compared with a catalogue.",
+    "input_sha256": "5aef5cea44467e4de1bb13818896d14adb02b7107efc9f49b2df228906269d6d",
+    "png_sha256": "ed930c7d40ef0643c026b4d5b51cab0153245627ed8b1982d0e67b9e9a3f1c2a"
   },
   {
     "file": "check-quotations.png",
     "appearance": "light",
     "width": 880,
     "title": "check: a quotation that differs, and a page outside the source",
-    "alt": "Output of stemma check: a cited page outside the mapped pages, a quotation shown beside the closest stored text, and a note that one quotation matched after joining a word split at a line end.",
-    "input_sha256": "75118c8007f427beb345877946a8ea879eae71e21d48f27ecc0bec9b4dfd94b8",
-    "png_sha256": "e3bba3f67f838230b6889099391e091cc1b5936526e2835aeefd55b9da8a07f4"
+    "alt": "Output of stemma check: a cited page outside the source files, quoted words that are not on the cited page, a quotation shown beside the closest source text, details that could not be compared, and a note that one quotation matched after joining a word split at a line end.",
+    "input_sha256": "54ee5ee1f39907e55192879d9029efe7eb2701d3c05d49211cfad8e4d603ccc8",
+    "png_sha256": "c955d02f77a71ac37269436068b602485f3c22c4a4b54b0a36bf6549b06f8fde"
   },
   {
     "file": "check-clean.png",

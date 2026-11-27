@@ -30,20 +30,56 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     limits: "It does not read manuscript files. For a project that has them, it reports that it could not check.",
   },
   "source.held": {
-    summary: "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
-    limits: "It does not show that the text is a faithful reading of the copy: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+    summary: "Each cited source must have source files in the project that hold text and are not damaged.",
+    limits: "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+  },
+  "source.pages": {
+    summary: "Each source file's manifest and its page or section files must agree: none missing, extra, out of order, unreadable or edited without being sealed, and as many pages as the original has.",
+    limits: "It shows that the files are complete and unchanged, not that their text is right. The count of pages in the original is the one recorded at conversion.",
+  },
+  "source.labels": {
+    summary: "Printed page labels in a source file must run on sensibly, and must agree with any page number marked on the page.",
+    limits: "Pages with no established label are left out. A finding may be a misprint or a missing leaf in the original: look at the page.",
+  },
+  "source.footnotes": {
+    summary: "Where a source file marks footnotes, each marker has its note and each note its marker.",
+    limits: "It applies only to notes the conversion could determine. It says nothing about pages whose notes are marked as undetermined.",
+  },
+  "source.original": {
+    summary: "Each source file must be tied to an original that its source's upstream records name, and a recorded fresh conversion of that original must still apply and agree.",
+    limits: "It reads the recorded comparison: it does not open the original. A conversion that agrees repeats any mistake already in the original's text layer.",
   },
   "quote.present": {
-    summary: "Each quotation held by a citation record must be in the stored text of the cited source, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
-    limits: "A pass is agreement with the stored text, which can be wrong, especially where it comes from character recognition. It does not test the cited page, though the text report says when the words were found on another one. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. Words running across a page break can be missed. It does not read manuscript files.",
+    summary: "Each quotation held by a citation record must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
+    limits: "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. It does not read manuscript files.",
+  },
+  "quote.page": {
+    summary: "Where a citation gives a quotation and a locator, the quoted words must be on that page, or in that chapter or paragraph.",
+    limits: "It relies on the page labels in the source files. Where a part has no label, it reports that it could not check.",
   },
   "locator.extent": {
-    summary: "A citation's page or other locator must fall inside the extent recorded on the source or, for pages and folios, inside the printed pages mapped in your stored copy.",
-    limits: "It tests range only, not that anything is on that page. A page map made from a partial copy covers only that part. It reads citation records only.",
+    summary: "A citation's page or other locator must fall inside the extent recorded on the source or, for pages, folios, chapters and paragraphs, inside what the source files hold.",
+    limits: "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part. It reads citation records only.",
+  },
+  "number.present": {
+    summary: "A figure in a sentence that cites one source must be in that source's text.",
+    limits: "It finds the figure anywhere in the source, not necessarily where cited or with the same meaning. Figures written as words are not read.",
+  },
+  "meta.source": {
+    summary: "A source record's title, authors, year and venue are compared with what its captured copy states about itself and with the text of its title page.",
+    limits: "It applies to sources that have source files. A value that recognized text garbles is reported as not found, which a person can confirm by looking. It shows disagreement, not which side is right.",
+  },
+  "meta.resolver": {
+    summary: "A source record's title, authors, year and venue are compared with saved catalogue lookups.",
+    limits: "It reads saved responses and does not go to the network. A catalogue can be wrong, or describe another edition or a whole set.",
+  },
+  "id.resolves": {
+    summary: "Each DOI or library identifier on a source record must have a saved lookup that names the same work.",
+    limits: "It compares titles. Only identifiers Stemma can look up are tested; others are reported as not checked.",
   },
   "source.changed": {
-    summary: "Lists the notes, claims and citations that rest on a copy, text or source since retired, or on a passage anchored before the source's details changed.",
-    limits: "A citation names no copy, so it is taken to rest on its source's copies and texts retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. A damaged or missing stored file is reported by source.held.",
+    summary: "Lists the passages, notes, claims and citations that rest on a source file or source since retired, on page text that has changed since a passage was captured, or on a passage captured before the source's details changed.",
+    limits: "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
   },
   "coordinate.stray": {
     summary: "Warns about written map coordinates in project files, without repeating the value.",
@@ -73,7 +109,7 @@ function run(command: string[], cwd: string, env: Record<string, string | undefi
 export function stableIds(text: string): string {
   const seen = new Map<string, string>();
   const counts = new Map<string, number>();
-  return text.replace(/\b(src|cap|ext)-[0-9a-hjkmnp-tv-z]{20}\b/g, (id, kind: string) => {
+  return text.replace(/\b(src|txt|psg|ups|run|res|rvw)-[0-9a-hjkmnp-tv-z]{20}\b/g, (id, kind: string) => {
     let name = seen.get(id);
     if (!name) {
       counts.set(kind, (counts.get(kind) ?? 0) + 1);
@@ -124,16 +160,6 @@ export async function generateText(): Promise<Map<string, string>> {
       report.body.tools.sqlite = "(removed)";
       files.set(`reports/check-${name}.json`, normalise(`${JSON.stringify(report, null, 2)}\n`, places));
     }
-
-    // The worked example, checked where its private store is not: that run is the same everywhere.
-    const example = join(work, "coral-reefs");
-    cpSync(join(ROOT, "examples/coral-reefs"), example, { recursive: true });
-    const empty = join(work, "empty-store");
-    const without = run([cli, "check", "--all", "--project", example, "--store-dir", empty], plugin);
-    if (without.code !== 1) throw new Error(`check failed on the worked example: ${without.err}`);
-    files.set("transcripts/example-coral-reefs.txt", normalise(
-      `$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY\n${without.out}[exit ${without.code}]\n`,
-      [...both(example, "$PROJECTS/coral-reefs"), [empty, "$EMPTY"]]));
 
     const checks = Object.keys(IMPLEMENTED_CHECKS).sort().map((id) => {
       const note = NOTES[id];

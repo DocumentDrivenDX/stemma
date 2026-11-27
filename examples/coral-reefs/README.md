@@ -93,6 +93,7 @@ admitted.
 | The pages of `darwin1842` printed 2, 88, and 89 | The four quoted passages and their page numbers match the images. The image of page 89 shows "deny-" at the end of one line and "ing" at the start of the next |
 | Each work's title page, or its first page | The titles, names, and years in the source records. Ladd and Schlanger's cover names no author, so the identity points to the inner title page |
 | `geolsoc1838`, the pages numbered 232 and 333 | As in the table above |
+| `darwin1842`, PDF pages 239 and 252, counting from 0 | A publisher's list of other books, numbered 2 and 15 on its own. Conversion left that run of fourteen pages unlabelled because it repeats numbers of the book |
 
 Printed page labels were proposed from the numbers in each work's own text. They
 were not compared with page images, apart from those named here.

@@ -95,7 +95,7 @@ Implications:
 
 - **Distribution**: A self-hosted marketplace avoids directory review. A Git
   marketplace can be added in Claude desktop. For a personal ChatGPT account it
-  needs a hands-on test. v1 installs from the project's repository marketplace;
+  needs a hands-on test. v1 installs from the DocumentDrivenDX marketplace;
   a directory listing is later (PRD). One repository layout installed in both
   the Claude Code and Codex command-line tools without sign-in (S). The first
   version promises full function only in Claude desktop's local Code tab on

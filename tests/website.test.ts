@@ -1,7 +1,7 @@
 // The committed website content must match what the current code prints, and no
 // tracked website file may hold a path from the machine that made it.
 import { describe, expect, test } from "bun:test";
-import { appendFileSync, cpSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, cpSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { GENERATED, LOCAL_PATH, normalise, staleness } from "../website/generate.ts";
@@ -55,18 +55,25 @@ describe("generated website content", () => {
 });
 
 describe("recorded runs of the worked example", () => {
-  const store = join(ROOT, "examples/.sources/store");
-  test.skipIf(!existsSync(store))("match a fresh run (skipped where the private copy is absent)", async () => {
-    for (const [path, text] of await recordExample(store)) expect(readFileSync(join(RECORDED, path), "utf8")).toBe(text);
+  test("match a fresh run", async () => {
+    for (const [path, text] of await recordExample()) expect(readFileSync(join(RECORDED, path), "utf8")).toBe(text);
   }, 60_000);
 
   test("show what the site says they show", () => {
-    const withCopy = readFileSync(join(RECORDED, "example-with-copy.txt"), "utf8");
-    expect(withCopy).toContain("OPEN FINDINGS: 0 problem(s), 0 could not be checked");
-    expect(withCopy).toContain("deny-|ing");
+    const checked = readFileSync(join(RECORDED, "example-check.txt"), "utf8");
+    expect(checked).toContain("OPEN FINDINGS: 8 problem(s), 2 could not be checked, 0 kind(s)");
+    // Nothing is open about the citations: what is open concerns source details and one page label.
+    expect(checked).not.toMatch(/\[(quote\.present|quote\.page|locator\.extent|cite\.key|source\.held)[\],]/);
+    expect(checked).not.toContain("cit-darwinreefs0001\n       citation file");
+    expect(checked).toContain("deny-|ing");
     const trial = readFileSync(join(RECORDED, "example-trial.txt"), "utf8");
-    expect(trial).toContain("OPEN FINDINGS: 2 problem(s)");
-    expect(trial).toContain("found on printed page 88; the citation gives 412");
+    // The two planted mistakes add exactly three findings: the impossible page is reported twice.
+    expect(trial).toContain("OPEN FINDINGS: 11 problem(s), 2 could not be checked");
+    for (const planted of ["[locator.extent]", "[quote.page]", "[quote.present]"]) expect(trial).toContain(planted);
+    expect(trial).toContain("locator: page 412");
+    expect(trial).toContain("found on: printed page 88");
+    expect(trial).toContain("this view inapplicable to the smaller number of atolls");
+    expect(trial).toContain("greater number of atolls");
   });
 });
 

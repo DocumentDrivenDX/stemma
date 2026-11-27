@@ -73,6 +73,8 @@ const typoPath = join(book, "records/citations", `${typo}.json`);
 writeFileSync(typoPath, readFileSync(typoPath, "utf8").replace('"ledgr1911"', '"ledger1911"'));
 writeFileSync(settingsPath, JSON.stringify({ ...settings, bibliography_include: [ledger] }));
 stemma(0, book, "fmt");
+const fixed = stemma(1, book, "check");
+expect(fixed.includes("[source.held, 2 places]") && !fixed.includes("[cite.key]") && !fixed.includes("[bib.uncited]"), "the three fixed problems should be gone");
 
 heading("5. A scan alone is not text. Its recognized text enters as such, page by page, labelled as recognized");
 const scan = join(materials, "ledger-scan.pdf");

@@ -11,8 +11,8 @@
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
 #   ./scripts/dev.sh docs          regenerate website/generated/ (needs browsers)
 #   ./scripts/dev.sh docs-check    fail if website/generated/ is stale
-#   ./scripts/dev.sh record-example <store>  rerun the worked example's runs that
-#                                  need its private copy, into website/recorded/
+#   ./scripts/dev.sh record-example  rerun the worked example's runs that the
+#                                  site shows, into website/recorded/
 #   ./scripts/dev.sh site          build the website into website/dist/
 #   ./scripts/dev.sh preview       build the website and serve it on 127.0.0.1
 #   ./scripts/dev.sh browsers      fetch the pinned headless Chromium into .tools/
@@ -56,7 +56,7 @@ case "${1:-check}" in
   publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;
   docs) run website/generate.ts ;;
   docs-check) run website/generate.ts --check ;;
-  record-example) shift; run website/record-example.ts "$@" ;;
+  record-example) run website/record-example.ts ;;
   site) run website/build.ts ;;
   preview) run website/build.ts && run website/preview.ts ;;
   browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;

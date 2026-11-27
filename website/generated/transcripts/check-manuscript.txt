@@ -1,5 +1,5 @@
 $ stemma check --all --project $PROJECTS/manuscript
-OPEN FINDINGS: 0 problem(s), 1 could not be checked, 12 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 0 problem(s), 2 could not be checked, 9 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 7 result(s) passed.
 
 1. COULD NOT CHECK: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
@@ -9,20 +9,24 @@ Checked the whole project: 7 result(s) passed.
        source file: records/sources/src-fixture0harbour01.json
        key: hartwell1998
 
+2. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-fixture0harbour01
+       source file: records/sources/src-fixture0harbour01.json
+       key: hartwell1998
+
 NOT CHECKED: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - bibliography entries that are never cited  [bib.uncited]
    - citation keys in the manuscript files  [cite.key]
-   - citations not linked to any claim  [cite.unlinked]
-   - manuscript text linked to a retired claim  [claim.inactive]
    - passages marked as needing a source  [draft.marked]
-   - whether DOIs and other identifiers name these works  [id.resolves]
    - whether cited pages and other locators fall inside the source  [locator.extent]
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - whether cited figures appear in the stored source text  [number.present]
-   - whether quotations appear in the stored source text  [quote.present]
-   - work that rests on a copy or source that has since changed  [source.changed]
-   - whether you hold a copy of each cited source, with its text extracted  [source.held]
+   - whether cited figures appear in the source text  [number.present]
+   - whether quotations are on the cited pages or in the cited chapter  [quote.page]
+   - whether quotations appear in the source text  [quote.present]
+   - work that rests on source text that has since changed  [source.changed]
+   - whether each cited source's text is in the project  [source.held]
 
 Full report: $PROJECTS/manuscript/.stemma/reports/check.json
 [exit 1]

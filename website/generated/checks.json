@@ -125,9 +125,64 @@
     ]
   },
   {
+    "id": "id.resolves",
+    "summary": "Each DOI or library identifier on a source record must have a saved lookup that names the same work.",
+    "limits": "It compares titles. Only identifiers Stemma can look up are tested; others are reported as not checked.",
+    "findings": [
+      {
+        "reason": "no_lookup",
+        "message": "An identifier on the source record has not been looked up.",
+        "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
+        "suggestions": [
+          "Run `resolve` for it. This version looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be checked."
+        ]
+      },
+      {
+        "reason": "not_found",
+        "message": "A catalogue did not find the work this identifier should name.",
+        "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
+        "suggestions": [
+          "Check the identifier against the work and correct or remove it."
+        ]
+      },
+      {
+        "reason": "other_work",
+        "message": "An identifier resolves to a work with a different title.",
+        "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
+        "suggestions": [
+          "Check which is wrong: the identifier or the record's title."
+        ]
+      },
+      {
+        "reason": "lookup_silent",
+        "message": "The saved lookup states no title, or the record has none, so the identifier could not be compared.",
+        "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
+        "suggestions": [
+          "Check the identifier by hand."
+        ]
+      },
+      {
+        "reason": "lookup_error",
+        "message": "The saved lookup is a response that could not be read.",
+        "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
+        "suggestions": [
+          "Run `resolve` again."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
     "id": "locator.extent",
-    "summary": "A citation's page or other locator must fall inside the extent recorded on the source or, for pages and folios, inside the printed pages mapped in your stored copy.",
-    "limits": "It tests range only, not that anything is on that page. A page map made from a partial copy covers only that part. It reads citation records only.",
+    "summary": "A citation's page or other locator must fall inside the extent recorded on the source or, for pages, folios, chapters and paragraphs, inside what the source files hold.",
+    "limits": "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part. It reads citation records only.",
     "findings": [
       {
         "reason": "outside_extent",
@@ -139,26 +194,26 @@
       },
       {
         "reason": "outside_page_map",
-        "message": "A cited page is outside the printed pages mapped in your stored copy.",
+        "message": "A cited page, chapter or paragraph is outside those in your source files.",
         "why": "A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.",
         "suggestions": [
-          "Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one)."
+          "Check the number against the source and correct it. If it is right, your source file holds only part of the work or leaves that page without a label."
         ]
       },
       {
         "reason": "page_not_mapped",
-        "message": "A cited page falls between mapped pages, on a page the page map gives no label, so it could not be checked.",
+        "message": "A cited page falls between labelled pages, on a page with no established label, so it could not be checked.",
         "why": "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.",
         "suggestions": [
-          "Look at the page in your copy. If its number can be established, attach the text again with a page map that includes it and says what shows the label."
+          "Look at the page. If its number can be established, add it to the page map and run `source label`."
         ]
       },
       {
         "reason": "no_extent",
-        "message": "A locator could not be checked: no extent is recorded for it, and no page map covers its numbering.",
+        "message": "A locator could not be checked: no extent is recorded for it, and no source file has its numbering.",
         "why": "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.",
         "suggestions": [
-          "For pages, attach your copy's text with a page map (`source pages` proposes one from the printed numbers). For another kind of locator, record the work's extent on the source, taken from the work itself."
+          "For pages, label your source file's pages; a source with no pages cannot check a page number. For another kind of locator, record the work's extent on the source, taken from the work itself."
         ]
       },
       {
@@ -171,10 +226,174 @@
       },
       {
         "reason": "record_unreadable",
-        "message": "A locator could not be checked: at least one capture or extraction record cannot be read.",
+        "message": "A locator could not be checked: a source file of this source cannot be read or is damaged.",
         "why": "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.",
         "suggestions": [
-          "Repair the unreadable record first (see the record.valid finding), then run `check` again."
+          "See the record.valid and source.pages findings, repair the source file, then run `check` again."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "meta.resolver",
+    "summary": "A source record's title, authors, year and venue are compared with saved catalogue lookups.",
+    "limits": "It reads saved responses and does not go to the network. A catalogue can be wrong, or describe another edition or a whole set.",
+    "findings": [
+      {
+        "reason": "mismatch",
+        "message": "The source record disagrees with a saved catalogue lookup.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference."
+        ]
+      },
+      {
+        "reason": "no_lookup",
+        "message": "The source's details have not been compared with any catalogue: no lookup is saved.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."
+        ]
+      },
+      {
+        "reason": "lookup_silent",
+        "message": "A saved lookup states no title, so nothing could be compared with it.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Look the work up by another identifier, or have a person confirm the details."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "meta.source",
+    "summary": "A source record's title, authors, year and venue are compared with what its captured copy states about itself and with the text of its title page.",
+    "limits": "It applies to sources that have source files. A value that recognized text garbles is reported as not found, which a person can confirm by looking. It shows disagreement, not which side is right.",
+    "findings": [
+      {
+        "reason": "mismatch",
+        "message": "The source record disagrees with what the captured copy states about itself.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one."
+        ]
+      },
+      {
+        "reason": "source_damaged",
+        "message": "The source's details could not be compared with a copy: its source file is damaged.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "See the source.pages finding and repair the source file."
+        ]
+      },
+      {
+        "reason": "not_found_in_copy",
+        "message": "Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity."
+        ]
+      },
+      {
+        "reason": "nothing_to_compare",
+        "message": "The source record has no title, so its details could not be compared with the copy.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Record the title from the work itself."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "number.present",
+    "summary": "A figure in a sentence that cites one source must be in that source's text.",
+    "limits": "It finds the figure anywhere in the source, not necessarily where cited or with the same meaning. Figures written as words are not read.",
+    "findings": [
+      {
+        "reason": "figure_absent",
+        "message": "A figure in a sentence that cites this source was not found in the source's text.",
+        "why": "A figure attributed to a source that does not hold it misreports the source.",
+        "suggestions": [
+          "Find the figure in the source and correct the sentence, or move the figure to a sentence that does not attribute it to this source. A converted or recognized text can also be wrong: look at the page."
+        ]
+      },
+      {
+        "reason": "several_citations",
+        "message": "A sentence with a figure cites more than one source, so which one holds the figure could not be judged.",
+        "why": "A figure attributed to a source that does not hold it misreports the source.",
+        "suggestions": [
+          "Check the figure by hand, or split the citation."
+        ]
+      },
+      {
+        "reason": "text_unavailable",
+        "message": "A figure could not be compared: the source has no usable text.",
+        "why": "A figure attributed to a source that does not hold it misreports the source.",
+        "suggestions": [
+          "Capture or repair the source's text."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quote.page",
+    "summary": "Where a citation gives a quotation and a locator, the quoted words must be on that page, or in that chapter or paragraph.",
+    "limits": "It relies on the page labels in the source files. Where a part has no label, it reports that it could not check.",
+    "findings": [
+      {
+        "reason": "wrong_page",
+        "message": "The quoted words are in the source, but not where the citation says.",
+        "why": "A reader who turns to the cited place and does not find the words cannot check them.",
+        "suggestions": [
+          "Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied."
+        ]
+      },
+      {
+        "reason": "partly_on_page",
+        "message": "The quotation runs beyond what the citation names, for example over a page break.",
+        "why": "A reader who turns to the cited place and does not find the words cannot check them.",
+        "suggestions": [
+          "Cite every page the words lie on, as a captured passage does."
+        ]
+      },
+      {
+        "reason": "place_unknown",
+        "message": "Where the quoted words lie could not be compared with the locator: that part of the text has no such page label, chapter or paragraph.",
+        "why": "A reader who turns to the cited place and does not find the words cannot check them.",
+        "suggestions": [
+          "Establish the page labels (`source pages`, `source label`) from what shows them, or cite a locator the source's text has."
         ]
       },
       {
@@ -189,47 +408,63 @@
   },
   {
     "id": "quote.present",
-    "summary": "Each quotation held by a citation record must be in the stored text of the cited source, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
-    "limits": "A pass is agreement with the stored text, which can be wrong, especially where it comes from character recognition. It does not test the cited page, though the text report says when the words were found on another one. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. Words running across a page break can be missed. It does not read manuscript files.",
+    "summary": "Each quotation held by a citation record must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
+    "limits": "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. It does not read manuscript files.",
     "findings": [
       {
         "reason": "near_match",
-        "message": "A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.",
+        "message": "A quotation is not in the source's text as written. A passage close to it is; both are shown.",
         "why": "Readers take quoted words to be the source's own. Words the source does not hold misreport it.",
         "suggestions": [
-          "Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences."
+          "Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences."
         ]
       },
       {
         "reason": "absent",
-        "message": "A quotation was not found in your stored copy's text.",
+        "message": "A quotation was not found in the source's text.",
         "why": "Readers take quoted words to be the source's own. Words the source does not hold misreport it.",
         "suggestions": [
-          "Find the words on the page and correct the quotation, or remove the quotation marks if these are your words or a paraphrase. If the page does hold these words, the stored text is wrong there, or it is a different edition: attach a better text or add the copy you quoted. Words that run across a page break can also be missed, because running heads come between them."
+          "Find the words (`passage find`) and capture them, or remove the quotation marks if these are your words or a paraphrase. If the page does hold these words, the source text is wrong there, or it is a different edition: record that, or capture the copy you quoted."
+        ]
+      },
+      {
+        "reason": "passage_differs",
+        "message": "A passage record no longer matches the words at its address.",
+        "why": "Readers take quoted words to be the source's own. Words the source does not hold misreport it.",
+        "suggestions": [
+          "Do not edit the record's words. Capture the passage again from the source text and retire this one."
+        ]
+      },
+      {
+        "reason": "citation_differs",
+        "message": "A citation made from a passage no longer says what the passage says: its quotation or locator was changed.",
+        "why": "Readers take quoted words to be the source's own. Words the source does not hold misreport it.",
+        "suggestions": [
+          "Add the citation again from the passage, so that both are copied, and retire this one."
         ]
       },
       {
         "reason": "text_unavailable",
-        "message": "A quotation could not be compared: the stored text of its source cannot be used here.",
-        "why": "Until the quotation can be compared with your copy's text, it is unchecked.",
+        "message": "A quotation could not be compared: the text of its source cannot be used here.",
+        "why": "Until the quotation can be compared with the source's text, it is unchecked.",
         "suggestions": [
-          "See the source.held finding. Add a copy and attach its text, point `--store-dir` at the store that holds it, or restore it from your backup."
+          "See the source.held and source.pages findings, then capture or repair the source's text."
         ]
       },
       {
         "reason": "poor_quality",
-        "message": "A quotation was not found, but the only stored text is marked poor, so this does not show that the source lacks it.",
-        "why": "Until the quotation can be compared with your copy's text, it is unchecked.",
+        "message": "A quotation was not found, but the only text is marked poor, so this does not show that the source lacks it.",
+        "why": "Until the quotation can be compared with the source's text, it is unchecked.",
         "suggestions": [
-          "Look at the page itself, or attach a better text."
+          "Look at the page itself, or capture a better text."
         ]
       },
       {
         "reason": "anchor_not_found",
-        "message": "A note extract could not be compared: none of the passages it is anchored to can be found in stored text.",
-        "why": "Until the quotation can be compared with your copy's text, it is unchecked.",
+        "message": "A note extract could not be compared: none of the passages it is anchored to can be found in the source text.",
+        "why": "Until the quotation can be compared with the source's text, it is unchecked.",
         "suggestions": [
-          "See the findings on its passages, and anchor the note to a passage that is in the stored text."
+          "See the findings on its passages, and anchor the note to a passage that is in the text."
         ]
       },
       {
@@ -281,10 +516,10 @@
       },
       {
         "reason": "record_misplaced",
-        "message": "A file under records/ is not where its record belongs (file name or directory does not match).",
+        "message": "A file under records/ or sources/ does not belong there: a name or directory that does not match, or a file such as a binary that a project does not hold.",
         "why": "References and tools find records by ID, directory and file name.",
         "suggestions": [
-          "Rename or move the file as the evidence shows, or move a file that is not a record out of records/."
+          "Rename or move the file as the evidence shows, or move a file that does not belong out of the project. Originals are not kept in the repository."
         ]
       },
       {
@@ -331,31 +566,70 @@
   },
   {
     "id": "source.changed",
-    "summary": "Lists the notes, claims and citations that rest on a copy, text or source since retired, or on a passage anchored before the source's details changed.",
-    "limits": "A citation names no copy, so it is taken to rest on its source's copies and texts retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. A damaged or missing stored file is reported by source.held.",
+    "summary": "Lists the passages, notes, claims and citations that rest on a source file or source since retired, on page text that has changed since a passage was captured, or on a passage captured before the source's details changed.",
+    "limits": "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
     "findings": [
       {
         "reason": "depends_on_retired",
-        "message": "This rests on a copy, text or source that has since been replaced or retired.",
+        "message": "This rests on a source file or source that has since been replaced or retired.",
         "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
         "suggestions": [
           "Compare what you took from it with what replaced it, then correct or retire this item if it no longer holds. Stemma cannot yet record that you have looked, so the finding stays listed."
         ]
       },
       {
-        "reason": "source_details_changed",
-        "message": "The source's details changed after a passage this rests on was anchored.",
+        "reason": "text_changed",
+        "message": "The text of a page or section changed after a passage this rests on was captured from it.",
         "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
         "suggestions": [
-          "Check that the passage still belongs to the source as it is now recorded. Anchor it again as a new passage if it does."
+          "Look at the page, capture the passage again, and retire the old passage and anything copied from it that no longer holds."
+        ]
+      },
+      {
+        "reason": "source_details_changed",
+        "message": "The source's details changed after a passage this rests on was captured.",
+        "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
+        "suggestions": [
+          "Check that the passage still belongs to the source as it is now recorded, and capture it again if it does."
         ]
       },
       {
         "reason": "record_unreadable",
-        "message": "Whether what this rests on has changed could not be checked: a record it depends on cannot be read.",
+        "message": "Whether what this rests on has changed could not be checked: something it depends on cannot be read.",
         "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
         "suggestions": [
-          "Repair the unreadable record first (see the record.valid finding), then run `check` again."
+          "Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "source.footnotes",
+    "summary": "Where a source file marks footnotes, each marker has its note and each note its marker.",
+    "limits": "It applies only to notes the conversion could determine. It says nothing about pages whose notes are marked as undetermined.",
+    "findings": [
+      {
+        "reason": "marker_without_note",
+        "message": "A note marker in the text has no note on its page or section.",
+        "why": "A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.",
+        "suggestions": [
+          "Compare the page with the original. The note may continue from or onto another page, or the conversion may have lost it."
+        ]
+      },
+      {
+        "reason": "note_without_marker",
+        "message": "A note has no marker in the text of its page or section.",
+        "why": "A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.",
+        "suggestions": [
+          "Compare the page with the original. If the note continues from an earlier page, mark its block continued."
         ]
       },
       {
@@ -370,71 +644,204 @@
   },
   {
     "id": "source.held",
-    "summary": "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
-    "limits": "It does not show that the text is a faithful reading of the copy: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+    "summary": "Each cited source must have source files in the project that hold text and are not damaged.",
+    "limits": "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
     "findings": [
       {
-        "reason": "no_copy",
-        "message": "A cited source has no stored copy, so this citation is unchecked.",
-        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.",
+        "reason": "no_source_file",
+        "message": "A cited source has no source file in the project, so this citation is unchecked.",
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.",
         "suggestions": [
-          "Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."
+          "Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile."
         ]
       },
       {
         "reason": "no_text",
-        "message": "A cited source has a stored copy but no extracted text, so this citation is unchecked.",
-        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.",
+        "message": "A cited source's files hold no text, so this citation is unchecked.",
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.",
         "suggestions": [
-          "Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is, and a PDF's own text layer is read page by page. For a scan with no text in it, supply recognized text with a form feed after each page (`--text-layer <file>`); Stemma recognizes no characters in page images."
+          "Capture a copy of the source whose text can be read, or supply a transcription."
         ]
       },
       {
         "reason": "record_unreadable",
-        "message": "Whether you hold this cited source could not be checked: at least one capture or extraction record cannot be read.",
-        "why": "The unreadable file may be the record of the stored copy or of its text.",
+        "message": "Whether this cited source's text is here could not be checked: a source file's manifest cannot be read.",
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.",
         "suggestions": [
-          "Repair the unreadable record first (see the record.valid finding), then run `check` again."
+          "Repair the unreadable file first (see the record.valid finding), then run `check` again."
         ]
       },
       {
-        "reason": "copy_missing",
-        "message": "A stored copy could not be checked: its file is not in the content store used here.",
-        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "reason": "source_damaged",
+        "message": "A cited source has a source file that is damaged, so it is not used and this citation is unchecked.",
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.",
         "suggestions": [
-          "The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest."
+          "See the source.pages and record.valid findings on that source file. Restore it from git, or record your own edit with `source seal`."
         ]
       },
       {
-        "reason": "copy_altered",
-        "message": "A stored copy no longer matches its recorded digest, so it is not treated as the copy that was added.",
-        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
         "suggestions": [
-          "Restore the file from your backup, or add the original file again. If the source itself changed, add it as a new copy."
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "source.labels",
+    "summary": "Printed page labels in a source file must run on sensibly, and must agree with any page number marked on the page.",
+    "limits": "Pages with no established label are left out. A finding may be a misprint or a missing leaf in the original: look at the page.",
+    "findings": [
+      {
+        "reason": "label_repeated",
+        "message": "Two pages in sequence carry the same printed label.",
+        "why": "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.",
+        "suggestions": [
+          "Look at the page images. Correct the page map (`source label`), or leave a page without a label if its number is not established."
         ]
       },
       {
-        "reason": "text_missing",
-        "message": "The extracted text of a stored copy could not be checked: it is not in the content store used here.",
-        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "reason": "label_backwards",
+        "message": "Printed page labels go backwards.",
+        "why": "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.",
         "suggestions": [
-          "Point `--store-dir` at the store that holds it, or restore it from your backup. `store verify` lists every missing digest."
+          "Look at the page images. A second numbering bound into one file can do this: label only the pages of the work you cite."
         ]
       },
       {
-        "reason": "text_altered",
-        "message": "The stored text of a copy no longer matches its recorded digest, so it is not used.",
-        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "reason": "label_jump",
+        "message": "Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.",
+        "why": "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.",
         "suggestions": [
-          "Restore the text from your backup, or attach the text again as a new extraction."
+          "Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`)."
         ]
       },
       {
-        "reason": "text_inconsistent",
-        "message": "An extraction record does not fit its stored text (its size or page spans disagree with it), so it is not used.",
-        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "reason": "folio_differs",
+        "message": "A page number printed on a page differs from the label recorded for that page.",
+        "why": "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.",
         "suggestions": [
-          "Retire this extraction and attach the text again as a new one. An extraction is never edited."
+          "Look at the page image and correct whichever is wrong."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "source.original",
+    "summary": "Each source file must be tied to an original that its source's upstream records name, and a recorded fresh conversion of that original must still apply and agree.",
+    "limits": "It reads the recorded comparison: it does not open the original. A conversion that agrees repeats any mistake already in the original's text layer.",
+    "findings": [
+      {
+        "reason": "original_not_upstream",
+        "message": "A source file was converted from an original that none of the source's upstream records names.",
+        "why": "The chain from the original to your citation rests on the source file being what the original gives.",
+        "suggestions": [
+          "Check which original is right. Record its upstream (`ingest --plan`), or retire this source file."
+        ]
+      },
+      {
+        "reason": "conversion_differs",
+        "message": "A fresh conversion of the original does not give the committed text, after a person's corrections are undone.",
+        "why": "The chain from the original to your citation rests on the source file being what the original gives.",
+        "suggestions": [
+          "Look at the differing readings. If a person edited the words, mark the change as a correction; otherwise restore the file, or convert the original again and retire this one."
+        ]
+      },
+      {
+        "reason": "comparison_stale",
+        "message": "The text or the tools changed after the last fresh conversion was compared, so it no longer says anything.",
+        "why": "The chain from the original to your citation rests on the source file being what the original gives.",
+        "suggestions": [
+          "Run `source verify <text id> --original <file>`, or `ingest` with the originals."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "source.pages",
+    "summary": "Each source file's manifest and its page or section files must agree: none missing, extra, out of order, unreadable or edited without being sealed, and as many pages as the original has.",
+    "limits": "It shows that the files are complete and unchanged, not that their text is right. The count of pages in the original is the one recorded at conversion.",
+    "findings": [
+      {
+        "reason": "part_missing",
+        "message": "A page or section file that the manifest lists is missing.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Restore the file from git."
+        ]
+      },
+      {
+        "reason": "part_edited",
+        "message": "A page or section file differs from the digest its manifest records.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "If you meant to edit it, record the edit with `source seal <text id> --actor person:<name>`. Otherwise restore it from git."
+        ]
+      },
+      {
+        "reason": "part_unlisted",
+        "message": "A page or section file is in the source directory but not in its manifest.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Remove the file, or convert the source again."
+        ]
+      },
+      {
+        "reason": "part_unreadable",
+        "message": "A page or section file cannot be read.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Restore the file from git."
+        ]
+      },
+      {
+        "reason": "part_index",
+        "message": "A page or section file's place does not agree with its name or its manifest.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Restore the files from git; their order is part of what is checked."
+        ]
+      },
+      {
+        "reason": "part_sequence",
+        "message": "The manifest does not list the pages or sections in sequence.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Restore the manifest from git."
+        ]
+      },
+      {
+        "reason": "page_count",
+        "message": "The pages of the source file do not match the number of pages in the original.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "Restore the missing pages from git, or convert the original again. A source file that holds only some pages must say so."
+        ]
+      },
+      {
+        "reason": "part_invalid",
+        "message": "A source file's manifest or a part breaks the source file format, so its completeness could not be checked.",
+        "why": "Every quotation and page check reads these files. A missing, reordered or changed part can hide or invent what the source says, so this source file is not used until it is sound.",
+        "suggestions": [
+          "See the record.valid finding and correct it."
         ]
       },
       {

@@ -2,143 +2,13 @@
   "body": {
     "changed": [],
     "inputs": {
-      "blobs": [],
       "corpus_sha256": "346d6b1d95802875d0246421c25d629ef35799eae0e8a0cd74b72ccf2dbb49cd",
       "manuscript": [],
       "profiles": []
     },
     "label": "checked_clean",
     "mode": "work",
-    "not_run": [
-      {
-        "check": "bib.uncited",
-        "reason": "input_absent"
-      },
-      {
-        "check": "build.uncommitted",
-        "reason": "input_absent"
-      },
-      {
-        "check": "changelog.missing",
-        "reason": "input_absent"
-      },
-      {
-        "check": "cite.format",
-        "reason": "input_absent"
-      },
-      {
-        "check": "cite.key",
-        "reason": "input_absent"
-      },
-      {
-        "check": "cite.unlinked",
-        "reason": "input_absent"
-      },
-      {
-        "check": "claim.complete",
-        "reason": "input_absent"
-      },
-      {
-        "check": "claim.inactive",
-        "reason": "input_absent"
-      },
-      {
-        "check": "construct.complete",
-        "reason": "input_absent"
-      },
-      {
-        "check": "construct.credit",
-        "reason": "input_absent"
-      },
-      {
-        "check": "draft.marked",
-        "reason": "input_absent"
-      },
-      {
-        "check": "id.resolves",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.alt",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.credit",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.font",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.metadata",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.permission",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.placement",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.resolution",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.vector",
-        "reason": "input_absent"
-      },
-      {
-        "check": "locator.extent",
-        "reason": "input_absent"
-      },
-      {
-        "check": "meta.resolver",
-        "reason": "input_absent"
-      },
-      {
-        "check": "meta.source",
-        "reason": "input_absent"
-      },
-      {
-        "check": "number.present",
-        "reason": "input_absent"
-      },
-      {
-        "check": "package.leak",
-        "reason": "input_absent"
-      },
-      {
-        "check": "quote.present",
-        "reason": "input_absent"
-      },
-      {
-        "check": "quote.self",
-        "reason": "input_absent"
-      },
-      {
-        "check": "restricted.leak",
-        "reason": "input_absent"
-      },
-      {
-        "check": "source.changed",
-        "reason": "input_absent"
-      },
-      {
-        "check": "source.held",
-        "reason": "input_absent"
-      },
-      {
-        "check": "support.current",
-        "reason": "input_absent"
-      },
-      {
-        "check": "takeover.removal",
-        "reason": "input_absent"
-      }
-    ],
+    "not_run": [],
     "redaction": "none",
     "results": [
       {
@@ -316,10 +186,13 @@
     },
     "tools": {
       "bun": "1.4.5",
+      "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.3"
+      "stemma": "0.0.4",
+      "stemma-convert": "1"
     },
-    "unreviewed": []
+    "unreviewed": [],
+    "verification": []
   },
   "run": {
     "started": "(removed)",

@@ -1,19 +1,21 @@
 $ stemma check --all --project $PROJECTS/cited
-OPEN FINDINGS: 1 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 1 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 11 result(s) passed.
 
-1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held]
-   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
-   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
+   - src-fixture0harbour01
+       source file: records/sources/src-fixture0harbour01.json
+       key: hartwell1998
+
+2. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
    - cit-fixture0good00001
        citation file: records/citations/cit-fixture0good00001.json
        key: hartwell1998
        source file: records/sources/src-fixture0harbour01.json
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - whether cited figures appear in the stored source text  [number.present]
 
 Full report: $PROJECTS/cited/.stemma/reports/check.json
 [exit 1]

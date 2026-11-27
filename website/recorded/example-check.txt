@@ -1,0 +1,154 @@
+$ stemma check --all --project $PROJECTS/coral-reefs
+OPEN FINDINGS: 8 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 5291 result(s) passed.
+
+1. PROBLEM: An identifier resolves to a work with a different title.  [id.resolves]
+   Why it matters: An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.
+   What to do: Check which is wrong: the identifier or the record's title.
+   - src-a72ssggbvnakjrgw9dw0
+       source file: records/sources/src-a72ssggbvnakjrgw9dw0.json
+       key: ladd1960
+       identifier: doi:10.3133/pp260Y
+       lookup file: records/resolutions/res-46kv75spym2jjctkst0y.json
+       looked up: crossref on 2026-11-27
+       title in record: Drilling Operations on Eniwetok Atoll
+       title in lookup: Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll
+
+2. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-a72ssggbvnakjrgw9dw0
+       source file: records/sources/src-a72ssggbvnakjrgw9dw0.json
+       key: ladd1960
+       lookup file: records/resolutions/res-46kv75spym2jjctkst0y.json
+       looked up: crossref on 2026-11-27
+       title in record: Drilling Operations on Eniwetok Atoll
+       title in lookup: Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll
+
+3. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-eh71qk5hm5zhpwzcz2v7
+       source file: records/sources/src-eh71qk5hm5zhpwzcz2v7.json
+       key: murray1880
+       lookup file: records/resolutions/res-fy773x3s74ybpdtkrt93.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1880
+       year in lookup: 1834
+
+4. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-n7pw0cvq9y0d742wr45f
+       source file: records/sources/src-n7pw0cvq9y0d742wr45f.json
+       key: funafuti1904
+       lookup file: records/resolutions/res-3pdfh26eqx1zmfhypxk4.json
+       looked up: internet_archive on 2026-11-27
+       authors in record: Coral Reef Committee of the Royal Society
+       authors in lookup: Royal Society (Great Britain). Coral Reef committee
+
+5. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-rd44yd9ctbs143rpe1be
+       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
+       key: lyell1832
+       lookup file: records/resolutions/res-sa7qewjtmgh6ev2bn0e1.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1832
+       year in lookup: 1830
+
+6. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-ymdxbsxjmc5fbmq0t4a0
+       source file: records/sources/src-ymdxbsxjmc5fbmq0t4a0.json
+       key: geolsoc1838
+       lookup file: records/resolutions/res-q2d2t1ptnem7m64ednet.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1838
+       year in lookup: 1826
+
+7. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-darwinreefs1842
+       source file: records/sources/src-darwinreefs1842.json
+       key: darwin1842
+       source text: sources/darwin1842/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 8
+       title in record: The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836
+       title result: agrees with what the copy states
+       authors in record: Darwin
+       authors result: agrees with what the copy states; found on the title page
+       year in record: 1842
+       year result: not found in what the copy states or in its title page text
+       not found: year
+
+8. PROBLEM: The source record disagrees with what the captured copy states about itself.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one.
+   - src-n7pw0cvq9y0d742wr45f
+       source file: records/sources/src-n7pw0cvq9y0d742wr45f.json
+       key: funafuti1904
+       source text: sources/funafuti1904/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 6
+       title in record: The Atoll of Funafuti
+       title result: agrees with what the copy states
+       authors in record: Coral Reef Committee of the Royal Society
+       authors the copy states: Royal Society (Great Britain). Coral Reef committee
+       authors result: the copy states otherwise, and the title page text does not show the record's value
+       year in record: 1904
+       year result: found on the title page
+
+9. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-rd44yd9ctbs143rpe1be
+       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
+       key: lyell1832
+       source text: sources/lyell1832/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 10
+       title in record: Principles of Geology
+       title result: agrees with what the copy states; found on the title page
+       authors in record: Lyell
+       authors result: agrees with what the copy states; found on the title page
+       year in record: 1832
+       year result: not found in what the copy states or in its title page text
+       not found: year
+
+10. PROBLEM: Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.  [source.labels]
+   Why it matters: Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.
+   What to do: Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`).
+   - txt-hcn5vw3frm4256b32xhe
+       file: sources/geolsoc1838/pages/p0248.md
+       labels: page index 247 is labelled 232; page index 248 is labelled 333
+
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/agassiz1903 (ocr): 0 of 494 parts reviewed whole by a person; fresh conversion: 494 of 494 parts agree
+   - sources/blanchon2014 (text_layer): 0 of 9 parts reviewed whole by a person; fresh conversion: 9 of 9 parts agree
+   - sources/daly1915 (ocr): 0 of 104 parts reviewed whole by a person; fresh conversion: 104 of 104 parts agree
+   - sources/dana1890 (ocr): 0 of 474 parts reviewed whole by a person; fresh conversion: 474 of 474 parts agree
+   - sources/darwin1842 (ocr): 0 of 258 parts reviewed whole by a person; fresh conversion: 258 of 258 parts agree
+   - sources/darwin1889 (ocr): 0 of 380 parts reviewed whole by a person; fresh conversion: 380 of 380 parts agree
+   - sources/darwinletters1887 (ocr): 0 of 432 parts reviewed whole by a person; fresh conversion: 432 of 432 parts agree
+   - sources/funafuti1904 (ocr): 0 of 466 parts reviewed whole by a person; fresh conversion: 466 of 466 parts agree
+   - sources/geolsoc1838 (ocr): 0 of 632 parts reviewed whole by a person; fresh conversion: 632 of 632 parts agree; 1 flag(s)
+   - sources/ladd1960 (ocr): 0 of 49 parts reviewed whole by a person; fresh conversion: 49 of 49 parts agree
+   - sources/lyell1832 (ocr): 0 of 364 parts reviewed whole by a person; fresh conversion: 364 of 364 parts agree
+   - sources/murray1880 (ocr): 0 of 836 parts reviewed whole by a person; fresh conversion: 836 of 836 parts agree
+   - sources/semper1881 (ocr): 0 of 502 parts reviewed whole by a person; fresh conversion: 502 of 502 parts agree
+   - sources/steibl2024 (text_layer): 0 of 22 parts reviewed whole by a person; fresh conversion: 22 of 22 parts agree
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
+[exit 1]

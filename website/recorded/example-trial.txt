@@ -1,46 +1,189 @@
-$ stemma check --all --project $PROJECTS/coral-reefs-trial --store-dir $STORE
-OPEN FINDINGS: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 37 result(s) passed.
+$ stemma check --all --project $PROJECTS/coral-reefs-trial
+OPEN FINDINGS: 11 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 5285 result(s) passed.
 
-1. PROBLEM: A cited page is outside the printed pages mapped in your stored copy.  [locator.extent]
+1. PROBLEM: An identifier resolves to a work with a different title.  [id.resolves]
+   Why it matters: An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.
+   What to do: Check which is wrong: the identifier or the record's title.
+   - src-a72ssggbvnakjrgw9dw0
+       source file: records/sources/src-a72ssggbvnakjrgw9dw0.json
+       key: ladd1960
+       identifier: doi:10.3133/pp260Y
+       lookup file: records/resolutions/res-46kv75spym2jjctkst0y.json
+       looked up: crossref on 2026-11-27
+       title in record: Drilling Operations on Eniwetok Atoll
+       title in lookup: Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll
+
+2. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
-   What to do: Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one).
+   What to do: Check the number against the source and correct it. If it is right, your source file holds only part of the work or leaves that page without a label.
    - cit-darwinreefs0001
        citation file: records/citations/cit-darwinreefs0001.json
        key: darwin1842
        locator: page 412
        source file: records/sources/src-darwinreefs1842.json
-       extent: printed pages 2-214 (mapped in your stored copy)
-       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
-       pages without a label: 45 page(s) of the stored file
+       extent: printed pages 2-214 (in your source files)
+       source text: sources/darwin1842/source.md
+       pages without a label: 45 page(s)
 
-2. PROBLEM: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+3. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-a72ssggbvnakjrgw9dw0
+       source file: records/sources/src-a72ssggbvnakjrgw9dw0.json
+       key: ladd1960
+       lookup file: records/resolutions/res-46kv75spym2jjctkst0y.json
+       looked up: crossref on 2026-11-27
+       title in record: Drilling Operations on Eniwetok Atoll
+       title in lookup: Bikini and nearby atolls, Marshall Islands; drilling operations on Eniwetok Atoll
+
+4. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-eh71qk5hm5zhpwzcz2v7
+       source file: records/sources/src-eh71qk5hm5zhpwzcz2v7.json
+       key: murray1880
+       lookup file: records/resolutions/res-fy773x3s74ybpdtkrt93.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1880
+       year in lookup: 1834
+
+5. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-n7pw0cvq9y0d742wr45f
+       source file: records/sources/src-n7pw0cvq9y0d742wr45f.json
+       key: funafuti1904
+       lookup file: records/resolutions/res-3pdfh26eqx1zmfhypxk4.json
+       looked up: internet_archive on 2026-11-27
+       authors in record: Coral Reef Committee of the Royal Society
+       authors in lookup: Royal Society (Great Britain). Coral Reef committee
+
+6. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-rd44yd9ctbs143rpe1be
+       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
+       key: lyell1832
+       lookup file: records/resolutions/res-sa7qewjtmgh6ev2bn0e1.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1832
+       year in lookup: 1830
+
+7. PROBLEM: The source record disagrees with a saved catalogue lookup.  [meta.resolver]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference.
+   - src-ymdxbsxjmc5fbmq0t4a0
+       source file: records/sources/src-ymdxbsxjmc5fbmq0t4a0.json
+       key: geolsoc1838
+       lookup file: records/resolutions/res-q2d2t1ptnem7m64ednet.json
+       looked up: internet_archive on 2026-11-27
+       year in record: 1838
+       year in lookup: 1826
+
+8. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-darwinreefs1842
+       source file: records/sources/src-darwinreefs1842.json
+       key: darwin1842
+       source text: sources/darwin1842/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 8
+       title in record: The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836
+       title result: agrees with what the copy states
+       authors in record: Darwin
+       authors result: agrees with what the copy states; found on the title page
+       year in record: 1842
+       year result: not found in what the copy states or in its title page text
+       not found: year
+
+9. PROBLEM: The source record disagrees with what the captured copy states about itself.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one.
+   - src-n7pw0cvq9y0d742wr45f
+       source file: records/sources/src-n7pw0cvq9y0d742wr45f.json
+       key: funafuti1904
+       source text: sources/funafuti1904/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 6
+       title in record: The Atoll of Funafuti
+       title result: agrees with what the copy states
+       authors in record: Coral Reef Committee of the Royal Society
+       authors the copy states: Royal Society (Great Britain). Coral Reef committee
+       authors result: the copy states otherwise, and the title page text does not show the record's value
+       year in record: 1904
+       year result: found on the title page
+
+10. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
+   - src-rd44yd9ctbs143rpe1be
+       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
+       key: lyell1832
+       source text: sources/lyell1832/source.md
+       identity basis: Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
+       title page parts: index 10
+       title in record: Principles of Geology
+       title result: agrees with what the copy states; found on the title page
+       authors in record: Lyell
+       authors result: agrees with what the copy states; found on the title page
+       year in record: 1832
+       year result: not found in what the copy states or in its title page text
+       not found: year
+
+11. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+   Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
+   What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
+   - cit-darwinreefs0001
+       citation file: records/citations/cit-darwinreefs0001.json
+       key: darwin1842
+       locator: page 412
+       source text: sources/darwin1842/source.md
+       found on: printed page 88 (index 105)
+       address: txt-bm6whwjm6vv9ce26mgbr/105:main:1097-1203
+
+12. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
    Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
-   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
    - cit-darwinreefs0002
        citation file: records/citations/cit-darwinreefs0002.json
        key: darwin1842
        cited text: this view inapplicable to the smaller number of atolls
        match: near
        profile: quote-fold/0
-       stored text: this view ⏎ inapplicable to the greater number of atolls
-       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
-       found on: printed page 89 (file index 106)
+       source passage: this view ⏎ inapplicable to the greater number of atolls
+       source text: sources/darwin1842/source.md
+       found on: printed page 89 (index 106)
+       address: txt-bm6whwjm6vv9ce26mgbr/106:main:2015-2069
        text method: ocr, quality unassessed
 
-For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+13. PROBLEM: Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.  [source.labels]
+   Why it matters: Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.
+   What to do: Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`).
+   - txt-hcn5vw3frm4256b32xhe
+       file: sources/geolsoc1838/pages/p0248.md
+       labels: page index 247 is labelled 232; page index 248 is labelled 333
+
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
 If the hyphen belongs to the word, the quotation should keep it: look at the page.
    - cit-darwinreefs0004: deny-|ing
 
-For information, not a finding: these quotations are in the source, but not on the page the citation gives.
-The quotation check does not test the cited page. Check the page number.
-   - cit-darwinreefs0001: found on printed page 88; the citation gives 412
-
-NOT CHECKED: this version does not run these, so the project is not called checked clean.
-Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
-   - authors, titles and dates against your stored copies  [meta.source]
-   - whether cited figures appear in the stored source text  [number.present]
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/agassiz1903 (ocr): 0 of 494 parts reviewed whole by a person; fresh conversion: 494 of 494 parts agree
+   - sources/blanchon2014 (text_layer): 0 of 9 parts reviewed whole by a person; fresh conversion: 9 of 9 parts agree
+   - sources/daly1915 (ocr): 0 of 104 parts reviewed whole by a person; fresh conversion: 104 of 104 parts agree
+   - sources/dana1890 (ocr): 0 of 474 parts reviewed whole by a person; fresh conversion: 474 of 474 parts agree
+   - sources/darwin1842 (ocr): 0 of 258 parts reviewed whole by a person; fresh conversion: 258 of 258 parts agree
+   - sources/darwin1889 (ocr): 0 of 380 parts reviewed whole by a person; fresh conversion: 380 of 380 parts agree
+   - sources/darwinletters1887 (ocr): 0 of 432 parts reviewed whole by a person; fresh conversion: 432 of 432 parts agree
+   - sources/funafuti1904 (ocr): 0 of 466 parts reviewed whole by a person; fresh conversion: 466 of 466 parts agree
+   - sources/geolsoc1838 (ocr): 0 of 632 parts reviewed whole by a person; fresh conversion: 632 of 632 parts agree; 1 flag(s)
+   - sources/ladd1960 (ocr): 0 of 49 parts reviewed whole by a person; fresh conversion: 49 of 49 parts agree
+   - sources/lyell1832 (ocr): 0 of 364 parts reviewed whole by a person; fresh conversion: 364 of 364 parts agree
+   - sources/murray1880 (ocr): 0 of 836 parts reviewed whole by a person; fresh conversion: 836 of 836 parts agree
+   - sources/semper1881 (ocr): 0 of 502 parts reviewed whole by a person; fresh conversion: 502 of 502 parts agree
+   - sources/steibl2024 (text_layer): 0 of 22 parts reviewed whole by a person; fresh conversion: 22 of 22 parts agree
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-darwinreefs1842 (not admitted)
