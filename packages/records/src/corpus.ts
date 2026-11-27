@@ -130,6 +130,25 @@ function checkReferences(file: LoadedFile, byId: Map<string, LoadedFile>, unread
   }
 }
 
+/**
+ * An extraction names the bytes it read. It must be the copy its capture holds,
+ * and an extraction of a PDF must say where each page lies in its text.
+ */
+function checkExtractions(records: LoadedFile[], byId: Map<string, LoadedFile>): void {
+  for (const file of records) {
+    if (file.state !== "ok" || file.data?.kind !== "extraction") continue;
+    const capture = byId.get(String(file.data.capture));
+    if (capture?.data?.kind !== "capture") continue;
+    const add = (code: "capture_digest_mismatch" | "missing_page_spans", field: string) =>
+      file.problems.push({ reason: "record_invalid", code, field, target: capture.path });
+    if (file.data.capture_sha256 !== capture.data.sha256) add("capture_digest_mismatch", "/capture_sha256");
+    const spans = file.data.page_spans;
+    if (capture.data.media_type === "application/pdf" && !(Array.isArray(spans) && spans.length > 0)) {
+      add("missing_page_spans", "/page_spans");
+    }
+  }
+}
+
 export function loadCorpus(content: ProjectContent): Corpus {
   const settings = loadFile(content.settings, "project");
   const records = [...content.records]
@@ -150,6 +169,7 @@ export function loadCorpus(content: ProjectContent): Corpus {
   }
   checkKeys(records.filter((f) => f.state === "ok" && f.data?.kind === "source"));
   for (const file of [settings, ...records]) checkReferences(file, byId, unreadableIds);
+  checkExtractions(records, byId);
   const corpus: Corpus = { settings, records, byId, manuscript: content.manuscript };
   if (content.rules) corpus.rules = content.rules;
   return corpus;

@@ -52,11 +52,11 @@ describe("label", () => {
     expect(label([], [{ check: "source.held", reason: "not_implemented" }])).toBe("open_findings");
   });
 
-  test("a cited source keeps the label open while source.held is not implemented", () => {
+  test("a cited source with no copy is open, and unbuilt checks of cited sources stay listed", () => {
     const body = run("cited");
-    expect(body.results.filter((r) => r.open)).toEqual([]);
+    expect(body.results.filter((r) => r.open).map((r) => [r.check, r.reason_code])).toEqual([["source.held", "no_copy"]]);
     expect(body.label).toBe("open_findings");
-    expect(body.not_run.filter((n) => n.reason === "not_implemented").map((n) => n.check)).toEqual(["meta.resolver", "number.present", "source.held"]);
+    expect(body.not_run.filter((n) => n.reason === "not_implemented").map((n) => n.check)).toEqual(["meta.resolver", "number.present"]);
   });
 
   test("record kinds whose extra rules are not checked keep the label open", () => {

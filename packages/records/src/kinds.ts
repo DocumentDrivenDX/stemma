@@ -38,4 +38,4 @@ export function isRecordId(kind: string, id: string): boolean {
 }
 
 /** Kinds for which this version checks every CONTRACT-001 rule it knows to apply. */
-export const FULLY_CHECKED_KINDS = new Set(["source", "citation", "agent"]);
+export const FULLY_CHECKED_KINDS = new Set(["source", "citation", "agent", "capture", "extraction"]);

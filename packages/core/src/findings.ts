@@ -6,6 +6,8 @@ import type { Evidence, Outcome, Result } from "./report.ts";
 export interface Explanation { message: string; why: string; suggestions: string[]; fixes: string[] }
 
 const RECORD_WHY = "Every other check reads these files. A broken record can hide a citation problem or create a false one.";
+const HELD_WHY = "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.";
+const INTEGRITY_WHY = "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.";
 const KEY_WHY = "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.";
 const COORDINATE_WHY = "This output can disclose a restricted site's position. The scan cannot tell whether a site is restricted, so it warns about every coordinate it recognizes.";
 
@@ -86,6 +88,39 @@ export const TEMPLATES = {
   "bib.uncited:check_error": explain(
     "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
     ["Report the defect together with the Stemma version."]),
+  "source.held:no_copy": explain(
+    "A cited source has no stored copy, so this citation is unchecked.", HELD_WHY,
+    ["Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."],
+    ["add_copy", "remove_citation"]),
+  "source.held:no_text": explain(
+    "A cited source has a stored copy but no extracted text, so this citation is unchecked.", HELD_WHY,
+    ["Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is. For a PDF or scan, supply its text layer with page breaks (`--text-layer <file>`); this version cannot read a PDF itself. A scan with no machine-readable text stays unchecked."],
+    ["add_text"]),
+  "source.held:record_unreadable": explain(
+    "Whether you hold this cited source could not be checked: at least one capture or extraction record cannot be read.",
+    "The unreadable file may be the record of the stored copy or of its text.",
+    ["Repair the unreadable record first (see the record.valid finding), then run `check` again."]),
+  "source.held:copy_missing": explain(
+    "A stored copy could not be checked: its file is not in the content store used here.", INTEGRITY_WHY,
+    ["The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest."],
+    ["restore_copy"]),
+  "source.held:copy_altered": explain(
+    "A stored copy no longer matches its recorded digest, so it is not treated as the copy that was added.", INTEGRITY_WHY,
+    ["Restore the file from your backup, or add the original file again. If the source itself changed, add it as a new copy."],
+    ["restore_copy"]),
+  "source.held:text_missing": explain(
+    "The extracted text of a stored copy could not be checked: it is not in the content store used here.", INTEGRITY_WHY,
+    ["Point `--store-dir` at the store that holds it, or restore it from your backup. `store verify` lists every missing digest."],
+    ["restore_text"]),
+  "source.held:text_altered": explain(
+    "The stored text of a copy no longer matches its recorded digest, so it is not used.", INTEGRITY_WHY,
+    ["Restore the text from your backup, or attach the text again as a new extraction."], ["restore_text"]),
+  "source.held:text_inconsistent": explain(
+    "An extraction record does not fit its stored text (its size or page spans disagree with it), so it is not used.", INTEGRITY_WHY,
+    ["Retire this extraction and attach the text again as a new one. An extraction is never edited."], ["add_text"]),
+  "source.held:check_error": explain(
+    "The check itself failed while running, so this was not checked.", "This is a defect in Stemma, not a pass.",
+    ["Report the defect together with the Stemma version."]),
   "coordinate.stray:coordinate_text": explain(
     "Text in a project file looks like a map coordinate. The value is not repeated here.", COORDINATE_WHY,
     ["Look at the position in the evidence. If it is a sensitive site, remove the value from the file (git history may still hold it). If it is public or not a coordinate, you need do nothing."]),
@@ -124,6 +159,13 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   reference_wrong_kind: "the record with this ID is of a kind that is not allowed here",
   null_value: "null is not allowed; leave the field out",
   number_not_integer: "numbers must be whole and within the safe range; write others as strings",
+  bad_size: "a size cannot be below zero",
+  bad_page_range: "a page-map segment has an impossible or overlapping range of file pages",
+  bad_page_labels: "a page-map segment's labels do not fit its numbering style or its number of pages",
+  label_evidence_missing: "a page-map segment gives printed labels without saying what evidence they come from",
+  bad_page_spans: "page spans must be in page order, must not overlap, and must not end before they start",
+  missing_page_spans: "an extraction of a PDF must say where each page's text starts and ends",
+  capture_digest_mismatch: "the extraction names other bytes than the copy its capture holds",
 };
 
 export const problemTemplate = (problem: Problem): TemplateId => `record.valid:${problem.reason}`;

@@ -1,0 +1,23 @@
+{
+  "acquired_at": "2026-11-26T18:34:51-05:00",
+  "admitted_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "created": {
+    "at": "2026-11-27T00:06:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cap-7sskba1cqwz7975wsc1v",
+  "kind": "capture",
+  "media_type": "application/pdf",
+  "origin": "https://archive.org/download/b29331213/b29331213.pdf",
+  "schema": "stemma.record/0",
+  "sha256": "52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9",
+  "size": 15775995,
+  "source": "src-darwinreefs1842",
+  "source_version": "Internet Archive item b29331213"
+}

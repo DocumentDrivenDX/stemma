@@ -9,7 +9,13 @@ Run as: bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/ste
   fmt [paths]
   rules check
   check [--changed | --all]
+  source add <file> --acquired-at <time> --actor <kind>:<name> [--source <id>] [--origin <text>]
+             [--source-version <text>] [--unpublished yes|no] [--community-restricted yes|no] [--license <text>]
+  source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>]
+             [--method text_layer|ocr|manual] [--tool <name> --tool-version <version>] [--note <text>]
+  store verify [--unreferenced]
 
-Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
+Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json,
+--store-dir <dir> (private content store; else STEMMA_STORE_DIR, else a per-user directory)
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.

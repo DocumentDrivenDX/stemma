@@ -44,6 +44,7 @@ describe("seeded and clean fixtures", () => {
       "record.valid fail rule_id_duplicate rules.md",
       "record.valid fail unknown_field src-fixture0invalid01",
       "record.valid unverifiable record_unreadable records/agents/agt-fixture0broken001.json",
+      "source.held fail no_copy cit-fixture0good00001",
     ]);
   });
 

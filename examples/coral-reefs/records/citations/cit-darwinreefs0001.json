@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T00:06:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0001",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "88"
+  },
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "5707157be0d75431fa23505c2f3a53acce768107b70aaaca80da9b654d70524f",
+    "text": "Darwin's fifth chapter sets out a theory of how the different classes of coral reefs formed."
+  }
+}

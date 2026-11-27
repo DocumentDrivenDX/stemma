@@ -5,8 +5,8 @@
     "width": 880,
     "title": "check: the first three findings in the test fixture",
     "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
-    "input_sha256": "02950ccafb6a84fb3e5ee18ea543882e07b0bef3781407bd3d98dbbedce15c75",
-    "png_sha256": "2f96462941c9d8fc4b4efbf8ca8bc5aabaed0e94c6f05a7386369b8072ec9515"
+    "input_sha256": "b9b9cd0f207c580b0069ff71b4c36ea16807f0d7615c0725a1c5a3bbe91ae1da",
+    "png_sha256": "a63700378736341a1e0b72603fe78b8769d2860e472d845292b1489a195c1af9"
   },
   {
     "file": "check-findings-dark.png",
@@ -14,8 +14,8 @@
     "width": 880,
     "title": "check: the first three findings in the test fixture",
     "alt": "Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where.",
-    "input_sha256": "455fefb9f491e1ce1ce4ee4645949bd9fd428fbb305fa33c543120117e0c7033",
-    "png_sha256": "fed543e472c56be75a9a829c9b31e4b706ac4a27d45a9a6bfdf1daeece04cd67"
+    "input_sha256": "00eebf5c55c86e46716843d1082fd3ae63547b7e7d68a947ce2cb9fed320e649",
+    "png_sha256": "8a861e959861cce3eaf6cc8263693f58e76b64e789a930676d3a1405666b92d0"
   },
   {
     "file": "check-findings-phone.png",
@@ -23,8 +23,8 @@
     "width": 375,
     "title": "check: findings at phone width",
     "alt": "The same findings wrapped to a narrow page.",
-    "input_sha256": "0218332993fe2db176142933dcb948d6941247987602d641fd60f1b5b72c5885",
-    "png_sha256": "d1add136eefd67def6f08d82a0372e140f4ef95a4fb93f9dbae47c6e59892caf"
+    "input_sha256": "50e2461aa12d5a4ee2bc3819e6b57efc55fd75f12afcf7f23700e849165af3fe",
+    "png_sha256": "92803dc269c107e2fd5a5e2bee5732ec7cff046567d6c36c6b484b203a0d918f"
   },
   {
     "file": "demo-first-check.png",
@@ -32,8 +32,8 @@
     "width": 880,
     "title": "check: a mistyped citation key",
     "alt": "Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form.",
-    "input_sha256": "ac17bb2caf633cd7dbe03abcdda0cb5cde3e52b12558db6a15f793eb541e41b1",
-    "png_sha256": "def6eb4f59bad5cfcf1ee0d8dc0f3b6baa2191da7de7502c2df6b9a77b2eea77"
+    "input_sha256": "6d464c24068061b785d750de0f98c359c3a7227db04d25e440ea21c8ef131e69",
+    "png_sha256": "63ce71d41568007cf53918d57849eb54e41971018f1ab72596d8df67d2198a4b"
   },
   {
     "file": "check-clean.png",

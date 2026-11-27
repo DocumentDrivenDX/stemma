@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T00:06:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0002",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "89"
+  },
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "d8dee9a57077df5578807a5b0ae24082ca282f3f772cd4088f4421bcba4b5e02",
+    "text": "Darwin calls Chamisso's account of atolls an earlier and better theory than the crater theory, and argues that it still does not apply to most atolls."
+  }
+}

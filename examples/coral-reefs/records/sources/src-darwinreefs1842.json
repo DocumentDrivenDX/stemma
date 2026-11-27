@@ -1,0 +1,46 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "publisher",
+      "value": {
+        "value": "Smith, Elder and Co."
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "London"
+      }
+    }
+  ],
+  "citation_key": "darwin1842",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T00:06:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "src-darwinreefs1842",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "1842"
+  },
+  "kind": "source",
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836"
+  },
+  "type": "book"
+}

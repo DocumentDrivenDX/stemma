@@ -1,12 +1,19 @@
 $ stemma check --all --project $PROJECTS/cited
-OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 1 problem(s), 0 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
 Checked the whole project: 10 result(s) passed.
+
+1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held]
+   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+   - cit-fixture0good00001
+       citation file: records/citations/cit-fixture0good00001.json
+       key: hartwell1998
+       source file: records/sources/src-fixture0harbour01.json
 
 NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
-   - whether you hold a copy of each cited source, with its text extracted  [source.held]
 
 Full report: $PROJECTS/cited/.stemma/reports/check.json
 [exit 1]

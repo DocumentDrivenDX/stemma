@@ -75,13 +75,13 @@ work.
 | `validate [paths]` / `fmt [paths]` | Check records against CONTRACT-001; `fmt` rewrites to canonical form without changing values | M1 |
 | `rules check` | Report malformed or duplicated rule headings in `rules.md` (CONTRACT-001 J) as `record.valid` results; `validate` includes it | M1 |
 | `migrate --list` / `migrate --apply <list digest>` | Move a project to a newer format (Data Design), only when the author asks. `--list` writes nothing and prints every file change and the review marks, support records, confirmations, and annotations that would end, with a digest of that list. `--apply` writes only when the digest still matches, otherwise exits 5 with `stale_input`. Neither prompts | With the first format change |
-| `store verify [--unreferenced]` | List referenced blobs that are missing or do not match their digest; with `--unreferenced`, also list blobs no record references. Stemma deletes no blob | M1 |
-| `source add <file or url> [--source <id>] [--origin <text>] [--acquired-at <time>] [--source-version <text>] [--unpublished yes\|no] [--community-restricted yes\|no] [--license <text>]` | Store the blob; create or extend a candidate source and capture with provenance. An omitted rights option stays unstated | M1 |
+| `store verify [--unreferenced]` | List referenced blobs that are missing, unreadable, or do not match their digest, with the record files that name them; with `--unreferenced`, also list blobs no record references. Exits 1 when a referenced blob is not intact or an unreadable record leaves the lists incomplete. Stemma deletes no blob. Referenced blobs are `Capture.sha256`, `Extraction.text_sha256`, `ImportBatch.original_sha256`, `Image.blob_sha256`, the `Conversion` digests, and every `*_blob_sha256` field (assumption: no other digest names a blob) | M1 |
+| `source add <file or url> --actor <kind>:<name> --acquired-at <time> [--source <id>] [--origin <text>] [--source-version <text>] [--unpublished yes\|no] [--community-restricted yes\|no] [--license <text>]` | Store the blob; create or extend a candidate source and capture with provenance. A capture requires the time the copy was acquired and who added it, so neither is guessed. An omitted origin is recorded as `unknown`; an omitted version and rights option stay unstated. A new source has no citation key. When the bytes are already captured, nothing is merged: without `--source` the command exits 5 with `already_held` and names the holders; with `--source` naming a holder it writes no second record and restores a missing or damaged blob; naming another source attaches a capture to it. A type other than PDF or UTF-8 text exits 5 with `unsupported_file` | M1; a URL exits 2 for now |
 | `source admit <id> \| source reject <id>` | Record the author's optional admission decision | M1 |
 | `source confirm <id> --capture <id> --pages <indexes> --basis title-page\|equivalent --fields <list>` | Save the author's `confirmation` of source details after showing the record values | M1 |
 | `capture replace <capture id> <file>` / `capture retire <capture id>` | Add a new capture and retire the old one, or retire it; blobs stay | M1 |
 | `key rename <source id> <key>` | Rename a citation key, keeping the old one as an alias | M1 |
-| `source text <capture id>` | Extract text and page map into a new extraction | M1 |
+| `source text <capture id> --actor <kind>:<name> [--text-layer <file>] [--page-map <file>] [--method text_layer\|ocr\|manual] [--tool <name> --tool-version <version>] [--note <text>]` | Save text and page map as a new extraction, after verifying the held copy. A UTF-8 text copy is read as it is (`born_text`). For a PDF this version takes only a supplied text layer: UTF-8 with a form feed after each page; without one it exits 2. Stemma does not compare a supplied layer with the copy and says so. `--page-map` is a JSON list of `PageSegment` objects; nothing else gives a page a label. `--tool` and `--method` record what the caller says made the layer; unstated, the tool is `unknown` and the method `text_layer`. Quality is `unassessed`. Text with nothing but white space exits 5 and saves nothing | M1; PDF reading is not built |
 | `check [--changed \| --all]` | Run scripted checks; `--changed` (default) covers what changed since the check baseline (below); `--all` covers the project | M1 |
 | `resolve [ids]` | Query resolvers; save `resolution` records | M1 |
 | `excerpt (--passage <id> \| --source <id> --pages <range>)` | Print a bounded piece of source text (G) | M1 |
@@ -146,7 +146,7 @@ reviewed or not.
 | Check ID | Requirement | `fail` when | Typical `unverifiable` |
 |---|---|---|---|
 | `record.valid` | FR-62 | CONTRACT-001 error | unreadable file |
-| `source.held` | FR-9 | A cited source has no non-retired capture with an extraction | blob missing |
+| `source.held` | FR-9 | A cited source has no non-retired capture with an extraction that holds text (`no_copy`, `no_text`) | blob missing or altered, an extraction that does not fit its text, or an unreadable capture or extraction record |
 | `source.changed` | FR-10 | A note, claim, or citation depends on a replaced or retired capture, extraction, or source, or on a passage whose `source_record_sha256` differs from the source's current bibliographic digest | none |
 | `cite.key` | FR-29 | A citation key matches no source | a source record is unreadable |
 | `bib.uncited` | FR-29, FR-15 | A source in `bibliography_include` is cited nowhere. Cited sources enter the built bibliography automatically, so no other entry can be uncited | no manuscript to read |
@@ -182,6 +182,17 @@ classes; the table maps each to at least one ID. Without a print threshold,
 
 `support.current` tests records only. Its `pass` MUST be described as "a current
 support record is present and resolved", never as verification of support.
+
+**`source.held`** (assumptions). It emits one result for each citation record
+that names exactly one source (a key naming none is `cite.key`'s finding). It
+passes only when every non-retired capture of that source, and every non-retired
+extraction of each, is intact, so one good copy does not hide a damaged one. It
+also reports an uncited source whose copy or text no longer matches its digest.
+While `manuscript/` holds files this version cannot read, it is
+`not_implemented`. The digests it verified are in `body.inputs.blobs`; no report
+field holds the store's path, which the text output prints outside the report
+when a stored file is missing or altered. A pass says nothing about whether the
+text is a faithful reading of the copy.
 
 **Every finding is explained.** Each `fail` or `unverifiable` result MUST say in
 plain language what is wrong or could not be checked, show its evidence, say why
@@ -506,7 +517,7 @@ exits 1, and labels the build `open_findings`.
 | Rebuild recheck | Recomputed quote and page checks caught edited records; a forged "supported" verdict passed | Nothing prevents the forgery |
 | `meta.*`, `id.resolves`, `number.present`, `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, and `check` with `record.valid`, `cite.key`, `bib.uncited`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations and confirmations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; real project data |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `source add` (files only), `source text` (UTF-8 text and supplied text layers), `store verify`, and `check` with `record.valid`, `cite.key`, `bib.uncited`, `source.held`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations and confirmations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; real project data |
 
 ## Schema Basis
 

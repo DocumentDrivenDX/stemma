@@ -7,6 +7,6 @@ export const PAGES = [
   { file: "status.html", nav: "What works today", title: "What works today", description: "What is built and what is only planned." },
   { file: "checks.html", nav: "Checks", title: "Checks reference", description: "What each check looks at and what it cannot show." },
   { file: "examples.html", nav: "Examples", title: "Examples", description: "Real command output from the demo and test fixtures." },
-  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "A planned example, in progress." },
+  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "One real source, three citations, and what Stemma can and cannot check." },
   { file: "design.html", nav: "Design", title: "Design language", description: "Identity, voice, color, type, components and accessibility." },
 ] as const;

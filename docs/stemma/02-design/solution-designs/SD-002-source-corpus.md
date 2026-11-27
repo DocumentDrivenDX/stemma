@@ -88,6 +88,35 @@ PDF extraction is the main unsettled choice.
 
 For storage, git and git LFS (Large File Storage) were rejected by owner decision and the Data Design.
 
+### Built so far
+
+- **Store location** (`workspace`): `--store-dir`, then `STEMMA_STORE_DIR`, then
+  `Library/Application Support/stemma/stores/<project_id>` on macOS,
+  `%LOCALAPPDATA%` on Windows, or the XDG data directory elsewhere (assumption;
+  the last two are untested). A `project_id` that is not plain lowercase letters
+  and digits cannot form a directory name. A location inside the project, holding
+  the project, or inside a git working tree is refused, except where `git
+  check-ignore` says the tree ignores it and `git ls-files` finds nothing tracked
+  there. git is asked only in that case, with its file-system monitor off.
+- **Put**: temporary file in the store, hash of what was written, rename. A
+  damaged blob is replaced only by bytes that match its address. Blob paths come
+  from digests, and a symbolic link in the store is not followed.
+- **Text**: UTF-8 text copies and supplied text layers, under profile
+  `utf8-lf/0` (CONTRACT-001 G). Reading a PDF is not built. A pinned library has
+  not been added.
+- **PDF library trial** (one macOS arm64 system, outside the project, not
+  bundled): `pdfjs-dist` 6.5.438 (Apache-2.0, about 37 MB unpacked, one optional
+  native package that text extraction did not need) read a 258-page scan with an
+  old text layer in 0.65 s and a 22-page two-column article in 0.2 s on Bun
+  1.4.5, with equal output on a second run, one string per page, and embedded
+  page labels. On the scan its words agreed with the Internet Archive's text at
+  99.9%. A running head can come out in content order without a space. It warns
+  at load time about drawing support it cannot find. Not tried: bundling,
+  right-to-left, diacritic or CID-font text without an embedded character map,
+  and hostile files. Recommended as the library; adoption is not done.
+- Not built: URL fetch, hostile-input time and memory limits, the project lock
+  and staged multi-record write, admission, replacement, retirement, excerpts.
+
 ## Domain Model
 
 Shapes and relationships are those of CONTRACT-001.

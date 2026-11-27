@@ -250,7 +250,22 @@ need no re-extraction. A segment with printed labels MUST carry `evidence`:
 `printed_sequence`, `embedded_label` (confirmed by the author or agreeing with
 the printed numbers), or `author_statement`. `metadata` holds the title,
 contributors, date, and venue read from the held copy, each only when found;
-`meta.source` compares with it. A passage keeps `source_record_sha256`, the
+`meta.source` compares with it.
+
+`text_size` counts the bytes of the text blob, and `capture_sha256` MUST equal
+the `sha256` of the capture the extraction names. An extraction of an
+`application/pdf` capture MUST have `page_spans`; they are in page order, do not
+overlap, and lie inside the text. Page-map segments MUST NOT overlap; an
+`arabic` or roman segment has a `first_label` in that style, an `explicit`
+segment one label for each of its pages, and an `unnumbered` segment neither.
+`normalization_profile` `utf8-lf/0` removes a leading byte-order mark, turns CR
+and CRLF into LF, and changes nothing else. In a text read or supplied under it,
+each form feed (U+000C) ends a page; text after the last one is a further page
+only if it holds something other than white space. The form feeds stay in the
+text, outside every span. A plain-text copy without a form feed has no
+`page_spans`.
+
+A passage keeps `source_record_sha256`, the
 source's `SourceBinding.record_sha256` when it was anchored. A
 `locator.label` is a CSL locator term; `value` is the printed string
 (`xii`, `12r`). Moving a passage to a new extraction leaves it unreviewed.

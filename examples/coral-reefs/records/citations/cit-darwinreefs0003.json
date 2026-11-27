@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T00:06:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-darwinreefs0003",
+  "intake": "parsed",
+  "key": "darwin1842",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "2"
+  },
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "d48a704d09c84c9e18bf90bfc529691c63b10084f473bc04ff8fb643a4e60e25",
+    "text": "Darwin says that he uses the term atoll throughout the volume as a synonym for lagoon-island."
+  }
+}

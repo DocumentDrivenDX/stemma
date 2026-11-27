@@ -2,6 +2,7 @@
 // and field paths only, never record values.
 import { type Json, type JsonObject, normalizeSentence, sha256 } from "./json.ts";
 import { isRecordId, KINDS } from "./kinds.ts";
+import { checkPageSegments, checkPageSpans, type PageProblem } from "./pages.ts";
 import { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generated.ts";
 
 export type ProblemCode =
@@ -9,7 +10,7 @@ export type ProblemCode =
   | "bad_digest" | "bad_id" | "unknown_kind" | "bad_citation_key" | "duplicate_citation_key" | "duplicate_id"
   | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
-  | "number_not_integer";
+  | "number_not_integer" | "bad_size" | "missing_page_spans" | "capture_digest_mismatch" | PageProblem;
 
 export interface Problem {
   reason: "record_invalid" | "record_misplaced" | "reference_dangling" | "unknown_field";
@@ -118,6 +119,14 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
         }
       });
     }
+  }
+  if (record.kind === "capture" || record.kind === "extraction") {
+    const field = record.kind === "capture" ? "size" : "text_size";
+    if (typeof record[field] === "number" && (record[field] as number) < 0) problems.push(invalid("bad_size", `/${field}`));
+  }
+  if (record.kind === "extraction") {
+    for (const { code, index } of checkPageSegments(record.pages ?? [])) problems.push(invalid(code, `/pages/${index}`));
+    for (const index of checkPageSpans(record.page_spans ?? [])) problems.push(invalid("bad_page_spans", `/page_spans/${index}`));
   }
   if (record.kind === "citation" && isObject(record.sentence)) {
     const { text, sha256: stated } = record.sentence;

@@ -5,6 +5,8 @@ import { appendFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFile
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { canonical, PROJECT_FORMAT, PROJECT_SCHEMA, type ProjectContent, type SourceFile } from "@stemma/records";
 
+export * from "./store.ts";
+
 export function findProject(start: string): string | undefined {
   for (let dir = resolve(start); ; dir = dirname(dir)) {
     if (existsSync(join(dir, "stemma.json"))) return dir;

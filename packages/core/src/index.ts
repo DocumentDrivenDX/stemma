@@ -5,3 +5,6 @@ export * from "./render.ts";
 export * from "./report.ts";
 export { guarded, IMPLEMENTED_CHECKS, label, recordResults, runChecks } from "./run.ts";
 export * from "./operations.ts";
+export * from "./sources.ts";
+export * from "./store.ts";
+export { heldResults, holding } from "./checks/held.ts";

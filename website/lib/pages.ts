@@ -115,14 +115,15 @@ function status(): string {
 <li><code>init</code> creates a project; <code>record add</code> adds a record from a JSON file.</li>
 <li><code>validate</code>, <code>fmt</code> and <code>rules check</code> check and tidy record files and standing rules.</li>
 <li><code>check</code> runs ${built.length} checks (${built.map((c) => code(c.id)).join(", ")}), each <a href="checks.html">with stated limits</a>, and writes a text or JSON report.</li>
-<li><code>version</code> and <code>doctor</code> say what is running.</li>
+<li><code>source add</code> keeps a copy of a source in a private store outside the project; <code>source text</code> attaches the text of a plain-text file, or a text layer you supply for a PDF or scan, with its page breaks; <code>store verify</code> names missing or altered files.</li>
+<li><code>version</code> and <code>doctor</code> say what is running and where the store is.</li>
 </ul>
 <p><code>check</code> keeps no change baseline yet, so it always checks the whole project. A project is not called checked clean while it holds something this version cannot check.</p>
 <p>Tried only on macOS on Apple silicon. No desktop app host and no release has been tested.</p>
 <h2>Planned, not built</h2>
 <ul>
 <li>Taking over a Word manuscript and its reference libraries; reading manuscript files at all.</li>
-<li>Storing copies of sources, extracting their text, and checking quotations and locators against them.</li>
+<li>Reading text out of a PDF itself, recognizing characters in scans, and checking quotations and locators against stored text.</li>
 <li>Reading notes, a claim ledger, model support verdicts, review marks and annotations.</li>
 <li>A browser explorer for the evidence graph, argument and geographic maps and typeset pages. There is no web interface to Stemma today: this site is documentation.</li>
 <li>Typesetting with Typst, with Chicago notes and bibliography first.</li>
@@ -176,20 +177,20 @@ ${fixtures.map(([name, about]) => `<h3>${name}</h3><p>${escape(about)} <a href="
 }
 
 function darwin(): string {
+  const source = JSON.parse(read("examples/coral-reefs/records/sources/src-darwinreefs1842.json"));
+  const citations = [1, 2, 3].map((n) => JSON.parse(read(`examples/coral-reefs/records/citations/cit-darwinreefs000${n}.json`)));
   return `<h1>Worked example: Darwin and coral reefs</h1>
-<p class="lead">A planned end-to-end example on a real historical subject.</p>
-<p class="note"><strong>In progress. Nothing of this example has been built or checked yet.</strong> It has no Stemma project, records, claims, quotations, maps or typeset pages. This page makes no statement about what any of these works argue.</p>
-<h2>Where it stands</h2>
-<p>Copies of candidate sources are kept on the maintainer's machine, outside the repository. The works below are those whose title or opening pages have been read so far, in the text layer of the stored copy. That text comes from character recognition and has not been compared with page images. These are not Stemma source records.</p>
-${table("Works read so far", ["Title", "Name given", "What the stored text shows"], [
-    ["<cite>The Structure and Distribution of Coral Reefs</cite>", "Charles Darwin", "London: Smith, Elder and Co. The preface is dated May 1842."],
-    ["<cite>The Structure and Distribution of Coral Reefs</cite>, third edition", "Charles Darwin, with an appendix by T. G. Bonney", "London: Smith, Elder, &amp; Co., 1889."],
-    ["<cite>The Life and Letters of Charles Darwin</cite>, volume III", "Edited by Francis Darwin", "London: John Murray, 1887."],
-    ["<cite>The Glacial-Control Theory of Coral Reefs</cite>", "Reginald A. Daly", "Proceedings of the American Academy of Arts and Sciences, volume 51, number 4, November 1915."],
-  ])}
-<h2>What has to happen first</h2>
-<ul><li>Stemma has to store a copy of a source and extract its text. Neither is built.</li><li>Quotation and locator checks have to be built before this page quotes anything.</li><li>Publication rights have to be confirmed for each copy before it enters the repository.</li></ul>
-<p>Until then, the <a href="examples.html">invented examples</a> show what works.</p>`;
+<p class="lead">One real source and three citations of it, kept as record files in the repository.</p>
+<p class="note">The copy of the book and its text are private and are not published. Only records and digests are. A model read the facts below from images of the stored pages; no person has confirmed them.</p>
+<h2>The source</h2>
+<p><cite>${escape(source.title.value)}</cite>. Charles Darwin. London: Smith, Elder and Co., ${escape(source.issued.edtf)}.</p>
+<p>The title and year were read from the image of the title page. The text layer of the same page, from unverified character recognition, gives one of the voyage's years wrongly and does not hold the year of publication.</p>
+<h2>What cites it</h2>
+<p>These sentences are paraphrases written for the example, each compared with the image of the cited page. They quote nothing.</p>
+${table("Citations", ["Page", "Sentence"], citations.map((c) => [escape(c.locator.value), escape(c.sentence.text)]))}
+<h2>What a check says without the private copy</h2>
+<p>Where the stored copy is not present, Stemma cannot check these citations, and says so. With it, all three citations passed <code>source.held</code> on the maintainer's machine on 2026-11-26; that run depends on the private store and is not reproduced here. Even then the project is not called checked clean, because some checks of cited sources are not built.</p>
+${excerpt("<strong>Transcript</strong> of a real run with an empty store, paths replaced.", generated("transcripts/example-coral-reefs.txt"))}`;
 }
 
 function design(): string {

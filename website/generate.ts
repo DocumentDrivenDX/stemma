@@ -29,6 +29,10 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     summary: "Each source listed in bibliography_include must be cited by a citation record.",
     limits: "When the project has a manuscript, this version cannot read it and reports that it could not check.",
   },
+  "source.held": {
+    summary: "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
+    limits: "It does not show that the text is a faithful reading of the copy, and for a text layer you supply it never compares the two. It does not show that a source supports a sentence. It reads citation records only.",
+  },
   "coordinate.stray": {
     summary: "Warns about written map coordinates in project files, without repeating the value.",
     limits: "Recognizes only geo: addresses, degrees with N, S, E and W, and comma-separated decimal pairs with at least three decimal places. It cannot tell whether a site is restricted.",
@@ -53,6 +57,21 @@ function run(command: string[], cwd: string, env: Record<string, string | undefi
   return { code: done.exitCode, out: done.stdout.toString(), err: done.stderr.toString() };
 }
 
+/** Record IDs Stemma makes at random, renamed in order of appearance so that runs match. */
+export function stableIds(text: string): string {
+  const seen = new Map<string, string>();
+  const counts = new Map<string, number>();
+  return text.replace(/\b(src|cap|ext)-[0-9a-hjkmnp-tv-z]{20}\b/g, (id, kind: string) => {
+    let name = seen.get(id);
+    if (!name) {
+      counts.set(kind, (counts.get(kind) ?? 0) + 1);
+      name = `${kind}-random${String(counts.get(kind)).padStart(4, "0")}`;
+      seen.set(id, name);
+    }
+    return name;
+  });
+}
+
 /** All generated text files, by path under website/generated/. */
 export async function generateText(): Promise<Map<string, string>> {
   const files = new Map<string, string>();
@@ -70,9 +89,9 @@ export async function generateText(): Promise<Map<string, string>> {
     if (demo.code !== 0) throw new Error(`demo failed\n${demo.out}${demo.err}`);
     const made = readdirSync(demoTmp).filter((n) => n.startsWith("stemma-demo-"));
     if (made.length !== 1) throw new Error("the demo directory was not found");
-    const demoText = normalise(demo.out, [
+    const demoText = stableIds(normalise(demo.out, [
       ...both(join(demoTmp, made[0]!), "$DEMO"), ...both(join(ROOT, "dist/release"), "<plugin root>"),
-    ]).replace(/^DEMO=\$DEMO$/m, "DEMO is a fresh temporary directory");
+    ])).replace(/^DEMO=\$DEMO$/m, "DEMO is a fresh temporary directory");
     files.set("transcripts/demo.txt", demoText);
 
     const help = run([cli, "--help"], plugin);
@@ -93,6 +112,16 @@ export async function generateText(): Promise<Map<string, string>> {
       report.body.tools.sqlite = "(removed)";
       files.set(`reports/check-${name}.json`, normalise(`${JSON.stringify(report, null, 2)}\n`, places));
     }
+
+    // The worked example, checked where its private store is not: that run is the same everywhere.
+    const example = join(work, "coral-reefs");
+    cpSync(join(ROOT, "examples/coral-reefs"), example, { recursive: true });
+    const empty = join(work, "empty-store");
+    const without = run([cli, "check", "--all", "--project", example, "--store-dir", empty], plugin);
+    if (without.code !== 1) throw new Error(`check failed on the worked example: ${without.err}`);
+    files.set("transcripts/example-coral-reefs.txt", normalise(
+      `$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY\n${without.out}[exit ${without.code}]\n`,
+      [...both(example, "$PROJECTS/coral-reefs"), [empty, "$EMPTY"]]));
 
     const checks = Object.keys(CHECK_DESCRIPTIONS).sort().map((id) => {
       if (!(id in IMPLEMENTED_CHECKS)) return { id, built: false, covers: CHECK_DESCRIPTIONS[id] };

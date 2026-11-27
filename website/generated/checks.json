@@ -352,8 +352,83 @@
   },
   {
     "id": "source.held",
-    "built": false,
-    "covers": "whether you hold a copy of each cited source, with its text extracted"
+    "built": true,
+    "summary": "Each cited source must have a stored copy and extracted text, both in the private content store and both matching their recorded SHA-256 digests.",
+    "limits": "It does not show that the text is a faithful reading of the copy, and for a text layer you supply it never compares the two. It does not show that a source supports a sentence. It reads citation records only.",
+    "findings": [
+      {
+        "reason": "no_copy",
+        "message": "A cited source has no stored copy, so this citation is unchecked.",
+        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.",
+        "suggestions": [
+          "Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."
+        ]
+      },
+      {
+        "reason": "no_text",
+        "message": "A cited source has a stored copy but no extracted text, so this citation is unchecked.",
+        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.",
+        "suggestions": [
+          "Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is. For a PDF or scan, supply its text layer with page breaks (`--text-layer <file>`); this version cannot read a PDF itself. A scan with no machine-readable text stays unchecked."
+        ]
+      },
+      {
+        "reason": "record_unreadable",
+        "message": "Whether you hold this cited source could not be checked: at least one capture or extraction record cannot be read.",
+        "why": "The unreadable file may be the record of the stored copy or of its text.",
+        "suggestions": [
+          "Repair the unreadable record first (see the record.valid finding), then run `check` again."
+        ]
+      },
+      {
+        "reason": "copy_missing",
+        "message": "A stored copy could not be checked: its file is not in the content store used here.",
+        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "suggestions": [
+          "The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest."
+        ]
+      },
+      {
+        "reason": "copy_altered",
+        "message": "A stored copy no longer matches its recorded digest, so it is not treated as the copy that was added.",
+        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "suggestions": [
+          "Restore the file from your backup, or add the original file again. If the source itself changed, add it as a new copy."
+        ]
+      },
+      {
+        "reason": "text_missing",
+        "message": "The extracted text of a stored copy could not be checked: it is not in the content store used here.",
+        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "suggestions": [
+          "Point `--store-dir` at the store that holds it, or restore it from your backup. `store verify` lists every missing digest."
+        ]
+      },
+      {
+        "reason": "text_altered",
+        "message": "The stored text of a copy no longer matches its recorded digest, so it is not used.",
+        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "suggestions": [
+          "Restore the text from your backup, or attach the text again as a new extraction."
+        ]
+      },
+      {
+        "reason": "text_inconsistent",
+        "message": "An extraction record does not fit its stored text (its size or page spans disagree with it), so it is not used.",
+        "why": "The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.",
+        "suggestions": [
+          "Retire this extraction and attach the text again as a new one. An extraction is never edited."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
   },
   {
     "id": "support.current",

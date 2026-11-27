@@ -48,8 +48,8 @@ export function notRun(corpus: Corpus): NotRun[] {
   const someCitation = (field: string) => citations.some((c) => c.data![field] !== undefined);
 
   const missing: Record<string, boolean> = {
-    "source.held": cited,
-    "source.changed": has("capture", "extraction", "passage"),
+    // A retired copy or text still counts: work may rest on it.
+    "source.changed": corpus.records.some((f) => ["capture", "extraction", "passage"].includes(String(f.data?.kind))),
     "quote.present": manuscript || someCitation("quotation") || has("note", "passage"),
     "quote.self": has("claim") && (manuscript || someCitation("quotation")),
     "locator.extent": manuscript || someCitation("locator"),
@@ -75,6 +75,9 @@ export function notRun(corpus: Corpus): NotRun[] {
   if (corpus.records.some((f) => f.state === "ok" && !FULLY_CHECKED_KINDS.has(String(f.data?.kind)))) {
     entries.push({ check: "record.valid", reason: "not_implemented" });
   }
+  // Which sources are cited is unknown while manuscript files cannot be read.
+  if (manuscript) entries.push({ check: "source.held", reason: "not_implemented" });
+  else if (citations.length === 0) entries.push({ check: "source.held", reason: "input_absent" });
   if (manuscript) entries.push({ check: "cite.key", reason: "not_implemented" });
   else if (citations.length === 0) entries.push({ check: "cite.key", reason: "input_absent" });
   if (manuscript && listedSources(corpus).length > 0) entries.push({ check: "bib.uncited", reason: "not_implemented" });

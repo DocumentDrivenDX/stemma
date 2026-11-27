@@ -1,5 +1,6 @@
 Stemma demo. All names and sources are invented.
 DEMO is a fresh temporary directory
+STEMMA_STORE_DIR is set to $DEMO/store, the private content store, outside the project.
 "stemma" below means: cd <plugin root> && bun --no-install --no-env-file --config=/dev/null <plugin root>/dist/stemma.js
 Plugin root: <plugin root>
 
@@ -44,7 +45,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 =============== 3. Check: the seeded errors are reported and explained
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 3 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
 Checked the whole project: 13 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
@@ -68,11 +69,18 @@ Checked the whole project: 13 result(s) passed.
    - stemma.json
        file: stemma.json
 
+4. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held]
+   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+   - cit-demo0toll00001
+       citation file: records/citations/cit-demo0toll00001.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+
 NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
-   - whether you hold a copy of each cited source, with its text extracted  [source.held]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
@@ -90,14 +98,25 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version cannot do yet. Nothing is blocked.
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version cannot do yet. Nothing is blocked.
 Checked the whole project: 15 result(s) passed.
+
+1. PROBLEM: A cited source has no stored copy, so this citation is unchecked.  [source.held, 2 places]
+   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile.
+   - cit-demo0toll00001
+       citation file: records/citations/cit-demo0toll00001.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+   - cit-demo0toll00002
+       citation file: records/citations/cit-demo0toll00002.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
 
 NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
-   - whether you hold a copy of each cited source, with its text extracted  [source.held]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
@@ -106,11 +125,149 @@ No change baseline is kept yet, so the whole project was checked.
 Full report: $DEMO/book/.stemma/reports/check.json
 [exit 1]
 
-The seeded errors are gone. The project is still NOT called checked clean, on purpose:
-it cites a source, and this version cannot yet check some things about cited sources
-(listed under NOT CHECKED). Those count as open.
+=============== 5. A paper-only book: add its scan. A scan alone is not yet checkable
 
-=============== 5. What checked clean looks like today: sources recorded, nothing cited yet
+$ stemma source add $DEMO/materials/ledger-scan.pdf --source src-demo0harbour01 --origin my own scan --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/book
+Stored the copy and recorded it as cap-random0001.
+  source: src-demo0harbour01
+  sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11 (439 bytes, application/pdf)
+  store: $DEMO/store (stored and verified)
+  origin: my own scan
+  acquired at: 2026-01-05T09:00:00Z
+  version: unknown
+  added by: person demo-author (a record of what was said, not proof)
+  wrote records/captures/cap-random0001.json
+The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
+Stemma holds back no source: any source in this project may be sent to a hosted model.
+Next: attach its text with `source text cap-random0001`.
+No record problems found.
+[exit 0]
+
+$ stemma check --project $DEMO/book
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 17 result(s) passed.
+
+1. PROBLEM: A cited source has a stored copy but no extracted text, so this citation is unchecked.  [source.held, 2 places]
+   Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Attach the text (`source text <capture id>`). A plain UTF-8 text copy is read as it is. For a PDF or scan, supply its text layer with page breaks (`--text-layer <file>`); this version cannot read a PDF itself. A scan with no machine-readable text stays unchecked.
+   - cit-demo0toll00001
+       citation file: records/citations/cit-demo0toll00001.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+       capture file: records/captures/cap-random0001.json
+       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+   - cit-demo0toll00002
+       citation file: records/citations/cit-demo0toll00002.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+       capture file: records/captures/cap-random0001.json
+       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+   - work that rests on a copy or source that has since changed  [source.changed]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0harbour01 (not admitted)
+
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/book/.stemma/reports/check.json
+[exit 1]
+
+=============== 6. Attach the scan's text layer, page by page, with a page map that states its evidence
+
+$ stemma source text cap-random0001 --actor person:demo-author --text-layer $DEMO/materials/ledger-text-layer.txt --page-map $DEMO/materials/ledger-page-map.json --method ocr --project $DEMO/book
+Saved the text as ext-random0001.
+  method: ocr, quality unassessed
+  sha256: 57304e80db7078658b8a866a5a51ce06925b96121a100bf59647bab92d77e748 (143 bytes)
+  pages: 4, split at the form feeds in the text
+  without a printed label (file page indexes, from 0): 2. No label is worked out from a page's position.
+  wrote records/extractions/ext-random0001.json
+Stemma did not make this text and did not compare it with the copy, page by page or at all: that it is the copy's text, with the pages in step, rests on what you supplied.
+No record problems found.
+[exit 0]
+
+$ stemma check --project $DEMO/book
+OPEN FINDINGS: 0 problem(s), 0 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 21 result(s) passed.
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+   - work that rests on a copy or source that has since changed  [source.changed]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0harbour01 (not admitted)
+
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/book/.stemma/reports/check.json
+[exit 1]
+
+No finding is left. The project is still NOT called checked clean, on purpose: it cites
+a source, and this version cannot yet check some things about cited sources (listed
+under NOT CHECKED). Those count as open.
+
+=============== 7. Without the store, nothing passes by default: could not check
+
+$ stemma check --project $DEMO/book
+OPEN FINDINGS: 0 problem(s), 2 could not be checked, 4 kind(s) of check this version cannot do yet. Nothing is blocked.
+Checked the whole project: 19 result(s) passed.
+
+1. COULD NOT CHECK: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 2 places]
+   Why it matters: The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.
+   What to do: The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest.
+   - cit-demo0toll00001
+       citation file: records/citations/cit-demo0toll00001.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+       capture file: records/captures/cap-random0001.json
+       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+   - cit-demo0toll00002
+       citation file: records/citations/cit-demo0toll00002.json
+       key: hartwell1998
+       source file: records/sources/src-demo0harbour01.json
+       capture file: records/captures/cap-random0001.json
+       copy sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+
+NOT CHECKED: this version cannot yet check these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+   - work that rests on a copy or source that has since changed  [source.changed]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0harbour01 (not admitted)
+
+Content store looked in: $DEMO/store (chosen by STEMMA_STORE_DIR). It is private and not part of the repository; where its files are absent or changed, nothing about them was checked.
+No change baseline is kept yet, so the whole project was checked.
+Full report: $DEMO/book/.stemma/reports/check.json
+[exit 1]
+
+$ stemma store verify --project $DEMO/book
+Content store: $DEMO/store (chosen by STEMMA_STORE_DIR; this directory does not exist)
+2 blob(s) named by records: 0 present and matching, 2 not.
+  MISSING 57304e80db7078658b8a866a5a51ce06925b96121a100bf59647bab92d77e748
+      named by records/extractions/ext-random0001.json
+  MISSING 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11
+      named by records/captures/cap-random0001.json
+Why it matters: checks that need these files report that they could not check.
+What to do: restore them from your backup of the store, or add the same files again.
+The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
+[exit 1]
+
+$ stemma store verify --project $DEMO/book
+Content store: $DEMO/store (chosen by STEMMA_STORE_DIR)
+2 blob(s) named by records: 2 present and matching, 0 not.
+The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
+[exit 0]
+
+=============== 8. What checked clean looks like today: sources recorded, nothing cited yet
 
 $ stemma init --project $DEMO/reading-list
 Created a Stemma project in $DEMO/reading-list
