@@ -33,11 +33,18 @@ Chromium has been used. Flows: [[UF-007]], [[UF-012]], [[UF-013]],
   earliest witness and lines of descent to three open nodes, one through an
   intermediate branch. It depicts no real tradition. It follows light and dark,
   keeps clear space of a quarter of its width, and is not used below 16 pixels.
+  On the microsite it may also stand large, up to 112 pixels, at the right of a
+  page's opening from 56rem wide. There it is ornament: it has empty alternative
+  text, and the name beside it in the masthead already says what it is.
 - **Character**: a careful report. No mascot, seal, check mark, shadow, gradient,
   or animation. Identity comes from the mark, serif headings, and the wording.
   On the microsite it also comes from the habits of a scholarly edition: a margin
-  beside the text, ruled entries, and a stemma drawn from real records. Stemma
-  sets no brand color.
+  beside the text, ruled entries, numbered sections and figures, and a stemma
+  drawn from real records. The microsite takes its visual interest from drawings
+  made from data (see Generated diagrams), real figures read from records, tinted
+  panels made of the existing surface tokens, large serif numerals, and the mark
+  shown large at a page's opening. None of these is decoration that carries a
+  claim, and none adds a color. Stemma sets no brand color.
 - **Voice**: plain, specific, and short. Say what is wrong, show the evidence,
   say why it matters, suggest what to do. Say what was not checked. Mark planned
   work "not built", never "coming soon". Never praise the author's text or
@@ -52,6 +59,7 @@ Reviewed on 2026-11-26 with read-only access.
 | arras (MIT OR Apache-2.0) | Color and radius role token defaults of `@documentdrivendx/arras-ui` 0.8.1, copied as values with attribution; its Playwright 1.63.0 and axe-core 4.13.0 pins | The package itself on the microsite, which has no record views and would need React |
 | HELIX | The practice of a written site design language; JetBrains Mono and Inter as faces | No files: the repository has no licence file. Hugo with the hextra theme needs Hugo and Go modules |
 | DocumentDrivenDX home page | Layout habits: static HTML, serif headings, a skip link | No files or colors: no licence file |
+| umf-visual 0.7.0 (MIT OR Apache-2.0), with the Lini 1.1.0 runtime it bundles (MIT, Copyright (c) 2026 Abbas Monfared) | At `./scripts/dev.sh docs` time only, for the microsite: the `umf.visual` document model, its Lini compiler and its Lini renderer, with the renderer's own checks of the runtime files' hashes, of Lini diagnostics (any one, warnings included, fails the build) and of the SVG. Nothing of it is published or shipped in the plugin, except the SVG drawings it made | Its embedded stylesheet, which the site removes and replaces with rules in the site's tokens; its Graphviz and Mermaid routes, which need other programs; its interchange adapters. The forms that read badly in this site's tests (sequence ladder, timeline, tree, stack) and its drawn edge labels are not used |
 | ux-builder (MIT OR Apache-2.0) | The rule that the contrast a page shows and the contrast a test enforces come from one function | Its token engine and widgets, which are larger than eight static pages need |
 | innsigle | Nothing | No licence file found |
 
@@ -187,6 +195,7 @@ axe-core run does not show conformance.
 | Construct | Hexagon |
 | Link | Its stance or relation as written in the record. Opposing links (`contradicts`, `attacks`, `undercuts`) are dashed with a bar end; others solid with an arrow end |
 | Unverified link | Dotted line, a "?" mark, and the word "unverified" |
+| Link in a generated diagram on the microsite | No label is drawn on the line: the renderer places labels where they read as belonging to another line. A link's stance or relation is written first in the box the link starts at, such as "Supports:", repeated in the text equivalent, and shown by the line style, which a legend explains. This replaces, for these drawings only, the rule that a link's own label gives its stance |
 | Location assertion | Lettered point or outline matching its list row |
 | Stated uncertainty | Dashed circle for a distance; the stated certainty as text. No distance: "uncertainty distance not stated" |
 | Restricted broad area | Hatched outline and "Restricted: broad area". A withheld site has a list row and no mark |
@@ -272,6 +281,11 @@ the browser synthesizes any italic of theirs.
 | Figure | A screenshot has alternative text, a caption saying how it was made, and the same content available as text. A captured page of command output says "Rendered page, not a terminal window" in the image and in its caption |
 | Line of descent | A drawing of record files as a stemma: a nested list with lines between its items, so the text is the drawing. As in the mark, the filled node is the one the rest descend from; each node also has a text label naming its kind. Filled from the records when the site is built, and captioned as this site's drawing. Side by side from 62rem, an indented tree below |
 | Explanatory drawings | The research cycle, the demo's successive checks, where material is kept, and the example's page map. HTML with CSS lines, so the words are the drawing. Counts and page ranges are read from runs and record files. The cycle's steps are the order of work, not stages that block one another |
+| Generated diagram | An SVG drawing made from data in the repository (see Generated diagrams), in a plate with a numbered caption that says it is this site's drawing, followed by a visible text equivalent holding the same items. Never presented as a Stemma screen |
+| Plate | The tinted panel a full-width figure sits in: the sunken surface token, a decorative hairline, and the card radius. No shadow. Plates are numbered "Figure 1", "Figure 2" in order on each page, by a CSS counter |
+| Section mark | On wide screens a section's number, in large muted serif, stands above its heading in the margin column. It is CSS-generated ornament; nothing refers to a section by that number. Where sections are steps, as in a worked example, the step number is real text in the heading instead |
+| Figures in numbers | A short row of large serif numerals, each with a label under it, for counts read from record files or run output. Never a score, a share, or a count typed into the site |
+| Example card | A bordered panel for one worked example: its subject, the question it works on, figures in numbers from its records, and one link. A card links to the example's page, or, when it has no page, to its folder on GitHub, and says which |
 | Folded detail | A native `details` element whose summary says what is inside. No script |
 | Unbuilt behaviour | The microsite presents and demonstrates what works, from real output. It carries no roadmap, planned-work, or in-progress content, and shows or claims nothing that does not work |
 
@@ -306,10 +320,15 @@ single offline page's content security policy accepts the bundled stylesheet.
 ## Microsite
 
 The microsite presents the plugin. Its home page leads with what the author is
-after, creating academically rigorous research reports and books, and presents
+after, creating academically rigorous research reports and books, with
+researching technical subjects as the first focus: documentation for a named
+version, release notes, papers, and engineering write-ups. It presents
 the checks as how Stemma serves that: the problem, how the author works, what
 each recorded citation rests on, what is checked, and what stays the author's
-judgment. It claims for Stemma only what works. It carries no testing history:
+judgment. Work in the humanities stays shown, by the Darwin example. It claims
+for Stemma only what works. It makes no theme of licenses or copyright: Stemma
+does not enforce them, and keeping a source's text in one's own project for
+research is the ordinary case. It carries no testing history:
 nothing about which machines, versions, or sessions have or have not been tried.
 Requirements a reader must meet, and the limits of what a check shows, stay.
 
@@ -323,16 +342,33 @@ whether the plain wording still says no more than the source; a person checks
 that. The design page speaks to maintainers and may be technical.
 
 Coverage is complete for what works: the research cycle and one round of it in
-detail, where material is kept and what may reach a model, every check with what
-a pass does not show, what is not checked, and the worked example from its works
-and one original, through source files and citations, to the check with its open
-findings and deliberate mistakes. Pages about the worked example may explain the
-tool; sentences shown as the author's scholarship hold only the scholarship.
+detail, the kinds of source Stemma reads and how each is cited, claims and what
+bears on them, the report build, where material is kept and what may reach a
+model, every check with what a pass does not show, what is not checked, and a
+worked example from its works and one original, through source files and
+citations, to the check with its open findings and deliberate mistakes. Pages
+about a worked example may explain the tool; sentences shown as the author's
+scholarship hold only the scholarship.
+
+The site has two worked examples: Darwin and coral reefs
+(`examples/coral-reefs/`), which has its own page, and PostgreSQL for web
+applications (`examples/postgres-web-apps/`), which has a card on the home page
+linking to its folder on GitHub until it has a page. The list of examples is
+data (`website/lib/examples.ts`): the home page's cards are made from it, and a
+second example page adds its entry there and in the page list
+(`website/lib/nav.ts`). Drawings and helpers that read an example take its
+folder as a value rather than naming Darwin.
 
 The one installation it may describe is
 installing the plugin; it states install commands only once they have been shown
 to work against the published marketplace. It gives no runtime, command-line, or
 build instructions.
+
+The home page opens with the name's mark, the title, the lead and the actions,
+with the diagram from an original source to a footnote beside them from 66rem
+and below them on narrower screens. Every other page opens in a plate with its
+title and lead, and the mark large at the right from 56rem. Full-width figures
+alternate with the short text column, so that a long page has a rhythm.
 
 `website/` is static HTML with one Tailwind stylesheet and no JavaScript, built by
 a Bun script (`./scripts/dev.sh site`). That is lighter than the family's Hugo
@@ -362,6 +398,41 @@ focus, and axe-core. The site is published by hand at
 <https://documentdrivendx.github.io/stemma/>: the built `website/dist/` and an
 empty `.nojekyll` are committed to the `gh-pages` branch, in a commit that names
 the source commit.
+
+## Generated diagrams
+
+Where a drawing explains structure that prose cannot carry, the microsite draws
+it from data rather than by hand. The pipeline, at `./scripts/dev.sh docs` time:
+
+data in `website/lib/graphs.ts`, with names and counts read from record files and
+generated output → an `umf.visual` document → umf-visual's Lini compiler and
+renderer (Lini 1.1.0, WebAssembly, run in Bun with no browser and no other
+program) → the site's SVG treatment (`website/lib/svg.ts`) → files under
+`website/generated/diagrams/`, committed.
+
+The site build reads those files and writes each drawing into its page, so that
+the site's tokens color it in light and dark. No JavaScript is added, and the
+page requests no image. umf-visual is loaded only by the docs run and its check:
+not by the site build, the command line, the plugin bundle, or any other test.
+
+| Rule | Convention |
+|---|---|
+| Source | One definition per diagram. A drawing of an example's records takes names, stances and counts from those records, and fails if a record it names is missing or its relation changed |
+| Theme | The renderer's embedded stylesheet is removed. Rules in `site.css` color the drawing with the tokens of this document and set the site's text font. A color in the SVG is mapped to a token; an unknown color, class or style property fails the run |
+| Safety | No script, link, image, external reference, event handler or local path may be left in the SVG |
+| Name | `role="img"`, with a `title` and a `desc` that the drawing is labelled by. IDs are unique to each drawing on a page |
+| Text equivalent | A visible list directly with the figure, made from the same definition, holding the same items, links and relation words. It is never folded away or hidden from sight. The site build fails if a box's label is missing from the drawing |
+| Caption | Says that it is this site's drawing, what it was made from, and, for an example's records, that no person has reviewed them when that is so |
+| Layout | Boxes on a grid, or left to right with few boxes per column. Left-to-right chains of many boxes and top-to-bottom chains taller than the screen are not used |
+| Narrow screens | A grid drawing has a second, one-column layout shown below 36rem. A drawing that has no readable one-column layout keeps its size inside a scrolling region that can be reached by keyboard and is named, with the text equivalent after it |
+| Legibility | At 320 CSS pixels the smallest text in any drawing that is shown renders at 11.5 pixels or more. A browser test measures it |
+| Labels | At most 26 characters, since the renderer does not wrap them. A longer label fails the run |
+| Encoding | Encoding for graphs and maps applies. Boxes and lines use text and strong-line tokens; no stance has a color of its own. An opposing link is dashed with a bar end. The thesis box has a double border. A legend is given where more than one line style appears |
+| Renderer limits | Any Lini diagnostic, a warning included, fails the run. Edge labels, curved routing, and edits to the compiled Lini source are not used. The renderer's title caption is removed from the SVG and the view box trimmed to the drawing; the run fails if a line or box would fall outside it |
+| Currency | `./scripts/dev.sh docs-check` and the local test run render the drawings again and fail when a committed file differs |
+
+The same bytes come out of repeated runs on one macOS system. Rendering on Linux
+and Windows is untested.
 
 ## Non-Goals
 
