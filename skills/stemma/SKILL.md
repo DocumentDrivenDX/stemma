@@ -73,8 +73,8 @@ step when it is wanted, in any later session; do not hold one back for another.
    recorded as yours; their text and pages are copied by `passage capture`.
    Keep what you want to find again (a search write-up, a source inventory, a
    thesis test, open questions) in a research note.
-4. **Assemble** the argument citing those passages. (Footnote generation and
-   builds are not available yet; say so.)
+4. **Assemble** the argument citing those passages. (Footnote and endnote
+   generation and builds from chapter files are not available yet; say so.)
 
 ## No binary files in the repository
 
@@ -567,8 +567,11 @@ asks, and carry on in the file. Nothing else in Stemma uses it.
   repair or retype one yourself; show the author each such change in the diff,
   and capture new evidence by passage address as usual.
 - After edits land, run `check`. When `manuscript/` holds `.md` chapter files,
-  it reads citations, quotations, locators and figures as written there, and the
-  citation records' own key, quotation and locator are history. A chapter it
+  it reads citations, quotations, locators and figures as written there, in the
+  text, footnotes and endnotes alike, and the citation records' own key,
+  quotation and locator are history. A footnote is `[^label]` with
+  `[^label]: text`; an endnote is written the same way with a label that begins
+  `en-`, so a footnote label never does. Keep each note's kind. A chapter it
   cannot read in Stemma's markup is reported with its line, and `check` exits 3;
   say that nothing in that file was checked. A manuscript kept anywhere else, or
   as a Word file, is not read: update the records, and say that a change made only

@@ -81,6 +81,45 @@ describe("quotations in a chapter file", () => {
   });
 });
 
+describe("footnotes and endnotes", () => {
+  // Each note has something a check reports or passes. All words are invented.
+  const text = (labels: string[]) => {
+    const [alone, right, wrong, loose] = labels;
+    return [
+      "# A chapter", "",
+      `[One survey was made.[^${alone}]]{.claim ids="clm-fixture0claim001"} A second followed.[^${right}] A third did not.[^${wrong}] A word stayed.[^${loose}]`, "",
+      `[^${alone}]: [@volume1850 page="94"]; [@nobody1850].`,
+      `[^${right}]: It says "nothing more is known" of 47 islets.[@volume1850 page="2" id="cit-takenover0001"]`,
+      `[^${wrong}]: It says "nothing more was known".[@volume1850 page="2"]`,
+      `[^${loose}]: The word "lagoon" came late, and "atoll later.`, "",
+    ].join("\n");
+  };
+  // Labels of equal length, so that every line and column is the same.
+  const footnotes = text(["aaa1", "aaa2", "aaa3", "aaa4"]);
+  const endnotes = text(["en-1", "en-2", "en-3", "en-4"]);
+  const mixed = text(["aaa1", "en-2", "aaa3", "en-4"]);
+  const listed = { listed: [VOLUME, OTHER] };
+
+  /** A finding on an unpaired mark is tied to its line as written, label included. */
+  const comparable = (results: Result[]) => results.map((r) => (r.reason_code === "unpaired_quote_mark" ? { ...r, locus: "", finding_key: "", fingerprint: "" } : r));
+
+  test("every check gives an endnote the result it gives a footnote", () => {
+    const foot = run(corpus(footnotes, listed));
+    // The comparison would mean little if the notes were not read.
+    const found = open(foot.results);
+    for (const expected of [["cite.key", "key_unknown"], ["locator.extent", "outside_page_map"], ["quote.present", "near_match"],
+      ["quote.present", "unattributed_quotation"], ["quote.present", "unpaired_quote_mark"], ["number.present", "figure_absent"],
+      ["record.valid", "reference_dangling"]]) {
+      expect(found).toContainEqual(expected);
+    }
+    for (const chapter of [endnotes, mixed]) {
+      const body = run(corpus(chapter, listed));
+      expect(comparable(body.results)).toEqual(comparable(foot.results));
+      expect([body.not_run, body.unreviewed, body.summary, body.label]).toEqual([foot.not_run, foot.unreviewed, foot.summary, foot.label]);
+    }
+  });
+});
+
 describe("citations in a chapter file", () => {
   test("unknown and unbound keys, a source with no text, and a page outside the source", () => {
     const record = {
