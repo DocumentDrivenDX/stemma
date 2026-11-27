@@ -22,8 +22,7 @@
 <p class="lead">Install one plugin, then ask Claude in plain words. There is nothing else for you to set up.</p>
 </div>
 <section class="band"><div class="band-head"><h2>What you need</h2></div><div class="band-body">
-<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs.</p>
-<p class="note">Stemma is pre-release. It has been tried on one Mac with Apple silicon, including installation with the Claude command-line tool (Stemma 0.0.1). The Claude desktop app, a live Claude session using the plugin, Windows and Linux are untested. On Windows, setup needs Git Bash.</p>
+<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs. On Windows, setup also needs Git Bash.</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Install the plugin</h2></div><div class="band-body">
 <p>Type these two commands in a terminal. They add the DocumentDrivenDX catalog of plugins and install Stemma from it.</p>
@@ -36,7 +35,6 @@ claude plugin install stemma@documentdrivendx</pre></figure>
 </div></section>
 <section class="band"><div class="band-head"><h2>What to ask Claude</h2></div><div class="band-body">
 <dl class="asks"><div><dt>&ldquo;Start a Stemma project in this folder.&rdquo;</dt><dd>Creates the project files and overwrites nothing.</dd></div><div><dt>&ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</dt><dd>Writes a record of the work. Claude says where each detail came from.</dd></div><div><dt>&ldquo;Keep this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</dt><dd>Puts the file in your private store, noting where and when you got it.</dd></div><div><dt>&ldquo;Read the text of that copy and work out its page numbers.&rdquo;</dt><dd>Reads the text inside the PDF, or takes a text file, and proposes page numbers for review where the printed numbers support them.</dd></div><div><dt>&ldquo;Record the citations in this chapter.&rdquo;</dt><dd>Writes one record for each citation, with its sentence, page and quotation.</dd></div><div><dt>&ldquo;Check the project and explain what is open.&rdquo;</dt><dd>Runs the checks and explains each finding. When a quotation differs, you see it beside the closest wording in your copy.</dd></div><div><dt>&ldquo;What does that book say on page 89?&rdquo;</dt><dd>Shows only the pages you ask for, up to five, marked as quoted from the source.</dd></div><div><dt>&ldquo;I have a better scan of this book. Replace the old one.&rdquo;</dt><dd>Keeps the new copy, sets the old one aside, and lists what relied on it.</dd></div><div><dt>&ldquo;Is anything missing from my source store?&rdquo;</dt><dd>Names every stored file that is missing or has changed.</dd></div></dl>
-<p class="note">The tools behind these requests are tested. A live Claude session following the plugin's instructions has not been tested.</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Before you add material</h2></div><div class="band-body">
 <p><strong>Anything in a project may be sent to the AI model.</strong> Stemma holds back no individual source. If you may not send something to a hosted model, do not put it in the project.</p>

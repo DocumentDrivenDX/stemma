@@ -178,7 +178,7 @@
 <p>With the private copy in place, the check compared all four citations with it. For each one: the copy and text are there and unchanged, the quotation is in the text, the page is within the numbered pages, and nothing it relies on has been replaced. Nothing was left open among the checks that ran.</p>
 <p>One quotation matched only after rejoining the word <em>denying</em>, split at the end of a line. The report points that out so you can look.</p>
 <p>The project is still <em>not</em> called checked clean, and the first line of the report says why: three kinds of check do not run. It also notes that nobody has admitted the source.</p>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run on the maintainer's machine, which holds the private copy. Folder names are replaced. It cannot be rebuilt on a machine without the copy.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $STORE</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run with the private copy. Folder names are replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $STORE</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 39 result(s) passed.
 
@@ -258,7 +258,7 @@ Full report: $PROJECTS/coral-reefs-trial/.stemma/reports/check.json
 <section class="band"><div class="band-head"><h2 id="without">8. Without the copy</h2></div><div class="band-body">
 <p>Anyone can download the example's records, but not the private copy. On such a machine the check cannot compare the citations or quotations with anything, and it says <em>could not check</em> instead of passing them. It can still test the page numbers, because the page map is part of the records.</p>
 <details class="more"><summary>What the tool printed without the copy</summary>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 8 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 31 result(s) passed.
 

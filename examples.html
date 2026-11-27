@@ -20,12 +20,12 @@
 <main id="main" tabindex="-1" class="shell page">
 <div class="opening"><h1>Examples</h1>
 <p class="lead">Watch Stemma at work on a made-up book. Everything here comes from real runs of the tool.</p>
-<p class="note">All names and sources on this page are invented. For a real book, see the <a href="darwin.html">worked example</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folders on the test machine.</p>
+<p class="note">All names and sources on this page are invented. For a real book, see the <a href="darwin.html">worked example</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folder names.</p>
 <nav class="contents" aria-label="Parts of this page"><ul><li><a href="#demo">The demo, step by step</a></li><li><a href="#fixtures">More test projects</a></li><li><a href="#screenshots">Pictures of the output</a></li></ul></nav></div>
 <section class="band"><div class="band-head"><h2 id="demo">The demo, step by step</h2></div><div class="band-body">
 <p>Eleven short steps, from an empty folder to checked quotations. IDs in the demo are fixed so that every run looks the same.</p>
 <ol class="steps"><li><h3>Start a project</h3><div><p>A new project is created, and two invented books are recorded.</p><details class="more"><summary>What the tool printed (step 1)</summary>
-<p class="record">1. Create a project and record two sources</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/book</span>
+<p class="record">1. Create a project and record two sources</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/book</span>
 Created a Stemma project in $DEMO/book
   wrote rules.md
   wrote .gitattributes
@@ -46,7 +46,7 @@ No record problems found.
 <span class="dim">[exit 0]</span></pre></figure>
 </details></div></li>
 <li><h3>Cite, with a slip</h3><div><p>Two citations are added. One mistypes the short label of its source, and a book that is never cited is listed for the bibliography.</p><details class="more"><summary>What the tool printed (step 2)</summary>
-<p class="record">2. Add two citations: one with a mistyped key</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma record add citation --input $DEMO/cite-1.json --actor person:demo-author --project $DEMO/book</span>
+<p class="record">2. Add two citations: one with a mistyped key</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma record add citation --input $DEMO/cite-1.json --actor person:demo-author --project $DEMO/book</span>
 Added cit-demo0toll00001
   records/citations/cit-demo0toll00001.json
 No record problems found.
@@ -61,7 +61,7 @@ No record problems found.
 By hand: list both sources for the bibliography in stemma.json (orphan1990 is never cited).</pre></figure>
 </details></div></li>
 <li><h3>First check</h3><div><p>The check finds the slip and the uncited book, notices a file out of its standard layout, and says that a cited book has no copy.</p><details class="more"><summary>What the tool printed (step 3)</summary>
-<p class="record">3. Check: the seeded errors are reported and explained</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
+<p class="record">3. Check: the seeded errors are reported and explained</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 14 result(s) passed.
 
@@ -107,7 +107,7 @@ Full report: $DEMO/book/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details></div></li>
 <li><h3>Fix and check again</h3><div><p>Three problems are fixed. What remains: there is still no copy of the cited book to compare with.</p><details class="more"><summary>What the tool printed (step 4)</summary>
-<p class="record">4. Fix them: correct the key, drop the uncited listing, reformat</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma fmt --project $DEMO/book</span>
+<p class="record">4. Fix them: correct the key, drop the uncited listing, reformat</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma fmt --project $DEMO/book</span>
 Rewrote 1 file(s) in canonical form.
   stemma.json
 No record problems found.
@@ -142,7 +142,7 @@ Full report: $DEMO/book/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details></div></li>
 <li><h3>Add a scan</h3><div><p>A scan of the book is stored. A picture alone holds no text, so the citations stay unchecked.</p><details class="more"><summary>What the tool printed (step 5)</summary>
-<p class="record">5. A paper-only book: add its scan. A scan alone is not checkable</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma source add $DEMO/materials/ledger-scan.pdf --source src-demo0harbour01 --origin my own scan --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/book</span>
+<p class="record">5. A paper-only book: add its scan. A scan alone is not checkable</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma source add $DEMO/materials/ledger-scan.pdf --source src-demo0harbour01 --origin my own scan --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/book</span>
 Stored the copy and recorded it as cap-random0001.
   source: src-demo0harbour01
   sha256: 78f8c3acc88b6c528519b03d4a51a37d01659b902477ea035ce10984ea902f11 (439 bytes, application/pdf)
@@ -192,7 +192,7 @@ Full report: $DEMO/book/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details></div></li>
 <li><h3>Add the scan's text</h3><div><p>Text for the scan is supplied page by page, with page numbers. Nothing is left open among the checks that ran. The project is still not called checked clean, because some kinds of check do not run.</p><details class="more"><summary>What the tool printed (step 6)</summary>
-<p class="record">6. Attach the scan's text layer, page by page, with a page map that states its evidence</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma source text cap-random0001 --actor person:demo-author --text-layer $DEMO/materials/ledger-text-layer.txt --page-map $DEMO/materials/ledger-page-map.json --method ocr --project $DEMO/book</span>
+<p class="record">6. Attach the scan's text layer, page by page, with a page map that states its evidence</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma source text cap-random0001 --actor person:demo-author --text-layer $DEMO/materials/ledger-text-layer.txt --page-map $DEMO/materials/ledger-page-map.json --method ocr --project $DEMO/book</span>
 Saved the text as ext-random0001.
   method: ocr, quality unassessed
   sha256: 57304e80db7078658b8a866a5a51ce06925b96121a100bf59647bab92d77e748 (143 bytes)
@@ -225,7 +225,7 @@ a source, and some checks of cited sources are not run (listed under NOT CHECKED
 Those count as open.</pre></figure>
 </details></div></li>
 <li><h3>Lose the store</h3><div><p>The private store is moved away. The check does not pass by default: it says what it could not check, and which files are missing.</p><details class="more"><summary>What the tool printed (step 7)</summary>
-<p class="record">7. Without the store, nothing passes by default: could not check</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
+<p class="record">7. Without the store, nothing passes by default: could not check</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 2 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 21 result(s) passed.
 
@@ -278,7 +278,7 @@ The content store is private, apart from the repository, and Stemma never copies
 <span class="dim">[exit 0]</span></pre></figure>
 </details></div></li>
 <li><h3>A PDF with its own text</h3><div><p>In a second project, Stemma reads the text inside a PDF and proposes page numbers. The warnings shown come from the PDF-reading library and concern drawing pages, which Stemma does not do.</p><details class="more"><summary>What the tool printed (step 8)</summary>
-<p class="record">8. A PDF with a text layer: Stemma reads it and proposes page numbers for review</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/quoting-book</span>
+<p class="record">8. A PDF with a text layer: Stemma reads it and proposes page numbers for review</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/quoting-book</span>
 Created a Stemma project in $DEMO/quoting-book
   wrote rules.md
   wrote .gitattributes
@@ -342,7 +342,7 @@ No record problems found.
 <span class="dim">[exit 0]</span></pre></figure>
 </details></div></li>
 <li><h3>Check quotations and pages</h3><div><p>Three quotations are recorded. One matches after rejoining a word split at the end of a line, one differs by a word, and one cites a page the book does not have.</p><details class="more"><summary>What the tool printed (step 9)</summary>
-<p class="record">9. Quotations and page numbers are checked against that text</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma record add citation --input $DEMO/quote-1.json --actor person:demo-author --project $DEMO/quoting-book</span>
+<p class="record">9. Quotations and page numbers are checked against that text</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma record add citation --input $DEMO/quote-1.json --actor person:demo-author --project $DEMO/quoting-book</span>
 Added cit-demo0quote0001
   records/citations/cit-demo0quote0001.json
 No record problems found.
@@ -412,7 +412,7 @@ Full report: $DEMO/quoting-book/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details></div></li>
 <li><h3>Look at one page</h3><div><p>Only the page asked for is shown, clearly marked as text quoted from the source.</p><details class="more"><summary>What the tool printed (step 10)</summary>
-<p class="record">10. An excerpt: only the pages asked for, marked as quoted data</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma excerpt --source src-demo0levybook1 --pages 2 --project $DEMO/quoting-book</span>
+<p class="record">10. An excerpt: only the pages asked for, marked as quoted data</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma excerpt --source src-demo0levybook1 --pages 2 --project $DEMO/quoting-book</span>
 Excerpt of source src-demo0levybook1: printed pages 2.
 Text: ext-random0002 of copy cap-random0002; method text_layer, quality unassessed.
 This is stored extracted text, not a reading of the page: compare any words you will quote with the page itself.
@@ -425,7 +425,7 @@ Stemma holds back no source: any source in this project may be sent to a hosted 
 <span class="dim">[exit 0]</span></pre></figure>
 </details></div></li>
 <li><h3>What a clean result looks like</h3><div><p>A project that records a source but cites nothing is called checked clean. That says nothing about citations, because there are none.</p><details class="more"><summary>What the tool printed (step 11)</summary>
-<p class="record">11. What checked clean looks like: sources recorded, nothing cited</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/reading-list</span>
+<p class="record">11. What checked clean looks like: sources recorded, nothing cited</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/reading-list</span>
 Created a Stemma project in $DEMO/reading-list
   wrote rules.md
   wrote .gitattributes
@@ -456,7 +456,7 @@ Demo finished as expected. The files are in $DEMO</pre></figure>
 <section class="band"><div class="band-head"><h2 id="fixtures">More test projects</h2></div><div class="band-body">
 <p>Small projects that the tool's own tests run. Each has its printed report and the same report as a data file, with the run time and machine details removed.</p>
 <h3>A project with planted mistakes</h3><p>Mistakes planted on purpose, one or more for each kind the tests expect. <a href="reports/check-seeded.json">Data file for the seeded project</a>.</p><details class="more"><summary>Printed report for the seeded project</summary>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/seeded</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/seeded</span>
 <span class="v-warn">OPEN FINDINGS</span>: 9 problem(s), 1 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 15 result(s) passed.
 
@@ -544,7 +544,7 @@ Full report: $PROJECTS/seeded/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details>
 <h3>A cited source with no copy</h3><p>One citation that resolves to a source with no stored copy, so it is reported as unchecked. <a href="reports/check-cited.json">Data file for the cited project</a>.</p><details class="more"><summary>Printed report for the cited project</summary>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/cited</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/cited</span>
 <span class="v-warn">OPEN FINDINGS</span>: 1 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 11 result(s) passed.
 
@@ -565,7 +565,7 @@ Full report: $PROJECTS/cited/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 </details>
 <h3>A project with nothing open</h3><p>Sources recorded and nothing cited, so it is called checked clean. The label says nothing about citations. <a href="reports/check-clean.json">Data file for the clean project</a>.</p><details class="more"><summary>Printed report for the clean project</summary>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/clean</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/clean</span>
 <span class="v-ok">CHECKED CLEAN</span>: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
 Checked the whole project: 8 result(s) passed.
@@ -574,7 +574,7 @@ Full report: $PROJECTS/clean/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
 </details>
 <h3>A project with a manuscript file</h3><p>A project with a manuscript file. Stemma does not read it, and says that it could not check. <a href="reports/check-manuscript.json">Data file for the manuscript project</a>.</p><details class="more"><summary>Printed report for the manuscript project</summary>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names from the test machine replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/manuscript</span>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/manuscript</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 1 could not be checked, 12 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 7 result(s) passed.
 
