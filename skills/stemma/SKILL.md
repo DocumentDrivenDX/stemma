@@ -246,11 +246,18 @@ with the data identity it prints. The page shows the same one.
 - The page works offline and never changes by itself. After records, sources or
   manuscript files change, export again and tell the author to reload;
   `graph status` says whether an export is current.
-- It holds passage text and other record contents. Say so once: anyone given the
-  file can read all of it. Do not send or publish it unasked, and do not commit
+- It holds passage text, the text of cited pages, the report's text when there
+  is one, and other record contents. Say so once: anyone given the file can read
+  all of it. Do not send or publish it unasked, and do not commit
   it; the default under `build/` is ignored by git.
-- It does not hold source pages, manuscript files or research notes. Pass on the
-  command's warnings and what it says was left out.
+- It does not hold other source pages, files under `manuscript/` or research
+  notes. Pass on the command's warnings and what it says was left out.
+- When the project has `report/report.json`, the page's **Manuscript** view shows
+  that report: the author can click a quotation, a note's citation or a
+  bibliography entry to see its source with the cited words marked. It reads only
+  `report/`, assembled again at export; it is not the PDF, and it opens no
+  original. A quotation `build report` would refuse is shown as broken and not
+  marked; the export names it in `manuscript_incomplete`.
 - Bad records do not stop an export. A file that cannot be read or breaks a
   record rule is left out whole, and a broken reference gives no link. The
   command exits 1 and names them: say the graph is incomplete, and use `check`
