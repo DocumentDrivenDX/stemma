@@ -1,11 +1,12 @@
 // What the plugin ships, and the launcher that sets it up. Nothing here uses the
 // network; `./scripts/dev.sh plugin-check` runs a real first-time setup.
-import { beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { chmodSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { bundle } from "../scripts/build.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "../scripts/publish-plugin.ts";
 import { ROOT, temporary } from "./helpers.ts";
+import { endMcp, McpHost } from "./mcp-run.ts";
 
 let plugin = "";
 beforeAll(async () => {
@@ -14,6 +15,14 @@ beforeAll(async () => {
   mkdirSync(join(plugin, "scripts"));
   cpSync(join(ROOT, "scripts/stemma.sh"), join(plugin, "scripts/stemma.sh"));
 });
+afterAll(endMcp);
+
+/** The server the manifest declares, as a host that fills in the two variables starts it. */
+function declared(fill: Record<string, string> = {}): string[] {
+  const { command, args } = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/plugin.json"), "utf8")).mcpServers.stemma as { command: string; args: string[] };
+  return [command === "sh" ? "/bin/sh" : command, ...args.map((a) => (Object.hasOwn(fill, a) ? fill[a]! : a))];
+}
+const filled = (data: string) => declared({ "${CLAUDE_PLUGIN_ROOT}": plugin, "${CLAUDE_PLUGIN_DATA}": data });
 
 /** The launcher with no bun on the search path. */
 function launch(args: string[], env: Record<string, string> = {}, cwd = temporary()) {
@@ -78,6 +87,94 @@ describe.skipIf(process.platform === "win32")("the plugin's launcher", () => {
   });
 });
 
+describe.skipIf(process.platform === "win32")("the declared MCP server", () => {
+  test("it is the only one, starts the launcher, and its script holds no variable of the host's", () => {
+    const servers = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/plugin.json"), "utf8")).mcpServers;
+    expect(Object.keys(servers)).toEqual(["stemma"]);
+    expect(Object.keys(servers.stemma)).toEqual(["command", "args"]);
+    const [flag, script, name, ...given] = servers.stemma.args as string[];
+    expect([flag, name, given]).toEqual(["-c", "stemma-mcp", ["${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PLUGIN_DATA}"]]);
+    expect(script).not.toMatch(/CLAUDE|\$\{/);
+    expect(script).toContain('exec sh "$1/scripts/stemma.sh" "$2" mcp');
+    expect(JSON.parse(readFileSync(join(ROOT, ".claude-plugin/plugin.json"), "utf8")).dependencies).toEqual(["docsync"]);
+  });
+
+  test("a host that does not fill the variables in runs nothing, even where the session's directory holds scripts under those names", () => {
+    const cloned = temporary();
+    const marker = join(cloned, "ran");
+    const planted = `#!/bin/sh\n: > '${marker}'\n`;
+    for (const directory of ["${CLAUDE_PLUGIN_ROOT}/scripts", "scripts", "relative/scripts"]) {
+      mkdirSync(join(cloned, directory), { recursive: true });
+      writeFileSync(join(cloned, directory, "stemma.sh"), planted);
+    }
+    const data = join(temporary(), "data");
+    const cases = [
+      declared(), declared({ "${CLAUDE_PLUGIN_DATA}": data }), declared({ "${CLAUDE_PLUGIN_ROOT}": plugin }),
+      declared({ "${CLAUDE_PLUGIN_ROOT}": "", "${CLAUDE_PLUGIN_DATA}": "" }), declared({ "${CLAUDE_PLUGIN_ROOT}": "relative", "${CLAUDE_PLUGIN_DATA}": data }),
+      declared({ "${CLAUDE_PLUGIN_ROOT}": ".", "${CLAUDE_PLUGIN_DATA}": data }),
+    ];
+    for (const command of cases) {
+      const done = Bun.spawnSync(command, { cwd: cloned, env: { PATH: "/usr/bin:/bin", HOME: temporary() }, stdin: new TextEncoder().encode('{"method":"initialize","jsonrpc":"2.0","id":0}\n') });
+      expect([command.slice(4), done.exitCode, done.stdout.toString()]).toEqual([command.slice(4), 4, ""]);
+      expect(done.stderr.toString()).toContain("did not fill in");
+    }
+    expect([existsSync(marker), existsSync(data)]).toEqual([false, false]);
+    // The planted script is what the plain form of the declaration would have run.
+    Bun.spawnSync(["/bin/sh", "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh"], { cwd: cloned });
+    expect(existsSync(marker)).toBe(true);
+  });
+
+  test("without the pinned Bun it lists the same tools and says to run setup, fetching and writing nothing; once Bun is there the next call reaches the command line", async () => {
+    const data = join(temporary(), "plugin data");
+    const home = temporary();
+    const session = temporary();
+    const fake = join(temporary(), "fake.tgz");
+    writeFileSync(fake, "not Bun");
+    // With an archive that would fail loudly, and a curl that would leave a mark, if either were reached for.
+    const tools = temporary();
+    writeFileSync(join(tools, "curl"), `#!/bin/sh\n: > '${join(tools, "fetched")}'\n`);
+    chmodSync(join(tools, "curl"), 0o755);
+    const host = McpHost.start(filled(data), { PATH: `${tools}:/usr/bin:/bin`, HOME: home, CLAUDE_PROJECT_DIR: session, STEMMA_BUN_ARCHIVE: fake }, session);
+    expect((await host.initialize()).protocolVersion).toBe("2025-11-25");
+    const listed = (await host.request("tools/list")).result.tools;
+    expect(listed).toEqual(JSON.parse(readFileSync(join(ROOT, "packages/server/src/mcp-tools.json"), "utf8")));
+    expect((await host.request("ping")).result).toEqual({});
+    expect((await host.request("resources/list")).error.code).toBe(-32601);
+    for (const name of ["status", "search", "open"]) {
+      const got = await host.call(name, { id: "x", text: "$(touch injected)" });
+      expect([got.isError, got.text.split(":")[0]]).toEqual([true, "setup_needed"]);
+    }
+    // IDs in either order, as strings or numbers; nothing else of a request is repeated.
+    host.send('{"jsonrpc": "2.0", "id": "a-1", "method": "tools/call", "params": {"name": "search", "arguments": {"id": 99}}}');
+    expect((await host.reply("a-1")).result.isError).toBe(true);
+    host.send('{"jsonrpc":"2.0","id":41,"method":"tools/call","params":{"name":"open","arguments":{"id":"$(touch injected)"}}}');
+    expect((await host.reply(41)).result.isError).toBe(true);
+    for (const hostile of ['{"method":"ping","jsonrpc":"2.0","id":"$(touch injected)"}', '{"method":"ping","jsonrpc":"2.0","id":"a\\"}', '{"method":"ping","jsonrpc":"2.0","id":1.5e9x}', "not JSON at all"]) host.send(hostile);
+    expect((await host.request("ping")).result).toEqual({});
+    expect(host.stdout).not.toContain("touch");
+    expect([existsSync(data), readdirSync(home), readdirSync(session), existsSync(join(tools, "fetched"))]).toEqual([false, [], [], false]);
+
+    mkdirSync(join(data, "bun-1.4.5"), { recursive: true });
+    symlinkSync(process.execPath, join(data, "bun-1.4.5/bun"));
+    const now = await host.call("status");
+    expect([now.isError, now.text]).toEqual([false, expect.stringContaining("not in a Stemma project")]);
+    expect((await host.call("stop")).isError).toBe(false);
+    expect(await host.end()).toBe(0);
+    expect([readdirSync(data), readdirSync(home), readdirSync(session), host.stderr]).toEqual([["bun-1.4.5"], [], [], ""]);
+  }, 60_000);
+
+  test("with the pinned Bun it starts the command line, writing nothing, a transpiler cache included", async () => {
+    const data = ready();
+    const home = temporary();
+    const session = temporary();
+    const host = McpHost.start(filled(data), { PATH: "/usr/bin:/bin", HOME: home, CLAUDE_PROJECT_DIR: session }, session);
+    expect((await host.initialize()).serverInfo.name).toBe("stemma");
+    await host.request("tools/list");
+    expect([readdirSync(data), readdirSync(home), readdirSync(session)]).toEqual([["bun-1.4.5"], [], []]);
+    expect(await host.end("SIGINT")).toBe(0);
+  }, 60_000);
+});
+
 describe("what is released", () => {
   const manifest = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/plugin.json"), "utf8"));
 
@@ -121,7 +218,7 @@ describe("what is released", () => {
     const files = readdirSync(join(plugin, "dist"), { recursive: true }).map(String);
     expect(files.filter((f) => /\.(node|dylib|so|dll)$|node_modules/i.test(f))).toEqual([]);
     for (const needed of ["pdfjs/cmaps/UniJIS-UCS2-H.bcmap", "pdfjs/cmaps/LICENSE", "pdfjs/standard_fonts/LICENSE_FOXIT", "pdfjs/standard_fonts/LICENSE_LIBERATION", "pdfjs/LICENSE",
-      "licenses/cite/CPAL-1.0.txt", "licenses/cite/citeproc-js-LICENSE", "licenses/cite/CC-BY-SA-3.0.txt", "licenses/cite/NOTICE.txt"]) {
+      "mcp-tools.json", "licenses/cite/CPAL-1.0.txt", "licenses/cite/citeproc-js-LICENSE", "licenses/cite/CC-BY-SA-3.0.txt", "licenses/cite/NOTICE.txt"]) {
       expect(files).toContain(needed);
     }
     // The worker is built in, so no separate worker module is looked for.
