@@ -80,5 +80,5 @@ The first pilot takes over one existing chapter. Support for an input is promise
 ## Out of Scope
 
 - Library files (US-100).
-- PDF-only or LaTeX manuscripts.
+- PDF manuscripts (US-116) and LaTeX manuscripts.
 - Capturing sources.

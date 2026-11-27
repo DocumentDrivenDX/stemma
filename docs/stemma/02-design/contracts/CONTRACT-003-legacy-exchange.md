@@ -12,25 +12,26 @@ ddx:
     - CONTRACT-002
 ---
 
-# Contract: Legacy import, export, and Word intake
+# Contract: Legacy import, export, and manuscript intake
 
 **Contract ID**: CONTRACT-003
 **Type**: schema and CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-002, FR-13, FR-71 to FR-73, FR-92, FR-93
+**Related**: ADR-002, FR-13, FR-71 to FR-73, FR-92, FR-93, FR-95
 
 ## Purpose
 
 Defines how CSL-JSON (Citation Style Language item data), BibLaTeX (a LaTeX
-bibliography format), RIS (a tagged reference format), and Word files enter a
-project, how libraries leave it, and what "keeps all of its information" means.
+bibliography format), RIS (a tagged reference format), Word files, and PDF
+manuscripts enter a project, how libraries leave it, and what "keeps all of its information" means.
 
 ## Scope and Boundaries
 
-- In scope: codec behaviour, equivalence, loss reports, Word intake outputs, and
-  limits on untrusted input.
+- In scope: codec behaviour, equivalence, loss reports, Word and PDF manuscript
+  intake outputs, and limits on untrusted input.
 - Out of scope: BibTeX, EndNote library files, Zotero database or API access,
-  LaTeX manuscripts, and Word, LaTeX, or HTML export (deferred past v1).
+  LaTeX manuscripts, recognition of scanned pages, and Word, LaTeX, or HTML
+  export (deferred past v1).
 - Owning module: `packages/intake`.
 
 ## Normative Surface
@@ -43,6 +44,7 @@ project, how libraries leave it, and what "keeps all of its information" means.
 | BibLaTeX | yes | yes | yes |
 | RIS | yes | yes | yes, for files the codec accepts without error |
 | Word `.docx` | yes | no | not applicable; the original is never modified |
+| PDF manuscript with a text layer (I) | yes | no | not applicable; the original is never modified |
 
 A format, producer, or embedded-field variant is **supported** only after tests
 on files saved by real tools pass (FR-71). Until then the intake report labels
@@ -554,6 +556,228 @@ report says so. The report also lists, apart from the counts, the linked
 citations that carry a working marker, and the entries flagged `bracketed_note`
 or `long_surname_form` with the number of citation items linked to each.
 
+### I. PDF manuscript intake
+
+The layout profile is `pdf-layout/1`. Its rules and numbers are design
+assumptions that no test has yet exercised. A change to a rule makes a new
+version. It covers born-digital, single-column drafts, as exported by a word
+processor or LaTeX. Other layouts are read by the same rules, and more of them
+is reported.
+
+A PDF places characters on a page. It does not state paragraphs, notes, or
+tables, so the reader sets structure only by a rule here, and reports what it
+cannot establish. No model reads the pages, sets structure, or links a citation.
+
+**What `takeover` produces.** For a PDF it MUST do what F requires of a Word
+file, in items 5 to 12 and the one-file-per-run, earlier-records, and unchanged
+original rules of item 1: the same records, intake items, Stemma copy, intake
+report, rounds, and author-date account, from the same neutral document. Where
+this section differs, it governs. F items 2 to 4 do not apply.
+
+**The reader** takes the file's bytes and returns the neutral document; for each
+paragraph the page, the rectangle, and the text offsets of each line it was made
+from; each page's state; comments; reported items; removed lines; the account;
+the support level (`untested` for every producer until A is met); the producer
+and creator the file states; and the coverage statements below. It writes
+nothing, fetches nothing, and runs nothing found in the file. Text is read from
+the text layer with the pinned PDF library (SD-002), with characters kept as the
+file maps them.
+
+**Pages.** Each page has exactly one state:
+
+| State | When | Converted |
+|---|---|---|
+| `converted` | It has text and none is drawn invisibly | yes |
+| `blank` | It has no text and paints no image or shape | nothing to convert |
+| `no_text` | It has no text and paints something, as a scan or a full-page figure does | no |
+| `invisible_text` | Any of its text is drawn in a rendering mode that neither fills nor strokes it, as a recognition layer over a scan is | no |
+
+`no_text` and `invisible_text` pages are **unread**. Each is an `unread_content`
+item with its page number, its state, and, for invisible text, the number of
+characters not converted. Stemma recognizes no text. If no page is `converted`,
+the command fails with `pdf_no_text` and writes nothing. If any page is unread,
+the report's first line says the import is partial and names the pages. A
+recognition layer drawn as visible text, under a page image, cannot be told from
+typed text.
+
+**Removed lines.** Before structure is read, only these are taken out. Each
+removal is listed with its page, rule, and text:
+
+| Rule | Removes |
+|---|---|
+| `download_stamp` | What CONTRACT-007 I removes. Its words are not recorded |
+| `repeated-line` | A running head or foot by the CONTRACT-007 I rule |
+| `page-number` | A line among the first two or last two of a page that is only an arabic or Roman number, where on at least three pages such numbers differ from the page's index by the same amount |
+| `list-heading-repeat` | A line among the first two of a page that is only `References` or `Bibliography`, on a page that continues a list |
+
+**Reading order.** Text is taken in the file's order.
+
+- A page that meets the CONTRACT-007 I test for two columns is read left column,
+  then right.
+- A page is **order-uncertain** when two pieces of text share a line's height
+  with a gap between them of more than 4% of the page's width, as columns,
+  tables, text boxes, and printed comment balloons do, or when a line in the
+  file's order stands higher than the line before it, other than at a change of
+  column. Its text is kept in the file's order and the page is reported.
+
+**Footnotes.** A note is a footnote only by the CONTRACT-007 I pairing of a
+small raised marker with a smaller line at the foot of the same page. Its
+paragraphs have location `footnote`, follow the paragraph that refers to them,
+and are labelled `p<page>-<marker>`, counting pages from 1. The paired marker
+leaves the body text, and its place is kept as a note reference.
+
+- Smaller text at the foot of a page that no marker pairs, including the rest of
+  a footnote carried over from the page before, becomes its own body paragraph,
+  with a seam at each end, and is reported `unpaired_foot_text`.
+- A raised marker that nothing pairs stays in the text as typed, with a seam on
+  each side, and is reported `unpaired_marker`.
+- Endnotes are read as the body text they appear as, and are not tied to their
+  markers.
+
+**Paragraphs and headings.** Lines in reading order form one paragraph until
+one of these: the next line is indented from the left margin and the line before
+was not; the gap to it is more than 1.4 times the usual line spacing; it is, or
+follows, a heading, a line that is only `References` or `Bibliography`, or
+unpaired foot text. A change of page or column alone ends no paragraph. A
+paragraph is never ended while a round bracket opened in it is unclosed, unless
+a heading or unpaired foot text comes next. Lines are joined with one space. A
+line that ends in a hyphen is joined to a following letter or digit with no
+space, and the hyphen is kept: the reader does not choose whether it belongs to
+the word. A heading is found only by the CONTRACT-007 I size rule; the sizes
+found give levels 1 to 4, largest first, and smaller sizes take level 4.
+`table` and `caption` are never assigned. Takeover writes one chapter for each
+PDF file and states that basis.
+
+**Seams and hyphens.** The reader marks in a paragraph where it cannot vouch
+for its text. A **seam** is an offset where what stands on the two sides may not
+belong together. Offset 0 or the paragraph's length means that its start or end
+may be false. A **hyphen mark** is the offset after a hyphen kept at a join. A
+seam goes:
+
+- at each join across a page or column, including a join across unread pages;
+- at each line join on an order-uncertain page;
+- at offset 0 of a body or footnote paragraph when the paragraph before it in
+  the body, or in the same note, is not a heading and does not end with `.`,
+  `?`, `!`, or `:`, with any closing quotation mark or bracket after it; and
+- where **Footnotes** says.
+
+In a list with separable entries (below), the layout shows where entries begin,
+so seams come only from joins inside an entry and from order-uncertain pages.
+
+**List entries.** A list starts and ends as H rule 1 says. Its entries are
+**separable** only when, from its start to that end, apart from removed lines,
+paired footnotes, and subheadings:
+
+- every line is set in one size and stands at one of two left positions, the
+  entry position and one deeper continuation position, within 2 points. The two
+  may shift together from page to page;
+- at least one line stands at the continuation position; and
+- no three lines in a row stand at the entry position and each reach within
+  three times the text size of the farthest right end of any body line, as the
+  lines of running prose do.
+
+An entry is then one line at the entry position and the continuation lines after
+it. This is the hanging indent. A list set any other way, for example with only
+a space between entries, is not separable. Other text that follows a list with
+no heading the reader finds usually breaks one of these rules, which makes the
+list not separable; text that breaks none is read as entries, and each one the
+list reader cannot read is listed. A list that is not separable has no
+entries and ends at its start paragraph. Its lines are read as ordinary text,
+the list is marked incomplete, and the report names the first line that broke
+the rule, says that no entry was carried forward for the bibliography (F11),
+and says that exporting each chapter as its own file, or taking over its Word
+file, can help.
+
+**What the matcher does with the marks.** H applies unchanged to a document that
+has no seams, hyphen marks, unread pages, or unseparated lists, which is every
+Word document. For a document that has them, these rules also apply. Each only
+removes or withholds a link; none adds one.
+
+- **Entries.** An entry with a seam anywhere in it, either end included, is
+  unread (`uncertain_boundary`). The text searched to decide whether it could be
+  the one cited joins it with the entry before and the entry after.
+- **Hyphens in entries.** An entry with a hyphen mark is read twice, with those
+  hyphens kept and removed. It is read only when both give the same authors,
+  family-name forms, year, suffix, and layout; otherwise it is unread
+  (`uncertain_hyphen`), and both texts are searched. A hyphen in a title changes
+  none of these.
+- **Citations.** A pair of brackets that H would link or leave unresolved is
+  instead left unlinked, reason `uncertain_layout`, when a seam lies inside it,
+  or, for a narrative form, anywhere from the end of the word before the names
+  (or the paragraph's start) to the opening bracket. The same applies when a
+  hyphen mark in the brackets or the narrative names would, with the hyphen
+  removed, give a different state, entry, year, suffix, or locator. A pair that
+  H already leaves unlinked keeps H's reason.
+- **Incomplete lists.** A list is incomplete when its entries are not separable,
+  or when an unread page lies between the first paragraph it serves and the
+  page after its last line, that page included: an entry or another list's
+  heading may be on it. A citation that an incomplete list serves is never
+  linked. It is unresolved, reason `list_incomplete`, which ranks directly after
+  `no_list`, with its candidates listed.
+
+`uncertain_layout` and `list_incomplete` join H's counts, so the three states
+still add up to the number examined. The report names both profiles.
+
+**Reported content.** Each has its page and, where there is one, its rectangle.
+
+- **Comments.** Every annotation that holds text or marks up text is a comment,
+  with any stated author and date and its text, saved as an `unread_content`
+  item (FR-71). Which words it marks is not established.
+- Form-field values are reported, not converted. Link annotations are counted
+  and their addresses listed; none is fetched, and no link is used to match a
+  citation. Attachments are listed by name and not opened. Optional content
+  (layers) is reported as present. Images are counted by page.
+- Characters the file maps to no readable character (the replacement character
+  or a private-use code) are counted by page, and their paragraphs listed.
+- A round bracket with no partner, in a paragraph that holds a year form, is
+  reported `unpaired_bracket`. A citation that a paragraph break divided is
+  therefore listed even though H does not examine it.
+
+**What a PDF cannot show.** Every report MUST state all of these, whatever the
+file holds:
+
+- Whether it was made showing tracked changes. If it was, deleted text is read
+  as current text and can produce citations; export with changes accepted, or
+  take over the Word file. F4's rule for deleted text cannot be met.
+- Comments printed onto the page are read as page text.
+- Hidden, white, struck-through, covered, and switched-off-layer text is read
+  like other text. Text placed wholly off the page may not be returned at all.
+- Tables, captions, block quotations, emphasis, and each passage's language and
+  direction are not recognized. Table text becomes ordinary text, so
+  citations in tables are not listed as `in_table`. Block quotations are not
+  attributed, and quotation checks do not cover them.
+- A PDF holds no reference-manager fields, so no embedded reference is recovered.
+- Text in images or drawn as shapes is not read.
+- Recognized text drawn visibly cannot be told from typed text.
+- Spaces and character order are as the PDF library rebuilds them from the
+  page. Right-to-left text is untested.
+
+**Account.** Every non-white-space character the library returns on a converted
+page ends in exactly one of: paragraph text, a paired note marker, or a listed
+removal (stamps by count only).
+Form-field values and comment texts are reported apart. A difference stops the
+reading as an internal error. Unread pages are outside this count and are named.
+
+**One file for each chapter** (Word and PDF alike). Before writing, `takeover`
+compares the new file with each file already taken over. It takes every run of
+12 consecutive words in the new file's body text outside reference lists, folded
+as in H, with bracketed text and line-end hyphens removed. When 20% or more of
+the runs occur in the chapters that came from one earlier file, it writes
+nothing, fails with `repeated_chapter`, and names that file and the share. With
+`--separate`, the author's statement that it is a different text, it proceeds
+and the batch records the statement. A file with fewer than 12 such words is not
+compared. The threshold is an assumption. Identical bytes follow F10.
+Replacing a chapter taken over from one file with another file is not defined.
+
+**Limits and damage.** `pdf_unreadable` is given for a file that is not a PDF,
+is encrypted, is damaged, or has a page that cannot be read; `input_limit` for a
+file over 200 MiB, 2,000 pages, 20 MiB of extracted text, 2,000,000 pieces of
+text, 10,000 annotations, or 300 seconds. Both write nothing. Document scripts,
+actions, forms, links, attachments, and external references are never run,
+opened, or fetched. The reading runs in a separate process that is stopped at
+the time limit. **G is not wholly met for PDF:** the library expands compressed
+page data itself, and no cap on expanded size or memory is designed.
+
 ## Precedence and Compatibility
 
 - Versioning: each codec has a version recorded on every batch. A codec change
@@ -570,6 +794,9 @@ or `long_surname_form` with the number of citation items linked to each.
 | Unparseable library entry | `import_parse_error` with line; nothing written | no | Fix the file or remove the entry |
 | Limit exceeded | `input_limit`; nothing written | no | Inspect the file |
 | Corrupt or encrypted `.docx` | `docx_unreadable` | no | Save an unencrypted copy |
+| Corrupt or encrypted PDF | `pdf_unreadable`; nothing written | no | Export an unencrypted copy |
+| PDF with no page that can be converted | `pdf_no_text`; nothing written | no | Supply the Word file or a born-digital PDF; recognition is not offered |
+| File repeats text already taken over | `repeated_chapter`; nothing written | yes | Take one file per chapter, or pass `--separate` for a different text |
 | Embedded field present but undecodable | Intake continues; listed with raw location | no | Author resolves manually |
 | Strict export would lose data | Exit 5, report only | yes | Use `report` policy |
 | Original file not supplied | Byte replay unavailable; regeneration still meets C | yes | Supply the original |
@@ -609,6 +836,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
+| PDF manuscript intake (I) | A probe of the pinned PDF library on one invented file showed that invisible, white, struck-through, and switched-off-layer text arrives unmarked; off-page text did not arrive; rendering modes, comment and form annotations, and attachment names are available apart from the text. The source converter's rules that I reuses have their own synthetic tests | Every rule, number, and guard of I: no reader is built. Any PDF from a real producer: PDF manuscript support is untested |
 | Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`. A run of `author-date/1` on the same drafts found no wrong link among those it added, but leaving later authors of unknown surname length unread lost correct links, mostly for ordinary names; `author-date/2`, which keeps each form instead, restored those links on the same drafts, and a check of the changed links found none wrong; most longer forms it kept were a middle name before the surname, and two authors with a separator missing between them can read as one, which that run did not find in the entries holding longer forms | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis

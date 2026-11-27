@@ -271,8 +271,8 @@ delays the pilot or the first Claude release.
    and places (subsystems 2, 3, 5, and 11).
 2. Scripted checks and claim-support records that run in the agent and at every
    build, with every finding explained (subsystem 7).
-3. Takeover of a Word manuscript and its reference libraries, with a basic PDF
-   of the result (subsystems 15 and 8).
+3. Takeover of a Word or born-digital PDF manuscript and its reference
+   libraries, with a basic PDF of the result (subsystems 15 and 8).
 4. Project setup, research discovery, and composition from the claim ledger
    (subsystems 1, 4, and 6).
 5. Typst output, audit, disclosure, and a reviewer package (subsystems 8 and 9).
@@ -512,7 +512,8 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 ### Subsystem: 15. Takeover of existing projects
 
-- **FR-71** (P0, M1) — Takeover reads a Word manuscript and BibLaTeX, CSL-JSON, and RIS libraries without changing the originals, recovering embedded reference-manager fields where present. A manuscript may be one Word file or several, such as one for each chapter or appendix, taken over into one project. Takeover reads body text, headings, and tables, reports every Word comment, and drops nothing silently. Support for an input is promised only after tests on files saved by real tools pass.
+- **FR-71** (P0, M1) — Takeover reads a Word manuscript and BibLaTeX, CSL-JSON, and RIS libraries without changing the originals, recovering embedded reference-manager fields where present. A manuscript may be one Word file or several, such as one for each chapter or appendix, taken over into one project. Takeover reads body text, headings, and tables, reports every Word comment, and drops nothing silently. Support for an input is promised only after tests on files saved by real tools pass. A chapter that has no Word file can be taken over from PDF (FR-95).
+- **FR-95** (P0, M1) — Takeover also reads a born-digital PDF manuscript with a text layer, for a chapter that has no Word file, and produces what it produces from Word, including the Stemma copy. It is designed for single-column drafts. A PDF does not state most structure, so Stemma sets it only by a stated rule, reports what it cannot establish, links no citation and reads no reference entry across a place it cannot vouch for, and states what a PDF cannot show, such as tracked changes and reference-manager fields. Scanned pages and invisible recognition layers are not converted and are named; recognition is a separate decision. A chapter is taken over from one file: a file that repeats text already taken over adds nothing unless the author says it is a different text. Support is promised only as in FR-71.
 - **FR-72** (P0, M1) — Takeover builds full and partial references, quotations, and claims into the graph as unverified. Typed footnotes that cannot be resolved with certainty are reported to the author. Extracted claims take effect at once, marked unreviewed (FR-23): the author reviews them when they like, in batches shown with their original passages, and can edit or retire any one. Review does not verify a claim. The whole original reference list carries forward as sources listed for the bibliography, so an entry that is cited nowhere is reported until the author removes it from the list or dismisses the finding (FR-15).
 - **FR-73** (P0, M1) — The author can work through failing references in rounds that can stop and resume, choosing to remove, repoint, or replace each one. Rounds are never required before other work. Fixes are written to a Stemma copy of the manuscript, in the Markdown of FR-35; original files are never changed. The citation, source, quotation, page, figure, and listed-entry checks of FR-9 and FR-29 read that copy. Every choice is rechecked with the records that depend on it. A claim that a removal leaves without a citation is reported.
 - **FR-82** (P0, M2) — For a taken-over project, Stemma suggests constructs and a research methodology, each with its supporting passages. A suggestion takes effect at once, marked unreviewed, and the author can revise or retire it.
@@ -611,6 +612,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-69 | Extend a profile | A built-in voice profile | The extension applies and the built-in is unchanged |
 | FR-70 | Amend from an example | A passage of the author's own writing | A change in effect, marked unreviewed, with the example saved |
 | FR-71 | Take over a Word file | A manuscript saved by a real tool with embedded fields | References are recovered and the original is unchanged |
+| FR-95 | Take over a PDF chapter | An invented PDF chapter with a running head, a footnote, a reference entry split across two pages that would otherwise read as a solo work, and a citation of that solo work; then a scan, and a Word file of the same chapter | The copy and records are written, every loss is listed, the split entry is unread and the citation is not linked; the scan is refused; the second file adds nothing unless the author says it is different |
 | FR-72 | Take over a short-form note | An ambiguous short form | It is unverified and reported to the author |
 | FR-72 | Carry the reference list | An original list with one uncited entry | The entry is listed and reported until removed or dismissed |
 | FR-73 | Remove a failing reference | The author removes it and stops | The claim is reported as left without a citation, and the session resumes later |
@@ -701,7 +703,7 @@ Each requirement carries its priority and, for P0, its delivery step.
     the author may make it public again.
   - Layout in an original that the manuscript markup does not define is reported
     by takeover, not carried over silently (FR-35, FR-71).
-  - A reference list serves the chapters read from its own Word file. An entry
+  - A reference list serves the chapters read from its own manuscript file. An entry
     in another list or in a library is shown as a candidate and never linked
     (FR-92).
   - A parenthesis that takeover leaves unlinked is listed and saved but is not a
@@ -744,6 +746,7 @@ Windows, desktop apps, and files saved by real tools are untested.
 | Material whose license, permission, or community terms bar hosted processing is added to a project and sent to a model | Medium | High | Say in setup and documentation that any source in a project may be sent; local models are an unsupported experiment; rights flags do not block sending |
 | Coordinates leak through prose or misclassified records into a draft, camera-ready book, or reviewer package; the scan only warns | Medium | High | Warn with the file and place, and state that a package or book can disclose a site; the author acts on the warning |
 | A restricted site nobody marked is treated as public, so maps, exports, and packages disclose its position | Medium | High | State the default where places are recorded; the author marks restricted sites |
+| A PDF layout rule divides or joins text wrongly, so that a citation or entry is lost, altered, or linked to the wrong work, or deleted text from a tracked-changes printout is read as current | High | High | Set structure only by stated rules; link nothing across a doubtful join; account for the text the library returns; state what a PDF cannot show; advise the Word file; label PDF support untested |
 | An author-date rule links a citation to the wrong entry, for example where an entry the reader could not parse is the one meant | Medium | High | Link only on one full match; leave the citation unresolved when an unparsed entry could also fit; check against hand-made answer lists |
 | A citation is read as an ordinary date and left unlinked, and a book is labelled checked clean | Medium | High | List every parenthesis with a year and its reason; state the count and this limit in the intake report; measure in the pilot |
 | Right-to-left quotations, or experimental right-to-left main text, lay out wrongly | Medium | Medium | Test pilot scripts with the footnote-marker case; promise only quotations in left-to-right books |
@@ -776,6 +779,19 @@ Windows, desktop apps, and files saved by real tools are untested.
 - [ ] Should every check report count the parentheses left unlinked, or should
   an unsettled one affect the checked-clean label? Until answered, only the
   intake report and `rounds status` show them; product owner.
+- [ ] A PDF page with no text, such as a full-page figure, cannot be told from a
+  scanned page, so any reference list it could affect links nothing (FR-95).
+  Should the author be able to say that such a page holds no text? Product
+  owner.
+- [ ] A reference list in a PDF that is not set with a hanging indent, or that
+  later text follows with no heading Stemma finds, links nothing. Is that
+  acceptable for the pilot's PDF files? Product owner with the pilot author.
+- [ ] Does the pilot need PDF takeover, or may it follow the Word path? FR-95 is
+  P0, M1 until answered, and no Word step waits for it. Product owner.
+- [ ] Which programs made the PDF manuscripts that matter? Their files decide
+  which support labels can be lifted. Product owner.
+- [ ] May a chapter taken over from PDF later move to its Word file, keeping the
+  author's choices? Not designed; product owner.
 - [x] Which PDF text-extraction library do the checks use? Answered by the
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a

@@ -17,7 +17,9 @@ ddx:
     - CONTRACT-003
     - CONTRACT-004
     - CONTRACT-006
+    - CONTRACT-007
     - SD-001
+    - SD-002
     - SD-003
     - SD-005
     - SD-007
@@ -35,14 +37,15 @@ ddx:
 
 ## Scope
 
-- Covers Word intake, the Stemma copy, the unverified graph, and resolution rounds (FR-71 to FR-73), reference lists and author-date linking (FR-92), the usable first report (FR-93), then construct and methodology suggestions (FR-82).
+- Covers Word and PDF manuscript intake (FR-71, FR-95), the Stemma copy, the unverified graph, and resolution rounds (FR-71 to FR-73), reference lists and author-date linking (FR-92), the usable first report (FR-93), then construct and methodology suggestions (FR-82).
 - **Pilot (M1)**: everything except suggestions (**M2**). The pilot's basic PDF is SD-008.
 - Depends on SD-003 (library codecs, source records), SD-005 (review service), SD-007 (checks, annotations), and the CONTRACT-006 reader and edits. SD-002 captures sources. A project must be initialized first, which the takeover mode does when needed (SD-001).
 - CONTRACT-003 owns intake behavior and reports; CONTRACT-006 F owns takeover output and edits; CONTRACT-002 owns commands.
 
 ## Build Order
 
-Each step depends on the ones before it. All are in the pilot.
+Each of steps 1 to 6 depends on the ones before it. All are in the pilot. The PDF
+reader steps P1 to P5 are below.
 
 | Order | Step | Requirements | Design status |
 |---|---|---|---|
@@ -53,12 +56,32 @@ Each step depends on the ones before it. All are in the pilot.
 | 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | Designed; no version reads the copy yet |
 | 6 | Usable first report | FR-93 | Designed here; usability unmeasured |
 
+### PDF reader build plan (FR-95)
+
+Specified, not built. P1 to P4 need none of steps 4 to 6. Each step ends with its
+tests passing on invented files and `./scripts/dev.sh check` passing.
+
+| Step | Build | Done when |
+|---|---|---|
+| P1 | **Matcher marks.** Add `seams` and `hyphens` to a neutral paragraph and `unreadPages` and `unseparatedLists` to a neutral document; apply CONTRACT-003 I, "What the matcher does with the marks", in the list reader and matcher; add the reasons `uncertain_boundary`, `uncertain_hyphen`, `uncertain_layout`, `list_incomplete` | Hand-made neutral documents show each guard, with the split entry of US-116-AC3 not linked; every existing Word and matcher test passes unchanged; a property test shows that adding any mark to a document never adds a link |
+| P2 | **PDF page facts.** Add the `core` port and implement it in `extract` over `readPdf`: for a manuscript, each page's lines and places, its state (invisible drawing, painted images or shapes), annotations, form values, link addresses, attachment names, layers, and image counts, read in a child process with a time stop. Move the CONTRACT-007 I layout rules the reader reuses into `core`. Extend `tests/pdf.ts` with annotations, invisible text, an image, and an attachment | Tests cover each page state and reported item; `pdf_unreadable` and `input_limit` cases; every source-conversion test gives byte-identical output |
+| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-116-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14 at the reader and matcher level; the library's own piece count equals the account on every invented file |
+| P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-116-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
+| P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the one-file-per-chapter check for both formats | US-116-AC1, AC10, AC11, AC13, AC14 through the command |
+
+After P4, run the developer report script on PDF manuscripts the author supplies,
+privately; commit only counts and invented reproductions. Every producer stays
+`untested` until openly licensed or invented-text files that it saved pass
+(CONTRACT-003 A).
+
 ## Requirements Mapping
 
 ### Functional Requirements
 
 | Requirement | Technical Capability | Component | Priority / step |
 |---|---|---|---|
+| PDF-01 to PDF-09 (FR-95) | Rule-based layout reading over the pinned PDF library, marks the matcher honors, stated limits | PDF reader, Author-date matcher | P0 / M1 pilot |
+| INT-11 (FR-71, FR-95) | One file for each chapter | Import coordinator | P0 / M1 pilot |
 | INT-01, INT-03, INT-04, INT-07, INT-08 (FR-71) | Bounded read-only Word reader; staged import | Word reader, Import coordinator | P0 / M1 pilot |
 | INT-02 (FR-71) | BibLaTeX, CSL-JSON, RIS intake | SD-003 codecs, Import coordinator | P0 / M1 pilot |
 | INT-05, INT-06 (FR-71) | Support levels and nothing dropped silently | Intake report | P0 / M1 pilot |
@@ -111,7 +134,35 @@ accepts broken XML, so a truncated part would read as a whole one, and flattens
 deep nesting without saying so; their archive reader keeps the last of two
 entries with one name and has no entry-path or expansion-ratio check.
 
-**Architecture/ADR impact**: No change; `intake` owns Word and legacy formats.
+**Architecture/ADR impact**: `intake` owns Word and legacy formats, and now the
+layout reading of PDF manuscripts. `extract` still owns the PDF format.
+`intake` may not import another adapter or start a process, so `core` owns a
+port for page facts (lines with their places, page states, annotations, and
+other reported content) that `extract` implements, running the library in a
+child process; the command line joins the two. No ADR changes.
+
+### PDF manuscripts
+
+| Approach | Finding | Decision |
+|---|---|---|
+| Use the source converter's output (`convertPdf`) as the manuscript | It is built for citing a source: it leaves paragraphs, tables, and reading order undetermined and keeps lines page by page. The reference-list reader needs one paragraph for each entry | Rejected as it stands; its rules are reused |
+| Turn the PDF into Word with an external converter | It guesses structure and hides what it lost; another large program | Rejected |
+| Read the structure tags some programs write into PDF | They could give paragraphs, headings, and tables. They are the producer's claim, many files have none, and no real file has been examined. On one invented untagged file the pinned library returned none | Deferred; look at real files first |
+| A layout reader in `intake` over the pinned library, with marks the matcher honors | Repeatable; every doubt is visible; no new outside dependency | Selected |
+| Recognition or a model reading page images | Not repeatable, can invent text | Rejected (FR-95) |
+
+**Reuse.** `readPdf` (text, positions, sizes, limits, refusal of encrypted and
+damaged files, download stamps) behind the port, and, from the converter's
+structure rules, recurring heads, body text size, the raised-marker footnote
+pairing, the heading size rule, and the two-column test. Those rules are pure
+and move to `core`, which both adapters may use, so that neither copies them. The neutral document, reference-list
+reader, matcher, report script, and `tests/pdf.ts` are extended, not copied.
+New in Stemma: line joining, order doubt, page-number runs, the list
+separability rule, page states, and annotation reading, all through the same
+pinned library. On one invented file the library gave no sign in its text that
+text was invisible, white, struck through, or on a switched-off layer, did not
+return text placed off the page, and gave drawing modes, annotations, and
+attachment names only through other calls.
 
 ## Domain Model
 
@@ -173,6 +224,17 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1519** — Reruns: identical bytes write nothing unless the author passes `--again` (CONTRACT-002 B). A changed original becomes an `original_changed` item and is not applied. No rerun overwrites a choice or an edit in the Stemma copy; a rerun with `--again` follows the same rule (assumption).
 - **BR-1520** — Reference list: every entry of a reference list or bibliography section found in the manuscript is bound by the BR-1507 and BR-1508 rules or becomes a provisional source with an intake item, and is added to `bibliography_include` (CONTRACT-003 F). The list is not copied into the chapter files. The report states the count or that no list was found; lists are detected by CONTRACT-003 H, a rule to test on real files.
 
+**PDF manuscripts** (the rules and numbers are CONTRACT-003 I)
+
+- **BR-1527** — One path: a PDF reading yields the same neutral document and the same records, copy, report, and rounds as a Word reading. Only the reader and the marks differ.
+- **BR-1528** — Structure by rule: the reader sets a role or a break only by a stated rule. It records what it could not determine and never assigns `table` or `caption`.
+- **BR-1529** — Doubt only withholds: marks can make an entry unread, a bracket unlinked, or a citation unresolved. No mark creates or changes a link. A document without marks is matched exactly as before.
+- **BR-1530** — Never choose a reading: where two readings of the text exist, as at a line-end hyphen, the text keeps what is printed, and a link or entry stands only if both readings agree.
+- **BR-1531** — Whole lists or nothing: entries are taken from a PDF list only when its layout separates every one of them. Otherwise the lines are examined as text and the list links nothing.
+- **BR-1532** — Unread pages: they are named, never recognized, and block links from any list they could affect.
+- **BR-1533** — Said every time: the limits that no rule can detect are in every PDF report, not only when something looks wrong.
+- **BR-1534** — One file for each chapter: the overlap check of CONTRACT-003 I applies to Word and PDF files in either order, before anything is staged.
+
 BR numbers for this feature start at 1501 so that designs written in parallel cannot collide.
 
 ### Input limits
@@ -199,6 +261,13 @@ one, applies to embedded data: a field's whole instruction, its stored data, a
 content control's tag, and the drawing data Word keeps in `gfxdata`
 attributes. The caps on elements and open fields bound memory (assumption).
 
+For PDF files the caps are those of CONTRACT-003 I, "Limits and damage". They
+are no more than the source converter's (SD-002) because a manuscript is
+smaller than a library original (assumption). `readPdf` checks time only between
+pages and caps text only after a page is read, so the `extract` port runs the library in a
+child process that is stopped at the time limit. No memory cap or cap on expanded
+page data is designed.
+
 ## System Decomposition
 
 ### Component: Word reader (`packages/intake`) — M1
@@ -206,6 +275,13 @@ attributes. The caps on elements and open fields bound memory (assumption).
 - **Responsibilities**: BR-1502, BR-1503; Zotero, Mendeley, and EndNote field decoders, each with its own support level; limits.
 - **Requirements Addressed**: INT-01, INT-04, INT-06, INT-07, INT-08.
 - **Interfaces**: Internal to `intake`; no Word shapes reach `core`.
+
+### Component: PDF reader (`packages/intake`, with page facts from `packages/extract`) — M1
+- **Purpose**: Turn a born-digital PDF into the neutral document with line places, marks, page states, reported items, and an account.
+- **Responsibilities**: BR-1528, BR-1532, BR-1533, and the marks of BR-1529 to BR-1531.
+- **Requirements Addressed**: PDF-01 to PDF-09, INT-06, INT-07, INT-08.
+- **Interfaces**: Reads the `core` page-facts port, which `extract` implements; the port's shapes are Stemma's, not the library's. Source conversion's output does not change.
+- **Owned by TDs**: US-116.
 
 ### Component: Reference resolver (`packages/intake`) — M1
 - **Purpose**: Classify notes and bind references by the binding profile.
@@ -227,8 +303,8 @@ attributes. The caps on elements and open fields bound memory (assumption).
 
 ### Component: Graph builder and import coordinator (`packages/intake` using `core` ports) — M1
 - **Purpose**: Create records, intake items, the report, and record the originals' digests.
-- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519; the intake report's groups.
-- **Requirements Addressed**: INT-02, INT-03, INT-05, INT-09, INT-10, GRF-01 to GRF-03, GRF-07, GRF-08, RPT-01, RPT-03.
+- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519, BR-1527, BR-1534; the intake report's groups.
+- **Requirements Addressed**: INT-02, INT-03, INT-05, INT-09, INT-10, INT-11, GRF-01 to GRF-03, GRF-07, GRF-08, RPT-01, RPT-03.
 - **Interfaces**: `takeover` and `import` (CONTRACT-002 B); outputs per CONTRACT-003 F.
 
 ### Component: Manuscript writer (`packages/manuscript`) — M1
@@ -257,6 +333,9 @@ graph TD
     Mode["takeover mode"] --> CLI["command line"]
     CLI --> Coord["import coordinator"]
     Coord --> Word["Word reader"]
+    Coord --> Pdf["PDF reader"]
+    Pdf --> Port["PDF page-facts port, core"]
+    Extract["extract: pinned PDF library, SD-002"] -.implements.-> Port
     Coord --> Lists["reference-list reader"]
     Coord --> Dates["author-date matcher"]
     Dates --> Lists
@@ -276,6 +355,7 @@ graph TD
 | Layer | Choice | Why | Alternatives Rejected |
 |---|---|---|---|
 | Word reading | Stemma reader with its own strict archive and XML readers over the pinned runtime | Accounting, limits, and refusing damaged files are requirements | External document converter; model reading; the converters' forgiving tag reader |
+| PDF reading | Stemma layout rules over the pinned `pdfjs-dist`, behind a `core` port that `packages/extract` implements | Same library and refusals as source conversion; every doubt can be marked | External PDF-to-Word or layout tools; recognition; model reading |
 | Reference binding | Fixed rules over library and prior citations | Repeatable; sends doubt to the author | Citation-parsing services and trained parsers: other runtimes, and research found weak footnote results |
 
 ## Traceability
@@ -292,6 +372,12 @@ graph TD
 | INT-08 | Coordinator | BR-1501 | Corrupt, encrypted, and interrupted imports leave no records |
 | INT-09 | Coordinator | BR-1519 | Second file after a choice; the choice stands |
 | INT-10 | Word reader | BR-1502 | Seeded comments all listed with text and position |
+| INT-11 | Coordinator | BR-1534 | Invented Word and PDF of one text, in both orders, and with `--separate` (US-116-AC13) |
+| PDF-01, PDF-09 | PDF reader, Coordinator | BR-1527 | US-116-AC1 |
+| PDF-02, PDF-03 | PDF reader | BR-1528 | US-116-AC2, AC7, AC12 on invented files |
+| PDF-04, PDF-05 | PDF reader, matcher, list reader | BR-1529 to BR-1531 | US-116-AC3 to AC6; added marks never add a link; Word tests unchanged |
+| PDF-06, PDF-07 | PDF reader, Intake report | BR-1533 | US-116-AC8, AC9 |
+| PDF-08 | PDF reader | BR-1532 | US-116-AC10 |
 | ADC-01, ADC-02 | Reference-list reader | BR-1521 | Invented lists in both layouts, with an unread entry and a file with no list |
 | ADC-03, ADC-04, ADC-07 | Author-date matcher | CONTRACT-003 H forms | One invented case per form, lead-in, locator, and date range |
 | ADC-05, ADC-06 | Author-date matcher | BR-1522 | Hand-made answer list with solo and co-authored look-alikes, a missing entry, and an unread one: zero wrong links; two runs identical |
@@ -321,6 +407,9 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 
 ### Gaps
 
+- [ ] **PDF reading is untested and partly blind.** No PDF reader is built and no real producer's manuscript has been examined. Tracked changes, hidden or struck text, tables, block quotations, and text off the page cannot be detected or recovered, so a report with nothing listed does not show that the reading is right. A running head that fewer than three pages repeat can stay in the text.
+- [ ] **PDF may link little.** Page breaks, hyphens, other list layouts, and any unread page withhold links. How much a real chapter loses is unknown; measure it before loosening a rule.
+- [ ] **Sentence places.** A taken-over sentence keeps its line places only if the import coordinator carries them into its origin; the origin's `document_position` form for PDF is page and line, to be fixed at P5.
 - [ ] **Some references are never checked.** Author-date citations in brackets that hold a year are now accounted for (BR-1523): unresolved ones are open findings, but left-unlinked ones are only listed. Citations with no bracketed year, unrecognized short forms the reader misreads as prose, and unclassified notes stay as text with no listing or check beyond the notes. An unclassified note left unsettled is listed by `rounds status` and the intake report only. Intake items with no citation are not findings, so a book can be labelled checked clean while they remain; text the reader never recognized stays invisible. The intake report must state each count and limit.
 - [ ] **Takeover starts with a long report.** Every extracted claim is unreviewed, incomplete, and unsupported at first. Grouping and clear next steps must keep the report usable; the pilot must measure it.
 - [ ] List detection in Word files and the author-date profile have had only a limited trial through a developer script (CONTRACT-003, Proof Status), which has its own rough Word conversion. The Word reader does not feed the profile yet.
@@ -350,6 +439,9 @@ Agent turns are in [UF-015](../flows/UF-015-takeover-rounds/UF-015.md) and follo
 | Real Word, Zotero, Mendeley, or EndNote files differ from fixtures | H | H | Get real saved files first; label each variant untested until passed |
 | A rule binds a footnote to the wrong source | M | H | One-candidate rules; seeded set; show the rule used |
 | A rule links an author-date citation to the wrong entry | M | H | One full match; unread entries block a link; hand-checked answer list |
+| A PDF layout rule joins or divides text wrongly with no mark, and a citation links wrongly | M | H | Withhold links at every doubtful join; seeded answer list with zero wrong links; private runs before any support claim |
+| PDF marks withhold so many links that the report is unusable | M | M | Count by reason; measure on real chapters; advise the Word file |
+| A hostile PDF exhausts memory | M | M | Size, page, text, and time caps; child process; no memory cap yet |
 | Real reference lists use layouts the reader cannot parse | H | H | Keep and list unread entries; citations that could name them stay unresolved; measure on pilot chapters |
 | German, author-date, or non-Latin notes go unrecognized | H | H | Report counts and limits; author review |
 | Markup cannot carry the pilot chapter's structure | M | H | Unconverted blocks and lost-style report; revise CONTRACT-006 |
