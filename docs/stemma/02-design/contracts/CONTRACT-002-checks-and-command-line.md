@@ -193,8 +193,8 @@ hidden characters shown (as in G). The 1,000-character cut is an assumption;
 **`reviewed`** takes one or more `<record id>@<64 hex>` arguments and
 `--actor person:<name>`; a model or software actor, a malformed argument, two
 digests for one record, an ID that names no readable record, a retired record,
-a record of a kind that carries no review mark, or a file that rewriting would
-change exits 5 and writes nothing. A digest that differs from the record's
+a record of a kind that carries no review mark, an ID that two records hold, or
+a file that rewriting would change exits 5 and writes nothing. A digest that differs from the record's
 current one is stale: that record is left unmarked and reported with
 `stale_input`, the others are marked, and the command exits 5. It does not print
 the current digest; `unreviewed list` shows the record as it is now. A mark is

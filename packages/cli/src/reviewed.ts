@@ -2,7 +2,7 @@
 // holds is untrusted data: in the text form it lies between lines carrying a
 // token the data does not hold, with hidden characters shown.
 import { planReviewed, type UnreviewedEntry, type UnreviewedOrigin, unreviewedListing } from "@stemma/core";
-import { showControls } from "@stemma/records";
+import { isObject, showControls } from "@stemma/records";
 import { randomToken, writeProjectFile } from "@stemma/workspace";
 import { emit, openCorpus, type Options, reportRecords, requireActor, requireProject, usageError, written } from "./context.ts";
 
@@ -23,7 +23,7 @@ function originLines(o: UnreviewedOrigin): string[] {
     return [`manuscript passage behind it, from import ${line(o.import)} at ${line(o.document_position)}${cut}:`, showControls(o.text)];
   }
   if (o.unreadable) return [`passage ${line(o.passage)}: it cannot be read`];
-  const where = o.locator === undefined ? "" : `, ${line(JSON.stringify(o.locator))}`;
+  const where = isObject(o.locator) ? `, ${line(`${String(o.locator.label)} ${String(o.locator.value)}`)}` : "";
   const from = o.source === undefined ? "" : ` from source ${line(o.source)}${where}`;
   return [`passage ${line(o.passage)}${from}${o.retired ? " (retired)" : ""}${o.text === undefined ? "" : `${cut}:`}`, ...(o.text === undefined ? [] : [showControls(o.text)])];
 }

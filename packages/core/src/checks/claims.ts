@@ -14,7 +14,7 @@ const unread = (corpus: Corpus) => once(corpus, "unread attestations and notes",
   const files = corpus.records.filter((f) => f.state === "unreadable" || f.state === "version_unsupported");
   return {
     attestations: files.filter((f) => f.path.startsWith("records/attestations/")).map((f) => f.path),
-    byId: new Map(files.map((f) => [f.path.replace(/^.*\//, "").replace(/\.json$/, ""), f.path])),
+    notes: new Map(files.filter((f) => f.path.startsWith("records/notes/")).map((f) => [f.path.replace(/^.*\//, "").replace(/\.json$/, ""), f.path])),
   };
 });
 
@@ -39,7 +39,7 @@ export function claimResults(corpus: Corpus): Result[] {
     // An unreadable attestation could be any claim's; an unreadable note matters only to a claim that points at it.
     const hidden = noted ? [] : [...new Set([
       ...unread(corpus).attestations,
-      ...links.flatMap((l) => unread(corpus).byId.get(String(l.attestation.data!.evidence)) ?? []),
+      ...links.flatMap((l) => unread(corpus).notes.get(String(l.attestation.data!.evidence)) ?? []),
     ])];
     const missing = [
       ...(noted || hidden.length > 0 ? [] : ["note"]),
