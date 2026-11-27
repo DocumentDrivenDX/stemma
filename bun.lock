@@ -67,6 +67,12 @@
         "@stemma/records": "workspace:*",
       },
     },
+    "packages/manuscript": {
+      "name": "@stemma/manuscript",
+      "dependencies": {
+        "@stemma/records": "workspace:*",
+      },
+    },
     "packages/publish": {
       "name": "@stemma/publish",
       "dependencies": {
@@ -174,6 +180,8 @@
     "@stemma/graph": ["@stemma/graph@workspace:packages/graph"],
 
     "@stemma/intake": ["@stemma/intake@workspace:packages/intake"],
+
+    "@stemma/manuscript": ["@stemma/manuscript@workspace:packages/manuscript"],
 
     "@stemma/publish": ["@stemma/publish@workspace:packages/publish"],
 
