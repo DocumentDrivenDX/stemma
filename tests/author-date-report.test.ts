@@ -50,6 +50,29 @@ describe("author-date developer script", () => {
     expect([made.linked.length, made.unlinked[0].reason, made.coverageLimits.length > 5]).toEqual([3, "in_table", true]);
   });
 
+  test("lists linked citations with a marker, and entries with a bracketed note, apart from the counts", () => {
+    const marked = zip({ "word/document.xml": `<w:document><w:body>
+      ${p(run("(Adair 2017 [CHECK]) (Brel 2003) (Zimmer 1990 [CHECK]) (Adair 2017; Zimmer 1990 [NB])"))}
+      ${p(run("References"))}
+      ${p(run("Adair, J. 2017. Rivers."))}
+      ${p(run("Brel, K. 2003. Weirs [STAND-IN]."))}
+      ${p(run("Corso, L. 2001. Locks [placeholder]."))}
+    </w:body></w:document>` });
+    const made = JSON.parse(report([{ file: "m.docx", bytes: marked }]).text);
+    expect(made.linkedWithMarker.map((l: any) => [l.text, l.item.year, l.item.marker, l.item.entry.paragraph, "items" in l]))
+      .toEqual([["(Adair 2017 [CHECK])", "2017", "[CHECK]", 2, false]]);
+    expect(made.entriesWithBracketedNote.map((e: any) => [e.paragraph, e.status, e.linkedItems])).toEqual([[3, "read", 1], [4, "read", 0]]);
+    expect(made.counts).toMatchObject({ examined: 4, linked: 2, unresolved: 2 });
+
+    const dir = temporary();
+    const input = join(dir, "m.docx");
+    writeFileSync(input, marked);
+    const done = spawnSync(process.execPath, [join(ROOT, "scripts/author-date-report.ts"), "--out", join(dir, "m.json"), input], { encoding: "utf8" });
+    expect(done.stdout).toContain("linked citation items with a working marker 1\n");
+    expect(done.stdout).toContain("entries with a bracketed note 2, citation items linked to them 1\n");
+    expect(done.stdout).not.toContain("STAND-IN");
+  });
+
   test("writes only the report, outside any repository, over nothing, and prints no manuscript text", () => {
     const dir = temporary();
     const input = join(dir, "in.docx");

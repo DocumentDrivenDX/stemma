@@ -189,7 +189,7 @@ by `doctor`. Cap values are set by the takeover solution design.
 
 ### H. Author-date profile
 
-The profile is `author-date/0`. It is deterministic. Its rules are design
+The profile is `author-date/1`. It is deterministic. Its rules are design
 assumptions drawn from one private set of drafts and are untested. Adding a
 form, a lead-in, or an entry layout makes a new profile version.
 
@@ -213,21 +213,43 @@ form, a lead-in, or an entry layout makes a new profile version.
      authors. Such a paragraph is **unread**;
    - `continuation`: it is unread, follows another entry, and begins with a
      digit, punctuation, or a lower-case word that does not begin a name.
+
+   An entry that holds text in square brackets with at least one letter, other
+   than a note that begins `accessed`, `last accessed`, or `retrieved`, is
+   flagged `bracketed_note`. The flag changes no reading and no link. A link to
+   such an entry identifies it and verifies nothing, whatever the note says.
 3. The profile reads authors' family names in order, the year, and any
    one-letter year suffix, in two layouts: the year directly after the authors,
    and the year near the end of the entry. An entry whose authors or year cannot
    be read is **unread**. When in doubt it is unread, because an entry read with
    too few authors could take another work's citations.
    - **Authors.** A person is `Family, Given`. A later author may also be
-     `Given Family` or `I. Family`. Authors are joined by commas, `and`, or `&`.
+     `Given Family`, `I. Family`, or `I. Given Family` (initials, then one given
+     name). Authors are joined by commas, `and`, or `&`.
      Editor marks such as `(ed.)` and `eds` are not names. `et al.` or `and
      others` marks the authors as cut short. A name with no comma and no
      initials is a corporate author, or a single name, and is one **whole
-     name**. A later `Given Family` with no initials, joined only by commas,
-     is a person only where `and` or `&` comes at or after it, or, in the
-     year-after-authors layout, where `et al.` or `and others` ends the authors. An abbreviation in capitals followed by its
-     full name in round brackets is one whole name, and a citation of either
-     matches it. Initials with no comma, and text after `and`, `&`, or `with` that
+     name**. A later `Given Family` with no initials, or `I. Given Family`,
+     joined only by commas, is a person only where `and` or `&` comes at or
+     after it, or, in the year-after-authors layout, where `et al.` or `and
+     others` ends the authors.
+   - **Where a later family name begins.** Where two or more written-out words
+     stand directly before the last word of a later author in natural order,
+     with no initial between them and it, as in `Given Other Family`, the family
+     name may be one word or more, so the entry is unread. A capitalized
+     particle counts as a written-out word. With one such word, as in
+     `Given Family` or `I. Given Family`, the family name is the last word with
+     any lower-case particles before it; a two-word surname written that way is
+     cut to its last word. `I. Given Family` is not read where the one
+     written-out word is a joining word or `the`, `of`, `for`, or `on`, or where
+     `y` joins the last word to the one before. Initials both before and after a
+     given name, as in `I. Given I. Family`, are not read, because two authors
+     with no separator look the same.
+   - **Abbreviations.** An abbreviation in capitals followed by its full name in
+     round brackets is one whole name, and a citation of either matches it. Only
+     there, the full name may also hold `in`, `at`, or `to` between its words.
+     A full name with commas is not read.
+   - **Refusals.** Initials with no comma, and text after `and`, `&`, or `with` that
      is not a name, leave the entry unread.
    - **Year after the authors.** All the text before the first year form reads
      as authors, apart from an opening bracket and punctuation. In this layout
@@ -313,6 +335,25 @@ only when:
   has more authors than are named; and
 - the year and suffix are equal, a missing suffix matching only a missing one.
 
+**Given names in text.** A narrative citation of one name, with or without
+`et al.`, may write the first author's given name, as in `Given Family (2001)`.
+It matches an entry this way only when all the cited words, folded as above, are
+that entry's first given names followed by its first family name, as typed in
+the entry:
+
+- the given names hold at least one written-out word, and are cited whole or
+  without the initials that end them (`Given I.` may be cited as `Given`);
+- no other word or initial is left out, added, or expanded, so an initial in an
+  entry never stands for a written-out name, and given names that end in a
+  particle are not used; and
+- the rest of the form matches as above.
+
+Such a citation links only when that entry is also the one entry that could be
+meant by the family name alone: any other entry that matches the family name in
+the same form, year, and suffix makes it `several_entries`, and any entry that
+could fit the family name blocks it as below. Bracketed names do not match this
+way.
+
 Authors cut short in a list match only an `et al.` citation, and only when
 every cited name is among those the entry shows.
 
@@ -337,7 +378,8 @@ entries in other lists or in a library are listed as candidates and never
 linked. Model judgment never links.
 
 A linked citation takes the source its entry is bound to under F11. A narrative
-form is a citation form when its names match an entry as above. It is also one,
+form is a citation form when its names match an entry as above, by family or by
+given names. It is also one,
 and unresolved, when it uses `et al.` or when a name in it, or the last word of
 one, is a family name in some list of the project. Other words before the
 brackets leave them unlinked. The names are all the names, with their joining
@@ -370,7 +412,9 @@ marked as a possible narrative citation and listed first.
 The report gives the count in each state, by reason, and the three counts MUST
 add up to the number examined. An unresolved citation fails `cite.key` and so is
 open. A left-unlinked item is not a finding and does not affect the label; the
-report says so.
+report says so. The report also lists, apart from the counts, the linked
+citations that carry a working marker, and the entries flagged `bracketed_note`
+with the number of citation items linked to each.
 
 ## Precedence and Compatibility
 
@@ -427,7 +471,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
-| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
+| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`; the forms and refusals added in `author-date/1` have only invented tests | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis
 

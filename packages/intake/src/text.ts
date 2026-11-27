@@ -1,7 +1,7 @@
 // Words, names, and year forms as the author-date profile defines them
 // (CONTRACT-003 H). Changing a rule here makes a new profile version.
 
-export const PROFILE = "author-date/0";
+export const PROFILE = "author-date/1";
 
 /** Case, diacritics, and apostrophe and hyphen forms folded away. */
 export const fold = (text: string): string =>

@@ -161,6 +161,19 @@ export function docxDocument(file: string, bytes: Uint8Array): { document: Docum
   };
 }
 
+/** Linked items that carry a working marker, and the entries with a bracketed note and how many items link to each. */
+export function linkedAside(result: AuthorDateResult) {
+  const linked = result.brackets.flatMap((bracket) => (bracket.state === "unlinked" ? [] : bracket.items.flatMap((item) =>
+    (item.state === "linked" ? [{ bracket, item }] : []))));
+  return {
+    marked: linked.filter(({ item }) => item.marker !== undefined),
+    noted: result.lists.flatMap((list) => list.entries.filter((e) => e.flags.includes("bracketed_note")).map((e) => ({
+      file: list.file, paragraph: e.paragraph, asFound: e.asFound, status: e.status,
+      linkedItems: linked.filter(({ item }) => item.entry.file === list.file && item.entry.paragraph === e.paragraph).length,
+    }))),
+  };
+}
+
 /** The report: coverage limits, counts, lists, and each linked, unresolved, and unlinked item. The same inputs give the same text. */
 export function report(inputs: { file: string; bytes: Uint8Array }[]): { text: string; result: AuthorDateResult; coverage: Record<string, FileCoverage> } {
   const read = inputs.map((i) => ({ ...docxDocument(i.file, i.bytes), sha256: createHash("sha256").update(i.bytes).digest("hex") }));
@@ -172,12 +185,19 @@ export function report(inputs: { file: string; bytes: Uint8Array }[]): { text: s
     return { ...item, before: paragraph.text.slice(Math.max(0, item.start - 80), item.start), ...(paragraph.note ? { note: paragraph.note } : {}) };
   };
   const of = (state: string) => result.brackets.filter((b) => b.state === state).map(placed);
+  const aside = linkedAside(result);
   const coverage = Object.fromEntries(read.map((r) => [r.document.file, r.coverage]));
   const text = JSON.stringify({
     profile: result.profile,
     coverageLimits: COVERAGE,
     files: read.map((r) => ({ file: r.document.file, sha256: r.sha256, paragraphs: r.document.paragraphs.length, coverage: r.coverage })),
     counts: result.counts,
+    // A link to check by hand: it identifies a list entry and verifies nothing.
+    linkedWithMarker: aside.marked.map(({ bracket, item }) => {
+      const { items: _, ...place } = placed(bracket);
+      return { ...place, item };
+    }),
+    entriesWithBracketedNote: aside.noted,
     unpairedBrackets: result.unpaired.map(placed),
     lists: result.lists.map((l) => ({
       ...l, startText: documents.get(l.file)!.paragraphs[l.start]!.text,
@@ -222,12 +242,15 @@ if (import.meta.main) {
   writeFileSync(out!, made.text, { flag: "wx", mode: 0o600 });
   const { counts, lists } = made.result;
   const entries = lists.flatMap((l) => l.entries);
+  const aside = linkedAside(made.result);
   console.log([
     `files ${inputs.length}, reference lists ${lists.length}, files with no list ${made.result.files.filter((f) => f.lists === 0).length}`,
     `entries ${entries.length}: read ${entries.filter((e) => e.status === "read").length}, unread ${entries.filter((e) => e.status === "unread").length}`,
     `bracketed years ${counts.examined}: linked ${counts.linked}, unresolved ${counts.unresolved}, left unlinked ${counts.unlinked}`,
     `left unlinked by reason ${JSON.stringify(counts.unlinkedByReason)}`,
     `citation items: linked ${counts.items.linked}, unresolved ${counts.items.unresolved} ${JSON.stringify(counts.items.unresolvedByReason)}`,
+    `linked citation items with a working marker ${aside.marked.length}`,
+    `entries with a bracketed note ${aside.noted.length}, citation items linked to them ${aside.noted.reduce((n, e) => n + e.linkedItems, 0)}`,
     `unpaired brackets before a year ${made.result.unpaired.length}`,
     ...Object.values(made.coverage).map((c, i) => `file ${i + 1} not fully read: ${JSON.stringify(c)}`),
     "Limits:", ...COVERAGE.map((l) => `- ${l}`),

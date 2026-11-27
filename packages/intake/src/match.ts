@@ -188,6 +188,8 @@ interface Known {
   /** Folded family names and whole names in every list of the project. */
   families: Set<string>;
   wholes: Set<string>;
+  /** Folded first authors written with their given names, as an entry types them. */
+  given: Set<string>;
 }
 
 /** The words before a year in brackets, read as names. */
@@ -308,9 +310,13 @@ function namesBefore(text: string, known: Known): Cited | undefined {
   return { names: series(whole, etAl), whole, etAl };
 }
 
-/** Whether any name, or its last word, is a family name in some list. */
+/** The names a first author's given names and family name make, as the entry types them. */
+const withGiven = (entry: Authors): string[] =>
+  (entry.whole ? [] : entry.firstGiven ?? []).map((given) => `${given} ${entry.authors[0]!}`);
+
+/** Whether any name, or its last word, is a family name in some list, or the names are a listed author with given names. */
 const anyKnown = (cited: Cited, known: Known): boolean =>
-  [cited.whole, ...cited.whole.split(SERIES).filter((_, i) => i % 2 === 0)]
+  known.given.has(fold(cited.whole)) || [cited.whole, ...cited.whole.split(SERIES).filter((_, i) => i % 2 === 0)]
     .some((n) => known.families.has(fold(n)) || known.families.has(fold(words(n).at(-1) ?? "")));
 
 // ---- Matching ----
@@ -332,6 +338,14 @@ function matches(entry: Entry, cited: Cited, year: string, suffix: string): bool
   return names !== undefined && sameNames(entry.authors, names);
 }
 
+/** The same form citing the first author of `entry` by family name alone. */
+const byFamily = (cited: Cited, entry: Authors): Cited => ({ names: [entry.authors[0]!], whole: entry.authors[0]!, etAl: cited.etAl });
+
+/** Whether one cited name is the entry's first author with given names, every word as the entry types it. */
+const matchesByGiven = (entry: Entry, cited: Cited, year: string, suffix: string): boolean =>
+  entry.status === "read" && cited.names?.length === 1 &&
+  withGiven(entry).some((name) => fold(name) === fold(cited.whole)) && matches(entry, byFamily(cited, entry), year, suffix);
+
 /** Whether an entry that does not match could still be the one meant. */
 function couldFit(entry: Entry, cited: Cited, year: string, suffix: string): boolean {
   const first = cited.names?.[0] ?? cited.whole;
@@ -346,15 +360,21 @@ function couldFit(entry: Entry, cited: Cited, year: string, suffix: string): boo
 
 const reference = (list: ReferenceList, entry: Entry): EntryRef => ({ file: list.file, paragraph: entry.paragraph, asFound: entry.asFound });
 
-function link(cited: Cited, item: YearItem, own: ReferenceList | undefined, lists: ReferenceList[]):
+function link(cited: Cited, narrative: boolean, item: YearItem, own: ReferenceList | undefined, lists: ReferenceList[]):
   { candidates: Candidate[] } & ({ state: "linked"; entry: EntryRef } | { state: "unresolved"; reason: UnresolvedReason }) {
-  const fits: Entry[] = own?.entries.filter((e) => matches(e, cited, item.year, item.suffix)) ?? [];
-  const could = own?.entries.filter((e) => !fits.includes(e) && couldFit(e, cited, item.year, item.suffix)) ?? [];
+  const { year, suffix } = item;
+  // Only running text may write given names.
+  const named = (e: Entry) => matches(e, cited, year, suffix) || (narrative && matchesByGiven(e, cited, year, suffix));
+  // A given name picks no entry over another that the family name alone could mean.
+  const families = narrative ? (own?.entries.filter((e) => matchesByGiven(e, cited, year, suffix)) ?? [])
+    .map((e) => byFamily(cited, e as Authors)) : [];
+  const fits: Entry[] = own?.entries.filter((e) => named(e) || families.some((f) => matches(e, f, year, suffix))) ?? [];
+  const could = own?.entries.filter((e) => !fits.includes(e) && [cited, ...families].some((f) => couldFit(e, f, year, suffix))) ?? [];
   const candidates: Candidate[] = [
     ...fits.map((e): Candidate => ({ ...reference(own!, e), why: "matches" })),
     ...could.map((e): Candidate => ({ ...reference(own!, e), why: "could_fit" })),
     ...lists.filter((l) => l !== own).flatMap((l) => l.entries
-      .filter((e) => matches(e, cited, item.year, item.suffix))
+      .filter(named)
       .map((e): Candidate => ({ ...reference(l, e), why: "other_list" }))),
   ];
   if (own && fits.length === 1 && could.length === 0) return { state: "linked", entry: reference(own, fits[0]!), candidates };
@@ -412,10 +432,11 @@ export function checkAccount(result: AuthorDateResult, examined: number): void {
 export function matchAuthorDate(documents: Document[]): AuthorDateResult {
   if (new Set(documents.map((d) => d.file)).size !== documents.length) throw new Error("two documents have the same file name");
   const lists = documents.flatMap(readReferenceLists);
-  const known: Known = { families: new Set(), wholes: new Set() };
+  const known: Known = { families: new Set(), wholes: new Set(), given: new Set() };
   for (const entry of lists.flatMap((l) => l.entries)) {
     if (entry.status !== "read") continue;
     for (const name of entry.authors) known.families.add(fold(name));
+    for (const name of withGiven(entry)) known.given.add(fold(name));
     if (entry.whole) {
       for (const name of wholeNames(entry)) {
         known.families.add(fold(name));
@@ -446,7 +467,7 @@ export function matchAuthorDate(documents: Document[]): AuthorDateResult {
         }
         const items: CitationItem[] = reading.cited.flatMap((part) => part.items.map((item) => ({
           ...part.cited, ...item, narrative: part.narrative, ...(part.prefix ? { prefix: part.prefix } : {}),
-          ...link(part.cited, item, serving, lists),
+          ...link(part.cited, part.narrative, item, serving, lists),
         })));
         brackets.push({ ...place, state: items.every((i) => i.state === "linked") ? "linked" : "unresolved", items });
       }
