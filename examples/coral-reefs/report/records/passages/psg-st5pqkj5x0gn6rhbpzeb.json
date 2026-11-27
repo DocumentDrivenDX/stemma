@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1737,
+      "index": 29,
+      "page_sha256": "04e707b8559e9199dbd421f92e4ad3a0e20ced116213af0ba4c3d48af3ecc71b",
+      "start": 1433,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:27Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-st5pqkj5x0gn6rhbpzeb",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xx"
+  },
+  "quote": {
+    "exact": "The erosive as\nwell as the solvent action of the sea would soon level the outer rim to\nthe plane of the sea, the further disintegration being stopped by the growth\nof recent corals or of coralline Algze upon the surface of the coralliferous\nor massive limestone eroded to the level of the sea or below it"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "01f93d52cfd00733e24ccd0ac298ccf3baac890248f65bdb48f42fa5361c6f82",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

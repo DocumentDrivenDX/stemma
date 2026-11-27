@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 450,
+      "index": 193,
+      "page_sha256": "e7fb4fce9178fc2cd99f9221dbf440cd8b6b84e829b7789d06d5f03a633bfbd3",
+      "start": 30,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-pr4y703ppb1ng581wx13",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "184"
+  },
+  "quote": {
+    "exact": "I have expressly said that a\nbank at the proper depth would give rise to an atoll, which\ncould not be distinguished from one formed during subsidence.\nI can, however, hardly believe in the former presence of as\nmany banks (there having been no subsidence) as there are\natolls in the great oceans, within a reasonable depth, on which\nminute oceanic organisms could have accumulated to the thick-\nness of many hundred feet"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a04mqd3jch9s39zbmpjp",
+  "source_record_sha256": "103010f364de9c7776d470f6e5451c8cc8c04d5d8aae9da214586e3c2bc07ecc",
+  "text": "txt-g0q4prwng7bn2bdxp4w1"
+}

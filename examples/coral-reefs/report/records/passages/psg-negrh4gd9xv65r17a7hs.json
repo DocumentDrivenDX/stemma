@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1626,
+      "index": 534,
+      "page_sha256": "7bf43ecfde638c321e4b79dac82260a14b38db780b6bc1393f3de8a3dcda44cb",
+      "start": 1342,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:25Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-negrh4gd9xv65r17a7hs",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "517"
+  },
+  "quote": {
+    "exact": "That when coral plantations build up from submarine banks\nthey assume an atoll form, owing to the more abundant supply of\nfood to the outer margins, and the removal of dead coral rock from\nthe interior portions by currents and by the action of the carbonic\nacid dissolved in sea-water"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eh71qk5hm5zhpwzcz2v7",
+  "source_record_sha256": "569e2ae8e9030c39ffcf1206d722c39ae41e793da5d06b05ddae1aef1b75e409",
+  "text": "txt-ft7bv7ra8nre9mzsvrrv"
+}

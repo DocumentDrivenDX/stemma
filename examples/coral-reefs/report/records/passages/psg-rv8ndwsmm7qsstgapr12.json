@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 4288,
+      "index": 0,
+      "page_sha256": "237bb10bc08cb8281afe46cae46c550984c184744bd044f9dfaaba9a5cc2e5b0",
+      "start": 4225,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:11Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-rv8ndwsmm7qsstgapr12",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "1"
+  },
+  "quote": {
+    "exact": ", they were insufficient to\nconfirm the link between reef types"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w4na70p97m1rbc19t6ak",
+  "source_record_sha256": "3f79b6ccc288a356d4a7f61c6c272f358c7f96d50e13b40cd19ca30001dc4e65",
+  "text": "txt-80v3xw39pbvb4ksf7vj3"
+}

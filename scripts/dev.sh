@@ -6,6 +6,11 @@
 #                                  convert the worked example's originals again,
 #                                  compare, and check it; --fetch downloads them
 #                                  from the recorded addresses
+#   ./scripts/dev.sh report        rebuild the worked example's research report
+#                                  (examples/coral-reefs/report/) from the committed
+#                                  source files; also typesets report.pdf when the
+#                                  pinned Typst is in .tools/typst-0.15.1/
+#   ./scripts/dev.sh report-check  fail if the report's generated files are stale
 #   ./scripts/dev.sh demo          build, then run the demo in a fresh temporary directory
 #   ./scripts/dev.sh plugin-check  build, then install into an isolated Claude profile
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
@@ -51,6 +56,16 @@ case "${1:-check}" in
     shift
     run scripts/build.ts >/dev/null
     run dist/stemma.js ingest --project "$root/examples/coral-reefs" --reconvert --actor software:dev-example "$@" ;;
+  report)
+    python3 -I -B examples/coral-reefs/report/tools/build.py
+    typst="$root/.tools/typst-0.15.1/typst-aarch64-apple-darwin/typst"
+    if [ -x "$typst" ]; then
+      "$typst" compile --root examples/coral-reefs/report examples/coral-reefs/report/report.typ examples/coral-reefs/report/report.pdf
+      echo "wrote examples/coral-reefs/report/report.pdf"
+    else
+      echo "report.pdf not typeset: Typst 0.15.1 is not in .tools/typst-0.15.1/"
+    fi ;;
+  report-check) python3 -I -B examples/coral-reefs/report/tools/build.py --check ;;
   demo) run scripts/build.ts >/dev/null && run scripts/demo.ts ;;
   plugin-check) run scripts/build.ts >/dev/null && run scripts/plugin-check.ts ;;
   publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;
@@ -61,5 +76,5 @@ case "${1:-check}" in
   preview) run website/build.ts && run website/preview.ts ;;
   browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;
   e2e) run website/build.ts && run --bun node_modules/.bin/playwright test --config website/playwright.config.ts ;;
-  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|example|record-example|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
+  *) echo "usage: $0 check|build|report|report-check|demo|plugin-check|docs|docs-check|example|record-example|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
 esac

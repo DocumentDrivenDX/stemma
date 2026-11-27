@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1587,
+      "index": 359,
+      "page_sha256": "9f4cd9685ba86e97941c58c7cb138eb5c4dd2bc8dff842e3430b739683454f1d",
+      "start": 1456,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:37Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-qtzr4s6yyjcqm0mxwyde",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "332"
+  },
+  "quote": {
+    "exact": "as the evidence at\npresent stands, it is insufiicient to justify a decision adverse\nto Mr. Darwin's theory as a general explanation"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "source_record_sha256": "6c6060a2f645fd9adf883904005dbe063f749ad5f3bd3f690fe6ba5177688878",
+  "text": "txt-0j25y9a786mfy0ntdtcx"
+}

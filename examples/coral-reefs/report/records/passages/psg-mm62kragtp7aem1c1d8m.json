@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1215,
+      "index": 191,
+      "page_sha256": "d81c05949a18360747262804d05ed6b901f8e963732e8380a89a59703463f77b",
+      "start": 1046,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-mm62kragtp7aem1c1d8m",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "182"
+  },
+  "quote": {
+    "exact": "I\nalways foresaw that a bank at the proper depth beneath the\nsurface would give rise to a reef which could not be distin-\nguished from an atoll, formed during subsidence"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a04mqd3jch9s39zbmpjp",
+  "source_record_sha256": "103010f364de9c7776d470f6e5451c8cc8c04d5d8aae9da214586e3c2bc07ecc",
+  "text": "txt-g0q4prwng7bn2bdxp4w1"
+}

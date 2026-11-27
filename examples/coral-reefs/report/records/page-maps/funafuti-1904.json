@@ -1,0 +1,58 @@
+[
+  {
+    "evidence": "page_image",
+    "first_index": 19,
+    "first_label": "xii",
+    "last_index": 20,
+    "style": "roman_lower"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 23,
+    "first_label": "2",
+    "last_index": 31,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 35,
+    "first_label": "12",
+    "last_index": 85,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 88,
+    "first_label": "63",
+    "last_index": 93,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 96,
+    "first_label": "69",
+    "last_index": 99,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 102,
+    "first_label": "73",
+    "last_index": 107,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 110,
+    "first_label": "79",
+    "last_index": 451,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 455,
+    "first_label": "422",
+    "last_index": 461,
+    "style": "arabic"
+  }
+]
