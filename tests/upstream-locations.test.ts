@@ -8,6 +8,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { addressesOf, validateRecord } from "@stemma/records";
+import { fetchBytes, privateAddress } from "@stemma/workspace";
 import { ingest } from "../packages/cli/src/ingest.ts";
 import { sourceLocate } from "../packages/cli/src/locate.ts";
 import type { Options } from "../packages/cli/src/context.ts";
@@ -172,10 +173,27 @@ describe("locations of an original (FR-98)", () => {
     expect(problems.map((p) => `${p.code} ${p.field}`)).toEqual([0, 1, 2, 3, 5, 6].map((i) => `bad_location /locations/${i}`));
   });
 
+  test("a retrieval or auxiliary address with a user name or password is record_invalid too", () => {
+    const { book, record } = page();
+    const data = upstreamData(book, record);
+    const secret = "https://user:token@203.0.113.1/reef.html";
+    expect(validateRecord(data, record).problems).toEqual([]);
+    const problems = validateRecord({ ...data, url: secret, auxiliary: [{ role: "page_numbers", url: secret, sha256: sha(""), size: 0 }] }, record).problems;
+    expect(problems.map((p) => `${p.code} ${p.field}`)).toEqual(["bad_location /url", "bad_location /auxiliary/0/url"]);
+  });
+
   test("the retrieval address is asked first, then each listed address once", () => {
     const added = { at: "2026-01-05T09:00:00Z", by: { kind: "person", name: "author" } };
     expect(addressesOf({ url: LIVE, locations: [{ added, kind: "web_archive", url: SNAPSHOT }, { added, kind: "private", label: "x" }, { added, kind: "publisher", url: LIVE }] })
       .map((a) => a.url)).toEqual([LIVE, SNAPSHOT]);
+  });
+
+  test("a listed address that reaches a local IPv4 address through IPv6 is refused, and nothing is asked", async () => {
+    for (const local of ["::ffff:7f00:1", "::7f00:1", "::ffff:0:a00:1", "64:ff9b::c0a8:1", "::ffff:127.0.0.1"]) expect(privateAddress(local)).toBe(true);
+    for (const outside of ["::ffff:cb00:7101", "2001:db8::1", "203.0.113.1"]) expect(privateAddress(outside)).toBe(false);
+    const asked = fakeFetch({});
+    await expect(fetchBytes("https://[::ffff:127.0.0.1]/reef.html", "test")).rejects.toThrow("local or private address");
+    expect(asked).toEqual([]);
   });
 
   test("ingest --fetch falls through a refusal and different bytes, says so, and never uses what differs", async () => {

@@ -21,6 +21,16 @@ export function isLocationAddress(value: string): boolean {
   }
 }
 
+/** Whether an address carries a user name or password, which a record never keeps. */
+export function hasCredentials(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.username !== "" || url.password !== "";
+  } catch {
+    return false;
+  }
+}
+
 /** The positions of the entries that break a rule of the location list. */
 export function badLocations(locations: Json[]): number[] {
   const seen = new Set<string>();

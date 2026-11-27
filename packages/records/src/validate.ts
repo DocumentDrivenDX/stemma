@@ -2,7 +2,7 @@
 // and field paths only, never record values.
 import { type Json, type JsonObject, normalizeSentence, sha256 } from "./json.ts";
 import { isRecordId, KINDS, recordPath } from "./kinds.ts";
-import { badLocations } from "./locations.ts";
+import { badLocations, hasCredentials } from "./locations.ts";
 import type { PageProblem } from "./pages.ts";
 import type { FormatProblem } from "./sourcefile.ts";
 import { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generated.ts";
@@ -129,6 +129,13 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
   if (record.kind === "upstream") {
     size(record.size, "/size");
     if (Array.isArray(record.locations)) for (const i of badLocations(record.locations)) problems.push(invalid("bad_location", `/locations/${i}`));
+    // The retrieval address and an auxiliary file's address are asked like a location, so they hold no user name or password either.
+    if (typeof record.url === "string" && hasCredentials(record.url)) problems.push(invalid("bad_location", "/url"));
+    if (Array.isArray(record.auxiliary)) {
+      record.auxiliary.forEach((aux, i) => {
+        if (isObject(aux) && typeof aux.url === "string" && hasCredentials(aux.url)) problems.push(invalid("bad_location", `/auxiliary/${i}/url`));
+      });
+    }
   }
   if (record.kind === "source_text" && isObject(record.original)) {
     const { form, files, description, held_at: held } = record.original;
