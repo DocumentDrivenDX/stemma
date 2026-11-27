@@ -72,7 +72,7 @@ Boundary IDs match the [threat model](../01-frame/threat-model.md).
 | B6 To reviewer or host | Source text, positions | Recipient gets everything in the files | Audience filtering before writing, redaction, scan |
 | B7 Tools and releases | Machine | Third-party code runs with author's rights | Pins, digests, lockfile, no runtime download, release audit |
 | B8 Collaborator input | Records, rules, agent behavior | Others' text becomes project content | Validation; comment import writes only comment records. `rules.md` is followed by the agent, so the author reviews changes to it |
-| B9 Requests to the local server | Everything an author export holds | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, calls signed with a per-run secret got by a one-time code and each accepted once, answers proved to the page, neither key sent by the page, no cookie and no cross-origin permission, bounded requests, fixed routes |
+| B9 Requests to the local server | Everything an author export holds, and recorded originals the author's places hold | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, calls signed with a per-run secret got by a one-time code and each accepted once, answers proved to the page, neither key sent by the page, no cookie and no cross-origin permission, bounded requests, fixed routes |
 
 ## Control Mapping
 
@@ -101,6 +101,8 @@ Verification names the SEC criterion that tests the control.
 | TM-S-008, TM-I-018 | Signed requests, each accepted once, and proved answers; code and secret not sent; the command and page say that the code was already used (CONTRACT-005 M, "Proofs", rules 7 and 9) | `server`, `explorer`, `cli` | SEC-037 |
 | TM-I-018 | Launch file in a private directory; nothing in arguments or output | `server`, `cli` | SEC-035 |
 | TM-D-010, TM-E-008 | CONTRACT-005 M rules 1, 10, 12; fixed routes | `server` | SEC-036 |
+| TM-I-019, TM-D-011 | CONTRACT-005 M, "Originals": recorded digests only, named places, no links, hashed bytes sent, size and number bounds | `server` | SEC-038 |
+| TM-E-009, TM-D-011 | CONTRACT-005 M, "Originals": canvas only, pinned pdf.js with nothing that runs or links, worker loaded with the page, unchanged policy, bounds. No process sandbox | `explorer` | SEC-039 |
 
 TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
 
@@ -129,7 +131,7 @@ TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
 |---|---|---|
 | Records, manuscript, rules | Git repository | Treat as private: holds excerpts, notes, and legacy values. Access is the author's choice of remote |
 | Source files | `sources/` in the repository | Digests; readable by whoever can read the repository |
-| Originals | Wherever the author keeps them; fetched ones in ignored `.stemma/originals/` | Never committed; matched by hash |
+| Originals | Wherever the author keeps them; fetched ones in ignored `.stemma/originals/` | Never committed; matched by hash. The local server reads one only to give it to the author's page |
 | Exact restricted coordinates | Restricted store outside the project | No hash or copy elsewhere by design; no encryption by Stemma; readable by the agent's process |
 | Index, reports, builds, exports | `.stemma/`, `build/` | Ignored by git; may copy source text |
 
@@ -234,4 +236,5 @@ the system they ran on; none is required to continue.
 | Browser: hostile strings and SVG, network denied | SEC-011, SEC-023 | M3 |
 | Seeded long source text in every package part | SEC-017, SEC-018 | M3 |
 | Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files, another program on the port, changed and repeated messages | SEC-034 to SEC-037 | With the server |
+| Originals: unknown digest, links, swapped, changed, and oversize files, changed answers, and a PDF with script, links, a form, and an attachment | SEC-038, SEC-039 | With originals |
 | Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

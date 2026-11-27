@@ -84,5 +84,5 @@ to the author's own page only.
 
 ## Out of Scope
 
-- Search beyond the arras limits (US-120), originals, and MCP.
+- Search beyond the arras limits (US-120), originals (US-121), and MCP.
 - Serving anyone on another computer, and a reviewer audience.

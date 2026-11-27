@@ -115,6 +115,30 @@ For a paged source with `coverage` `all` and a `page_count`, the part list MUST
 hold exactly the indexes `0` to `page_count - 1`. A part list always runs from
 its first index upwards without repeating; a section list runs `0, 1, 2, …`.
 
+**Which page of the original a part is.** The explorer shows a part beside the
+original only where the record establishes which page that is. Nothing is worked
+out from the text, a printed label, a file name, or the order of parts. A part's
+`index` is established as a place in a digital original in two cases only:
+
+- **A page of a PDF**: `form` is `file`; `files` holds exactly one file, of type
+  `application/pdf`; the source file is `paged` and records `page_count`; and
+  every listed part's index is below it. The part with index `n` is the PDF's
+  page `n + 1`, counting the file's own pages. A converter records `page_count`
+  only when it made one page of text for each page of the file, in file order: it
+  read them itself, or a supplied text with form feeds had exactly as many pages
+  as the file. A transcription that states its own indexes records no
+  `page_count`, so nothing says its indexes count the file's pages. A reader that
+  draws the PDF MUST also find that it has `page_count` pages, and shows no page
+  otherwise.
+- **A page image**: `form` is `page_images`; each listed part's index is named by
+  exactly one file of `files`; and the file named for the part is a PNG or JPEG
+  image. When some part has no image, or two files name one index, the numbers of
+  the images and of the text need not be the same numbers, so no image is shown
+  for any part.
+
+In every other case, a source with no pages, a physical original, another kind of
+file, and a TIFF image included, no page is established, and a reader says why.
+
 ### D. Part files
 
 A part's front matter is a `SourcePage` value of the UMF schema:

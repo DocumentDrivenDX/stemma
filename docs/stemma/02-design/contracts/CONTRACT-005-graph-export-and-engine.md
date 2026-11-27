@@ -516,8 +516,10 @@ text is isolated (`dir="auto"` and `unicode-bidi: isolate`), and bidirectional,
 format, and control characters other than line feed and tab are shown as visible
 code points. The highlight is a `mark` element. An address is a link only when
 its scheme is `http` or `https`, with `rel="noreferrer noopener"`; nothing is
-fetched or preloaded, and the content security policy (D) is unchanged. The panel
-does not open originals.
+fetched or preloaded, and the content security policy (D) is unchanged. The
+offline page opens no original and says so where one would be. The served page
+shows the original page beside the text (M, "Originals"); that is no part of the
+source view, which is the same in both.
 
 ### L. The manuscript view
 
@@ -590,14 +592,18 @@ that rests on it `not_exported`.
 **Showing it.** When the state is not `none`, the host page shows a control that
 opens the manuscript, at the fragment route `#/manuscript`, in place of the
 record browser. It says that this is the manuscript as the export read it, not
-the printed PDF, and that originals are not opened yet. Text is rendered as text
+the printed PDF; the offline page also says that it cannot show originals, and the
+served page that they are shown unhighlighted beside the text (M). Text is rendered as text
 nodes, isolated and with hidden characters shown as in K. `*italic*` becomes
 emphasis and a bare `http` or `https` address a link as in K; in a quotation only
 the italics its list entry names are applied. A quotation, a citation, and a
 bibliography entry each open a pane at their own route. The pane shows quotation
 views under the K rules with the components of the record's source panel, taking
-passage views from `stemma.sourceviews.json`. A bibliography entry's pane
-highlights nothing and lists its places. On a narrow screen the pane lies over
+passage views from `stemma.sourceviews.json`. A bibliography entry's pane lists
+its places and then shows one quotation of the work in its source, as a quotation
+pane does, saying which it is: the first the places list in order, else the first
+quoted without a citation of its own. The others open from the list. When the
+report quotes nothing from the work, the pane says so and highlights nothing. On a narrow screen the pane lies over
 the lower part of the window and can be closed. The content security policy (D)
 is unchanged and the page sends no request.
 
@@ -605,7 +611,8 @@ is unchanged and the page sends no request.
 
 `browse` (CONTRACT-002 B; ADR-012) serves the explorer to a browser on the same
 computer. It serves the `author` audience only. Its search is Stemma's own, with
-no result limit ("Search" below). It opens no original and has no MCP surface.
+no result limit ("Search" below). It shows original pages beside source text
+("Originals" below) and has no MCP surface.
 
 **What is served.** The author export of B, E, F, J, K, and L, made in memory
 from the record files by the same functions, with no size cap on source views or
@@ -629,12 +636,15 @@ when the command ends.
 
 **Surface.** Every request outside this table is refused. The target on the
 request line is compared whole, as sent: nothing is decoded or resolved, and no
-query string is accepted. No part of a request names or reaches a file, since
-the three assets are held in memory.
+query string is accepted. No part of a request names or reaches a file: the
+assets and the data pdf.js asks for are held in memory, and an original is looked
+for by a digest the snapshot records, in places the command was given
+("Originals").
 
 | Method and path | Body | Answer |
 |---|---|---|
 | `GET /`, `GET /app.js`, `GET /app.css` | none | The page shell, script, and styles. They hold no project data |
+| `GET /pdf-worker.js`, `GET /pdfjs/pdf.worker.min.mjs`, `GET /pdfjs/openjpeg_nowasm_fallback.js`, `GET /pdfjs/jbig2_nowasm_fallback.js` | none | The pinned pdf.js worker and its two image decoders. They hold no project data |
 | `POST /api/session` | `{}`, signed with the one-time code | `{"secret"}`, once; after that the refusal `code_used` or `code_expired` |
 | `POST /api/status` | `{}` | `{"state": "current" \| "rebuilding" \| "failed", "data_identity"?, "message"?}` |
 | `POST /api/boot` | `{}` | Banner data and the manuscript view's state |
@@ -643,8 +653,12 @@ the three assets are held in memory.
 | `POST /api/search` | `{"text", "type"?, "offset", "limit"}` and nothing else | One page of Stemma's search ("Search") |
 | `POST /api/source-view` | `{"id"}` | The source view of that citation or passage, or none. The ID is only looked up in the snapshot |
 | `POST /api/manuscript` | `{}` | The manuscript view |
+| `POST /api/original-page` | `{"text", "index"}`, a source file ID and a part's index | Which page of which original the part is, or why none is established ("Originals") |
+| `POST /original` | `{"sha256"}` | The bytes of the original with that digest, or why they cannot be given ("Originals") |
+| `POST /pdfjs-data` | `{"name"}` | A character map or standard font of the pinned pdf.js, looked up by name among those held in memory |
 
-Each answer made from the snapshot is `{"data_identity", "result"}`. A refusal
+Each answer made from the snapshot is `{"data_identity", "result"}`. The
+successful answers of `/original` and `/pdfjs-data` are bytes. A refusal
 is `{"error": {"code", "message"}}` with an HTTP status; a refusal under the
 rules below holds no value taken from the request, and arras's own refusal
 (`arras_refusal`) holds the message arras gives. No call writes anything; arras's write, journal, and SQL calls
@@ -664,7 +678,7 @@ are refused in the page as the static profile refuses them.
    method other than `GET` and `POST` are refused, so a preflight fails.
 5. Every `POST` must carry `Content-Type` exactly `application/json` and the
    header `X-Stemma-Request: 1`.
-6. Every `/api/` call but `session` must be signed with the run's secret, as
+6. Every `POST` but `/api/session` must be signed with the run's secret, as
    "Proofs" below says, and its nonce is accepted once. The secret is 256 random
    bits made at each start. No request carries it. No cookie is set or read,
    since cookies are shared between ports.
@@ -706,8 +720,15 @@ are refused in the page as the static profile refuses them.
     content security policy `default-src 'none'; script-src 'self'; worker-src
     'self'; style-src 'self'; img-src 'self' data:; connect-src 'self';
     frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action
-    'none'`. The served page is its own template: its script and styles are
-    separate files, with none inline.
+    'none'`, which the pdf.js worker's script carries too. The one exception is a
+    successful answer of `/original`, which is never to be a document or script:
+    `Content-Type: application/octet-stream`,
+    `Content-Disposition: attachment; filename="original"`, and the policy
+    `default-src 'none'; sandbox; frame-ancestors 'none'`, with the other headers
+    above. The served page is its own template: its script and styles are
+    separate files, with none inline. No part of this policy is loosened for
+    originals: nothing is evaluated, WebAssembly included, and no `blob:` or
+    other address is added.
 12. The server and its child make no outbound request.
 13. A request's cost and answer are bounded. A search reads each entry's search
     text once, for at most 16 words of a text of at most 200 code points, and
@@ -715,7 +736,9 @@ are refused in the page as the static profile refuses them.
     `arras`, or `search` is at most 8 MiB; a larger one is not sent, and the call
     is refused with `answer_too_large` (422). arras's own limits bound its other
     queries. A source view and the manuscript view have no size cap: they are as
-    large as the records make them, and a request gets at most one.
+    large as the records make them, and a request gets at most one. An original
+    is at most 256 MiB, at most two are held in memory at once, and others wait;
+    an answer with an original that is not taken within 120 seconds is ended.
 
 **Search.** The server searches every entry of every type in the served graph.
 An entry of a searched type (F) is searched by its `searchText`; every other
@@ -784,6 +807,73 @@ type's list is read 50 at a time with "Show next 50" to its end. The
 neighbourhood picture draws only some of a record's links; the lists beside it
 hold all.
 
+**Originals.** Beside the highlighted text of each page a passage lies on, the
+served page shows that page of the original: a page of a PDF, drawn by the pinned
+pdf.js, or the page image. This is so wherever a source view is shown: the record
+panel, and a manuscript quotation, note citation, and bibliography entry (L). The
+original is **not highlighted**, and the page says so beside it: the highlight is
+in the converted text only. When the original cannot be shown, the page says
+which of these is so and why, and the text stays: the offline file; a physical
+original; a type that is not shown (a TIFF image included, which is not
+converted); no page established; not held; changed (the digest does not match);
+too large; or it could not be drawn.
+
+- **Which page.** The server applies CONTRACT-007 C to the source file as the
+  snapshot holds it. `/api/original-page` answers `state` `pdf` (`sha256`,
+  `size`, `page` counted from 1, and `page_count`), `image` (`sha256`, `size`,
+  `media_type`), or `none` (`reason`: `physical`, `unsupported_type`, or
+  `no_page_mapping`), with `why` in words. A view with no highlight has no page.
+  No page is worked out any other way.
+- **Where a file is looked for.** Only at `.stemma/originals/<sha256>` in the
+  project, and in the files and folders named with `--originals`. Nothing else in
+  the project is looked at, and no recorded address is ever fetched. No symbolic
+  link is followed: `.stemma`, `originals`, and the file in it must be plain
+  directories and a plain file, a named path that is a link is not looked in, and
+  no link met inside a named folder is followed. Names inside a named folder that
+  begin with a dot are passed over. Only files of the recorded size are read, and
+  one search looks at no more than 100,000 entries.
+- **The bytes served are the bytes hashed.** A file is opened without following
+  a link, checked to be a regular file of the recorded size, read whole into
+  memory, and hashed; those bytes in memory are sent only when their SHA-256 is
+  the one asked for. A file that was swapped or edited gives other bytes, which
+  are not sent. Where it was found is remembered only as a place to look first.
+- **What is served.** `/original` gives a digest only when a source file in
+  effect and usable in the snapshot records it among its original's files, as a
+  PDF, PNG, or JPEG. Refusals, each proved, hold no path and no value from the
+  request: `unknown_original` (404), `original_unsupported` (415),
+  `original_too_large` (422, from the recorded size, before anything is read),
+  `original_not_held` (404), `original_changed` (409: the file at the cache's
+  name for the digest, or a file of the recorded size in a place looked in, holds
+  other bytes), and `index_stale` as for any call.
+- **Proofs.** The bytes of `/original` and `/pdfjs-data` are proved as every
+  answer is. The page gives pdf.js, or draws, no byte before its proof has been
+  checked, and checks too that an original's SHA-256 is the one it asked for.
+  `/pdfjs-data` reads no snapshot, so it makes no scan.
+- **pdf.js's own code** is a script of the page, with the same limit as the page's
+  script (see below). So that nothing of it is asked for later, when another
+  program might hold the port, the page starts the one worker as it loads, which
+  loads the worker and both decoders then, and it never starts another. If that
+  worker fails or stops answering, originals from PDFs cannot be drawn until the
+  page is loaded again from a running server.
+- **Drawing.** A PDF is given to pdf.js as bytes, never as an address, and never
+  to the browser's own PDF viewer. XFA is off, nothing is evaluated (the policy
+  forbids it, and WebAssembly is off, so the JavaScript decoders are used and
+  embedded color profiles are not applied), pdf.js's scripting engine is not
+  shipped or loaded, no font is installed in the page and no system font is used,
+  and pdf.js fetches nothing itself. Only the page's own content is drawn, on a
+  canvas: no annotation, form field, or link layer is made, so links are inert,
+  and no attachment is read. A PDF whose page count is not the recorded one shows
+  no page. A canvas is at most 16 million pixels, an image over 100 million
+  pixels is not decoded, and drawing is given up after 60 seconds.
+- **Page images.** The bytes must begin as the recorded type does, and the size
+  stated in them must be at most 100 million pixels. They are decoded by the
+  browser's image decoder (`createImageBitmap`) and drawn on a canvas: no image
+  address is made.
+- **What is shown is the whole file's page.** An original can show what the
+  source text and an export leave out, such as a download stamp that names a
+  person, or a restricted position. It is shown on the author's computer only,
+  and no export holds it.
+
 **Proofs.** Once a server stops, another program can take its port at once, and
 an open page would reach it. So each side shows the other, on every `POST`, that
 it holds a key, without sending the key.
@@ -823,7 +913,7 @@ it holds a key, without sending the key.
   `verify`, over the status and the bytes received, before it reads any of them,
   whatever the status. This covers every answer it uses: the secret, status,
   banner, arras's answers over the module and graph, source views, and the
-  manuscript. A proof therefore answers one request only: it fails for a changed
+  manuscript, originals, and pdf.js's data. A proof therefore answers one request only: it fails for a changed
   body or status, another path, or another request. The page's script and styles
   are not covered (see below). WebCrypto is available because a browser treats a
   loopback address as a secure context.
@@ -833,7 +923,7 @@ it holds a key, without sending the key.
 - The inputs are those of the data identity (J) and the export: `stemma.json`,
   `rules.md`, and every file under `records/`, `sources/`, `manuscript/`,
   `research/`, and `report/`.
-- Before it answers any `/api/` call but `session`, the server makes a stat scan
+- Before it answers any `/api/` call but `session`, and `/original`, the server makes a stat scan
   of the inputs (name, kind, size, inode, and modification and change times, to
   about a microsecond where the system keeps it) that started after the request
   arrived. Calls waiting together share one scan.
@@ -889,6 +979,13 @@ running. It then removes the launch file and ends its child.
   stopped.
 - Another program can still stop the page, by holding the port or by answering
   nothing.
+- An original is a file from outside, parsed by pdf.js or the browser's image
+  decoders. A flaw in either could do what the page can. The worker holds no
+  secret, and the policy lets it connect nowhere but the server's own address,
+  but it shares the page's origin: this is not a sandbox that holds against such
+  a flaw.
+- A hostile PDF can take much time or memory to draw, and stop other PDFs being
+  drawn until the page is loaded again.
 - A browser extension allowed on the page reads what the page shows.
 - The secret crosses the loopback interface once, in the answer to the exchange,
   and record contents cross it unencrypted. A program able to capture loopback
@@ -943,6 +1040,7 @@ running. It then removes the launch file and ends its child.
 | Graph beyond the measured size | Export succeeds with a warning and the counts | yes | Scope by chapter |
 | Browser refuses to load | The page names the failing file or record | no | Re-export; report |
 | A served request breaks a rule of M | Refused with a status and code; nothing is read from the snapshot | no | Open the page from `browse` |
+| An original cannot be shown (M, "Originals") | The page says which reason and why, and keeps the text | no | Name where the originals are with `--originals`, or none |
 | A served answer would be larger than 8 MiB, or a search is outside its bounds (M) | `answer_too_large` or `bad_request`; nothing else is affected | no | Ask for less; use the Search view |
 | The inputs changed (M) | `index_stale` until rebuilt; the page says so | yes | Wait; the page loads again |
 | A rebuild fails (M) | State `failed` with what is wrong; no earlier data is served | after a change | Fix the project; run `check` |

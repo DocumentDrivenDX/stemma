@@ -70,6 +70,18 @@ Each item states its acceptance criterion.
   (CONTRACT-005 M, "Proofs"). When the code is redeemed the command says so with
   the time, and a page given a used code says that another page or program opened
   the link first. A page served by another program is not covered (TM-S-009).
+- **SEC-038**: The local server gives the bytes of an original only for a digest
+  that a source file in effect records, found only in `.stemma/originals/` or a
+  place named with `--originals`, following no symbolic link, and only the bytes
+  it has just hashed to that digest, within a size limit, as an inert attachment
+  under SEC-034 and SEC-037. It fetches no recorded address.
+- **SEC-039**: The served page uses no byte of an original, or of pdf.js's data,
+  before its proof has been checked, and draws an original only on a canvas with
+  the pinned pdf.js or the browser's image decoder, with no scripting, XFA,
+  evaluation, WebAssembly, link or form layer, or attachment, within bounds, and
+  with the content security policy of CONTRACT-005 M, rule 11, unchanged. It
+  never uses the browser's PDF viewer, and shows no page that CONTRACT-007 C does
+  not establish.
 - **SEC-002**: Every user-facing text about review marks, annotations, text
   reviews, comparisons, restriction marks, and support verdicts, including the disclosure, calls them
   records and not proof of who acted or verification of support.
@@ -235,6 +247,8 @@ controls cover only its instructions and its own commands.
 | SEC-035 | Code and secret stay out of arguments, output, and files | G: CONTRACT-005 M; TM-I-017, TM-I-018 | High | Run and search output, arguments, files |
 | SEC-036 | Loopback only, fixed routes, bounds, no outbound request | G: CONTRACT-005 M; TM-D-010, TM-I-016, TM-E-008 | High | Socket, path, size, time, and header tests |
 | SEC-037 | Page and server prove themselves; the author is told of a first opener | G: CONTRACT-005 M, ADR-012; TM-S-008, TM-I-018 | High | A program on the port, changed, moved, and repeated answers and requests, and both code notices |
+| SEC-038 | Only recorded originals, from named places, as hashed | G: CONTRACT-005 M; TM-I-019, TM-D-011 | High | Unknown digest, paths, links, swapped, changed, oversize, and unsupported files |
+| SEC-039 | Originals drawn inert, after their proof | G: CONTRACT-005 M, ADR-012; TM-E-009, TM-D-011 | High | A PDF with script, links, a form, and an attachment; changed answers; the policy |
 
 ## Compliance Requirements
 
@@ -278,7 +292,7 @@ allows hosted processing. Stemma does not decide or enforce it.
   SEC-023 bounds network use.
 - [ ] Application security testing: hostile fixtures for the criteria above.
 - [ ] Dependency vulnerability scanning: SEC-026.
-- [ ] Server hardening: the local server follows SEC-034 to SEC-037. There is no
+- [ ] Server hardening: the local server follows SEC-034 to SEC-039. There is no
   hosted server.
 - [ ] Patch management: pins change only through a new release (SEC-025, SEC-026).
 - [ ] Backup and recovery tested: the author backs up git, source files

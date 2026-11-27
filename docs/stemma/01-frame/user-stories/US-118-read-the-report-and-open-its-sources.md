@@ -32,7 +32,8 @@ from what the report was assembled from.
 
 1. Margit opens the explorer and chooses the manuscript.
 2. She reads the report. The page says that this is the manuscript as the export
-   read it, not the printed PDF, and that originals are not opened yet.
+   read it, not the printed PDF. Originals are shown only by the served explorer
+   (US-121).
 3. She clicks a quotation or a note's citation. The source appears beside the
    text, or over it on a narrow screen, with the words marked.
 4. She clicks a bibliography entry, sees the source and every place the report

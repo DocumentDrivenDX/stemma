@@ -37,9 +37,27 @@ The single offline file stays, unchanged in behaviour, for reviewer packages and
 for browsing without a server.
 
 Delivery is in stages. The server (`stemma browse`, CONTRACT-005 M) comes first,
-then search beyond the arras limits (M, "Search"). Originals, highlighting on
-originals, and MCP are later stages, each specified before it is built. None of
-them is built by this decision alone.
+then search beyond the arras limits (M, "Search"), then originals shown
+unhighlighted beside the text (M, "Originals"). Highlighting on originals and MCP
+are later stages, each specified before it is built. None of them is built by
+this decision alone.
+
+## Originals in the page
+
+An original is a file from outside. It is never handed to the browser's own PDF
+viewer, which would run it with the browser's features: the pinned pdf.js draws
+one page of it on a canvas from bytes whose proof and digest have been checked.
+The page's content security policy is not loosened for it. pdf.js can decode
+JPEG 2000 and JBIG2 images, which scanned books use, with WebAssembly or with
+JavaScript; WebAssembly would need `'wasm-unsafe-eval'`, so the JavaScript
+decoders are used, which are slower, and embedded color profiles, which need
+WebAssembly, are not applied. The worker and both decoders are loaded when the
+page is, because a script asked for later could come from another program that
+had taken the port. The character maps and fonts are data asked for later, so
+they travel as signed calls with proved answers.
+
+Whether a part of a source file is a page of its original is decided from the
+record alone (CONTRACT-007 C). Where it is not established, no page is shown.
 
 ## Search in the server
 
@@ -115,7 +133,9 @@ state the rules and what they do not defend against. A process running as the
 author is not defended against, as it can already read the project. The server
 holds the whole export in memory, and rebuilds it all after a change.
 
-**Drift signals to watch**: A rule weakened to make something work; a server that
+**Drift signals to watch**: A rule or the page's policy weakened to make
+something work, drawing originals included; a page of an original chosen by
+anything but CONTRACT-007 C; a server that
 answers from data older than the record files; a request path that reaches the
 file system; any outbound request; a second implementation of arras behaviour
 beyond the search result's shape; a search that cuts results without saying so.

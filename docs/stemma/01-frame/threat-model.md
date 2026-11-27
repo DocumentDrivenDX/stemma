@@ -220,6 +220,8 @@ modules, or the product owner for accepted risks.
 | TM-I-015 | The index and saved reports copy source text; sharing the working folder shares them | 3 | 2 | 6 | Author | SEC-019 |
 | TM-I-016 | Hostile web page in the author's browser reads the local server: a cross-origin fetch or form post, DNS rebinding to 127.0.0.1, framing, or guessing paths | 4 | 3 | 12 | `server` | SEC-034, SEC-036: exact Host and Origin, no cross-origin permission, JSON and custom header, secret header, no cookie, framing refused |
 | TM-I-017 | Another local port: a page or program on another loopback port reaches the server, or receives its cookie or secret | 4 | 2 | 8 | `server`, `explorer` | SEC-034: origin includes the port; no cookie (cookies are shared between ports); the secret is in per-origin session storage |
+| TM-I-019 | The local server is made to give a file that is not a recorded original: a request naming a path, a link placed where originals are looked for, or a file swapped for another after it was checked | 4 | 2 | 8 | `server` | SEC-038: a request names only a digest a source file records; no link is followed; the bytes sent are the bytes hashed |
+| TM-I-020 | An original shown shows what the source text and the export leave out, such as a download stamp naming a person or a restricted position | 2 | 2 | 4 | Author (accepted) | Shown only through the local server on the author's computer; no export or package holds it; stated in CONTRACT-005 M |
 | TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested. Neither is sent (SEC-037). A process running as the author that redeems the code first gets in; the author's page and the command's output then say that the link was opened first, which tells of it and does not prevent it |
 
 ### Denial of Service
@@ -235,6 +237,7 @@ modules, or the product owner for accepted risks.
 | TM-D-007 | Pathological content stalls citation formatting or Typst | 2 | 2 | 4 | `publish` | None specific |
 | TM-D-008 | Injected or oversized text makes the agent loop, spend, or stop | 2 | 2 | 4 | Author | Bounded excerpts |
 | TM-D-009 | The index is corrupt or stale | 1 | 2 | 2 | `graph` | Rebuilt from records |
+| TM-D-011 | A hostile or very large original takes the memory or time of the server or the page | 2 | 2 | 4 | `server`, `explorer` | SEC-039: size limit before reading, two originals held at once, bounded canvas, image pixels, and drawing time |
 | TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds, including a search's work and answer size (CONTRACT-005 M, rule 13). Another user can still use up the connection limit while it connects; the author loses browsing, not data |
 
 ### Elevation of Privilege
@@ -248,6 +251,7 @@ modules, or the product owner for accepted risks.
 | TM-E-005 | Content becomes Typst code, reads files, or pulls a package | 4 | 2 | 8 | `publish` | SEC-010 |
 | TM-E-006 | Record, comment, resolver, or SVG content runs script in the explorer, including by breaking out of inlined data. In-browser Typst may need a looser policy | 4 | 3 | 12 | `explorer` | SEC-011 |
 | TM-E-007 | A malicious dependency, install script, or update runs with the author's rights | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
+| TM-E-009 | A hostile PDF or image shown in the served page exploits pdf.js or the browser's image decoders, or its scripts, links, forms, or attachments act | 5 | 2 | 10 | `explorer` | SEC-039: only files whose digest a source file records; pinned pdf.js drawing a canvas from bytes, no scripting, XFA, evaluation, WebAssembly, annotation or link layer, or attachment; policy unchanged. A flaw in a parser or decoder is not contained beyond the page's policy |
 | TM-E-008 | A crafted request reads a file outside the served set or makes the local server run something | 5 | 1 | 5 | `server` | SEC-036: fixed routes, assets held in memory, a record ID only looked up in the snapshot; arras runs queries over memory only |
 
 ## Risk Assessment
@@ -328,11 +332,6 @@ TM-E-004, TM-E-006, TM-E-007.
 ADR-012's later stages add threats that are analysed here before they are built
 and have no control yet:
 
-- **Hostile PDF** (originals shown in the page): an original is a file from
-  outside that a PDF reader in the browser would parse. The plan is to serve only
-  files whose digest a source text records, as inert attachments, and to render
-  them with the pinned pdf.js with evaluation, scripting, and XFA off and links
-  inert; never the browser's own viewer. No original is opened now.
 - **Injection through MCP** (an MCP surface): record and source text returned to
   an agent can pose as instructions (TM-S-001, TM-E-001), and a tool argument
   can try to name an address or a file. The plan is read-only tools, results

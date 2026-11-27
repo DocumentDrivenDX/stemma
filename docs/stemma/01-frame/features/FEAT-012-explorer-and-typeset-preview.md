@@ -110,7 +110,8 @@ N/A — the user stories name the tasks.
   form, files by digest, addresses it was obtained from, or where it is held) and
   must not show a local path. Viewing must fetch nothing. The command line says
   whether a file with the recorded digest is held in the project or its cache.
-  Opening an original is not part of this requirement.
+  Showing an original is the served explorer's (SRV-10); the offline page says
+  that it cannot.
 
 #### Manuscript browser (FR-64; disclosure also obeys FR-61)
 
@@ -121,7 +122,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   the explorer: its headings, text, quotations, numbered notes with their
   citations and comments, and bibliography. It must be the manuscript as the
   export read it, from the report directory the export names, and the page must
-  say that it is not the printed PDF and that originals are not opened yet.
+  say that it is not the printed PDF, and what it can show of originals.
 - MAN-02. Clicking a quotation, or the citation of a note, must show the cited
   source with the quoted words highlighted in its source text, under SRC-02 to
   SRC-04 and by the same source view. A quotation over several passages lists
@@ -225,6 +226,18 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   say so with both numbers. The offline file keeps arras's limits and states
   them.
 - SRV-09. A search request's cost and a served answer's size must be bounded.
+- SRV-10. Wherever the served explorer shows a source view (the record panel, and
+  a manuscript quotation, note citation, and bibliography entry), it must show the
+  page of the original beside the highlighted text, from the PDF or page image
+  whose digest the source file records, where the record establishes which page
+  that is (CONTRACT-007 C), and never a guessed one. The original is not
+  highlighted, and the page must say so. Where it cannot be shown, the page must
+  say why and keep the text.
+- SRV-11. Originals must be looked for only in the project's originals cache and
+  in places the author names, following no link, and only bytes whose digest was
+  just computed and matches may be given, under the same proofs as every answer.
+  No recorded address is fetched, nothing in a file is run, and the server's
+  policy is not loosened.
 
 ### Non-Functional Requirements
 
@@ -254,6 +267,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 - [US-116 — See a citation in its source](../user-stories/US-116-see-a-citation-in-its-source.md)
 - [US-118 — Read the report and open its sources](../user-stories/US-118-read-the-report-and-open-its-sources.md)
 - [US-119 — Browse through the local server](../user-stories/US-119-browse-through-the-local-server.md)
+- [US-121 — See the original page beside the highlighted text](../user-stories/US-121-see-the-original-page.md)
 
 ## Edge Cases and Error Handling
 
