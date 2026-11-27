@@ -708,7 +708,7 @@
         "fixes": [
           "repoint"
         ],
-        "message": "A record points at a record that is missing or is of the wrong kind.",
+        "message": "A record or a chapter file names a record that is missing or is of the wrong kind.",
         "open": true,
         "outcome": "fail",
         "reason_code": "reference_dangling",
@@ -810,7 +810,7 @@
       "bun": "1.4.5",
       "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.14",
+      "stemma": "0.0.18",
       "stemma-convert": "1"
     },
     "unreviewed": [],

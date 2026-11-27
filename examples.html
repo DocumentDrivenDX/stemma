@@ -142,7 +142,7 @@ Full report: $DEMO/book/.stemma/reports/check.json
 <p class="record">5. A scan alone is not text. Its recognized text enters as such, page by page, labelled as recognized</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma source pages $DEMO/materials/ledger-scan.pdf --project $DEMO/book</span>
 Warning: Cannot load &quot;@napi-rs/canvas&quot; package: &quot;ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- &lt;plugin root&gt;/dist/pdf-71vhnt0w.js&quot;.
+- &lt;plugin root&gt;/dist/highlight-worker.js&quot;.
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 Proposed page map, for review. Nothing in the project was changed. The file has 1 pages.
@@ -156,7 +156,7 @@ Add --out &lt;file&gt; to save the proposed map.
 <span class="cmd">$ stemma source convert $DEMO/materials/ledger-scan.pdf --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --origin &quot;my own scan&quot; --source src-demo0ledger001 --text-layer $DEMO/materials/ledger-text-layer.txt --method ocr --tool invented-ocr --tool-version 1.0 --page-map $DEMO/materials/ledger-page-map.json --project $DEMO/book</span>
 Warning: Cannot load &quot;@napi-rs/canvas&quot; package: &quot;ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- &lt;plugin root&gt;/dist/pdf-71vhnt0w.js&quot;.
+- &lt;plugin root&gt;/dist/highlight-worker.js&quot;.
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 Wrote the source file txt-random0001 to sources/ledger1911/
@@ -213,7 +213,7 @@ The PDF library's warnings are shown as it prints them: the plugin ships no nati
 <span class="cmd">$ stemma ingest --plan $DEMO/plan.json --actor person:demo-author --project $DEMO/quoting-book</span>
 Warning: Cannot load &quot;@napi-rs/canvas&quot; package: &quot;ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- &lt;plugin root&gt;/dist/pdf-71vhnt0w.js&quot;.
+- &lt;plugin root&gt;/dist/highlight-worker.js&quot;.
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 == 1. Capture
@@ -506,7 +506,7 @@ Checked the whole project: 16 result(s) passed.
        field: /tittle
        problem: the field is not part of the record format
 
-9. <span class="v-bad">PROBLEM</span>: A record points at a record that is missing or is of the wrong kind.  [record.valid]
+9. <span class="v-bad">PROBLEM</span>: A record or a chapter file names a record that is missing or is of the wrong kind.  [record.valid]
    Why it matters: The link between your evidence and its source is broken, so anything relying on it cannot be traced.
    What to do: Point the reference at the right record, or remove it.
    - stemma.json
@@ -557,32 +557,26 @@ Checked the whole project: 9 result(s) passed.
 Full report: $PROJECTS/clean/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
 </details>
-<h3>A project with a manuscript file</h3><p>A project with a manuscript file. Stemma does not read it, and says that it could not check. <a href="reports/check-manuscript.json">Data file for the manuscript project</a>.</p><details class="more"><summary>Printed report for the manuscript project</summary>
+<h3>A project with a manuscript file</h3><p>A project with a manuscript file. Its citation is checked there, and the source it cites is not in the project. <a href="reports/check-manuscript.json">Data file for the manuscript project</a>.</p><details class="more"><summary>Printed report for the manuscript project</summary>
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/manuscript</span>
-<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 1 could not be checked, 9 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 8 result(s) passed.
+<span class="v-warn">OPEN FINDINGS</span>: 1 problem(s), 0 could not be checked, 1 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 11 result(s) passed.
 
-1. <span class="v-warn">COULD NOT CHECK</span>: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
-   Why it matters: The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.
-   What to do: Nothing to fix in your files. Check this entry by hand.
-   - src-fixture0harbour01
-       source file: records/sources/src-fixture0harbour01.json
+1. <span class="v-bad">PROBLEM</span>: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: Capture the source: `ingest`, or `source convert &lt;original&gt; --source &lt;id&gt;`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
+   - manuscript/chp-fixture0chapter1.md
+       manuscript position: manuscript/chp-fixture0chapter1.md, line 3, column 13
+       sentence: A sentence.
        key: hartwell1998
+       source file: records/sources/src-fixture0harbour01.json
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - not compared with a catalogue: no lookup that found the work is saved: hartwell1998
 
 <span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - bibliography entries that are never cited  [bib.uncited]
-   - citation keys in the manuscript files  [cite.key]
    - passages marked as needing a source  [draft.marked]
-   - whether cited pages and other locators fall inside the source  [locator.extent]
-   - whether cited figures appear in the source text  [number.present]
-   - whether quotations are on the cited pages or in the cited chapter  [quote.page]
-   - whether quotations appear in the source text  [quote.present]
-   - work that rests on source text that has since changed  [source.changed]
-   - whether each cited source's text is in the project  [source.held]
 
 Full report: $PROJECTS/manuscript/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>

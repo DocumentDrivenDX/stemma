@@ -9,46 +9,16 @@
           "sha256": "ab5b9ae682ae957b5e743b0eb38de9d628fdb949338dcbad6a1ca048dc4c6865"
         }
       ],
-      "profiles": [],
+      "profiles": [
+        "sentence-split/0"
+      ],
       "research": []
     },
     "label": "open_findings",
     "mode": "work",
     "not_run": [
       {
-        "check": "bib.uncited",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "cite.key",
-        "reason": "not_implemented"
-      },
-      {
         "check": "draft.marked",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "locator.extent",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "number.present",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "quote.page",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "quote.present",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "source.changed",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "source.held",
         "reason": "not_implemented"
       }
     ],
@@ -75,17 +45,49 @@
           "content_sha256": "87f2475ea978d46c83c1f52596b70887f50c62904e039a6f72c5a063aae34d92",
           "record": "src-fixture0harbour01"
         },
-        "message": "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
-        "open": true,
-        "outcome": "unverifiable",
-        "reason_code": "manuscript_not_read",
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
         "rules": [],
         "source": "src-fixture0harbour01",
         "subject": "src-fixture0harbour01",
-        "suggestions": [
-          "Nothing to fix in your files. Check this entry by hand."
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "cite.key",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "manuscript_position",
+            "value": "manuscript/chp-fixture0chapter1.md, line 3, column 13"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "A sentence."
+          },
+          {
+            "class": "manuscript",
+            "name": "key",
+            "value": "hartwell1998"
+          }
         ],
-        "why": "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way."
+        "finding_key": "6dfea9ca5479dd74530f1ce0abafeaaa6e0ee093560326d66c8a91395d2493bb",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "sentence": {
+          "sha256": "92cc199c38785d890c7e284dbe881d529d25650998e4178eb0515ac930140eff",
+          "text": "A sentence."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "manuscript/chp-fixture0chapter1.md",
+        "suggestions": [],
+        "why": ""
       },
       {
         "annotations": [],
@@ -287,25 +289,101 @@
         "subject": "stemma.json",
         "suggestions": [],
         "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "source.changed",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "manuscript_position",
+            "value": "manuscript/chp-fixture0chapter1.md, line 3, column 13"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "A sentence."
+          }
+        ],
+        "finding_key": "c87e69922a5848633cbf9a4ddc2aa9c1a944d646ab2aa7039b943663d71f9adb",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "sentence": {
+          "sha256": "92cc199c38785d890c7e284dbe881d529d25650998e4178eb0515ac930140eff",
+          "text": "A sentence."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "manuscript/chp-fixture0chapter1.md",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
+        "check": "source.held",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "manuscript_position",
+            "value": "manuscript/chp-fixture0chapter1.md, line 3, column 13"
+          },
+          {
+            "class": "manuscript",
+            "name": "sentence",
+            "value": "A sentence."
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          },
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "fd8dbc289e94f784f716bccf63d933a53dfc21504be47c893aaaa9364f3479d1",
+        "fixes": [
+          "capture_source",
+          "remove_citation"
+        ],
+        "message": "A cited source has no source file in the project, so this citation is unchecked.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "no_source_file",
+        "rules": [],
+        "sentence": {
+          "sha256": "92cc199c38785d890c7e284dbe881d529d25650998e4178eb0515ac930140eff",
+          "text": "A sentence."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "manuscript/chp-fixture0chapter1.md",
+        "suggestions": [
+          "Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile."
+        ],
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked."
       }
     ],
     "scope": "all",
     "summary": {
       "confirmed": 0,
-      "could_not_check": 2,
+      "could_not_check": 1,
       "dismissed": 0,
-      "fail": 0,
-      "not_implemented": 9,
+      "fail": 1,
+      "not_implemented": 1,
       "open": 1,
-      "pass": 8,
+      "pass": 11,
       "unreviewed": 0,
-      "unverifiable": 2
+      "unverifiable": 1
     },
     "tools": {
       "bun": "1.4.5",
       "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.14",
+      "stemma": "0.0.18",
       "stemma-convert": "1"
     },
     "unreviewed": [],
