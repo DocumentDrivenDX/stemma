@@ -225,18 +225,17 @@ Before and after were both run on these projects.
   wrong cause. Retry with backoff, keeping the secret, and stop only on an
   unproved answer or a sustained outage.
 - The scale test does not catch scans that compare records by identity.
-- The export's data identity hashes manuscript file digests without their paths,
-  but results can depend on paths, so `graph status` can call an export current
-  after a chapter is renamed. Hash each path with its digest (CONTRACT-005 J);
-  needed before the manuscript checks land.
+- Adding a research note changes a count in the export but not its data
+  identity, so `graph status` still calls the export current.
+- The PDF reader's 4 GiB bound covers only the reading process; the whole
+  command reached 5.9 GB on an invented 5,000-page book of 700 words a page, and
+  a denser book may be refused.
 - A finding on a manuscript citation with no record has the chapter path as its
   subject, so no record's states show it.
 - Highlighting on originals refuses scans (hidden recognition text), words split
   by a line-end hyphen and ligatures: 6 of 125 passage segments of the worked
   example were marked. Whether to show labelled estimates is the product
   owner's decision.
-- The command-line PDF reader has no memory bound: a crafted 13 KB file drove it
-  to 19.6 GiB. Bound it before takeover reads PDF manuscripts.
 
 ## Not completable by an agent alone
 
