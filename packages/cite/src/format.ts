@@ -124,20 +124,18 @@ const formatOne = (engine: ReturnType<typeof engineFor>, id: string, note: numbe
  * publisher is kept for that one).
  */
 function letterDescriber(corpus: Corpus): (record: JsonObject) => { full: string; short: string } {
-  // Compiling the style is the costly step, so one engine for each form serves
-  // every letter, emptied before each so that no letter affects another.
-  const maker = () => {
-    const items: Record<string, CslItem> = {};
-    let engine: ReturnType<typeof engineFor> | undefined;
-    return (item: CslItem) => {
-      items[item.id] = item;
-      engine ??= engineFor(items);
-      engine.updateItems([]);
-      return engine;
-    };
+  // Compiling the style is the costly step, so one engine serves both forms of
+  // every letter, emptied before each so that no form or letter affects another.
+  const items: Record<string, CslItem> = {};
+  let made: ReturnType<typeof engineFor> | undefined;
+  const engineWith = (item: CslItem) => {
+    items[item.id] = item;
+    made ??= engineFor(items);
+    made.updateItems([]);
+    return made;
   };
-  const fullEngine = maker();
-  const shortEngine = maker();
+  const fullEngine = engineWith;
+  const shortEngine = engineWith;
   const described = new Map<string, { full: string; short: string }>();
   return (record) => {
     const own = cslItem(corpus, record);
