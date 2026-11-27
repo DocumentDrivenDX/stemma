@@ -257,13 +257,14 @@ export interface Closest extends Span {
 interface Candidate { start: number; end: number; distance: number }
 
 /**
- * Every offset in `hay` from `begin` to `until` where some stretch ending there
- * is within `limit` edits of the needle, with the fewest edits. This is Myers'
- * bit-parallel form of the approximate substring search, 32 rows at a time
- * (Hyyro's blocks), so that text which holds nothing like the needle is passed
- * over quickly. It gives distances only, not where each stretch starts.
+ * Myers' bit-parallel form of the edit distance table, 32 rows at a time
+ * (Hyyro's blocks), which gives the last row's value after each unit of `hay`
+ * from `begin` to `until`. With `top` 0 a stretch may begin anywhere, which is
+ * the approximate substring search: the value is the fewest edits of any stretch
+ * ending there. With `top` 1 it must begin at `begin`: the value is the edit
+ * distance from there. It gives distances only, not where a stretch starts.
  */
-function endsWithin(needle: string, hay: string, begin: number, until: number, limit: number): { end: number; distance: number }[] {
+function bitDistances(needle: string): (hay: string, begin: number, until: number, top: 0 | 1, each: (end: number, distance: number) => void) => void {
   const m = needle.length;
   const blocks = Math.ceil(m / 32);
   const rows = new Map<number, number>();
@@ -271,37 +272,39 @@ function endsWithin(needle: string, hay: string, begin: number, until: number, l
   // Row 0 is for every unit the needle does not hold.
   const match = new Int32Array((rows.size + 1) * blocks);
   for (let i = 0; i < m; i++) match[rows.get(needle.charCodeAt(i))! * blocks + (i >> 5)]! |= 1 << (i & 31);
-  const plus = new Int32Array(blocks).fill(-1);
+  const plus = new Int32Array(blocks);
   const minus = new Int32Array(blocks);
   const lastRow = 1 << ((m - 1) & 31);
-  const found: { end: number; distance: number }[] = [];
-  let score = m;
-  for (let j = begin; j < until; j++) {
-    const offset = (rows.get(hay.charCodeAt(j)) ?? 0) * blocks;
-    let carry = 0;
-    for (let b = 0; b < blocks; b++) {
-      let equal = match[offset + b]!;
-      const pv = plus[b]!;
-      const mv = minus[b]!;
-      const xv = equal | mv;
-      if (carry < 0) equal |= 1;
-      const xh = (((((equal & pv) >>> 0) + (pv >>> 0)) | 0) ^ pv) | equal;
-      let ph = mv | ~(xh | pv);
-      let mh = pv & xh;
-      const high = b === blocks - 1 ? lastRow : 0x80000000 | 0;
-      const out = (ph & high) !== 0 ? 1 : (mh & high) !== 0 ? -1 : 0;
-      ph <<= 1;
-      mh <<= 1;
-      if (carry < 0) mh |= 1;
-      else if (carry > 0) ph |= 1;
-      plus[b] = mh | ~(xv | ph);
-      minus[b] = ph & xv;
-      carry = out;
+  return (hay, begin, until, top, each) => {
+    plus.fill(-1);
+    minus.fill(0);
+    let score = m;
+    for (let j = begin; j < until; j++) {
+      const offset = (rows.get(hay.charCodeAt(j)) ?? 0) * blocks;
+      let carry: number = top;
+      for (let b = 0; b < blocks; b++) {
+        let equal = match[offset + b]!;
+        const pv = plus[b]!;
+        const mv = minus[b]!;
+        const xv = equal | mv;
+        if (carry < 0) equal |= 1;
+        const xh = (((((equal & pv) >>> 0) + (pv >>> 0)) | 0) ^ pv) | equal;
+        let ph = mv | ~(xh | pv);
+        let mh = pv & xh;
+        const high = b === blocks - 1 ? lastRow : 0x80000000 | 0;
+        const out = (ph & high) !== 0 ? 1 : (mh & high) !== 0 ? -1 : 0;
+        ph <<= 1;
+        mh <<= 1;
+        if (carry < 0) mh |= 1;
+        else if (carry > 0) ph |= 1;
+        plus[b] = mh | ~(xv | ph);
+        minus[b] = ph & xv;
+        carry = out;
+      }
+      score += carry;
+      each(j + 1, score);
     }
-    score += carry;
-    if (score <= limit) found.push({ end: j + 1, distance: score });
-  }
-  return found;
+  };
 }
 
 /**
@@ -347,43 +350,27 @@ function startsWithin(needle: string, hay: string, begin: number, until: number,
 }
 
 /**
- * The candidates of one distance at a time, fewest edits first, each with its
- * start. A start depends only on the text a short way before the end, so it is
- * worked out there, unless so much would be read again that reading the whole
- * stretch once costs less.
+ * Every offset where a stretch within the limit ends, with its fewest edits and
+ * where it starts, in the order they are tried: fewest edits, then start, then
+ * end. A start depends only on the text a short way before the end, so only the
+ * text near the ends is read cell by cell, and none of it twice.
  */
-function* byDistance(needle: string, hay: string, begin: number, until: number, limit: number, keep: (end: number) => boolean): Generator<Candidate[]> {
-  const groups: number[][] = Array.from({ length: limit + 1 }, () => []);
-  for (const { end, distance } of endsWithin(needle, hay, begin, until, limit)) if (keep(end)) groups[distance]!.push(end);
+function candidatesOf(distances: ReturnType<typeof bitDistances>, needle: string, hay: string, begin: number, until: number, limit: number, keep: (end: number) => boolean): Candidate[] {
+  const found: Candidate[] = [];
+  distances(hay, begin, until, 0, (end, distance) => { if (distance <= limit && keep(end)) found.push({ start: 0, end, distance }); });
   // No optimal path to a cell within the limit begins further back than this.
   const reach = needle.length + 2 * limit + 2;
-  let whole: Map<number, number> | undefined;
-  let reread = 0;
-  for (let distance = 0; distance <= limit; distance++) {
-    const ends = groups[distance]!;
-    if (ends.length === 0) continue;
-    const windows: { from: number; to: number; ends: Set<number> }[] = [];
-    for (const end of ends) {
-      const from = Math.max(begin, end - reach);
-      const open = windows.at(-1);
-      if (open && from <= open.to) {
-        open.to = end;
-        open.ends.add(end);
-      } else windows.push({ from, to: end, ends: new Set([end]) });
-    }
-    reread += windows.reduce((n, w) => n + w.to - w.from, 0);
-    const starts = new Map<number, number>();
-    if (!whole && reread > until - begin) {
-      const all = new Map<number, number>();
-      startsWithin(needle, hay, begin, until, limit, (end, start) => all.set(end, start));
-      whole = all;
-    }
-    if (!whole) {
-      for (const w of windows) startsWithin(needle, hay, w.from, w.to, limit, (end, start) => { if (w.ends.has(end)) starts.set(end, start); });
-    }
-    yield ends.map((end) => ({ start: (whole ?? starts).get(end)!, end, distance }))
-      .sort((a, b) => a.start - b.start || a.end - b.end);
+  for (let first = 0; first < found.length; ) {
+    const from = Math.max(begin, found[first]!.end - reach);
+    let last = first;
+    while (last + 1 < found.length && found[last + 1]!.end - reach <= found[last]!.end) last++;
+    let next = first;
+    startsWithin(needle, hay, from, found[last]!.end, limit, (end, start) => {
+      if (found[next]?.end === end) found[next++]!.start = start;
+    });
+    first = last + 1;
   }
+  return found.sort((a, b) => a.distance - b.distance || a.start - b.start || a.end - b.end);
 }
 
 /** The first of `count` places where `test` holds, when it holds at every place after it. */
@@ -429,42 +416,28 @@ export function findClosest(stored: Folded, quotation: string, within: Within = 
   // The distance that counts is to the whole words shown, not to a stretch that cuts into one.
   let best: Closest | undefined;
   const tried = new Set<string>();
-  for (const candidates of byDistance(needle, hay, begin, until, limit, keep)) {
-    for (const candidate of candidates) {
-      if (tried.size >= WIDENED_CANDIDATES) break;
-      let { start, end } = candidate;
-      while (start < end && hay[start] === " ") start++;
-      while (end > start && hay[end - 1] === " ") end--;
-      while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
-      while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
-      const key = `${start} ${end}`;
-      if (end <= start || tried.has(key)) continue;
-      const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
-      if (!within(span)) continue;
-      tried.add(key);
-      const distance = editDistance(needle, hay.slice(start, end));
-      if (distance <= limit && (!best || distance < best.distance)) best = { ...span, distance, near: distance <= m * NEAR_SHARE };
-    }
+  const distances = bitDistances(needle);
+  for (const candidate of candidatesOf(distances, needle, hay, begin, until, limit, keep)) {
     if (tried.size >= WIDENED_CANDIDATES) break;
+    let { start, end } = candidate;
+    while (start < end && hay[start] === " ") start++;
+    while (end > start && hay[end - 1] === " ") end--;
+    while (start > 0 && (insideWord(hay, start) || !stored.starts[start])) start--;
+    while (end < hay.length && (insideWord(hay, end) || !stored.starts[end])) end++;
+    const key = `${start} ${end}`;
+    if (end <= start || tried.has(key)) continue;
+    const span = { start: stored.from[start]!, end: stored.to[end - 1]! };
+    if (!within(span)) continue;
+    tried.add(key);
+    // The distance to the whole span, which holds at least one unit.
+    let distance = m;
+    distances(hay, start, end, 1, (_, value) => { distance = value; });
+    if (distance <= limit && (!best || distance < best.distance)) best = { ...span, distance, near: distance <= m * NEAR_SHARE };
   }
   return best;
 }
 
 const WIDENED_CANDIDATES = 40;
-
-function editDistance(a: string, b: string): number {
-  let row = Int32Array.from({ length: b.length + 1 }, (_, j) => j);
-  let next = new Int32Array(b.length + 1);
-  for (let i = 1; i <= a.length; i++) {
-    next[0] = i;
-    const unit = a[i - 1];
-    for (let j = 1; j <= b.length; j++) {
-      next[j] = Math.min(row[j]! + 1, next[j - 1]! + 1, row[j - 1]! + (unit === b[j - 1] ? 0 : 1));
-    }
-    [row, next] = [next, row];
-  }
-  return row[b.length]!;
-}
 
 /**
  * A passage's words as a quotation prints them: only the approved line-end join,
