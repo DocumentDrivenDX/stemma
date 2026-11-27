@@ -21,7 +21,7 @@ describe("explanations", () => {
     expect(new Set(results.map((r) => r.outcome))).toEqual(new Set(["pass", "fail", "unverifiable"]));
     for (const result of results) {
       expect(result.evidence.length).toBeGreaterThan(0);
-      if (result.outcome !== "pass") expect([result.why.length > 0, result.suggestions.length > 0, result.open]).toEqual([true, true, true]);
+      if (result.outcome !== "pass") expect([result.why.length > 0, result.suggestions.length > 0, result.open]).toEqual([true, true, !result.coverage_only]);
     }
   });
 
@@ -55,7 +55,8 @@ describe("label", () => {
   test("FR-86 only checks that apply are run or listed; a cited source with nothing captured is open", () => {
     const body = run("cited");
     expect(body.results.filter((r) => r.open).map((r) => [r.check, r.reason_code]))
-      .toEqual([["meta.resolver", "no_lookup"], ["source.held", "no_source_file"]]);
+      .toEqual([["source.held", "no_source_file"]]);
+    expect(body.results.find((r) => r.check === "meta.resolver")).toMatchObject({ outcome: "unverifiable", coverage_only: true, open: false });
     expect(body.label).toBe("open_findings");
     expect(body.not_run).toEqual([]);
     for (const absent of ["source.pages", "meta.source", "quote.present", "locator.extent", "number.present", "id.resolves"]) {

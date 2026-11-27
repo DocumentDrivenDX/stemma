@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1846,
+      "index": 111,
+      "page_sha256": "5376aa2f47ed388a0873429b86f8102ce93375ba12f9b898f67a40ac17b27211",
+      "start": 1707,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-f7j1y49mn3625hdn8dzn",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "94"
+  },
+  "quote": {
+    "exact": "Chamisso’s theory,\nfrom assuming the existence of so many banks, all lying at the proper\ndepth beneath the water, is also vitally defective"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-darwinreefs1842",
+  "source_record_sha256": "c37163df88dd21745cc919fab59dab7cd447fdaa64b21fc5a4967613b3b03b02",
+  "text": "txt-bm6whwjm6vv9ce26mgbr"
+}

@@ -45,8 +45,6 @@ describe("seeded and clean fixtures", () => {
       "record.valid fail unknown_field src-fixture0invalid01",
       "record.valid unverifiable record_unreadable records/agents/agt-fixture0broken001.json",
       "source.held fail no_source_file cit-fixture0good00001",
-      "meta.resolver unverifiable no_lookup src-fixture0harbour01",
-      "meta.resolver unverifiable no_lookup src-fixture0orphan001",
     ].sort());
   });
 

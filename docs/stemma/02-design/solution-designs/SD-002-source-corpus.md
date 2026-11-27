@@ -203,6 +203,7 @@ graph TD
 | Requirement ID | Component | Design Element | Test Strategy |
 |---|---|---|---|
 | STO-01, STO-02 | Capture | BR-201 to BR-203 | Capture synthetic originals; no binary in the project |
+| ITR-01 to ITR-04 | Capture and enrichment (`core`, `cli`) | `source capture`, `enrich`, `tag`, `list`, `history` (CONTRACT-002 B); `tags` and `changes` on the source record, outside every source file | Enrich a cited synthetic source and compare bytes and addresses |
 | STO-03 | Fetch | BR-216 | Refusing server; non-HTTPS address |
 | CNV-01 to CNV-05 | Converters | BR-207, BR-214 | One synthetic original per format, converted twice; a model correction refused |
 | TXT-01 to TXT-03 | Converters, format | BR-208 | Roman and arabic labels; unlabelled plates; unpaged chapters |

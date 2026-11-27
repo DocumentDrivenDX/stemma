@@ -61,16 +61,15 @@ describe("recorded runs of the worked example", () => {
 
   test("show what the site says they show", () => {
     const checked = readFileSync(join(RECORDED, "example-check.txt"), "utf8");
-    expect(checked).toContain("OPEN FINDINGS: 1 problem(s), 3 could not be checked, 0 kind(s)");
-    // Nothing is open about the citations: what is open is two or three years a person has to
-    // read from a title page, and one jump in an original's page numbers, shown with its explanation.
-    expect(checked).toContain("explained by model");
-    expect(checked).not.toMatch(/\[(quote\.present|quote\.page|locator\.extent|cite\.key|source\.held)[\],]/);
-    expect(checked).not.toContain("cit-darwinreefs0001\n       citation file");
+    expect(checked).toContain("CHECKED CLEAN: the checks found nothing open.");
+    // Nothing is open, and what was covered by other means is said without asking for anything.
+    expect(checked).not.toContain("PROBLEM:");
+    expect(checked).not.toContain("COULD NOT CHECK:");
+    expect(checked).toContain("Nothing here is a problem or needs doing.");
     expect(checked).toContain("deny-|ing");
     const trial = readFileSync(join(RECORDED, "example-trial.txt"), "utf8");
     // The two planted mistakes add exactly three findings: the impossible page is reported twice.
-    expect(trial).toContain("OPEN FINDINGS: 4 problem(s), 3 could not be checked");
+    expect(trial).toContain("OPEN FINDINGS: 3 problem(s), 0 could not be checked");
     for (const planted of ["[locator.extent]", "[quote.page]", "[quote.present]"]) expect(trial).toContain(planted);
     expect(trial).toContain("locator: page 412");
     expect(trial).toContain("found on: printed page 88");

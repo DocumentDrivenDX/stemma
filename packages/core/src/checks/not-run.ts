@@ -8,6 +8,7 @@ import { active, hasManuscript, listedSources } from "./bibliography.ts";
 /** What each check would tell the author, in plain words. */
 export const CHECK_DESCRIPTIONS: Record<string, string> = {
   "record.valid": "the extra rules for some record kinds in this project",
+  "project.binary": "binary files kept in the repository",
   "cite.key": "citation keys in the manuscript files",
   "bib.uncited": "bibliography entries that are never cited",
   "source.held": "whether each cited source's text is in the project",

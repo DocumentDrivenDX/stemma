@@ -57,8 +57,16 @@ const front = join(base, "plugins");
 mkdirSync(join(front, ".claude-plugin"), { recursive: true });
 writeFileSync(join(front, ".claude-plugin/marketplace.json"), `${JSON.stringify({
   name: MARKETPLACE, owner: { name: "DocumentDrivenDX" },
-  plugins: [{ name: "stemma", description: "Stemma, as built here.", source: PLUGIN_SOURCE }],
+  plugins: [
+    { name: "stemma", description: "Stemma, as built here.", source: PLUGIN_SOURCE },
+    { name: "docsync", description: "A stand-in for the dependency.", source: "./plugins/docsync" },
+  ],
 }, null, 2)}\n`);
+// Stemma declares docsync as a dependency (ADR-011). The stand-in shows that
+// installing Stemma installs it; it is not the real plugin.
+mkdirSync(join(front, "plugins/docsync/.claude-plugin"), { recursive: true });
+writeFileSync(join(front, "plugins/docsync/.claude-plugin/plugin.json"),
+  `${JSON.stringify({ name: "docsync", version: "0.0.0", description: "A stand-in." })}\n`);
 publishInto(front, release);
 
 for (const tree of [root, release]) {
@@ -71,6 +79,8 @@ run([claude, "plugin", "install", id]);
 const listed = JSON.parse(run([claude, "plugin", "list", "--json"])) as { id: string; installPath: string; enabled: boolean; errors?: unknown[] }[];
 const entry = listed.find((p) => p.id === id) ?? fail(`${id} is not listed`);
 if (!entry.enabled || entry.errors?.length) fail("the plugin is listed as disabled or with errors");
+const dependency = listed.find((p) => p.id === `docsync@${MARKETPLACE}`);
+if (!dependency?.enabled || dependency.errors?.length) fail("installing the plugin did not install and enable docsync");
 const installed = entry.installPath;
 if (relative(config, installed).startsWith("..")) fail("the installed copy is outside the isolated profile");
 run([claude, "plugin", "details", id]);
@@ -117,7 +127,7 @@ if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.te
 console.log(`
 PASSED on this machine with the Claude command-line tool: both manifests validate, the
 plugin installs from a local stand-in for the DocumentDrivenDX marketplace
-into an empty profile with one skill, and with no bun on the search path the
+into an empty profile with one skill, bringing a stand-in docsync dependency with it, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
 no native module. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop

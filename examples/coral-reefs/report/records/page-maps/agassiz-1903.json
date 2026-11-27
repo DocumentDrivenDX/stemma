@@ -1,0 +1,30 @@
+[
+  {
+    "evidence": "page_image",
+    "first_index": 22,
+    "first_label": "xiii",
+    "last_index": 41,
+    "style": "roman_lower"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 44,
+    "first_label": "1",
+    "last_index": 47,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 52,
+    "first_label": "5",
+    "last_index": 71,
+    "style": "arabic"
+  },
+  {
+    "evidence": "printed_sequence",
+    "first_index": 106,
+    "first_label": "31",
+    "last_index": 485,
+    "style": "arabic"
+  }
+]

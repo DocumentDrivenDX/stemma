@@ -15,6 +15,7 @@ import {
 import {
   actorOf, CommandError, emit, openCorpus, type Options, reportRecords, requireActor, requireProject, tools, usageError, VERSION,
 } from "./context.ts";
+import { sourceCapture, sourceEnrich, sourceHistoryCommand, sourceList, sourceTag } from "./enrich.ts";
 import { ingest } from "./ingest.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
@@ -32,6 +33,13 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   doctor
   init --project <dir>
   ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups]
+  source capture <original> --actor <kind>:<name> --acquired-at <time> [--source <id|key>] [--origin <text>]
+             [--source-version <text>]
+  source enrich <id|key> --actor <kind>:<name> [--from <text>] [--add-identifier <scheme>:<value>]...
+             [--set <name>=<value>]... [--author "<Family, Given>"]... [--replace] | --lookup <resolution id>
+  source tag <id|key>... --actor <kind>:<name> [--add <tag>]... [--remove <tag>]... [--from <text>]
+  source list [--tag <tag|namespace:>]... [--stage record|captured|text] [--has identifiers|lookup|tags]...
+  source history <id|key>
   source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
              [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...
@@ -86,12 +94,16 @@ const OPTIONS = {
   original: STRING, with: STRING, against: STRING, independent: FLAG, scope: STRING, pages: STRING, passage: STRING, fields: STRING,
   outcome: STRING, flag: LIST, "original-sha256": STRING, address: STRING, via: STRING, identifier: STRING, plan: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
-  finding: STRING, effect: STRING,
+  finding: STRING, effect: STRING, "add-identifier": LIST, set: LIST, author: LIST, lookup: STRING, replace: FLAG, from: STRING,
+  add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST,
 };
 
 /** The options each command takes beyond --project and --format. A command not listed takes none. */
 const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "source convert": ["actor", "source", "origin", "acquired-at", "source-version", "held-at", "description", "image", "text-layer", "transcription", "method", "recognition", "tool", "tool-version", "page-map", "auto-pages", "page-numbers", "identity", "coverage-note", "note", "name"],
+  "source capture": ["actor", "source", "origin", "acquired-at", "source-version"],
+  "source enrich": ["actor", "from", "add-identifier", "set", "author", "lookup", "replace"],
+  "source tag": ["actor", "from", "add", "remove"], "source list": ["tag", "stage", "has"], "source history": [],
   "source pages": ["text-layer", "page-numbers", "out"],
   "source label": ["actor", "page-map"],
   "source seal": ["actor", "note"],
@@ -333,6 +345,11 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "annotate": only(0); return annotateCommand(options);
     case "resolve": return resolveCommand(options, rest);
     case "coverage": only(1); return coverage(options, rest[0]);
+    case "source capture": only(1); return sourceCapture(options, rest[0]);
+    case "source enrich": only(1); return sourceEnrich(options, rest[0]);
+    case "source tag": return sourceTag(options, rest);
+    case "source list": only(0); return sourceList(options);
+    case "source history": only(1); return sourceHistoryCommand(options, rest[0]);
     case "source pages": only(1); return sourcePages(options, rest[0]);
     case "source convert": only(1); return sourceConvert(options, rest);
     case "source label": only(1); return sourceLabel(options, rest[0]);

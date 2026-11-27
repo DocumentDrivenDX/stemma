@@ -134,7 +134,7 @@
         "message": "An identifier on the source record has not been looked up.",
         "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
         "suggestions": [
-          "Run `resolve` for it. This version looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be checked."
+          "Nothing needs doing. `resolve` looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be looked up."
         ]
       },
       {
@@ -158,7 +158,7 @@
         "message": "The saved lookup states no title, or the record has none, so the identifier could not be compared.",
         "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
         "suggestions": [
-          "Check the identifier by hand."
+          "Nothing needs doing. It is compared once both state a title."
         ]
       },
       {
@@ -166,7 +166,7 @@
         "message": "The saved lookup is a response that could not be read.",
         "why": "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.",
         "suggestions": [
-          "Run `resolve` again."
+          "Nothing needs doing. Running `resolve` again replaces it."
         ]
       },
       {
@@ -257,26 +257,26 @@
       },
       {
         "reason": "no_lookup",
-        "message": "The source's details have not been compared with any catalogue: no lookup is saved.",
+        "message": "The source's details have not been compared with any catalogue: no lookup that found the work is saved.",
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
         "suggestions": [
-          "Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."
-        ]
-      },
-      {
-        "reason": "set_date",
-        "message": "A saved lookup is for one volume of a set and gives the set's date, so the volume's year was not compared, and the copy's title page text does not show it.",
-        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
-        "suggestions": [
-          "Look at the title page itself. If the record's year is right, a person can confirm it: `review add <text id> --scope source_details --fields year --against <what you looked at> --outcome agrees --actor person:<name>`."
+          "Nothing needs doing. `resolve` compares the source once an identifier is known; some works are in no catalogue it reads."
         ]
       },
       {
         "reason": "lookup_silent",
-        "message": "A saved lookup states no title, so nothing could be compared with it.",
+        "message": "A saved lookup states no title, so no title could be compared with it.",
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
         "suggestions": [
-          "Look the work up by another identifier, or have a person confirm the details."
+          "Nothing needs doing. A lookup by another identifier may state one."
+        ]
+      },
+      {
+        "reason": "set_date",
+        "message": "A saved lookup is for one volume of a set and gives the set's date, and nothing else here shows the volume's year or contradicts it.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Nothing needs doing. A catalogue record that dates the volume, or a copy with a clearer title page text, would corroborate the year."
         ]
       },
       {
@@ -312,18 +312,18 @@
       },
       {
         "reason": "not_found_in_copy",
-        "message": "Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.",
+        "message": "Some of the source's details are shown neither by the copy's title page text nor by a saved catalogue record, and nothing contradicts them.",
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
         "suggestions": [
-          "Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity."
+          "Nothing needs doing: this is a limit of what was covered. A saved lookup or a copy with a clearer text would corroborate more. The author may also record what the title page shows (`review add --scope source_details`)."
         ]
       },
       {
         "reason": "nothing_to_compare",
-        "message": "The source record has no title, so its details could not be compared with the copy.",
+        "message": "The source record has no title yet, so its details could not be compared with the copy.",
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
         "suggestions": [
-          "Record the title from the work itself."
+          "Nothing needs doing. Once a title is recorded, it is compared."
         ]
       },
       {
@@ -354,7 +354,7 @@
         "message": "A sentence with a figure cites more than one source, so which one holds the figure could not be judged.",
         "why": "A figure attributed to a source that does not hold it misreports the source.",
         "suggestions": [
-          "Check the figure by hand, or split the citation."
+          "Nothing needs doing. A sentence that cites one source has its figures looked for there."
         ]
       },
       {
@@ -371,6 +371,22 @@
         "why": "This is a defect in Stemma, not a pass.",
         "suggestions": [
           "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "project.binary",
+    "summary": "The repository must hold no binary file, such as a Word, PDF or image file. It reads the files git tracks or would add.",
+    "limits": "A file that git ignores is not read. A file already removed stays in git history, which this does not read.",
+    "findings": [
+      {
+        "reason": "binary_file",
+        "message": "A binary file is in the repository, or would be added to it. A project holds text; originals and other binary files stay outside.",
+        "why": "git cannot show what changed in a binary, keeps every version for good, and nothing in it can be searched, checked or cited.",
+        "suggestions": [
+          "Keep the file where the author holds it, outside the repository. To read or cite it, convert it with `source convert`: the Markdown in sources/ is tied to the original by its hash. For a format Stemma does not convert, note what it is, its hash and where it is held.",
+          "Moving the file out is the author's decision. A file already committed stays in git history until the history is rewritten."
         ]
       }
     ]
@@ -723,7 +739,7 @@
         "message": "Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.",
         "why": "Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.",
         "suggestions": [
-          "Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`)."
+          "Nothing in the text shows that the pages run on. If leaves are missing from your copy, capture a complete one; if a label is wrong, correct the page map (`source label`)."
         ]
       },
       {

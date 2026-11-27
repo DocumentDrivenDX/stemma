@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 105,
+      "index": 528,
+      "page_sha256": "17f2b900b66cd92284a66a14eaa4ce81b8a3db0b12edca02778005bf9e550528",
+      "start": 0,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-3tcs836gjhfwcrrd9dct",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "511"
+  },
+  "quote": {
+    "exact": "so many submerged banks existing in the open ocean caused him to\nreject this mode of formation for atolls"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eh71qk5hm5zhpwzcz2v7",
+  "source_record_sha256": "569e2ae8e9030c39ffcf1206d722c39ae41e793da5d06b05ddae1aef1b75e409",
+  "text": "txt-ft7bv7ra8nre9mzsvrrv"
+}

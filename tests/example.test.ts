@@ -1,6 +1,6 @@
 // The worked example, checked from the committed files alone, as in a clone with
 // no originals: what is held, that its citations are what their passages copied,
-// and exactly which findings are open.
+// and that it checks clean.
 import { beforeAll, describe, expect, test } from "bun:test";
 import { cpSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -21,20 +21,15 @@ const records = (kind: string): any[] => walk(join(EXAMPLE, "records", kind)).ma
 
 let report: CheckReport;
 let code = 0;
-let stemma: (...args: string[]) => { code: number; out: string };
 beforeAll(async () => {
   const work = temporary();
   const cli = await bundle(join(work, "plugin/dist"));
   const clone = join(work, "coral-reefs");
   cpSync(EXAMPLE, clone, { recursive: true, filter: (path) => !OUTSIDE.has(relative(EXAMPLE, path)) });
-  stemma = (...args) => {
-    const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, ...args, "--project", clone],
-      { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
-    return { code: done.exitCode, out: done.stdout.toString() };
-  };
-  const done = stemma("check", "--all", "--format", "json");
-  code = done.code;
-  report = JSON.parse(done.out) as CheckReport;
+  const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, "check", "--all", "--format", "json", "--project", clone],
+    { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
+  code = done.exitCode;
+  report = JSON.parse(done.stdout.toString()) as CheckReport;
 }, 120_000);
 
 describe("the worked example", () => {
@@ -105,44 +100,35 @@ describe("the worked example", () => {
     expect(report.body.results.filter((r) => r.check === "quote.present" && r.subject.startsWith("cit-")).length).toBe(4);
   });
 
-  test("leaves open exactly the differences its README describes, and runs every applicable check", () => {
-    const key = new Map(records("sources").map((s) => [s.id, s.citation_key]));
-    for (const name of readdirSync(join(EXAMPLE, "sources"))) {
-      const text = readFileSync(join(EXAMPLE, "sources", name, "source.md"), "utf8");
-      key.set(JSON.parse(text.slice(4, text.indexOf("\n---\n", 4))).id, name);
+  test("tags every work with its place in the argument, by command, with who and from what", () => {
+    for (const source of records("sources")) {
+      expect(source.tags.some((t: string) => /^(position|evidence):/.test(t)), source.citation_key).toBe(true);
+      const logged = source.changes.filter((c: any) => c.field === "tags");
+      expect(logged.map((c: any) => c.value).sort(), source.citation_key).toEqual(source.tags);
+      expect(logged.every((c: any) => c.by.kind === "model" && c.from.startsWith("report/report.md")), source.citation_key).toBe(true);
     }
-    const open = report.body.results.filter((r) => r.open).map((r) => `${r.check} ${r.outcome} ${key.get(r.source ?? r.subject) ?? r.subject}`).sort();
-    expect(open).toEqual([
-      "meta.resolver unverifiable lyell1832",
-      "meta.source unverifiable darwin1842",
-      "meta.source unverifiable lyell1832",
-      "source.labels fail geolsoc1838",
-    ]);
+  });
+
+  test("is checked clean: every applicable check runs and nothing is open", () => {
+    expect(report.body.results.filter((r) => r.open)).toEqual([]);
     expect(report.body.not_run).toEqual([]);
-    expect(report.body.label).toBe("open_findings");
-    expect(code).toBe(1);
+    expect(report.body.label).toBe("checked_clean");
+    expect(code).toBe(0);
   });
 
-  test("the misprinted-looking page number is explained and still open", () => {
-    const found = report.body.results.find((r) => r.open && r.check === "source.labels")!;
-    expect(found.annotations.map((a) => [a.effect, a.by])).toEqual([["explain", "model claude-sonnet-5-5"]]);
-    expect(found.annotations[0]!.reason).toContain("one is printed 232 and the next 333");
+  test("says what was borne out by other means and what was seen in an original, without any person's act", () => {
+    const key = new Map(records("sources").map((s) => [s.id, s.citation_key]));
+    expect(report.body.summary.confirmed).toBe(0);
+    expect(report.body.summary.dismissed).toBe(0);
+    expect(report.body.results.filter((r) => r.coverage_only)).toEqual([]);
+    const darwin = report.body.results.find((r) => r.check === "meta.source" && key.get(r.source!) === "darwin1842")!;
+    expect(darwin.evidence.find((e) => e.name === "year_corroborated_by")!.value).toContain("internet_archive record of ia:b29331213");
+    const lyell = report.body.results.find((r) => r.check === "meta.source" && key.get(r.source!) === "lyell1832")!;
+    expect(lyell.evidence.find((e) => e.name === "year_result")!.value).toContain('"MDCCCXXXir"');
+    const jumps = report.body.results.flatMap((r) => r.evidence.filter((e) => e.name === "observation").map((e) => e.value));
+    expect(jumps.length).toBe(1);
+    expect(jumps[0]).toContain('printed page 232 is followed by 333');
+    expect(jumps[0]).toContain('"Northern Drift"');
   });
 
-  // This runs in the throwaway clone with an invented reviewer. It commits nothing:
-  // no person has looked at these pages for the example.
-  test("what is left is a person's to settle: two reviews and one dismissal would check it clean", () => {
-    const years = report.body.results.filter((r) => r.open && r.check === "meta.source");
-    for (const finding of years) {
-      const text = (report.body.verification as any[]).find((v) => v.source === finding.source)!.text;
-      const page = finding.evidence.find((e) => e.name === "title_page_parts")!.value.replace("index ", "");
-      expect(stemma("review", "add", text, "--scope", "source_details", "--pages", page, "--fields", "year", "--against", "the page image", "--outcome", "agrees", "--actor", "person:test-reviewer").code).toBeLessThan(2);
-    }
-    const jump = report.body.results.find((r) => r.open && r.check === "source.labels")!;
-    expect(readFileSync(join(EXAMPLE, "README.md"), "utf8")).toContain(`--finding ${jump.finding_key}`);
-    expect(stemma("annotate", "--finding", jump.finding_key, "--effect", "dismiss", "--reason", "invented for this test", "--actor", "person:test-reviewer").code).toBeLessThan(2);
-    const after = stemma("check", "--all");
-    expect(after.out).toStartWith("CHECKED CLEAN");
-    expect(after.code).toBe(0);
-  }, 120_000);
 });

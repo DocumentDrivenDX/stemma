@@ -57,6 +57,8 @@ export function numberResults(corpus: Corpus, texts = new SourceTexts(corpus)): 
       ...(outcome === "fail" ? [{ name: "not_found", class: "manuscript" as const, value: missing.join(", ") }] : []),
       ...views.map((v): Evidence => ({ name: "source_text", class: "location", value: v.loaded.manifest.path })),
     ];
-    return [result({ check: "number.present", outcome, ...(reason ? { reason } : {}), subject: subjectOf(citation), locus: `${idOf(citation)}#figures`, source, evidence, item: itemOf(citation), sentence })];
+    // A sentence with several citations shows nothing wrong: which holds the figure is simply not told.
+    if (several) evidence.push({ name: "coverage", class: "metadata", value: "figures in sentences that cite more than one source were not attributed to one" });
+    return [result({ check: "number.present", outcome, ...(reason ? { reason } : {}), subject: subjectOf(citation), locus: `${idOf(citation)}#figures`, source, evidence, item: itemOf(citation), sentence, coverage: several })];
   });
 }

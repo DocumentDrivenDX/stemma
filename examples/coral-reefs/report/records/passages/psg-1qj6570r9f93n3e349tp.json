@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1374,
+      "index": 313,
+      "page_sha256": "7c754e1a8a352c57261fd9ad9643b7f430eb72b9b191dee396ed64e7c60b5bc1",
+      "start": 1326,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:47Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-1qj6570r9f93n3e349tp",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "292"
+  },
+  "quote": {
+    "exact": "It may be so; but there is as yet no proof of it"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "source_record_sha256": "56a35216751de04f98a3d29bdc6b00b5fab208e0d0263b021bb410594d264fc4",
+  "text": "txt-adczshjjk43q6v0qryx8"
+}

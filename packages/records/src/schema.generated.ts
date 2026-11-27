@@ -692,6 +692,16 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "many": true
   },
+  "tags": {
+   "type": "string",
+   "many": true
+  },
+  "changes": {
+   "type": {
+    "value": "SourceChange"
+   },
+   "many": true
+  },
   "type": {
    "type": "string"
   },
@@ -778,6 +788,41 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    ]
   },
   "as_found": {
+   "type": "string"
+  }
+ },
+ "SourceChange": {
+  "at": {
+   "type": "date-time",
+   "required": true
+  },
+  "by": {
+   "type": {
+    "value": "Actor"
+   },
+   "required": true
+  },
+  "action": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "added",
+    "replaced",
+    "removed"
+   ]
+  },
+  "field": {
+   "type": "string",
+   "required": true
+  },
+  "value": {
+   "type": "string",
+   "required": true
+  },
+  "previous": {
+   "type": "string"
+  },
+  "from": {
    "type": "string"
   }
  },

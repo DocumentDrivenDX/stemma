@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1219,
+      "index": 77,
+      "page_sha256": "ce047054d06ee994ea72e5c80fe5f1dbfdcdae0edabde6407d1936f837807f66",
+      "start": 730,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:33Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-k3z4ttymr9xw9adwh1nc",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "54"
+  },
+  "quote": {
+    "exact": "At first sight it seemed like a consolidated chalky ooze, and our first impression was\nthat it represented the beginning of the original foundation of the coral atoll. Later\nexamination in the laboratories at the Royal College of Science, London (for the\nresults of which see Sections XII. and XIV.), and at Sydney University, showed\nthat this rock was largely coral-reef material converted into dolomite. It was\nevident then, that the base of the coral-reef rock had not yet been attaimed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "191539882229b1ac3d89178f16eeb8d6f9b637c91d30c6e305b08dd79c5a9b83",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

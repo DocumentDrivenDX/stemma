@@ -1,5 +1,12 @@
 ---
 {
+  "changed": {
+    "at": "2026-11-27T02:51:11Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
   "conversion": {
     "level": "unassessed",
     "method": "ocr",
@@ -150,12 +157,12 @@
     {
       "file": "pages/p0019.md",
       "index": 19,
-      "sha256": "ab171b832b5c121f0deebae8af62e9105d0a40b68773dc92c14bfd6e10e2a850"
+      "sha256": "2f1ed17c67363834320028cc18de9c795ef484f0be8937cddd910b27f52a2616"
     },
     {
       "file": "pages/p0020.md",
       "index": 20,
-      "sha256": "8b652e3886aa7bf5a0b421f7ea0bb8358bdc1228fdb33df0d0d0966d31e3a3a9"
+      "sha256": "9826f6d727be4987bcba1017c8f17f5451da563c5fcbcc630bf72b78adf266e1"
     },
     {
       "file": "pages/p0021.md",

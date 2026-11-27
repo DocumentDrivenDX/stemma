@@ -3262,6 +3262,14 @@
       },
       {
        "module": "stemma_record",
+       "element": "Source.tags"
+      },
+      {
+       "module": "stemma_record",
+       "element": "Source.changes"
+      },
+      {
+       "module": "stemma_record",
        "element": "Source.type"
       },
       {
@@ -3400,6 +3408,23 @@
           "name": "string"
          },
          "cardinality": "optional"
+        },
+        "tags": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "many"
+        },
+        "changes": {
+         "type": {
+          "kind": "concept",
+          "target": {
+           "module": "stemma_record",
+           "element": "SourceChange"
+          }
+         },
+         "cardinality": "many"
         },
         "key_aliases": {
          "type": {
@@ -3653,6 +3678,199 @@
      "extensions": {},
      "cardinality": "one",
      "scalarType": "string"
+    },
+    {
+     "id": "SourceChange",
+     "kind": "record",
+     "name": "SourceChange",
+     "members": [
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.at"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.by"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.action"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.field"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.value"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.previous"
+      },
+      {
+       "module": "stemma_record",
+       "element": "SourceChange.from"
+      }
+     ],
+     "extensions": {
+      "umf.ddd": {
+       "kind": "value",
+       "fields": {
+        "at": {
+         "type": {
+          "kind": "scalar",
+          "name": "date-time"
+         },
+         "cardinality": "one"
+        },
+        "by": {
+         "type": {
+          "kind": "concept",
+          "target": {
+           "module": "stemma_record",
+           "element": "Actor"
+          }
+         },
+         "cardinality": "one"
+        },
+        "action": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "one"
+        },
+        "field": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "one"
+        },
+        "value": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "one"
+        },
+        "previous": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "optional"
+        },
+        "from": {
+         "type": {
+          "kind": "scalar",
+          "name": "string"
+         },
+         "cardinality": "optional"
+        }
+       },
+       "equality": {
+        "fields": [
+         "at",
+         "by",
+         "action",
+         "field",
+         "value",
+         "previous",
+         "from"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "id": "SourceChange.at",
+     "kind": "field",
+     "name": "at",
+     "nullability": "required",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "timestamp"
+    },
+    {
+     "id": "SourceChange.by",
+     "kind": "field",
+     "name": "by",
+     "nullability": "required",
+     "extensions": {},
+     "cardinality": "one"
+    },
+    {
+     "id": "SourceChange.action",
+     "kind": "field",
+     "name": "action",
+     "nullability": "required",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "string",
+     "allowedValues": [
+      {
+       "string": "added"
+      },
+      {
+       "string": "replaced"
+      },
+      {
+       "string": "removed"
+      }
+     ]
+    },
+    {
+     "id": "SourceChange.field",
+     "kind": "field",
+     "name": "field",
+     "nullability": "required",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "string"
+    },
+    {
+     "id": "SourceChange.value",
+     "kind": "field",
+     "name": "value",
+     "nullability": "required",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "string"
+    },
+    {
+     "id": "SourceChange.previous",
+     "kind": "field",
+     "name": "previous",
+     "nullability": "absent-allowed",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "string"
+    },
+    {
+     "id": "SourceChange.from",
+     "kind": "field",
+     "name": "from",
+     "nullability": "absent-allowed",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "string"
+    },
+    {
+     "id": "Source.tags",
+     "kind": "field",
+     "name": "tags",
+     "nullability": "absent-allowed",
+     "extensions": {},
+     "scalarType": "string"
+    },
+    {
+     "id": "Source.changes",
+     "kind": "field",
+     "name": "changes",
+     "nullability": "absent-allowed",
+     "extensions": {}
     },
     {
      "id": "Source.key_aliases",

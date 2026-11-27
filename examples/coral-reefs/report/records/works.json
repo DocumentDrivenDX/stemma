@@ -1,0 +1,146 @@
+{
+ "_about": "Bibliographic records for the report. Every value was read from a page image of the stored copy; 'basis' names the pages. 'note_full', 'note_short' and 'bib' are templates the build fills; {loc} is the locator.",
+ "darwin1837": {
+  "basis": "Volume title page (file index 6); masthead 'Vol. II. 1837. No. 51.' (index 452); article heading and 'May 31.' entry (index 467, page 552); text ends on page 554 (index 469).",
+  "note_full": "Charles Darwin, “On Certain Areas of Elevation and Subsidence in the Pacific and Indian Oceans, as Deduced from the Study of Coral Formations” (abstract of a paper read 31 May 1837), *Proceedings of the Geological Society of London* 2, no. 51 (1837): {loc}",
+  "note_short": "Darwin, “Areas of Elevation and Subsidence,” {loc}",
+  "bib": "Darwin, Charles. “On Certain Areas of Elevation and Subsidence in the Pacific and Indian Oceans, as Deduced from the Study of Coral Formations.” Abstract of a paper read 31 May 1837. *Proceedings of the Geological Society of London* 2, no. 51 (1837): 552–54.",
+  "sort": "Darwin 1837"
+ },
+ "darwin1842": {
+  "basis": "Title page (file index 8).",
+  "note_full": "Charles Darwin, *The Structure and Distribution of Coral Reefs: Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836* (London: Smith, Elder, 1842), {loc}",
+  "note_short": "Darwin, *Structure and Distribution* (1842), {loc}",
+  "bib": "Darwin, Charles. *The Structure and Distribution of Coral Reefs: Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836*. London: Smith, Elder, 1842.",
+  "sort": "Darwin 1842"
+ },
+ "darwin1889": {
+  "basis": "Title page (file index 10).",
+  "note_full": "Charles Darwin, *The Structure and Distribution of Coral Reefs*, 3rd ed., with an appendix by T. G. Bonney (London: Smith, Elder, 1889), {loc}",
+  "note_short": "Darwin, *Structure and Distribution* (1889), {loc}",
+  "bib": "Darwin, Charles. *The Structure and Distribution of Coral Reefs*. 3rd ed. With an appendix by T. G. Bonney. London: Smith, Elder, 1889.",
+  "sort": "Darwin 1889"
+ },
+ "bonney1889": {
+  "basis": "Title page of the 1889 edition (file index 10) names Bonney's appendix; contents page xv (index 22) gives Appendix II, pages 281–332, and its title.",
+  "note_full": "T. G. Bonney, “Summary of the Principal Contributions to the History of Coral-Reefs since the Year 1874,” appendix 2 in Charles Darwin, *The Structure and Distribution of Coral Reefs*, 3rd ed. (London: Smith, Elder, 1889), {loc}",
+  "note_short": "Bonney, “Summary of the Principal Contributions,” {loc}",
+  "bib": "Bonney, T. G. “Summary of the Principal Contributions to the History of Coral-Reefs since the Year 1874.” Appendix 2 in Charles Darwin, *The Structure and Distribution of Coral Reefs*, 3rd ed., 281–332. London: Smith, Elder, 1889.",
+  "sort": "Bonney 1889"
+ },
+ "letters1887": {
+  "basis": "Title page of volume 3 (file index 6); letter headings on pages 182 and 183 (indexes 191 and 192).",
+  "bib": "Darwin, Francis, ed. *The Life and Letters of Charles Darwin, Including an Autobiographical Chapter*. Vol. 3. London: John Murray, 1887.",
+  "sort": "Darwin, Francis 1887"
+ },
+ "letter-semper": {
+  "in": "letters1887",
+  "basis": "Heading 'C. Darwin to K. Semper. Down, October 2, 1879.' on page 182 (index 191).",
+  "note_full": "Charles Darwin to Karl Semper, 2 October 1879, in *The Life and Letters of Charles Darwin, Including an Autobiographical Chapter*, ed. Francis Darwin, vol. 3 (London: John Murray, 1887), {loc}",
+  "note_short": "Darwin to Semper, 2 October 1879, in *Life and Letters*, 3:{loc}"
+ },
+ "letter-agassiz": {
+  "in": "letters1887",
+  "basis": "Heading 'C. Darwin to A. Agassiz. Down, May 5, 1881.' on page 183 (index 192).",
+  "note_full": "Charles Darwin to Alexander Agassiz, 5 May 1881, in *The Life and Letters of Charles Darwin, Including an Autobiographical Chapter*, ed. Francis Darwin, vol. 3 (London: John Murray, 1887), {loc}",
+  "note_short": "Darwin to Agassiz, 5 May 1881, in *Life and Letters*, 3:{loc}"
+ },
+ "lyell1832": {
+  "basis": "Title page of volume 2 (file index 10); date printed MDCCCXXXII.",
+  "note_full": "Charles Lyell, *Principles of Geology, Being an Attempt to Explain the Former Changes of the Earth’s Surface, by Reference to Causes Now in Operation*, vol. 2 (London: John Murray, 1832), {loc}",
+  "note_short": "Lyell, *Principles of Geology*, 2:{loc}",
+  "bib": "Lyell, Charles. *Principles of Geology, Being an Attempt to Explain the Former Changes of the Earth’s Surface, by Reference to Causes Now in Operation*. Vol. 2. London: John Murray, 1832.",
+  "sort": "Lyell 1832"
+ },
+ "semper1881": {
+  "basis": "Title page (file index 8). No translator is named on it.",
+  "note_full": "Karl Semper, *Animal Life as Affected by the Natural Conditions of Existence*, International Scientific Series (New York: D. Appleton, 1881), {loc}",
+  "note_short": "Semper, *Animal Life*, {loc}",
+  "bib": "Semper, Karl. *Animal Life as Affected by the Natural Conditions of Existence*. International Scientific Series. New York: D. Appleton, 1881.",
+  "sort": "Semper 1881"
+ },
+ "murray1880": {
+  "basis": "First page of the article with masthead 'Vol. X. 1879–80. No. 107.', session date and '(Abstract.)' (file index 522, page 505); text ends on page 518 (index 535).",
+  "note_full": "John Murray, “On the Structure and Origin of Coral Reefs and Islands” (abstract of a paper read 5 April 1880), *Proceedings of the Royal Society of Edinburgh* 10, no. 107 (1879–80): {loc}",
+  "note_short": "Murray, “Structure and Origin,” {loc}",
+  "bib": "Murray, John. “On the Structure and Origin of Coral Reefs and Islands.” Abstract of a paper read 5 April 1880. *Proceedings of the Royal Society of Edinburgh* 10, no. 107 (1879–80): 505–18.",
+  "sort": "Murray 1880"
+ },
+ "dana1890": {
+  "basis": "Title page (file index 6), which carries no date; verso (index 7) reads 'Copyright, 1890, by Dodd, Mead, and Company.'",
+  "note_full": "James D. Dana, *Corals and Coral Islands*, 3rd ed. (New York: Dodd, Mead, 1890), {loc}",
+  "note_short": "Dana, *Corals and Coral Islands*, {loc}",
+  "bib": "Dana, James D. *Corals and Coral Islands*. 3rd ed. New York: Dodd, Mead, 1890.",
+  "sort": "Dana 1890"
+ },
+ "agassiz1903": {
+  "basis": "Title page (file index 14).",
+  "note_full": "Alexander Agassiz, *The Coral Reefs of the Tropical Pacific*, Memoirs of the Museum of Comparative Zoölogy at Harvard College 28 (Cambridge, MA: Printed for the Museum, 1903), {loc}",
+  "note_short": "Agassiz, *Coral Reefs of the Tropical Pacific*, {loc}",
+  "bib": "Agassiz, Alexander. *The Coral Reefs of the Tropical Pacific*. Memoirs of the Museum of Comparative Zoölogy at Harvard College 28. Cambridge, MA: Printed for the Museum, 1903.",
+  "sort": "Agassiz 1903"
+ },
+ "funafuti1904": {
+  "basis": "Title page (file index 6); contents (index 10) for section titles, authors and first pages.",
+  "bib": "Royal Society. Coral Reef Committee. *The Atoll of Funafuti: Borings into a Coral Reef and the Results; Being the Report of the Coral Reef Committee of the Royal Society*. London: Royal Society, 1904.",
+  "sort": "Royal Society 1904"
+ },
+ "fu-preface": {
+  "in": "funafuti1904",
+  "basis": "Contents (index 10): Preface, page vii; heading 'By Professor T. G. Bonney' on index 14.",
+  "note_full": "T. G. Bonney, preface to *The Atoll of Funafuti: Borings into a Coral Reef and the Results; Being the Report of the Coral Reef Committee of the Royal Society* (London: Royal Society, 1904), {loc}",
+  "note_short": "Bonney, preface to *Atoll of Funafuti*, {loc}"
+ },
+ "fu-david": {
+  "in": "funafuti1904",
+  "basis": "Contents (index 10): section IV, page 40; running head on page 54 (index 77).",
+  "note_full": "T. W. Edgeworth David, “Narrative of the Second and Third Expeditions,” in *The Atoll of Funafuti* (London: Royal Society, 1904), {loc}",
+  "note_short": "David, “Narrative of the Second and Third Expeditions,” {loc}"
+ },
+ "fu-dredging": {
+  "in": "funafuti1904",
+  "basis": "Contents (index 10): section VII, page 151; running head on page 156 (index 187).",
+  "note_full": "T. W. Edgeworth David, G. H. Halligan, and A. E. Finckh, “Report on Dredging at Funafuti,” in *The Atoll of Funafuti* (London: Royal Society, 1904), {loc}",
+  "note_short": "David, Halligan, and Finckh, “Report on Dredging,” {loc}"
+ },
+ "fu-judd": {
+  "in": "funafuti1904",
+  "basis": "Contents (index 10): section X, page 167; running head on page 180 (index 211).",
+  "note_full": "J. W. Judd, “General Report on the Materials Sent from Funafuti, and the Methods of Dealing with Them,” in *The Atoll of Funafuti* (London: Royal Society, 1904), {loc}",
+  "note_short": "Judd, “General Report,” {loc}"
+ },
+ "daly1915": {
+  "basis": "Cover of the separate (file index 2) with volume, number and date; title and contents page (index 4), unnumbered, immediately before page 158; text ends on page 251 (index 98).",
+  "note_full": "Reginald A. Daly, “The Glacial-Control Theory of Coral Reefs,” *Proceedings of the American Academy of Arts and Sciences* 51, no. 4 (1915): {loc}",
+  "note_short": "Daly, “Glacial-Control Theory,” {loc}",
+  "bib": "Daly, Reginald A. “The Glacial-Control Theory of Coral Reefs.” *Proceedings of the American Academy of Arts and Sciences* 51, no. 4 (1915): 157–251.",
+  "sort": "Daly 1915"
+ },
+ "ladd1960": {
+  "basis": "Title page (file index 1); first page of text, page 863 (index 5); contents (index 3) gives the index at page 905.",
+  "note_full": "Harry S. Ladd and Seymour O. Schlanger, *Drilling Operations on Eniwetok Atoll*, Geological Survey Professional Paper 260-Y (Washington, DC: Government Printing Office, 1960), {loc}",
+  "note_short": "Ladd and Schlanger, *Drilling Operations on Eniwetok Atoll*, {loc}",
+  "bib": "Ladd, Harry S., and Seymour O. Schlanger. *Drilling Operations on Eniwetok Atoll*. Geological Survey Professional Paper 260-Y. Washington, DC: Government Printing Office, 1960.",
+  "sort": "Ladd 1960"
+ },
+ "blanchon2014": {
+  "basis": "First page (file index 0): authors, title, journal line 'Scientific Reports | 4 : 4997 | DOI: 10.1038/srep04997', published 21 May 2014.",
+  "note_full": "Paul Blanchon et al., “Postglacial Fringing-Reef to Barrier-Reef Conversion on Tahiti Links Darwin’s Reef Types,” *Scientific Reports* 4 (2014): 4997, {loc}, https://doi.org/10.1038/srep04997",
+  "note_short": "Blanchon et al., “Postglacial Fringing-Reef to Barrier-Reef Conversion,” {loc}",
+  "bib": "Blanchon, Paul, Marian Granados-Corea, Elizabeth Abbey, Juan C. Braga, Colin Braithwaite, David M. Kennedy, Tom Spencer, Jody M. Webster, and Colin D. Woodroffe. “Postglacial Fringing-Reef to Barrier-Reef Conversion on Tahiti Links Darwin’s Reef Types.” *Scientific Reports* 4 (2014): 4997. https://doi.org/10.1038/srep04997.",
+  "sort": "Blanchon 2014"
+ },
+ "steibl2024": {
+  "basis": "First page (file index 0): authors, title, 'Annu. Rev. Ecol. Evol. Syst. 2024. 55:301–22', DOI.",
+  "note_full": "Sebastian Steibl et al., “A Renaissance of Atoll Ecology,” *Annual Review of Ecology, Evolution, and Systematics* 55 (2024): {loc}, https://doi.org/10.1146/annurev-ecolsys-102722-013447",
+  "note_short": "Steibl et al., “Renaissance of Atoll Ecology,” {loc}",
+  "bib": "Steibl, Sebastian, Nancy Bunbury, Hillary S. Young, and James C. Russell. “A Renaissance of Atoll Ecology.” *Annual Review of Ecology, Evolution, and Systematics* 55 (2024): 301–22. https://doi.org/10.1146/annurev-ecolsys-102722-013447.",
+  "sort": "Steibl 2024"
+ },
+ "letters-editor": {
+  "in": "letters1887",
+  "basis": "Bracketed editorial note on page 183 (index 192), introducing the letter to Agassiz; the title page names Francis Darwin as editor.",
+  "note_full": "Francis Darwin, editorial note, in *The Life and Letters of Charles Darwin, Including an Autobiographical Chapter*, ed. Francis Darwin, vol. 3 (London: John Murray, 1887), {loc}",
+  "note_short": "F. Darwin, editorial note, in *Life and Letters*, 3:{loc}"
+ }
+}

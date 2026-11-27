@@ -54,6 +54,8 @@ and the obligations the agent has toward the command line and the records.
   published as the built release tree at `plugins/stemma` in the
   DocumentDrivenDX/plugins marketplace repository (SD-010). Different content
   MUST NOT be published under a version already published.
+- The manifest MUST declare the `docsync` plugin as a dependency (ADR-011), so
+  that the marketplace MUST list it.
 - Installing the plugin MUST be the only installation step a person takes. An
   installed plugin MUST NOT download anything but the pinned tools of D, and no
   check or build downloads.

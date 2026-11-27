@@ -22,6 +22,8 @@ export interface Result {
   suggestions: string[];
   /** The notes that apply, each with who wrote it and why. */
   annotations: { id: string; effect: string; by: string; reason: string }[];
+  /** Set when nothing shows anything wrong and the result only says what was not covered. It is not open. */
+  coverage_only?: boolean;
   /** A person's source-details review that covers what could not be compared. */
   confirmed_by?: string;
   open: boolean;

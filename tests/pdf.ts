@@ -19,9 +19,9 @@ export interface PdfOptions {
   encrypted?: boolean;
 }
 
-/** WinAnsi codes for the curly quotation marks, as octal escapes. */
-const WIN_ANSI: Record<string, string> = { "\u2018": "\\221", "\u2019": "\\222", "\u201c": "\\223", "\u201d": "\\224" };
-const latin = (text: string) => `(${text.replace(/[\\()]/g, "\\$&").replace(/[\u2018\u2019\u201c\u201d]/g, (c) => WIN_ANSI[c]!)})`;
+/** WinAnsi codes for the dash and curly quotation marks, as octal escapes. */
+const WIN_ANSI: Record<string, string> = { "\u2014": "\\227", "\u2018": "\\221", "\u2019": "\\222", "\u201c": "\\223", "\u201d": "\\224" };
+const latin = (text: string) => `(${text.replace(/[\\()]/g, "\\$&").replace(/[\u2014\u2018\u2019\u201c\u201d]/g, (c) => WIN_ANSI[c]!)})`;
 const ucs2 = (text: string) => `<${[...text].map((c) => c.charCodeAt(0).toString(16).padStart(4, "0")).join("")}>`;
 
 export function makePdf(options: PdfOptions): Uint8Array {

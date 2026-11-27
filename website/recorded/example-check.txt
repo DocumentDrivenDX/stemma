@@ -1,61 +1,11 @@
 $ stemma check --all --project $PROJECTS/coral-reefs
-OPEN FINDINGS: 1 problem(s), 3 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 5303 result(s) passed.
+CHECKED CLEAN: the checks found nothing open.
+This does not mean that the book is correct. It covers only what is in these project files.
+Checked the whole project: 5308 result(s) passed.
 
-1. COULD NOT CHECK: A saved lookup is for one volume of a set and gives the set's date, so the volume's year was not compared, and the copy's title page text does not show it.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record's year is right, a person can confirm it: `review add <text id> --scope source_details --fields year --against <what you looked at> --outcome agrees --actor person:<name>`.
-   - src-rd44yd9ctbs143rpe1be
-       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
-       key: lyell1832
-       lookup file: records/resolutions/res-sa7qewjtmgh6ev2bn0e1.json
-       looked up: internet_archive on 2026-11-27
-       year in record: 1832
-       year not compared: the catalogue dates this item 1830, and it is the volume "v. 2" of a set, with no years for the volume, and the copy's title page text does not show the record's year
-       compared: title, authors
-
-2. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-darwinreefs1842
-       source file: records/sources/src-darwinreefs1842.json
-       key: darwin1842
-       source text: sources/darwin1842/source.md
-       identity basis: Title and names, where given, are the PDF's own document information, not read from the page. The title page parts were chosen from page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
-       title page parts: index 8
-       title in record: The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836
-       title result: agrees with what the copy states
-       authors in record: Darwin
-       authors result: agrees with what the copy states; found on the title page
-       year in record: 1842
-       year result: not found in what the copy states or in its title page text
-       not found: year
-
-3. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-rd44yd9ctbs143rpe1be
-       source file: records/sources/src-rd44yd9ctbs143rpe1be.json
-       key: lyell1832
-       source text: sources/lyell1832/source.md
-       identity basis: Title and names, where given, are the PDF's own document information, not read from the page. The title page parts were chosen from page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them
-       title page parts: index 10
-       title in record: Principles of Geology
-       title result: agrees with what the copy states; found on the title page
-       authors in record: Lyell
-       authors result: agrees with what the copy states; found on the title page
-       year in record: 1832
-       year result: not found in what the copy states or in its title page text
-       not found: year
-
-4. PROBLEM: Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.  [source.labels]
-   Why it matters: Citations name printed pages. A wrong page label makes a wrong page reference pass, or a right one fail.
-   What to do: Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`).
-   - txt-hcn5vw3frm4256b32xhe
-       file: sources/geolsoc1838/pages/p0248.md
-       labels: page index 247 is labelled 232; page index 248 is labelled 333
-       finding key: c9fbbe4b77b7081004447a6d911532099c281c8f32c099381d73e0b708eaf12b
-       explained by model claude-sonnet-5-5 (ann-wnkmmxa0m0dz730w8d9f): The two page numbers are the ones printed. A model compared the page images of the original PDF at index 247 and 248: one is printed 232 and the next 333, an even number followed by an odd one as on the two sides of a leaf, and the text runs on, since page 232 ends by announcing a second part on the northern drift and the next page begins under the heading 'Northern Drift'. The numbering continues 334 onward. So no text appears to be missing and the numbering in the original jumps. The images do not show why. See rvw-rfg04ng7f6a30a4vjcrn. A model's reading, not a person's review.
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - observed in an original: printed page 232 is followed by 333 on the next page of the original, with nothing shown missing: txt-hcn5vw3frm4256b32xhe
+   - the title page text does not show the year; a saved catalogue record bears it out: darwin1842
 
 For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
 If the hyphen belongs to the word, the quotation should keep it: look at the page.
@@ -81,4 +31,4 @@ For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-darwinreefs1842 (not admitted)
 
 Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
-[exit 1]
+[exit 0]

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 4155,
+      "index": 41,
+      "page_sha256": "1fb4229e158db993346f3e0d29ed42b02671b6cec16c78ae1c6dc99c988202ac",
+      "start": 4033,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:08Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-3y8wfjq00p51fr7txtty",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "899"
+  },
+  "quote": {
+    "exact": "The first sediments to\nbe laid down were Eocene in age, and they contained\nreef corals that do not flourish below 150 feet"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "f1307b24e0e70db84490689b7aee51249db7d4e9687510d9e1f6fbe654b885bb",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

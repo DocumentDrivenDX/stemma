@@ -4,7 +4,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { cpSync, existsSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type CheckReport, catalogueTitleMatches, figuresIn, foldName, headingMatches, planResolution, readLookup, renderReport, type Result, titlesMatch } from "@stemma/core";
+import { type CheckReport, catalogueTitleMatches, figuresIn, foldName, headingMatches, imprintYears, misreadRoman, planResolution, readLookup, renderReport, type Result, titlesMatch } from "@stemma/core";
 import { canonical, sha256 } from "@stemma/records";
 import { fetchBytes, FetchRefused } from "@stemma/workspace";
 import { bundle } from "../scripts/build.ts";
@@ -251,6 +251,50 @@ describe("structure checks (FR-87)", () => {
     expect(labelled(explicit(["1", "2", "9", "10"]))).toContain("fail label_jump");
   });
 
+  /** Four pages numbered 1, 2, 9 and 10, whose second and third are given here. */
+  function jump(second: string[], third: string[], more: { last?: string; elsewhere?: string; labels?: string[]; coverage?: string } = {}) {
+    const book = new Book();
+    const source = book.source("jump");
+    const pdf = makePdf({ pages: [["An opening page about the sea.", more.elsewhere ?? "Nothing more."], second, third, ["A closing page."]] });
+    const made = book.convert(book.file("jump.pdf", pdf), source);
+    const labels = more.labels ?? ["1", "2", "9", "10"];
+    book.run("source", "label", made.text, "--page-map", book.file("map.json", JSON.stringify([{ first_index: 0, last_index: 3, style: "explicit", labels, evidence: "author_statement" }])), ...AUTHOR);
+    return { book, report: book.check() };
+  }
+  const announced = [["The next part is given under the head of the Northern Shoals."], ["Northern Shoals.\u2014These differ from the reef."]] as const;
+
+  test("a jump in the numbers with text that runs on is recorded as an observation, not a problem", () => {
+    const heading = jump([...announced[0]], ["Northern Shoals.\u2014These differ from the reef."]);
+    expect(verdicts(heading.report, "source.labels")).toEqual(["pass"]);
+    expect(evidence(of(heading.report, "source.labels")[0]!, "observation")[0]).toContain("printed page 2 is followed by 9");
+    expect(renderReport(heading.report.body)).toContain("observed in an original");
+    const split = jump(["The swell broke on the reef with great vio-"], ["lence all that night."], { elsewhere: "Its violence was remarked." });
+    expect(verdicts(split.report, "source.labels")).toEqual(["pass"]);
+    expect(evidence(of(split.report, "source.labels")[0]!, "observation")[0]).toContain("is written whole elsewhere");
+  });
+
+  test("a jump stays a problem when nothing shows that the text runs on, as where pages are missing", () => {
+    const open = (made: ReturnType<typeof jump>) => verdicts(made.report, "source.labels").filter((v) => v !== "pass");
+    // Pages lost from the middle of a sentence or between paragraphs.
+    expect(open(jump(["The water was deep and"], ["we returned to the ship."]))).toEqual(["fail label_jump"]);
+    expect(open(jump(["That ends the account."], ["Northern Shoals.\u2014These differ from the reef."]))).toEqual(["fail label_jump"]);
+    expect(open(jump([...announced[0]], ["Southern Shoals.\u2014These differ from the reef."]))).toEqual(["fail label_jump"]);
+    expect(open(jump([...announced[0]], ["The Northern Shoals differ from the reef."]))).toEqual(["fail label_jump"]);
+    // A split word that the source never writes whole.
+    expect(open(jump(["The swell broke with great vio-"], ["lence all that night."]))).toEqual(["fail label_jump"]);
+    // The numbers do not run in step on both sides.
+    expect(open(jump([...announced[0]], ["Northern Shoals.\u2014These differ from the reef."], { labels: ["1", "2", "9", "12"] }))).toContain("fail label_jump");
+  });
+
+  test("an imprint year and a misread roman numeral are read narrowly", () => {
+    expect(imprintYears("LONDON:\n1842.\nWASHINGTON : 1960\nLondon, 1850\nMDCCCLXXX.")).toEqual(["1842", "1960", "1850", "1880"]);
+    expect(imprintYears("DURING THE YEARS 1882 TO 1836.\nNOVEMBER 1878 to JULY 1880.\nJUN 03 1987\nof 1832\nMDCCCXXXir.")).toEqual([]);
+    expect(misreadRoman("LONDON\nMDCCCXXXir.", 1832)).toBe("MDCCCXXXir");
+    for (const year of [1831, 1833, 1837]) expect(misreadRoman("MDCCCXXXir.", year)).toBeUndefined();
+    expect(misreadRoman("MDCCCXXXI.", 1832)).toBeUndefined();
+    expect(misreadRoman("MDCCCXXXIrs", 1832)).toBeUndefined();
+  });
+
   test("a note marker without its note, and a note without its marker, are reported; a continued note is not", () => {
     const book = new Book();
     const source = book.source("notes");
@@ -353,7 +397,7 @@ describe("annotations (CONTRACT-001 G)", () => {
     const { book, finding, annotate } = wrongYear();
     expect(annotate("explain", "model:some-model").code).toBe(0);
     const found = finding();
-    expect([found.outcome, found.open, found.annotations.map((a) => [a.effect, a.by])]).toEqual(["unverifiable", true, [["explain", "model some-model"]]]);
+    expect([found.outcome, found.open, found.annotations.map((a) => [a.effect, a.by])]).toEqual(["fail", true, [["explain", "model some-model"]]]);
     const printed = renderReport(book.check().body);
     expect(printed).toContain("explained by model some-model (ann-");
     expect(printed).toContain("the page shows 1851 in a later impression");
@@ -368,7 +412,7 @@ describe("annotations (CONTRACT-001 G)", () => {
     expect(annotate("dismiss", "person:author", "0".repeat(64)).code).toBe(5);
     annotate("dismiss", "person:author");
     const found = finding();
-    expect([found.outcome, found.open]).toEqual(["unverifiable", false]);
+    expect([found.outcome, found.open]).toEqual(["fail", false]);
     expect(book.check().body.summary.dismissed).toBe(1);
     expect(renderReport(book.check().body)).toContain("a person dismissed these findings");
     // A dismissal typed as a model's has no effect.
@@ -403,20 +447,68 @@ describe("metadata and identifiers (FR-86)", () => {
     expect(foldName("The 3rd edition")).toBe("the 3rd edition");
   });
 
-  test("meta.source agrees with the title page, fails on a wrong year, and a person's review confirms what the text cannot show", () => {
+  test("meta.source agrees with the title page, and a year the imprint contradicts is a problem", () => {
     const good = reef();
     expect(verdicts(good.book.check(), "meta.source")).toEqual(["pass"]);
     const wrong = reef({ issued: { edtf: "1851" } });
     const finding = of(wrong.book.check(), "meta.source")[0]!;
-    expect([finding.outcome, finding.reason_code, evidence(finding, "not_found")]).toEqual(["unverifiable", "not_found_in_copy", ["year"]]);
-    const confirm = (...more: string[]) => wrong.book.run("review", "add", wrong.text, "--scope", "source_details", "--pages", "0", "--fields", "year", "--against", "the printed title page", "--outcome", "agrees", ...more);
-    expect(confirm(...AUTHOR).code).toBe(0);
-    const confirmed = of(wrong.book.check(), "meta.source")[0]!;
-    expect([confirmed.outcome, confirmed.open, confirmed.confirmed_by?.startsWith("rvw-")]).toEqual(["unverifiable", false, true]);
-    // Changing the record ends the confirmation.
-    const path = `records/sources/${wrong.source}.json`;
-    wrong.book.write(path, canonical({ ...JSON.parse(wrong.book.read(path)), issued: { edtf: "1852" } }));
-    expect(of(wrong.book.check(), "meta.source")[0]!.open).toBe(true);
+    expect([finding.outcome, finding.reason_code, finding.open, evidence(finding, "year_the_copy_states")]).toEqual(["fail", "mismatch", true, ["1850"]]);
+    // A saved lookup that repeats the wrong year does not outweigh the title page.
+    saveLookup(wrong.book, wrong.source, "internet_archive", "invented00reef", { result: { title: "The Invented Reef", date: "1851" } });
+    expect(verdicts(wrong.book.check(), "meta.source")).toEqual(["fail mismatch"]);
+  });
+
+  /** A captured book whose title page gives no year, as recognition may leave one. */
+  function undated(year: string) {
+    const book = new Book();
+    const source = book.source("author1850", { contributions: [{ lid: "a", role: "author", as_printed: { family: "Author" } }], issued: { edtf: year } });
+    const made = book.convert(book.file("undated.pdf", makePdf({ pages: [["THE INVENTED REEF", "by A. N. Author"], ["The reef was old."]] })), source);
+    return { book, source, text: made.text };
+  }
+  const dated = (year: string) => ({ result: { title: "The Invented Reef", creator: "Author, A. N.", date: year } });
+
+  test("a detail the copy does not show is borne out by a catalogue, is coverage without one, and is a problem when contradicted", () => {
+    const alone = undated("1850").book.check();
+    const uncovered = of(alone, "meta.source")[0]!;
+    expect([uncovered.outcome, uncovered.reason_code, uncovered.open, uncovered.coverage_only]).toEqual(["unverifiable", "not_found_in_copy", false, true]);
+    expect(verdicts(alone, "meta.resolver")).toEqual(["unverifiable no_lookup"]);
+    expect(alone.body.label).toBe("checked_clean");
+    expect(renderReport(alone.body)).toContain("not corroborated: neither the title page text nor a saved catalogue record shows the year: author1850");
+
+    const borne = undated("1850");
+    saveLookup(borne.book, borne.source, "internet_archive", "invented00reef", dated("1850"));
+    const agreed = borne.book.check();
+    expect([verdicts(agreed, "meta.source"), verdicts(agreed, "meta.resolver")]).toEqual([["pass"], ["pass"]]);
+    expect(evidence(of(agreed, "meta.source")[0]!, "year_corroborated_by")[0]).toContain("internet_archive record of ia:invented00reef");
+    expect(renderReport(agreed.body)).toContain("a saved catalogue record bears it out");
+
+    const contradicted = undated("1851");
+    saveLookup(contradicted.book, contradicted.source, "internet_archive", "invented00reef", dated("1850"));
+    const report = contradicted.book.check();
+    expect([verdicts(report, "meta.resolver"), of(report, "meta.source")[0]!.outcome, report.body.label]).toEqual([["fail mismatch"], "unverifiable", "open_findings"]);
+    // One catalogue that agrees does not outweigh another that does not.
+    saveLookup(contradicted.book, contradicted.source, "crossref", "10.1234/x", { message: { title: ["The Invented Reef"], author: [{ family: "Author" }], issued: { "date-parts": [[1851]] } } });
+    expect(of(contradicted.book.check(), "meta.source")[0]!.outcome).toBe("unverifiable");
+  });
+
+  test("a person may record what a title page shows; it adds to coverage and ends when the record changes", () => {
+    const made = undated("1850");
+    expect(made.book.run("review", "add", made.text, "--scope", "source_details", "--pages", "0", "--fields", "year", "--against", "the printed title page", "--outcome", "agrees", ...AUTHOR).code).toBe(0);
+    const confirmed = of(made.book.check(), "meta.source")[0]!;
+    expect([confirmed.open, confirmed.confirmed_by?.startsWith("rvw-")]).toEqual([false, true]);
+    const path = `records/sources/${made.source}.json`;
+    made.book.write(path, canonical({ ...JSON.parse(made.book.read(path)), issued: { edtf: "1852" } }));
+    const after = of(made.book.check(), "meta.source")[0]!;
+    expect([after.open, after.confirmed_by]).toEqual([false, undefined]);
+  });
+
+  test("a source with nothing captured about it yet is no finding", () => {
+    const book = new Book();
+    const source = book.add("source", { citation_key: "bare", identifiers: [{ scheme: "isbn", value: "9780000000000" }] });
+    book.convert(book.file("a.md", "Text.\n"), source);
+    const report = book.check();
+    expect(report.body.results.filter((r) => r.open)).toEqual([]);
+    expect(report.body.label).toBe("checked_clean");
   });
 
   test("meta.source fails when the copy states otherwise", () => {
@@ -444,6 +536,7 @@ describe("metadata and identifiers (FR-86)", () => {
   test("meta.resolver and id.resolves compare saved Crossref and Internet Archive responses offline", () => {
     const { book, source } = reef({ identifiers: [{ scheme: "doi", value: "10.1234/reef" }, { scheme: "ia", value: "invented00reef" }] });
     expect(verdicts(book.check(), "meta.resolver")).toEqual(["unverifiable no_lookup"]);
+    expect(book.check().body.results.filter((r) => r.open)).toEqual([]);
     expect(verdicts(book.check(), "id.resolves")).toEqual(["unverifiable no_lookup", "unverifiable no_lookup"]);
     saveLookup(book, source, "internet_archive", "invented00reef", { result: { title: "The invented reef : being a narrative", creator: "Author, A. N., 1800-1870", date: "1850", description: null, size: 1.5 } });
     saveLookup(book, source, "crossref", "10.1234/reef", { message: { title: ["The Invented Reef"], author: [{ given: "A. N.", family: "Author" }], issued: { "date-parts": [[1850, 2]] }, reference: [{ x: 1 }], score: 1.2 } });
@@ -535,10 +628,10 @@ describe("metadata and identifiers (FR-86)", () => {
 
     const open = against("1862", { volume: "v. 2" });
     expect(verdicts(open.report, "meta.resolver")).toEqual(["unverifiable set_date"]);
-    expect(of(open.report, "meta.resolver")[0]!.open).toBe(true);
+    expect(of(open.report, "meta.resolver")[0]!.open).toBe(false);
     expect(open.book.run("review", "add", open.text, "--scope", "source_details", "--pages", "0", "--fields", "year", "--against", "the printed title page", "--outcome", "agrees", ...AUTHOR).code).toBe(0);
-    expect(of(open.book.check(), "meta.resolver")[0]!.open).toBe(false);
-  });
+    expect(of(open.book.check(), "meta.resolver")[0]!.confirmed_by).toStartWith("rvw-");
+  }, 30_000);
 
   test("a review's flag lies on a page the review covers", () => {
     const { book, text } = reef();
@@ -568,8 +661,8 @@ describe("ingest (FR-86)", () => {
     book.file("reef.pdf", reefPdf());
     const planFile = book.file("plan.json", JSON.stringify(plan(source)));
     const first = book.run("ingest", "--plan", planFile, ...AUTHOR);
-    expect(first.code).toBe(1);
-    for (const line of ["5 pages written to sources/author1850/ (text_layer, 4 labelled)", "converted again; 5 of 5 parts agree", "== 4. Check", "[meta.resolver]"]) {
+    expect(first.code).toBe(0);
+    for (const line of ["5 pages written to sources/author1850/ (text_layer, 4 labelled)", "converted again; 5 of 5 parts agree", "== 4. Check", "CHECKED CLEAN", "not compared with a catalogue"]) {
       expect(first.out).toContain(line);
     }
     expect(first.out).not.toContain("NOT CHECKED");

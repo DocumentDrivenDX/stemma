@@ -18,6 +18,7 @@ ddx:
     - stemma.adr-008
     - stemma.adr-009
     - stemma.adr-010
+    - stemma.adr-011
 ---
 
 # Architecture
@@ -330,7 +331,7 @@ format, or command depends on a particular model.
 
 | Decision | Status | Rationale | Follow-up |
 |----------|--------|-----------|-----------|
-| ADR-001 to ADR-010 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy; source files in the repository | Their stated assumptions |
+| ADR-001 to ADR-011 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy; source files in the repository; shared manuscript editing with docsync | Their stated assumptions |
 | Architecture style: hexagonal, ports and adapters (HELIX `hexagonal-architecture`) | Decided by the product owner; fills the `architecture-style` slot | One core is driven by the command line and tests and drives parts that are undecided or will change: the index, extraction, recognition, manuscript form, and citation formatting. `classic-layered` would let checks depend on files and SQLite directly; onion and clean styles add layers no requirement needs. Core rules (`records`, `manuscript`, `core`) are independent of applications, databases, and file tools | Boundary check |
 | Checks are pure over ports | Proposed | Repeatable tests and one result path for agent, build, and terminal | none |
 | Publish the built, unminified release tree as `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository | Decided by the product owner; SD-010 | No built file in the Stemma repository. Trade-off: a second publishing surface; unobserved in Claude desktop | Desktop install check |

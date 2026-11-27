@@ -1,5 +1,6 @@
 // The plain-language text form of a report. One cause is shown once with the
 // items it affects (CONTRACT-002 C).
+import { compareCodePoints } from "@stemma/records";
 import { CHECK_DESCRIPTIONS } from "./checks/not-run.ts";
 import { type Coverage, coverageWords } from "./verification.ts";
 import type { Result, ReportBody } from "./report.ts";
@@ -66,6 +67,23 @@ export function renderCoverage(body: { verification: Coverage[] }, most = 3): st
   return lines;
 }
 
+/**
+ * What was corroborated by other means, what was not covered, and what was seen
+ * in an original, each line with the sources it is about. None of it is a finding.
+ */
+function coverageSummary(results: Result[]): string[] {
+  const lines = new Map<string, Set<string>>();
+  for (const result of results.filter((r) => !r.open && r.confirmed_by === undefined)) {
+    const about = result.evidence.find((e) => e.name === "key")?.value ?? result.subject;
+    for (const e of result.evidence.filter((x) => x.name === "coverage")) {
+      lines.set(e.value, (lines.get(e.value) ?? new Set()).add(about));
+    }
+  }
+  if (lines.size === 0) return [];
+  return ["", "Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.",
+    ...[...lines].sort(([a], [b]) => compareCodePoints(a, b)).map(([line, about]) => `   - ${printable(line)}: ${[...about].sort().map(printable).join(", ")}`)];
+}
+
 export function renderReport(body: ReportBody): string {
   const { summary } = body;
   const lines: string[] = [];
@@ -85,6 +103,7 @@ export function renderReport(body: ReportBody): string {
   }
   lines.push(`Checked the whole project: ${summary.pass} result(s) passed.`);
   lines.push(...renderFindings(body.results));
+  lines.push(...coverageSummary(body.results));
   lines.push(...quotationNotes(body.results));
   const dismissed = body.results.filter((r) => !r.open && r.annotations.some((a) => a.effect === "dismiss"));
   if (dismissed.length > 0) {
@@ -93,7 +112,7 @@ export function renderReport(body: ReportBody): string {
   }
   const confirmed = body.results.filter((r) => r.confirmed_by !== undefined);
   if (confirmed.length > 0) {
-    lines.push("", "For information: these could not be compared and a person confirmed the details. They are confirmed by the author, not verified.");
+    lines.push("", "For information: a person recorded what they saw for these details, which nothing else here shows. They are confirmed by the author, not verified.");
     for (const r of confirmed) lines.push(`   - ${r.subject} [${r.check}] review ${r.confirmed_by}`);
   }
   if (body.verification.length > 0) {

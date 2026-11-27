@@ -40,6 +40,11 @@ claude plugin marketplace add DocumentDrivenDX/plugins
 claude plugin install stemma@documentdrivendx
 ```
 
+That also installs [docsync](https://github.com/DocumentDrivenDX/docsync), which
+Stemma uses when you want to edit a manuscript with others in a Claude Doc. If an
+update leaves Claude saying that docsync is not installed, run the second command
+again.
+
 On first use Claude fetches a pinned copy of the Bun runtime, checks it against a
 digest shipped in the plugin, and keeps it in the plugin's own data directory. It
 changes no system or shell setting, and Claude's usual permission prompts apply.
@@ -49,6 +54,7 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - "Start a Stemma project in this folder."
 - "Add a source record for this book, taking the details from its title page."
 - "Capture this PDF as my copy of that source. I downloaded it from the library today."
+- "Tag these three as arguing against the theory, then list them."
 - "Find where that book discusses atolls, and capture the passage I choose."
 - "Record the citations in this chapter."
 - "Check the project and explain what is open."
@@ -66,6 +72,9 @@ PDFs and page images stay out of the repository.
 ## What it does
 
 - Keeps sources and citations as plain record files in your project.
+- Lets a source start as just its file and gain text, identifiers, catalogue
+  details, and tags over time, without changing its text or your passages. It
+  lists sources by tag and stage and shows each one's history.
 - Converts your sources into Markdown source files in your project: PDF with a
   text layer, EPUB, HTML, DOCX, Markdown, Project Gutenberg and plain text, and
   text that you or your recognition tool supply for paper or page images. Each
