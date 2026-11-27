@@ -67,17 +67,60 @@ describe("graph export", () => {
     expect(everyFile(dir)).toEqual(before);
   });
 
-  test("invalid records exit 3 with no export; a warning does not stop one", () => {
+  test("no finding blocks an export: what is bad is left out, counted, warned about, and the exit says something is open", () => {
     const dir = project();
     const claim = join(dir, "records/claims/clm-graphcliclaim01.json");
     const whole = readFileSync(claim, "utf8");
-    writeFileSync(claim, whole.replace('"role": "claim"', '"role": "nonsense"'));
-    const done = exportTo(dir, "--format", "json");
-    expect([done.code, done.json().error.code, done.json().error.paths]).toEqual([3, "records_invalid", ["records/claims/clm-graphcliclaim01.json"]]);
-    expect(existsSync(join(dir, "build"))).toBe(false);
-    // Not in canonical form and with a field Stemma does not know: warnings.
+    // Not in canonical form and with a field Stemma does not know: warnings only.
     writeFileSync(claim, JSON.stringify({ ...JSON.parse(whole), unheard_of: true }));
     expect(exportTo(dir).code).toBe(0);
+    writeFileSync(join(dir, "records/README.md"), "# Notes\n");
+    writeFileSync(claim, whole.replace('"role": "claim"', '"role": "nonsense"'));
+    const done = exportTo(dir, "--page");
+    expect(done.code).toBe(1);
+    expect(done.out).toContain("WARNING records_left_out: 2 file(s) are not in this graph");
+    expect(done.out).toContain("Files: records/README.md, records/claims/clm-graphcliclaim01.json.");
+    expect(readFileSync(join(dir, "build/graph/author/stemma.graph.json"), "utf8")).not.toContain("A first wording");
+    expect(cli(["graph", "status", "--project", dir]).code).toBe(0);
+  });
+
+  test("a records directory that cannot be listed exits 3 with no export", () => {
+    const dir = project(false);
+    rmSync(join(dir, "records"), { recursive: true });
+    writeFileSync(join(dir, "records"), "not a directory\n");
+    const done = exportTo(dir, "--format", "json");
+    expect([done.code, done.json().error.code, done.json().error.paths, existsSync(join(dir, "build"))]).toEqual([3, "project_unreadable", ["records"], false]);
+  });
+
+  test("--out never overwrites or removes a file that no export manifest there lists as its own", () => {
+    const dir = project();
+    const names = ["explorer.html", "stemma.export.json", "stemma.graph.json", "stemma.umf.json", "arras-static.json", "stemma.states.json"];
+    const contents = (out: string) => Object.fromEntries(readdirSync(out).map((name) => [name, readFileSync(join(out, name), "utf8")]));
+    for (const [i, name] of names.entries()) {
+      const out = join(temporary(), `taken${i}`);
+      mkdirSync(out);
+      writeFileSync(join(out, name), "someone else's\n");
+      for (const more of [[], ["--page"]]) {
+        const done = exportTo(dir, "--out", out, ...more);
+        expect([name, done.code, done.err.includes("Nothing was written"), done.err.includes(name)]).toEqual([name, 5, true, true]);
+        expect(contents(out)).toEqual({ [name]: "someone else's\n" });
+      }
+    }
+    // A manifest that is Stemma's own owns only what it lists.
+    const out = join(temporary(), "partly");
+    expect(exportTo(dir, "--out", out).code).toBe(0);
+    writeFileSync(join(out, "explorer.html"), "my own page\n");
+    expect(exportTo(dir, "--out", out).code).toBe(5);
+    expect(readFileSync(join(out, "explorer.html"), "utf8")).toBe("my own page\n");
+    // A directory or a link with an output name is not an export's file either.
+    rmSync(join(out, "explorer.html"));
+    mkdirSync(join(out, "explorer.html"));
+    expect(exportTo(dir, "--out", out).code).toBe(5);
+    rmSync(join(out, "explorer.html"), { recursive: true });
+    // An export cut short, its manifest written and a file not, can be made again.
+    rmSync(join(out, "stemma.graph.json"));
+    expect(cli(["graph", "status", "--project", dir, "--out", out]).code).toBe(1);
+    expect(exportTo(dir, "--out", out).code).toBe(0);
   });
 
   test("a restricted location holding exact geometry is left out, warned about, and the export still made", () => {

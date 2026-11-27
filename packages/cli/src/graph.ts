@@ -3,9 +3,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  dataIdentity, type Export, exportBlockers, exportGraph, ExportMappingError, exportStaleness, MANIFEST, PAGE,
+  dataIdentity, type Export, exportBlockers, exportGraph, ExportMappingError, exportOwnFiles, exportStaleness, FILES, MANIFEST, PAGE,
 } from "@stemma/graph";
-import { checkOutputDirectory, readOutputFile, RefusedOutput, removeOutputFile, writeOutputFiles } from "@stemma/workspace";
+import { checkOutputDirectory, outputExists, readOutputFile, RefusedOutput, removeOutputFile, writeOutputFiles } from "@stemma/workspace";
 import { CommandError, emit, openCorpus, type Options, requireProject, usageError, VERSION } from "./context.ts";
 
 const TEMPLATE = "explorer.template.html";
@@ -44,7 +44,7 @@ export async function graphExport(options: Options): Promise<number> {
   const blockers = exportBlockers(corpus);
   if (blockers.length > 0) {
     const listed = blockers.slice(0, 20).map((b) => `  ${b.path}: ${b.problems.slice(0, 3).join(", ")}`).join("\n");
-    throw new CommandError(3, "records_invalid", `${blockers.length} record file(s) are invalid, so a graph of them would be incomplete. Nothing was written. Run \`check\` for what is wrong and how to fix it.\n${listed}`, blockers.map((b) => b.path));
+    throw new CommandError(3, "project_unreadable", `The project cannot be read, so a graph of it would be wrong. Nothing was written. Run \`check\` for what is wrong and how to fix it.\n${listed}`, blockers.map((b) => b.path));
   }
   const template = options.page ? await pageTemplate() : undefined;
   let made: Export;
@@ -57,31 +57,40 @@ export async function graphExport(options: Options): Promise<number> {
     throw error;
   }
   const out = outputOf(root, options);
-  const names = [...made.files.map((f) => f.name), PAGE];
+  // Every name an export may write or remove.
+  const names: string[] = [...Object.values(FILES), PAGE, MANIFEST];
   try {
     checkOutputDirectory(root, out, names);
   } catch (error) {
     if (error instanceof RefusedOutput) throw new CommandError(5, "output_refused", `Nothing was written to ${out}. ${error.message}`, [out]);
     throw error;
   }
+  const previous = readOutputFile(out, MANIFEST);
+  const own = new Set(previous ? exportOwnFiles(new TextDecoder().decode(previous)) : []);
+  // A name that is there as anything but a plain file of an earlier export is someone else's.
+  const others = names.filter((name) => outputExists(out, name) && !(own.has(name) && readOutputFile(out, name)));
+  if (others.length > 0) {
+    throw new CommandError(5, "output_refused", `Nothing was written to ${out}. It already holds ${others.join(", ")}, which no export manifest there lists as an export's own, so Stemma will not overwrite or remove it. Choose another directory with --out, or move what is there.`, [out]);
+  }
   // A page left from an earlier export would show earlier data beside this one.
   if (!options.page) removeOutputFile(out, PAGE);
-  // The manifest goes last, so that an export cut short never reads as current.
-  removeOutputFile(out, MANIFEST);
-  writeOutputFiles(out, made.files);
+  // The manifest goes first: an export cut short still owns its files, so it can
+  // be made again, and never reads as current, since their digests differ.
+  writeOutputFiles(out, [...made.files].sort((a, b) => Number(b.name === MANIFEST) - Number(a.name === MANIFEST)));
   const { manifest } = made;
-  const restricted = manifest.warnings.some((w) => w.code === "restricted_in_project");
+  // Something is open when the graph leaves out, or cannot follow, what it should show.
+  const open = manifest.warnings.some((w) => w.code !== "large_graph");
   const lines = [
     `Exported the author graph to ${out}`,
     `Data identity ${manifest.data_identity.slice(0, 12)}${options.page ? " (the page shows the same)" : ""}`,
     `Entries: ${manifest.counts.entities}. Links: ${manifest.counts.links}. Left out: ${total(manifest.omissions)} items and ${total(manifest.dropped_links)} links, each listed by type and reason in ${MANIFEST}.`,
     `States shown where they apply: ${manifest.states.computed.join(", ")}. Not computed: ${manifest.states.not_computed.join(", ")}. A record with no state has not been shown to be clear.`,
-    ...manifest.warnings.map((w) => `WARNING ${w.code}: ${w.message}${w.records.length > 0 ? ` Records: ${w.records.join(", ")}.` : ""}`),
+    ...manifest.warnings.map((w) => `WARNING ${w.code}: ${w.message}${w.records.length > 0 ? ` ${w.code === "records_left_out" ? "Files" : "Records"}: ${w.records.slice(0, 20).join(", ")}${w.records.length > 20 ? ` and ${w.records.length - 20} more, all listed in ${MANIFEST}` : ""}.` : ""}`),
     "These files hold passage text and other record contents: anyone who is given them can read all of it.",
     options.page ? `Open ${join(out, PAGE)} in a browser. After records change, export again and reload.` : "No page was made; add --page for explorer.html.",
   ];
   emit(options, { out, ...(options.page ? { page: join(out, PAGE) } : {}), manifest }, `${lines.join("\n")}\n`);
-  return restricted ? 1 : 0;
+  return open ? 1 : 0;
 }
 
 const STALE: Record<string, string> = {

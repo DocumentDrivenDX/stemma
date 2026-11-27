@@ -64,7 +64,7 @@ byte-identical files. They hold no time, user, machine path, or git revision.
 Every JSON file writes `<` as `\u003c`, so the page inlines the module and graph
 byte for byte and their digests match the manifest.
 The default output is `build/graph/<audience>/`. An export without `--page`
-removes an `explorer.html` already there.
+removes an `explorer.html` that an earlier export left there.
 
 ### C. Never committed; rebuilt when needed
 
@@ -79,6 +79,14 @@ Every output directory, the default included, MUST be refused when:
 - no git repository holds it, and it is inside the project but not under
   `build/`.
 
+An export overwrites or removes only its own files. In the output directory,
+those are a `stemma.export.json` whose schema is `stemma.graph-export/0` and the
+export files (B) that it lists, each a plain file. When any other thing has the
+name of any export file, `explorer.html` and the manifest included, with or
+without `--page`, the directory MUST be refused. The manifest is written first,
+so that an export cut short still lists its files, can be made again, and is
+reported stale because their digests differ.
+
 Links are followed before the test. A relative `--out` is relative to the
 project. `graph status` reports an existing export stale when the data identity,
 the exporter version, or a file digest differs.
@@ -86,9 +94,9 @@ the exporter version, or a file digest differs.
 **A fresh clone** holds no graph files. To browse, the author:
 
 1. Installs the plugin and the pinned Bun.
-2. Runs `graph export --audience author --page`. It validates the records and
-   builds the module, graph, and page from files in the repository and assets
-   shipped with Stemma. It needs no network, index, originals, or restricted
+2. Runs `graph export --audience author --page`. It validates the records,
+   leaves out and names what cannot be used (E), and builds the module, graph,
+   and page from files in the repository and assets shipped with Stemma. It needs no network, index, originals, or restricted
    store.
 3. Opens `build/graph/author/explorer.html`.
 
@@ -146,8 +154,30 @@ Filtering happens before any file is written; the page does no filtering.
   `ImportBatch.original_name`, `LossItem.path`, `Image.file_path`,
   `Chapter.manuscript_path`, `GoverningRecord.path`, and `PageEntry.file`; and
   any value that begins as a path on a machine (`file:`, `~/`, a drive letter, a
-  network share, or a system directory such as `/Users/` or `/home/`). A path
-  written inside prose is not detected. `ImportBatch.blocks` is legacy content.
+  network share, or a system directory such as `/Users/`, `/home/`, or
+  `/nix/`). In a field that says where something is, a value is also left out
+  when it is an absolute POSIX path of two or more segments in any directory, or
+  a `~user/` path: `Original.held_at`, `Original.obtained_from`, `Upstream.url`,
+  `Upstream.note` (also after the words `Obtained from: ` that Stemma writes),
+  `AuxiliaryFile.url`, `Resolution.url`, `CandidateOrigin.location`,
+  `InputDigest.input`, `GoverningRecord.identity`, `SourceChange.value` and
+  `previous` and `from`, and the value of a bibliography field named `file`,
+  `local-url`, `localfile`, `pdf`, or `path`. A web address is not such a path.
+  A path written inside prose is not detected. Nor, in any other field, is a
+  path outside the named system directories. `ImportBatch.blocks` is legacy content.
+- These rules rely on a record's shape. A record with a `record_invalid`
+  problem (CONTRACT-001) is therefore left out whole, as is a file that cannot
+  be read, has a newer version, or does not belong under `records/` or
+  `sources/`. Each is counted by type (`File` when the kind is not known) and
+  reason (`invalid_record`, `unreadable`, `newer_version`, `stray_file`), and
+  the warning `records_left_out` names the files. A record that is only
+  misplaced, or has an unknown field or a dangling reference, stays. A
+  reference to a missing record, or to one of a kind the field does not allow,
+  gives no link; it is counted in `dropped_links`, and the warning
+  `broken_references` names the records that hold it. A `content_sha256` of a
+  bound item (an annotation's) is emitted only when the record it names was read
+  whole with no `record_invalid` problem; otherwise it is omitted and counted
+  `unchecked_digest`, or `restricted_digest` as below.
 - The graph holds no page text, part list of a source file, manuscript file,
   research note, or standing rule. Each is counted.
 - A project record can wrongly hold restricted data. For a location whose
@@ -155,8 +185,11 @@ Filtering happens before any file is written; the page does no filtering.
   when `release` is `area` and the geometry is a polygon. Otherwise it emits
   none, and omits `content_sha256` values made from that record (its review
   mark and annotations of it), counts them, and warns `restricted_in_project`.
-  The export is still written. The corpus digest and data identity cover every
-  record file, that one included.
+  This is looked for in every record that can be read, invalid ones included. A
+  location too malformed to be recognized as restricted is invalid, so none of
+  it is emitted. The export is still written. The corpus digest and data
+  identity cover every record file, that one included (CONTRACT-001 H, a
+  proposed exception).
 - `author` is for the author's own machine or private repository. It MAY include
   passage text.
 - `reviewer` MUST include only fields on its allow list. It omits source files
@@ -367,13 +400,16 @@ record with no state is not shown to be clear.
 
 | Condition | Outcome | Retry | Recovery Expectation |
 |---|---|---|---|
-| Records invalid | Exit 3; no export | no | Fix records |
+| A record cannot be read, is a newer version, is a stray file, or breaks a rule (`record_invalid`) | Left out whole, counted, `records_left_out` warning; export written; exit 1 | no | Run `check`, fix, export again |
+| A reference to a missing record or one of the wrong kind | No link; counted, `broken_references` warning; export written; exit 1 | no | Run `check`, repoint or remove |
+| `stemma.json` cannot be read as an object or is a newer version, or `records/` or `sources/` cannot be listed | Exit 3 (`project_unreadable`); no export, since it would be wrong | no | Fix the file or directory |
 | Name or key violates arras rules | `export_mapping_error`; no export | no | Defect in the exporter or schema |
 | arras loader rejects the output | Export test fails; nothing is shipped | no | Fix the mapping |
 | Withheld source material found in a reviewer export | Removed from generated files; anything that cannot be removed is a `package.leak` finding and a warning; export written | no | The author checks the named part before sending it |
 | Restricted coordinate found by the scan | Warning with the location; export written | no | The author removes it or accepts the disclosure |
 | Export stale | `graph status` exits 1 | yes | Re-export |
 | `--out` names a path git would track, or another refused place (C) | Exit 5; nothing written | no | Use an ignored path |
+| The output directory holds something with an export file's name that no export manifest there lists as its own (C) | Exit 5; nothing written or removed | no | Use another directory, or move it |
 | A restricted location holds more than was released | Geometry left out; `restricted_in_project` warning; export written; exit 1 | no | Move the value to the restricted store |
 | The installed copy lacks its page template | Exit 70; nothing written | no | Install Stemma again |
 | `--audience reviewer` or `--chapter` in this version | Exit 2, not implemented: a partial filter could disclose withheld text | no | None yet |
@@ -412,7 +448,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Element | Evidence | Not shown |
 |---|---|---|
 | Projection loads | The pinned 0.8.1 loader accepts the export of the worked example and of a synthetic project with every kind, field, and pair of linked types (44 types, 275 relationships) | A real author's project |
-| Author export, `graph export`, `graph status` | Local tests: byte determinism, omissions, restricted geometry, refusals, a fresh clone, and a run from the installed plugin | `reviewer` filtering; `--chapter` |
+| Author export, `graph export`, `graph status` | Local tests: byte determinism, omissions, restricted geometry, invalid and unreadable records, local paths, refusals, files that are not an export's own, a fresh clone, and a run from the installed plugin | `reviewer` filtering; `--chapter` |
 | Offline page | In headless Chromium on one macOS system (Apple silicon), from a local file with the network off: search, diacritic search, links in both directions, Back, reload, 150 links on one record, hostile record text shown as text, no request, no console error. axe-core reported no violation on the arras home, list, and record views it was run on, or on the Stemma banner | Other browsers, systems, and desktop hosts; keyboard and screen-reader use by hand |
 | Scale | The stock static browser loaded 10,000 synthetic nodes in about 0.28 s and 100,000 in 2.5 to 2.9 s in an earlier feasibility test | This projection at that size, real note text; arras claims support for 1,024 nodes and 7.9 MB, past which an export warns |
 | arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |

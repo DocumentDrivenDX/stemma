@@ -126,7 +126,8 @@ See [build iterations](build-iterations.md).
    the author's machine and needs no `node_modules`. Running from source in
    tests must also work. Pin exact versions in `package.json` and `bun.lock`.
 6. **CLI.** `graph export --audience author [--page] [--out <dir>]` and
-   `graph status`, with the CONTRACT-005 error semantics (invalid records exit 3;
+   `graph status`, with the CONTRACT-005 error semantics (an unreadable project
+   exits 3; bad records are left out, warned about, and exit 1;
    `--out` inside the project that git does not ignore exits 5, nothing written),
    `--format json`, usage text. `init` must ignore `build/`. Add the `graph`
    command to the skill so an author can ask to browse.

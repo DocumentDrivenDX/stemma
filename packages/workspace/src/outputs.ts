@@ -85,4 +85,7 @@ export function readOutputFile(directory: string, name: string): Uint8Array | un
   }
 }
 
+/** Whether anything, a link or a directory included, has this name. */
+export const outputExists = (directory: string, name: string): boolean => lstatSync(join(directory, name), { throwIfNoEntry: false }) !== undefined;
+
 export const removeOutputFile = (directory: string, name: string): void => rmSync(join(directory, name), { force: true });

@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
 import { planAnnotation, runChecks } from "@stemma/core";
-import { ARRAS_VERSION, checkName, dataIdentity, type Export, exportBlockers, exportGraph, exportStaleness, ExportMappingError, fillPage, InvalidRecords, MANIFEST, propertyName, SEARCHED_TYPES } from "@stemma/graph";
-import { canonical, type Corpus, digest, KIND_TYPES, loadCorpus, type ProjectContent, REFERENCES, searchFold } from "@stemma/records";
+import { ARRAS_VERSION, checkName, dataIdentity, type Export, exportBlockers, exportGraph, exportStaleness, ExportMappingError, fillPage, MANIFEST, propertyName, SEARCHED_TYPES, UnreadableProject } from "@stemma/graph";
+import { canonical, type Corpus, digest, KIND_TYPES, loadCorpus, type ProjectContent, REFERENCES, searchFold, serializeManifest } from "@stemma/records";
 import { readProject, randomToken } from "@stemma/workspace";
 import { everyShape, fixtureId, recordFile } from "./graph-fixture.ts";
 import { fixture, ROOT } from "./helpers.ts";
@@ -249,11 +249,148 @@ describe("the page holds what it was given and the explorer, and nothing else", 
   });
 });
 
-describe("invalid records", () => {
-  test("stop the export, and warnings do not", () => {
-    expect(() => make(loadCorpus(project([{ ...base("clm-invalidclaim01", "claim") }])))).toThrow(InvalidRecords);
-    const warned = { ...base("clm-warnedclaim001", "claim"), text: "t", role: "claim", review: { state: "unreviewed" }, unheard_of: 1 };
-    expect(make(loadCorpus(project([warned]))).manifest.counts.entities).toBe(1);
+describe("records that cannot be read or break a rule (no finding blocks a build)", () => {
+  const claim = (id: string, more: object = {}) => ({ ...base(id, "claim"), text: `Words of ${id}`, role: "claim", review: { state: "unreviewed" }, ...more });
+  const warning = (out: Export, code: string) => out.manifest.warnings.find((w) => w.code === code);
+
+  test("a warning, such as an unknown field, leaves the record in", () => {
+    const out = make(loadCorpus(project([claim("clm-warnedclaim001", { unheard_of: 1 })])));
+    expect([out.manifest.counts.entities, out.manifest.warnings]).toEqual([1, []]);
+  });
+
+  test("a dangling reference, a wrong kind and a stray file do not block: they are counted and said in plain words", () => {
+    const kept = claim("clm-danglingkept01");
+    const attestation = { ...base("att-danglingatt001", "attestation"), claim: kept.id, evidence: "nte-nosuchnote0001", stance: "supports", review: { state: "unreviewed" } };
+    const wrong = { ...base("att-wrongkindatt01", "attestation"), claim: kept.id, evidence: kept.id, stance: "supports", review: { state: "unreviewed" } };
+    const content = project([kept, attestation, wrong]);
+    content.records.push({ path: "records/README.md", bytes: text("# Notes\n") });
+    const corpus = loadCorpus(content);
+    expect(exportBlockers(corpus)).toEqual([]);
+    const out = make(corpus);
+    expect(out.manifest.counts.entities).toBe(3);
+    expect(counted(out, "File", "stray_file")).toBe(1);
+    expect(out.manifest.dropped_links).toContainEqual({ relationship: "attestation.evidence", reason: "target_not_exported", count: 1 });
+    expect(out.manifest.dropped_links).toContainEqual({ relationship: "attestation.evidence", reason: "target_wrong_kind", count: 1 });
+    expect(warning(out, "records_left_out")).toMatchObject({ records: ["records/README.md"], message: expect.stringContaining("The graph is incomplete.") });
+    expect(warning(out, "broken_references")!.records).toEqual([attestation.id, wrong.id]);
+  });
+
+  test("a record that breaks a rule, or cannot be read, is left out whole", () => {
+    const SECRET = "SEEDED-INVALID";
+    const source = {
+      ...base("src-invalidsource1", "source"), citation_key: "i", type: "book", intake: "raw", admission: "nonsense",
+      title: { value: `${SECRET}-title` }, x: { "a.b": `${SECRET}-extension` }, legacy: `${SECRET}-legacy`,
+    };
+    // Shapes that would slip past the rules about paths and legacy values.
+    const batch = { ...base("imp-invalidimport1", "import_batch"), blocks: `${SECRET}-block`, original_name: [`${SECRET}-name`] };
+    const agent = { ...base("agt-invalidagent01", "agent"), name: { literal: `${SECRET}-agent` }, variants: `${SECRET}-variants` };
+    const book = { ...base("src-validsource001", "source"), citation_key: "v", type: "book", intake: "raw", admission: "candidate", contributions: [{ lid: "a", role: "author", agent: agent.id }] };
+    const unknown = { ...base("zzz-unknownkind001", "claim"), kind: "constructor", text: `${SECRET}-kind` };
+    const content = project([source, batch, agent, book]);
+    content.records.push(
+      { path: "records/claims/clm-conflicted0001.json", bytes: text(`<<<<<<< HEAD\n${SECRET}-conflict\n`) },
+      { path: "records/claims/zzz-unknownkind001.json", bytes: text(canonical(unknown)) },
+    );
+    const out = make(loadCorpus(content));
+    for (const f of out.files) expect([f.name, f.text.includes(SECRET)]).toEqual([f.name, false]);
+    expect(graphOf(out).records.flatMap((r) => (r.key ? [r.key] : []))).toEqual([book.id, `${book.id}.a`]);
+    expect(counted(out, "Source", "invalid_record")).toBe(1);
+    expect(counted(out, "ImportBatch", "invalid_record")).toBe(1);
+    expect(counted(out, "Agent", "invalid_record")).toBe(1);
+    expect(counted(out, "File", "invalid_record")).toBe(1);
+    expect(counted(out, "File", "unreadable")).toBe(1);
+    expect(warning(out, "records_left_out")!.records).toHaveLength(5);
+  });
+
+  const stamp = { at: AT, by };
+  const hidden = { type: "Point", positions: [{ lon: "17.171717", lat: "27.272727" }] };
+  const location = (id: string, more: object) => ({
+    ...base(id, "place_location"), place: "plc-invalidplace01", certainty: "certain", method: "surveyed", evidence: ["src-invalidsource2"], review: { state: "unreviewed" },
+    sensitivity: { class: "restricted", release: "withhold", decided: stamp }, geometry: hidden, ...more,
+  });
+  const place = { ...base("plc-invalidplace01", "place"), label: "A place" };
+  const evidence = { ...base("src-invalidsource2", "source"), citation_key: "e", type: "book", intake: "raw", admission: "candidate" };
+  const noteOn = (id: string, record: string) => ({
+    ...base(id, "annotation"), effect: "explain", check: "record.valid", finding_key: "k", reason: "r", written: stamp, item: { record, content_sha256: "d".repeat(64) },
+  });
+
+  test.each<[string, object, boolean]>([
+    ["a class in the wrong letter case", { sensitivity: { class: "Restricted", release: "withhold", decided: stamp } }, false],
+    ["sensitivity that is not an object", { sensitivity: "restricted" }, false],
+    ["a release nothing allows", { sensitivity: { class: "restricted", release: "some", decided: stamp } }, true],
+    ["geometry in a list", { geometry: [hidden] }, true],
+    ["a missing field", { certainty: undefined }, true],
+  ])("a restricted location with %s gives no coordinate and no digest", (_why, more, warned) => {
+    const bad = location("loc-invalidloc0001", { review: { state: "reviewed", content_sha256: "c".repeat(64) }, ...more });
+    const out = make(loadCorpus(project([place, evidence, bad, noteOn("ann-invalidnote001", bad.id)])));
+    for (const f of out.files) {
+      for (const value of ["17.171717", "27.272727", "c".repeat(64), "d".repeat(64)]) expect([f.name, f.text.includes(value)]).toEqual([f.name, false]);
+    }
+    expect(entity(out, bad.id)).toBeUndefined();
+    expect(counted(out, "PlaceLocation", "invalid_record")).toBe(1);
+    expect(counted(out, "Annotation", "restricted_digest") + counted(out, "Annotation", "unchecked_digest")).toBe(1);
+    expect(warning(out, "restricted_in_project")?.records).toEqual(warned ? [bad.id] : undefined);
+  });
+
+  test("a digest of a record that cannot be read at all is left out too", () => {
+    const content = project([noteOn("ann-invalidnote002", "loc-unreadable00001")]);
+    content.records.push({ path: "records/place-locations/loc-unreadable00001.json", bytes: text("{ 17.171717") });
+    const out = make(loadCorpus(content));
+    for (const f of out.files) expect(f.text).not.toContain("d".repeat(64));
+    expect(counted(out, "Annotation", "unchecked_digest")).toBe(1);
+  });
+
+  test("only settings that cannot be read, or a directory that cannot be listed, stop an export", () => {
+    for (const content of [
+      { ...project([]), settings: { path: "stemma.json", bytes: text("{") } },
+      { ...project([]), records: [{ path: "records" }] },
+      { ...project([]), sources: [{ path: "sources" }] },
+    ]) expect(() => make(loadCorpus(content))).toThrow(UnreadableProject);
+  });
+});
+
+describe("local paths", () => {
+  const physical = (held: string, from: string) => ({
+    ...base("txt-localpathtext01", "source_text"), source: "src-localpathsrc01",
+    original: { form: "physical", description: "A bound copy", held_at: held, obtained_from: from },
+  });
+  const upstream = (n: number, url: string, note?: string) => ({
+    ...base(`ups-localpathups00${n}`, "upstream"), source: "src-localpathsrc01", url, retrieved_at: AT, retrieved_by: by, sha256: "a".repeat(64), size: 1, media_type: "text/plain", ...(note ? { note } : {}),
+  });
+  const source = (bib: object[]) => ({ ...base("src-localpathsrc01", "source"), citation_key: "l", type: "book", intake: "raw", admission: "candidate", bib });
+  const walked = (records: object[]) => exportGraph(loadCorpus(project(records)), { version: VERSION });
+
+  test.each(["/nix/store/abc-book/book.pdf", "/data/Shelf of books/book.pdf", "/srv2/a/", "C:\\Books\\a.pdf", "\\\\server\\share\\a.pdf", "~ada/books/a.pdf", "~/a.pdf", "file:/data/a.pdf"])(
+    "%s is left out of a field that says where something is", (path) => {
+      const out = walked([source([{ name: "file", value: { value: path } }]), upstream(1, path), upstream(2, "https://example.org/a/b", `Obtained from: ${path}`)]);
+      const all = out.files.map((f) => f.text).join("");
+      expect(all).not.toContain(JSON.stringify(path).slice(1, -1));
+      expect(counted(out, "Upstream", "local_path")).toBe(2);
+      expect(counted(out, "Source", "local_path")).toBe(1);
+    });
+
+  test("web addresses and prose stay", () => {
+    const prose = "/a/ and /b/ are written between slashes in the second chapter";
+    const kept = [
+      "https://example.org/nix/store/a", "//example.org/protocol/relative", "/single", "Library of Congress, shelf QE565 .D2",
+    ];
+    const out = walked([
+      source([{ name: "annotation", value: { value: prose } }]),
+      ...kept.map((url, i) => upstream(i + 1, url)),
+      upstream(7, "https://example.org/", "Downloaded by hand from the /a/b page"),
+    ]);
+    const all = out.files.map((f) => f.text).join("");
+    for (const value of [prose, ...kept, "Downloaded by hand from the /a/b page"]) expect([value, all.includes(value)]).toEqual([value, true]);
+    expect(counted(out, "Upstream", "local_path")).toBe(0);
+  });
+
+  test("where a physical original is held", () => {
+    const content = project([source([])]);
+    content.sources.push({ path: "sources/a-book/source.md", bytes: text(serializeManifest({ ...physical("/nix/store/abc/shelf", "/data/scans/a"), paged: false, coverage: "all", identity: { title: "A", basis: "b" }, conversion: { method: "typed", tools: [] }, pages: [] } as never, "")) });
+    const out = exportGraph(loadCorpus(content), { version: VERSION });
+    const all = out.files.map((f) => f.text).join("");
+    expect(all).not.toContain("/nix/store");
+    expect(all).not.toContain("/data/scans");
   });
 });
 

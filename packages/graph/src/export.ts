@@ -30,20 +30,24 @@ export function dataIdentity(corpus: Corpus): DataIdentity {
 export interface Blocker { path: string; problems: string[] }
 
 /**
- * Records that keep an export from being made (CONTRACT-005, "Records invalid").
- * A warning, such as a record not in canonical form or an unknown field, does not.
+ * What keeps an export from being made (CONTRACT-005, "Error Semantics"): only
+ * what would make the export wrong, which is project settings that cannot be
+ * read, or a records or sources directory that cannot be listed. A record that
+ * cannot be read or breaks a rule is left out, counted and warned about.
  */
 export function exportBlockers(corpus: Corpus): Blocker[] {
-  return [corpus.settings, ...corpus.records].flatMap((file: LoadedFile): Blocker[] => {
-    if (file.state !== "ok") return [{ path: file.path, problems: [file.unreadable ?? file.state] }];
-    const errors = file.problems.filter((p) => p.reason !== "unknown_field");
-    return errors.length > 0 ? [{ path: file.path, problems: errors.map((p) => `${p.code}${p.field ? ` at ${p.field}` : ""}`) }] : [];
-  });
+  const { settings } = corpus;
+  const unread = settings.state !== "ok" || !settings.data;
+  return [
+    ...(unread ? [{ path: settings.path, problems: [settings.unreadable ?? (settings.state === "ok" ? "not_an_object" : settings.state)] }] : []),
+    // A directory that could not be listed stands in the list as one file of its own name.
+    ...corpus.records.filter((f: LoadedFile) => f.path === "records" || f.path === "sources").map((f) => ({ path: f.path, problems: ["cannot_list"] })),
+  ];
 }
 
-export class InvalidRecords extends Error {
+export class UnreadableProject extends Error {
   constructor(readonly blockers: Blocker[]) {
-    super(`${blockers.length} record file(s) are invalid.`);
+    super(`The project cannot be read: ${blockers.map((b) => b.path).join(", ")}.`);
   }
 }
 
@@ -83,7 +87,7 @@ export interface ExportRequest {
 
 export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
   const blockers = exportBlockers(corpus);
-  if (blockers.length > 0) throw new InvalidRecords(blockers);
+  if (blockers.length > 0) throw new UnreadableProject(blockers);
   const states = recordStates(corpus);
   const projection = project(corpus, states);
   const moduleText = jsonText(moduleDocument(projection));
@@ -121,7 +125,8 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
     warnings,
   };
   if (request.template !== undefined) {
-    const project_id = String((isObject(corpus.settings.data) ? corpus.settings.data.project_id : "") ?? "");
+    const named = corpus.settings.data?.project_id;
+    const project_id = typeof named === "string" ? named : "";
     const banner: BannerData = { ...shared, project_id, module_sha256: sha256(moduleText), graph_sha256: sha256(graphText) };
     files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText }) });
   }
@@ -130,6 +135,22 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
     files: Object.fromEntries(files.map((f) => [f.name, sha256(f.text)])),
   };
   return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states };
+}
+
+/**
+ * The files in a directory that are an export's own, which another export may
+ * overwrite or remove: its manifest and the export files that manifest lists.
+ * None when the text is not an export manifest.
+ */
+export function exportOwnFiles(manifestText: string): string[] {
+  try {
+    const manifest = JSON.parse(manifestText) as Manifest;
+    if (manifest.schema !== EXPORT_SCHEMA || !isObject(manifest.files as never)) return [];
+    const known: string[] = [...Object.values(FILES), PAGE];
+    return [MANIFEST, ...Object.keys(manifest.files).filter((name) => known.includes(name))];
+  } catch {
+    return [];
+  }
 }
 
 export interface Staleness {

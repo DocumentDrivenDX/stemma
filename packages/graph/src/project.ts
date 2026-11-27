@@ -23,7 +23,25 @@ const LEGACY_FIELDS = new Set(["ImportBatch.blocks"]);
 /** The list of a source file's parts. The parts and their text are not in the graph. */
 const PART_LISTS = new Set(["SourceText.pages"]);
 /** A value that is a path on someone's machine, in whatever field it was put. */
-const LOCAL_PATH = /^\s*(file:|~[\\/]|[A-Za-z]:[\\/]|\\\\|\/(Users|home|private|tmp|var|Volumes|mnt|media|opt|root|etc|srv)\/)/i;
+const LOCAL_PATH = /^\s*(file:|~[\\/]|[A-Za-z]:[\\/]|\\\\|\/(Users|home|private|tmp|var|Volumes|mnt|media|nix|opt|root|etc|srv)\/)/i;
+
+/**
+ * Fields where someone says where something is. There, any value that is as a
+ * whole a path on a machine is left out, whichever directory it begins in.
+ */
+const LOCATION_FIELDS = new Set([
+  "Original.held_at", "Original.obtained_from", "Upstream.url", "Upstream.note", "AuxiliaryFile.url", "Resolution.url",
+  "CandidateOrigin.location", "InputDigest.input", "GoverningRecord.identity", "SourceChange.value", "SourceChange.previous", "SourceChange.from",
+]);
+/** Bibliography fields that name a file. */
+const PATH_BIB_FIELDS = new Set(["file", "local-url", "localfile", "pdf", "path"]);
+/** An absolute POSIX path of two or more segments, a drive or network path, a `~` path or a `file:` address. A URL is none of these. */
+const WHOLE_PATH = /^\s*(file:|~[\w.-]*[\\/]|[A-Za-z]:[\\/]|\\\\|\/(?!\/)[^/\r\n]+\/+[^/\s])/i;
+/** How Stemma writes an origin that is no web address into an upstream's note. */
+const ORIGIN_NOTE = /^Obtained from: /;
+
+const isLocalPath = (value: string, field: string | undefined): boolean =>
+  LOCAL_PATH.test(value) || (field !== undefined && LOCATION_FIELDS.has(field) && WHOLE_PATH.test(field === "Upstream.note" ? value.replace(ORIGIN_NOTE, "") : value));
 
 /** Types the explorer searches. arras searches at most 20 types in one query, taken in declaration order. */
 export const SEARCHED_TYPES = [
@@ -101,7 +119,12 @@ export interface Relationship { name: string; sourceType: string; targetType: st
 export interface Count { type: string; reason: string; count: number }
 export interface DroppedLink { relationship: string; reason: string; count: number }
 
-export interface Warning { code: "restricted_in_project" | "large_graph"; message: string; records: string[] }
+export interface Warning {
+  code: "restricted_in_project" | "records_left_out" | "broken_references" | "large_graph";
+  message: string;
+  /** Record IDs; for `records_left_out`, file paths. */
+  records: string[];
+}
 
 export interface Projection {
   /** Entities in declaration order of their type, then key by code point. */
@@ -116,7 +139,8 @@ export interface Projection {
   warnings: Warning[];
 }
 
-interface PendingLink { sourceType: string; source: string; path: string[]; targetId: string }
+/** `allowed` is the record kinds the reference field may name; a link to an owned entry has none. */
+interface PendingLink { sourceType: string; source: string; path: string[]; targetId: string; allowed?: string[] }
 
 class Tally {
   private readonly counts = new Map<string, number>();
@@ -156,8 +180,8 @@ class Walker {
   }
 
   /** A scalar as it goes into the graph, or undefined when it is left out. */
-  private scalar(value: Json, counted: string): Json | undefined {
-    if (typeof value === "string" && LOCAL_PATH.test(value)) {
+  private scalar(value: Json, counted: string, field?: string): Json | undefined {
+    if (typeof value === "string" && isLocalPath(value, field)) {
       this.omitted.add(counted, "local_path");
       return undefined;
     }
@@ -193,7 +217,7 @@ class Walker {
       const items = many ? (Array.isArray(item) ? item : []) : [item];
 
       if (Object.hasOwn(REFERENCES, refPath)) {
-        for (const one of items) if (typeof one === "string") this.links.push({ sourceType: entity.type, source: entity.key, path, targetId: one });
+        for (const one of items) if (typeof one === "string") this.links.push({ sourceType: entity.type, source: entity.key, path, targetId: one, allowed: REFERENCES[refPath]! });
         continue;
       }
       if (typeof spec.type === "object") {
@@ -202,7 +226,8 @@ class Walker {
         if (at.top && ENTRY_TYPES.includes(valueType)) {
           for (const one of items.filter(isObject)) this.entry(entity, valueType, one, path, refPath, searched);
         } else if (valueType === "Text" && !many) {
-          if (isObject(item)) this.text(entity, item, path, order, searched);
+          const names = typeName === "BibField" && PATH_BIB_FIELDS.has(String(value.name).toLowerCase()) ? "Original.held_at" : undefined;
+          if (isObject(item)) this.text(entity, item, path, order, searched, names);
         } else if (many) {
           // A repeated object becomes one line of text for each item; what refers elsewhere also becomes a link.
           const lines = items.filter(isObject).flatMap((one) => {
@@ -224,7 +249,7 @@ class Walker {
       }
       const type = spec.type === "integer" ? "integer" : spec.type === "boolean" ? "boolean" : "string";
       const kept = items.flatMap((one) => {
-        const out = this.scalar(one, entity.type);
+        const out = this.scalar(one, entity.type, field);
         return out === undefined ? [] : [out];
       });
       if (kept.length === 0) continue;
@@ -235,18 +260,18 @@ class Walker {
   }
 
   /** Multilingual text: the value, with its other forms as their own properties. */
-  private text(entity: Entity, text: JsonObject, path: string[], order: number[], searched: string[] | undefined): void {
+  private text(entity: Entity, text: JsonObject, path: string[], order: number[], searched: string[] | undefined, field?: string): void {
     const put = (name: string, value: Json, many: boolean, rank: number) => {
       this.set(entity, name, value, { type: "string", many }, [...order, rank]);
       searched?.push(...[value].flat().map(String));
     };
     const base = propertyName(path);
     for (const key of Object.keys(text)) if (!Object.hasOwn(TYPES.Text!, key)) this.omitted.add(entity.type, "unrecognized_field");
-    if (typeof text.value === "string" && this.scalar(text.value, entity.type) !== undefined) put(base, text.value, false, 0);
+    if (typeof text.value === "string" && this.scalar(text.value, entity.type, field) !== undefined) put(base, text.value, false, 0);
     if (typeof text.lang === "string") this.set(entity, `${base}Lang`, text.lang, { type: "string", many: false }, [...order, 1]);
     const variants = (Array.isArray(text.variants) ? text.variants : []).filter(isObject);
     for (const [kind, suffix, rank] of [["original", "Original", 2], ["transliteration", "Romanized", 3], ["translation", "Translated", 4]] as const) {
-      const values = variants.filter((v) => v.kind === kind).flatMap((v) => (typeof v.value === "string" && this.scalar(v.value, entity.type) !== undefined ? [v.value] : []));
+      const values = variants.filter((v) => v.kind === kind).flatMap((v) => (typeof v.value === "string" && this.scalar(v.value, entity.type, field) !== undefined ? [v.value] : []));
       if (values.length > 0) put(`${base}${suffix}`, values, true, rank);
     }
     for (const v of variants) if (v.lang !== undefined || v.scheme !== undefined) this.omitted.add(entity.type, "variant_language_or_scheme");
@@ -285,8 +310,11 @@ export function restrictedExcess(data: JsonObject): boolean {
   return !(data.sensitivity.release === "area" && isObject(data.geometry) && data.geometry.type === "Polygon");
 }
 
-/** The record as it may be exported, given which records hold restricted geometry. */
-function releasable(data: JsonObject, excess: Set<string>, omit: (reason: string) => void): JsonObject {
+/**
+ * The record as it may be exported. `excess` holds the records with restricted
+ * geometry; `checked` those read whole, with no rule broken and no such geometry.
+ */
+function releasable(data: JsonObject, excess: Set<string>, checked: Set<string>, omit: (reason: string) => void): JsonObject {
   let out = data;
   const id = String(data.id);
   if (excess.has(id)) {
@@ -300,10 +328,11 @@ function releasable(data: JsonObject, excess: Set<string>, omit: (reason: string
       omit("restricted_digest");
     }
   }
-  if (isObject(out.item) && excess.has(String(out.item.record)) && out.item.content_sha256 !== undefined) {
+  // A digest of a record this export cannot check may be of a restricted value.
+  if (isObject(out.item) && !checked.has(String(out.item.record)) && out.item.content_sha256 !== undefined) {
     const { content_sha256: _d, ...item } = out.item;
     out = { ...out, item };
-    omit("restricted_digest");
+    omit(excess.has(String(item.record)) ? "restricted_digest" : "unchecked_digest");
   }
   return out;
 }
@@ -349,11 +378,25 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
   const walker = new Walker();
   const droppedTally = new Tally();
   const readable = corpus.records.filter((f): f is LoadedFile & { data: JsonObject } => f.state === "ok" && f.data !== undefined && idOf(f) !== undefined);
+  // Restricted geometry is looked for in every record that can be read, invalid ones included.
   const excess = new Set(readable.filter((f) => restrictedExcess(f.data)).map((f) => idOf(f)!));
+  // The rules about what to leave out rely on a record's shape, so a record that breaks one is left out whole.
+  const invalid = (f: LoadedFile) => f.problems.some((p) => p.reason === "record_invalid");
+  const valid = readable.filter((f) => !invalid(f));
+  const checked = new Set(valid.map((f) => idOf(f)!).filter((id) => !excess.has(id)));
+  for (const f of readable.filter(invalid)) checked.delete(idOf(f)!);
+  const leftOut: string[] = [];
+  for (const file of corpus.records) {
+    if (valid.includes(file as typeof valid[number])) continue;
+    const kind = String(file.data?.kind);
+    const reason = file.state === "stray" ? "stray_file" : file.state === "unreadable" ? "unreadable" : file.state === "version_unsupported" ? "newer_version" : "invalid_record";
+    walker.omitted.add(Object.hasOwn(KIND_TYPES, kind) ? KIND_TYPES[kind]! : "File", reason);
+    leftOut.push(file.path);
+  }
   const typeOf = new Map<string, string>();
   const exported: { entity: Entity; data: JsonObject; searched: string[] | undefined }[] = [];
 
-  for (const file of readable) {
+  for (const file of valid) {
     const data = file.data;
     const type = KIND_TYPES[String(data.kind)];
     if (!type) throw new ExportMappingError(`No type is declared for the record kind ${String(data.kind)}.`);
@@ -369,7 +412,7 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
     typeOf.set(key, type);
     const entity: Entity = { type, key, properties: {} };
     const searched = SEARCHED_TYPES.includes(type) ? [] as string[] : undefined;
-    walker.walk(entity, type, releasable(data, excess, (reason) => walker.omitted.add(type, reason)), {
+    walker.walk(entity, type, releasable(data, excess, checked, (reason) => walker.omitted.add(type, reason)), {
       path: [], refPath: String(data.kind), order: [], searched, top: true,
     });
     if (searched && type === "Source") searched.push(...citationKeys(data), ...agentWords(corpus, data));
@@ -377,7 +420,7 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
   }
   for (const { entity, searched } of walker.entries) exported.push({ entity, data: {}, searched });
   const entryData = new Map<string, JsonObject>();
-  for (const file of readable.filter((f) => !isRetired(f.data))) {
+  for (const file of valid.filter((f) => !isRetired(f.data))) {
     for (const [field, spec] of Object.entries(TYPES[KIND_TYPES[String(file.data.kind)]!]!)) {
       if (typeof spec.type !== "object" || !ENTRY_TYPES.includes(spec.type.value)) continue;
       for (const one of (Array.isArray(file.data[field]) ? file.data[field] : []).filter(isObject)) {
@@ -415,9 +458,10 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
     const entry = link.targetId.includes("\0") ? link.targetId.split("\0") as [string, string] : undefined;
     const target = entry ? entry[1] : link.targetId;
     const targetType = entry ? entry[0] : typeOf.get(target);
-    if (!targetType || !present.has(`${targetType}\0${target}`)) {
+    const wrongKind = targetType !== undefined && link.allowed !== undefined && !link.allowed.some((kind) => KIND_TYPES[kind] === targetType);
+    if (!targetType || wrongKind || !present.has(`${targetType}\0${target}`)) {
       const file = corpus.byId.get(target);
-      const reason = file?.data && isRetired(file.data) ? "target_retired" : "target_not_exported";
+      const reason = wrongKind ? "target_wrong_kind" : file?.data && isRetired(file.data) ? "target_retired" : "target_not_exported";
       droppedTally.add(`${lower(link.sourceType)}.${link.path.join(".")}`, reason);
       continue;
     }
@@ -449,6 +493,21 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
       records: [...excess].sort(compareCodePoints),
     });
   }
+  if (leftOut.length > 0) {
+    warnings.push({
+      code: "records_left_out",
+      message: `${leftOut.length} file(s) are not in this graph, nor are links to them, because they could not be read, do not belong where they are, or break a record rule. The graph is incomplete. Run \`check\` to see what is wrong with each and how to fix it, then export again.`,
+      records: leftOut.sort(compareCodePoints),
+    });
+  }
+  const broken = valid.filter((f) => !isRetired(f.data) && f.problems.some((p) => p.reason === "reference_dangling" && !p.field.startsWith("/legacy/")));
+  if (broken.length > 0) {
+    warnings.push({
+      code: "broken_references",
+      message: `${broken.length} record(s) name a record that is missing or of the wrong kind. They are in this graph without those links. Run \`check\` to see each one, then point it at the right record or remove the reference.`,
+      records: broken.map((f) => idOf(f)!).sort(compareCodePoints),
+    });
+  }
   return {
     entities, links, types, relationships: declared, properties: walker.properties,
     omissions: walker.omitted.list().map(([type, reason, count]) => ({ type, reason, count })),
@@ -461,7 +520,7 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
 function agentWords(corpus: Corpus, source: JsonObject): string[] {
   return (Array.isArray(source.contributions) ? source.contributions : []).filter(isObject).flatMap((entry) => {
     const file = typeof entry.agent === "string" ? corpus.byId.get(entry.agent) : undefined;
-    if (!file?.data || file.data.kind !== "agent" || isRetired(file.data)) return [];
+    if (!file?.data || file.data.kind !== "agent" || isRetired(file.data) || file.problems.some((p) => p.reason === "record_invalid")) return [];
     const variants = (Array.isArray(file.data.variants) ? file.data.variants : []).filter(isObject).map((v) => String(v.value));
     const name = isObject(file.data.name) ? Object.values(file.data.name).map(String) : [];
     return [...name, ...variants].filter((w) => !LOCAL_PATH.test(w));

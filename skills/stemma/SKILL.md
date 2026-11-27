@@ -250,6 +250,13 @@ with the data identity it prints. The page shows the same one.
   it; the default under `build/` is ignored by git.
 - It does not hold source pages, manuscript files or research notes. Pass on the
   command's warnings and what it says was left out.
+- Bad records do not stop an export. A file that cannot be read or breaks a
+  record rule is left out whole, and a broken reference gives no link. The
+  command exits 1 and names them: say the graph is incomplete, and use `check`
+  to explain each.
+- The command refuses a directory that holds a file with an export's name that
+  is not from an earlier export. Choose another `--out`; do not delete the
+  author's file unasked.
 - A record with no state has not been shown to be clear. Run `check` for
   findings. Support results shown there are recorded model judgments, not
   verification.

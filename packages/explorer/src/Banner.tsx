@@ -22,7 +22,8 @@ export function Banner({ data }: { data: BannerData }) {
       </p>
       {data.warnings.map((warning) => (
         <p key={warning.code} role="note">
-          <strong>Warning ({warning.code}).</strong> {warning.message} {warning.records.join(", ")}
+          <strong>Warning ({warning.code}).</strong> {warning.message} {warning.records.slice(0, 20).join(", ")}
+          {warning.records.length > 20 ? ` and ${warning.records.length - 20} more, listed in the export manifest` : ""}
         </p>
       ))}
       <details>
