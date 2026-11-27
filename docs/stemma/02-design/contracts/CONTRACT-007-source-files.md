@@ -23,7 +23,7 @@ ddx:
 **Contract ID**: CONTRACT-007
 **Type**: schema (text format)
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-010, FR-6, FR-8, FR-9, FR-10, FR-29, FR-84 to FR-89, FR-98
+**Related**: ADR-010, FR-6, FR-8, FR-9, FR-10, FR-29, FR-84 to FR-89, FR-98, FR-104
 
 ## Purpose
 
@@ -259,7 +259,7 @@ joined the same way. Each offset range maps back to the parts it lies in.
   never edits.
 - A source file is retired, never deleted by a command (CONTRACT-001 C).
 
-**Text that is not here (FR-98).** A copy of a project may hold a source file's
+**Text that is not here (FR-104).** A copy of a project may hold a source file's
 manifest and none of its parts, for example because the author does not commit
 that text. This is the case **text not held** when the manifest is sound, it
 lists at least one part, every listed part file is absent, and no other rule of

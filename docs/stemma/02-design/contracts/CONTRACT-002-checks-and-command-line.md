@@ -19,7 +19,7 @@ ddx:
 **Contract ID**: CONTRACT-002
 **Type**: CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93, FR-98
+**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93, FR-98, FR-104
 
 ## Purpose
 
@@ -202,7 +202,7 @@ is printed for a command's first reading only.
   Windows the bound is untested; where a system does not report that the
   process was killed, the command still stops, with exit 70.
 
-### B2. Locations and text that is not held (FR-98)
+### B2. Locations and text that is not held (FR-98, FR-104)
 
 **Where `ingest` looks.** First by hash in `.stemma/originals/` and in the files
 and folders named with `--originals`, which needs no request; this is how a
@@ -372,7 +372,7 @@ was complete when it was made into a file. `source.original` emits a result for 
 whose source has upstream records or that has a comparison run of its original.
 A source file that does not pass `source.pages` is not used by other checks.
 
-**Text that is not held** (FR-98; CONTRACT-007 H). When every listed part of a
+**Text that is not held** (FR-104; CONTRACT-007 H). When every listed part of a
 source file is absent and its manifest is sound, `source.pages` gives one result
 for the source file, `unverifiable` with `not_held`, not one failure for each
 part. It says how many passages and citation records were taken from that text. It is never a pass and is not called damage. It names the command that

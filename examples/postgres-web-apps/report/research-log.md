@@ -38,4 +38,4 @@ The model chose candidate sources from what it already knew of the subject, then
 - No command brings back converted text that is deliberately left out of the repository. `tools/restore-text.ts`, a script of this project, does it with `stemma ingest --fetch` in a throwaway project and compares digests.
 - A project cannot say that a text is deliberately not held. In a copy without it, checks report a damaged source file and advise restoring it from git.
 
-The last two items were so when the report was made. Stemma has since changed (FR-98): `ingest --fetch` writes such text again, `check` reports it as not held here, and the script was removed. The project's README says how.
+The last two items were so when the report was made. Stemma has since changed (FR-104): `ingest --fetch` writes such text again, `check` reports it as not held here, and the script was removed. The project's README says how.

@@ -1,4 +1,4 @@
-// Writing again the text of a source file whose parts are not here (FR-98;
+// Writing again the text of a source file whose parts are not here (FR-104;
 // CONTRACT-007 H). The committed manifest is the authority: parts are written
 // only when a conversion gives exactly the files it lists, each with its
 // recorded digest. Otherwise nothing is written. What is converted is the

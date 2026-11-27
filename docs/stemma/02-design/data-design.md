@@ -84,7 +84,7 @@ An export is never edited or read back.
   copy is recorded. A location's bytes count only when their digest is the
   original's.
 - A copy of a project may hold a source file's manifest without its parts. That
-  text is "not held": checks say they could not check what rests on it
+  text is "not held" (FR-104): checks say they could not check what rests on it
   (CONTRACT-002 C), and `ingest` writes the parts again from the original only
   when every part has its recorded digest (CONTRACT-007 H).
 - Verifying against an original is optional. Given the file, by path or from the

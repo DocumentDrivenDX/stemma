@@ -1,5 +1,5 @@
 // Several places an original can be had from, and text that a copy of a project
-// does not hold (FR-98; CONTRACT-001 G, CONTRACT-002 B2 and C, CONTRACT-007 H).
+// does not hold (FR-98, FR-104; CONTRACT-001 G, CONTRACT-002 B2 and C, CONTRACT-007 H).
 // Every source is invented. Nothing uses the network: where a request would be
 // made, `fetch` is replaced and the command runs in this process, with addresses
 // written as numbers so that no name is looked up.
@@ -227,7 +227,7 @@ describe("locations of an original (FR-98)", () => {
   });
 });
 
-describe("text that is not held (FR-98)", () => {
+describe("text that is not held (FR-104)", () => {
   /** The page project with a passage and a citation of it. */
   function cited() {
     const made = page();

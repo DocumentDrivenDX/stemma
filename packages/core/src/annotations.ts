@@ -13,7 +13,7 @@ import { grouped } from "./corpus-index.ts";
 
 /** Facts that keep a project from being checked clean: they can be explained, not dismissed. */
 const NOT_DISMISSIBLE = new Set(["source.held", "record.valid", "build.uncommitted"]);
-/** A project with text that is not here is never checked clean (FR-98), so that finding cannot be dismissed either. */
+/** A project with text that is not here is never checked clean (FR-104), so that finding cannot be dismissed either. */
 const dismissible = (found: Result): boolean => !NOT_DISMISSIBLE.has(found.check) && !(found.check === "source.pages" && found.reason_code === "not_held");
 
 /** What a note on this finding binds to, copied from the finding and never from a caller. */
