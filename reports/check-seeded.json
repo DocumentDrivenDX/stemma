@@ -119,10 +119,6 @@
         "reason": "input_absent"
       },
       {
-        "check": "source.held",
-        "reason": "not_implemented"
-      },
-      {
         "check": "support.current",
         "reason": "input_absent"
       },
@@ -737,6 +733,51 @@
           "Point the reference at the right record, or remove it."
         ],
         "why": "The link between your evidence and its source is broken, so anything relying on it cannot be traced."
+      },
+      {
+        "annotations": [],
+        "check": "source.held",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "citation_file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          },
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          }
+        ],
+        "finding_key": "895b2a0166db30671baab84bc98c6605db838c137a79e16455de3770a7635299",
+        "fixes": [
+          "add_copy",
+          "remove_citation"
+        ],
+        "item": {
+          "content_sha256": "ef727f0a8ba832a8b68e81893791d02f2ce8e755393c0bfd54ce0dfb4ab3fcab",
+          "record": "cit-fixture0good00001"
+        },
+        "message": "A cited source has no stored copy, so this citation is unchecked.",
+        "open": true,
+        "outcome": "fail",
+        "reason_code": "no_copy",
+        "rules": [],
+        "sentence": {
+          "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
+          "text": "The invented town charged a toll at its harbour."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "cit-fixture0good00001",
+        "suggestions": [
+          "Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."
+        ],
+        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked."
       }
     ],
     "scope": "all",
@@ -744,9 +785,9 @@
       "confirmed": 0,
       "could_not_check": 1,
       "dismissed": 0,
-      "fail": 8,
-      "not_implemented": 3,
-      "open": 9,
+      "fail": 9,
+      "not_implemented": 2,
+      "open": 10,
       "pass": 14,
       "unreviewed": 0,
       "unverifiable": 1

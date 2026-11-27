@@ -167,7 +167,7 @@
           "content_sha256": "87f2475ea978d46c83c1f52596b70887f50c62904e039a6f72c5a063aae34d92",
           "record": "src-fixture0harbour01"
         },
-        "message": "Whether a listed source is cited could not be checked: this version cannot yet read the files in manuscript/.",
+        "message": "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
         "open": true,
         "outcome": "unverifiable",
         "reason_code": "manuscript_not_read",
@@ -175,7 +175,7 @@
         "source": "src-fixture0harbour01",
         "subject": "src-fixture0harbour01",
         "suggestions": [
-          "Nothing to fix in your files. Check this entry by hand until Stemma reads manuscripts."
+          "Nothing to fix in your files. Check this entry by hand."
         ],
         "why": "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way."
       },

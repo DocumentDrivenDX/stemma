@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Install the Stemma plugin, then ask Claude in plain words.">
+<title>Install and ask Claude | Stemma</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="border-b border-line bg-surface">
+<div class="mx-auto max-w-4xl px-4 py-3">
+<a class="inline-flex items-center gap-2 font-serif text-xl font-semibold text-ink no-underline" href="index.html"><img src="mark.svg" alt="" width="28" height="28">Stemma</a>
+<nav aria-label="Main"><ul class="nav mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0 text-sm"><li><a href="index.html">What Stemma is</a></li><li><a href="principles.html">Principles</a></li><li><a href="install.html" aria-current="page">Install and ask</a></li><li><a href="checks.html">Checks</a></li><li><a href="examples.html">Examples</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="design.html">Design</a></li></ul></nav>
+</div>
+</header>
+<main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
+<h1>Install and ask Claude</h1>
+<p class="lead">Installing the plugin is the only installation there is. The plugin and Claude set up everything else themselves.</p>
+<p class="note">Stemma is not published to a marketplace, so this page gives no install command. Installation through the plugin's marketplace entry has been tried with the Claude command-line tool on one Mac, using a local stand-in for the distribution repository. The Claude desktop app, Windows and Linux are untested.</p>
+<h2>What happens on first use</h2>
+<p>Claude fetches a pinned copy of the Bun runtime from the npm registry, checks it against a digest shipped in the plugin, and keeps it in the plugin's own data directory. It changes no system or shell setting, and Claude's usual permission prompts apply. If setup fails or you decline it, Claude says that nothing was checked, and your writing carries on.</p>
+<h2>What to ask Claude</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Requests"><table><thead><tr><th scope="col">You ask</th><th scope="col">Stemma does</th></tr></thead><tbody><tr><td>&ldquo;Start a Stemma project in this folder.&rdquo;</td><td>Creates the project files and overwrites nothing.</td></tr><tr><td>&ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</td><td>Writes a record of the work. Claude says where each detail came from.</td></tr><tr><td>&ldquo;Keep this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</td><td>Stores the file in a private store outside the project, with its digest, origin and the time you got it.</td></tr><tr><td>&ldquo;Attach the text of that copy, with its page breaks.&rdquo;</td><td>Saves a plain-text file, or a text layer for a PDF or scan, page by page. A page gets a printed number only from stated evidence.</td></tr><tr><td>&ldquo;Record the citations in this chapter.&rdquo;</td><td>Writes one record for each citation, with its sentence and page.</td></tr><tr><td>&ldquo;Check the project and explain what is open.&rdquo;</td><td>Runs the checks and explains each finding in plain language.</td></tr><tr><td>&ldquo;Is anything missing from my source store?&rdquo;</td><td>Names every stored file that is missing or has changed.</td></tr></tbody></table></div>
+<p class="note">The commands behind these requests are tested. A live Claude session following the plugin's skill has not been tested.</p>
+<h2>Your copies stay yours</h2>
+<p>Copies of sources and their text go to a private store outside your project, never into it. Backing that store up is your job. Stemma is for material that may be sent to a language model: it holds back no individual source.</p>
+</main>
+<footer class="border-t border-line">
+<div class="mx-auto max-w-4xl px-4 py-5 text-sm text-muted">Stemma is pre-release, MIT licensed, and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</div>
+</footer>
+</body>
+</html>
