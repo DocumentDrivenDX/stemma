@@ -23,7 +23,8 @@
 #   ./scripts/dev.sh browsers      fetch the pinned headless Chromium into .tools/
 #   ./scripts/dev.sh e2e           build the website and run the Playwright tests
 #   ./scripts/dev.sh publish-plugin <dir>  build, then copy the plugin into a
-#                                  checkout of DocumentDrivenDX/plugins (no push)
+#                                  checkout of DocumentDrivenDX/plugins (no push);
+#                                  a pushed v<version> tag runs this and pushes
 set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"

@@ -1,0 +1,59 @@
+# Publishes the plugin to the DocumentDrivenDX/plugins marketplace when a
+# release tag v<version> is pushed (SD-010). It checks no pull request or branch
+# and nothing waits on it (ADR-007).
+#
+# It pushes as a GitHub App installed only on DocumentDrivenDX/plugins, with
+# Contents read and write. It needs the app's client ID in the variable
+# PLUGINS_APP_CLIENT_ID and its private key in the secret
+# PLUGINS_APP_PRIVATE_KEY.
+name: publish
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+concurrency:
+  group: publish-plugin
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: The tag names the manifest's version
+        run: |
+          version=$(jq -r .version .claude-plugin/plugin.json)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match plugin version $version."
+            exit 1
+          fi
+      - uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        id: app
+        with:
+          client-id: ${{ vars.PLUGINS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.PLUGINS_APP_PRIVATE_KEY }}
+          owner: DocumentDrivenDX
+          repositories: plugins
+          permission-contents: write
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DocumentDrivenDX/plugins
+          token: ${{ steps.app.outputs.token }}
+          path: .tools/marketplace
+      - name: Build and copy into the marketplace
+        run: ./scripts/dev.sh publish-plugin "$GITHUB_WORKSPACE/.tools/marketplace"
+      - name: Commit and push
+        working-directory: .tools/marketplace
+        run: |
+          git add --all --force plugins/stemma
+          if git diff --cached --quiet; then
+            echo "This version is already published."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Publish stemma ${GITHUB_REF_NAME#v}" \
+              -m "Built from $GITHUB_REPOSITORY@$GITHUB_SHA"
+          git push origin HEAD:main
