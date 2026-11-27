@@ -7,7 +7,7 @@ import { isCapitalWord, isConnector, isInitials, isName, isParticle, MONTHS, SEN
 
 export type Layout = "after_authors" | "near_end";
 export type UnreadReason = "no_year" | "authors" | "year_place" | "repeated_author" | "several_entries";
-export type EntryFlag = "line_break" | "several_entries" | "continuation" | "bracketed_note";
+export type EntryFlag = "line_break" | "several_entries" | "continuation" | "bracketed_note" | "long_surname_form";
 
 export interface Authors {
   /** Family names in order. A whole name is the only element. */
@@ -376,6 +376,8 @@ export function readReferenceLists(document: Document): ReferenceList[] {
     if (reading.status === "unread" && reading.why === "several_entries") flags.push("several_entries");
     if (reading.status === "unread" && previous && continues(paragraph.text)) flags.push("continuation");
     if (BRACKETED_NOTE.test(paragraph.text)) flags.push("bracketed_note");
+    // Two authors with no separator can read as one with several longer surname forms.
+    if (reading.status === "read" && Object.values(reading.longer ?? {}).some((forms) => forms.length > 1)) flags.push("long_surname_form");
     let couldBe = paragraph.text;
     // A wrapped line that adds a name or a year is read with the line before it.
     if (flags.includes("continuation") && addsToEntry(paragraph.text)) couldBe = `${previous!.asFound} ${paragraph.text}`;

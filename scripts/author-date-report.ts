@@ -13,7 +13,7 @@ import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Element, find, localName, textOf, tree } from "../packages/extract/src/markup.ts";
 import { readZip } from "../packages/extract/src/zip.ts";
-import { type AuthorDateResult, type Document, type Location, matchAuthorDate, type Paragraph, yearForms } from "../packages/intake/src/index.ts";
+import { type AuthorDateResult, type Document, type EntryFlag, type Location, matchAuthorDate, type Paragraph, yearForms } from "../packages/intake/src/index.ts";
 
 export const COVERAGE = [
   "Read: body text, headings, tables, footnotes, and endnotes, with insertions applied and tracked deletions and moved-from text left out.",
@@ -161,16 +161,19 @@ export function docxDocument(file: string, bytes: Uint8Array): { document: Docum
   };
 }
 
-/** Linked items that carry a working marker, and the entries with a bracketed note and how many items link to each. */
+/** Linked items that carry a working marker, and the flagged entries to look at, with how many items link to each. */
 export function linkedAside(result: AuthorDateResult) {
   const linked = result.brackets.flatMap((bracket) => (bracket.state === "unlinked" ? [] : bracket.items.flatMap((item) =>
     (item.state === "linked" ? [{ bracket, item }] : []))));
+  const flagged = (flag: EntryFlag) => result.lists.flatMap((list) => list.entries.filter((e) => e.flags.includes(flag)).map((e) => ({
+    file: list.file, paragraph: e.paragraph, asFound: e.asFound, status: e.status,
+    ...(flag === "long_surname_form" && e.status === "read" ? { authors: e.authors, longer: e.longer } : {}),
+    linkedItems: linked.filter(({ item }) => item.entry.file === list.file && item.entry.paragraph === e.paragraph).length,
+  })));
   return {
     marked: linked.filter(({ item }) => item.marker !== undefined),
-    noted: result.lists.flatMap((list) => list.entries.filter((e) => e.flags.includes("bracketed_note")).map((e) => ({
-      file: list.file, paragraph: e.paragraph, asFound: e.asFound, status: e.status,
-      linkedItems: linked.filter(({ item }) => item.entry.file === list.file && item.entry.paragraph === e.paragraph).length,
-    }))),
+    noted: flagged("bracketed_note"),
+    longSurnames: flagged("long_surname_form"),
   };
 }
 
@@ -198,6 +201,8 @@ export function report(inputs: { file: string; bytes: Uint8Array }[]): { text: s
       return { ...place, item };
     }),
     entriesWithBracketedNote: aside.noted,
+    // Two authors run together can look like one long surname.
+    entriesWithLongSurnameForm: aside.longSurnames,
     unpairedBrackets: result.unpaired.map(placed),
     lists: result.lists.map((l) => ({
       ...l, startText: documents.get(l.file)!.paragraphs[l.start]!.text,
@@ -251,6 +256,7 @@ if (import.meta.main) {
     `citation items: linked ${counts.items.linked}, unresolved ${counts.items.unresolved} ${JSON.stringify(counts.items.unresolvedByReason)}`,
     `linked citation items with a working marker ${aside.marked.length}`,
     `entries with a bracketed note ${aside.noted.length}, citation items linked to them ${aside.noted.reduce((n, e) => n + e.linkedItems, 0)}`,
+    `entries with a long surname form to look at ${aside.longSurnames.length}, citation items linked to them ${aside.longSurnames.reduce((n, e) => n + e.linkedItems, 0)}`,
     `unpaired brackets before a year ${made.result.unpaired.length}`,
     ...Object.values(made.coverage).map((c, i) => `file ${i + 1} not fully read: ${JSON.stringify(c)}`),
     "Limits:", ...COVERAGE.map((l) => `- ${l}`),

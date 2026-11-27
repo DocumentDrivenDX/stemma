@@ -206,6 +206,25 @@ describe("US-113-AC1: reference entries", () => {
     expect(one(entries, "(Adair 2017)")).toEqual([`(Adair 2017) => linked ${entries[0]}`]);
   });
 
+  test("an entry whose later author may have a surname of three or more words is flagged, and its links stand", () => {
+    const entries = [
+      // Two authors with no separator between them.
+      "Rowe, Alden, and Bea Stone Cy Field. 2001. Fords.",
+      "Rowe, Alden, Bea Mary Lee Stone, and Cy Teal. 2002. Fords.",
+      "Rowe, Alden, and Bea Lee Stone. 2003. Fords.",
+      "Rowe, Alden, and Bea Lee van Stone. 2004. Fords.",
+      "Rowe, Alden Mary Lee. 2005. Fords.",
+      // A stated limit: with fewer words, two authors run together are not flagged.
+      "Rowe, Alden, and Stone Cy Field. 2006. Fords.",
+      // An unread entry has no authors to look at.
+      "Rowe, Alden, and Bea Mary Lee Stone. Fords.",
+    ];
+    expect(readReferenceLists(chapter(entries))[0]!.entries.map((e) => e.flags)).toEqual([
+      ["long_surname_form"], ["long_surname_form"], [], [], [], [], [],
+    ]);
+    expect(one(entries, "(Rowe and Field 2001)")).toEqual([`(Rowe and Field 2001) => linked ${entries[0]}`]);
+  });
+
   test("keeps each entry as found, reports starts, subheadings, flags, and where a list ends", () => {
     const wrapped = "Corso, L. 2001. Locks. https://example.org/\nlocks";
     const lists = readReferenceLists(doc("a.docx",

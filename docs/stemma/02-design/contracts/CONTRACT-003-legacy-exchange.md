@@ -343,6 +343,13 @@ form, a lead-in, or an entry layout makes a new profile version.
    than a note that begins `accessed`, `last accessed`, or `retrieved`, is
    flagged `bracketed_note`. The flag changes no reading and no link. A link to
    such an entry identifies it and verifies nothing, whatever the note says.
+
+   A read entry is flagged `long_surname_form` where some later author keeps two
+   or more longer forms of a family name (item 3), so that three or more
+   written-out words could be one name. Two authors with no separator between
+   them can look like this. The flag changes no reading and no link, and asks
+   for a look at the entry: many flagged names are right, and two authors run
+   together with fewer words are not flagged.
 3. The profile reads authors' family names in order, the year, and any
    one-letter year suffix, in two layouts: the year directly after the authors,
    and the year near the end of the entry. An entry whose authors or year cannot
@@ -545,7 +552,7 @@ add up to the number examined. An unresolved citation fails `cite.key` and so is
 open. A left-unlinked item is not a finding and does not affect the label; the
 report says so. The report also lists, apart from the counts, the linked
 citations that carry a working marker, and the entries flagged `bracketed_note`
-with the number of citation items linked to each.
+or `long_surname_form` with the number of citation items linked to each.
 
 ## Precedence and Compatibility
 
