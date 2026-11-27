@@ -175,8 +175,10 @@ async function checkBrowse(): Promise<void> {
   }
   const boot = await post("/api/boot", {}, secret);
   if (boot.json.data_identity !== info.data_identity || boot.json.result.manuscript_state !== "read") fail("the installed copy served no data");
-  const search = await post("/api/query", { module: "stemma", query: 'query { _search(text: "subsid", limit: 5) { hits { type key } } }' }, secret);
-  if (!(search.json.result?.data?._search?.hits?.length > 0)) fail("arras in the installed copy answered no search");
+  const read = await post("/api/query", { module: "stemma", query: "query { sourceList(limit: 5) { items { key } } }" }, secret);
+  if (!(read.json.result?.data?.sourceList?.items?.length > 0)) fail("arras in the installed copy answered no read");
+  const search = await post("/api/search", { text: "subsid", offset: 0, limit: 5 }, secret);
+  if (!(search.json.result?.hits?.length === 5 && search.json.result.total > 5)) fail("the installed copy answered no search");
   const manuscript = (await post("/api/manuscript", {}, secret)).json.result;
   const passage = (Object.values(manuscript.quotations)[0] as any).view.passages[0].passage as string;
   const view = (await post("/api/source-view", { id: passage }, secret)).json.result;
