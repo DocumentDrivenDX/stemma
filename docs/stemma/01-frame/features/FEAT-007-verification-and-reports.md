@@ -20,7 +20,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 7. Verification and reports
-**Covered PRD Requirements**: FR-29, FR-30, FR-31, FR-32, FR-33, FR-34, FR-52, FR-53, FR-54, FR-74
+**Covered PRD Requirements**: FR-29, FR-30, FR-31, FR-32, FR-33, FR-34, FR-52, FR-53, FR-54, FR-74, FR-107
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -94,6 +94,14 @@ CHK-16 (FR-29, P0, M1). A quotation or note extract must pass only when it match
 CHK-17 (FR-29, P0, M1). Any other near match must be reported with both texts until it is fixed or the author dismisses it under EXC-01.
 
 CHK-18 (FR-30, P0, M1). A source detail that the copy's title page text does not show must be corroborated from independently recorded evidence where there is any, and otherwise reported as coverage that is not open; a contradiction must be reported as a failure until fixed or dismissed. A model's reading must not count as that evidence. A person may record a review naming the title page or equivalent checked and what it shows, which must then be shown as confirmed by the author, not verified. Reaching checked clean must not require such a review.
+
+#### Technical text
+
+TCH-01 (FR-107, FR-29, P0, M1). The figure check of CHK-07 must not take a software version, a section or standard number, or another identifier for a figure to find in the cited source. It must do so by a stated rule, and the report must say what it left out. **Not built.**
+
+TCH-02 (FR-107, FR-29, P0, M1). In a quotation of preformatted text, line breaks, indentation, and spacing, apart from the style of line ending, must not count as the harmless differences of CHK-16. **Not built.**
+
+TCH-03 (FR-107, CHK-04, P0, M1). Bibliographic details of a web page must be corroborated from what the page states about itself, not from its navigation or a title shared by the whole site. A detail it does not show is coverage; a contradiction is a finding (CHK-18). **Not built.**
 
 #### Claim support
 
@@ -192,6 +200,7 @@ FBK-06 (FR-74, P0, M1). A finding without an explanation, a repeat that adds not
 - **Saved report or result edited by hand**: The build recomputes scripted results.
 - **Support verdict or annotation edited by hand**: A well-formed altered verdict, review mark, or annotation passes undetected. Stemma states this limit (ADR-003).
 - **Resolver unavailable or contradictory**: Show what was returned, with query and date; an absent result is unverifiable.
+- **Source text not held in this copy**: Items that need it are could not check, grouped by source, and never a pass (FR-104, FEAT-002 HLD-01).
 - **Quotation that cannot be string-matched**: A translation or unextractable text is unverifiable, not pass.
 - **Support check cannot run**: No support record is created, so the claim's record is reported missing.
 - **Draft build**: It completes with its report; FEAT-008 watermarks it (FR-39).
@@ -217,7 +226,7 @@ FBK-06 (FR-74, P0, M1). A finding without an explanation, a repeat that adds not
 
 - **Other features**: FEAT-002 corpus; FEAT-011 records; FEAT-003 records, keys, and uncited entries; FEAT-005 notes, claims, and constructs; FEAT-001 rule identifiers and inputs; FEAT-008 builds and watermark; FEAT-009 disclosure; FEAT-015 takeover; FEAT-010 command line without an AI (FR-49).
 - **External services**: Optional DOI and bibliographic metadata resolvers; a model reached through the agent host for support judgments. Check results, reports, support records, and annotations need Contract artifacts.
-- **PRD requirements**: FR-29 to FR-34, FR-52 to FR-54, FR-74 (all P0, M1, except CHK-08 in M2).
+- **PRD requirements**: FR-29 to FR-34, FR-52 to FR-54, FR-74, FR-107 (all P0, M1, except CHK-08 in M2).
 
 ## Out of Scope
 

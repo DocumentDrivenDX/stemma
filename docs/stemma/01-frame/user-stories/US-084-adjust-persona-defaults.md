@@ -42,7 +42,7 @@ Personas differ in comfort with AI and field. Defaults set onboarding, explanati
 
 ## Edge Cases
 
-- **No persona chosen**: The documented default for the primary persona, the AI-fluent author, applies (assumption).
+- **No persona chosen**: The documented default for the primary persona, the technologist-researcher, applies (assumption).
 - **Checkpoints off**: Review marks and annotations still record only what the author says.
 
 ## Test Scenarios

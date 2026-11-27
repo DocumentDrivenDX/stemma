@@ -1,0 +1,57 @@
+{
+  "against": "a fresh conversion of the original with the recorded settings",
+  "created": {
+    "at": "2026-11-27T18:02:38Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "run-1a5exajj6200nmxs440e",
+  "independent": false,
+  "kind": "comparison_run",
+  "method": "reconversion",
+  "original_sha256": "0a80486df4b6714d349b15188496bc10751228ee7c478a8c802a9e88d09c86e6",
+  "pages": [
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 0,
+      "sha256": "35db1616706c00945cd6185ce8d5544871fd518faeae7ee07df1d1d9d33d1a0c",
+      "words": 35
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 1,
+      "sha256": "8ca82db9e5b3074afd66f04ffc42d23f019d6f6bf3d66ec79f2563d76c09cc71",
+      "words": 6006
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 2,
+      "sha256": "ebebfdea373032cc7667f9f73efa5cd988298d8fc899b49d267a58191b9cd388",
+      "words": 53
+    }
+  ],
+  "run": {
+    "at": "2026-11-27T18:02:38.537Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "source": "src-mfaaxnw4et2z8359btzf",
+  "text": "txt-acpq4g943waz57jbtk62",
+  "tools": [
+    {
+      "name": "stemma-convert",
+      "version": "1"
+    }
+  ]
+}

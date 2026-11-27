@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-mgvr9mf8et3kbgdfrfgt",
+  "kind": "claim",
+  "reason": "The version 18 documentation states each mechanism, and three operators’ accounts report trouble with upkeep or write capacity on large or heavily written databases. Medium, not high: nothing here measures how often ordinary applications meet these limits, the accounts are self-selected, and no other database is compared.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "thesis",
+  "schema": "stemma.record/0",
+  "text": "PostgreSQL 18 is a sound default primary datastore for a web application while the application’s writes fit comfortably on one primary server and that server’s upkeep is attended to. The limits to plan for follow from that single write primary: a process for each connection, row versions and transaction IDs that vacuum has to keep reclaiming, and replication that does not divide writes."
+}

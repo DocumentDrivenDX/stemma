@@ -2,6 +2,7 @@
 // and field paths only, never record values.
 import { type Json, type JsonObject, normalizeSentence, sha256 } from "./json.ts";
 import { isRecordId, KINDS, recordPath } from "./kinds.ts";
+import { badLocations, hasCredentials } from "./locations.ts";
 import type { PageProblem } from "./pages.ts";
 import type { FormatProblem } from "./sourcefile.ts";
 import { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generated.ts";
@@ -12,7 +13,7 @@ export type ProblemCode =
   | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "text_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
   | "number_not_integer" | "bad_size" | "bad_original" | "bad_page_label" | "bad_part" | "model_verification"
-  | "response_digest_mismatch" | "bad_address" | "bad_binding" | "note_without_passage" | FormatProblem | PageProblem;
+  | "response_digest_mismatch" | "bad_address" | "bad_binding" | "bad_location" | "note_without_passage" | FormatProblem | PageProblem;
 
 export interface Problem {
   reason: "record_invalid" | "record_misplaced" | "reference_dangling" | "unknown_field";
@@ -125,7 +126,17 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
   const size = (value: Json | undefined, field: string) => {
     if (typeof value === "number" && value < 0) problems.push(invalid("bad_size", field));
   };
-  if (record.kind === "upstream") size(record.size, "/size");
+  if (record.kind === "upstream") {
+    size(record.size, "/size");
+    if (Array.isArray(record.locations)) for (const i of badLocations(record.locations)) problems.push(invalid("bad_location", `/locations/${i}`));
+    // The retrieval address and an auxiliary file's address are asked like a location, so they hold no user name or password either.
+    if (typeof record.url === "string" && hasCredentials(record.url)) problems.push(invalid("bad_location", "/url"));
+    if (Array.isArray(record.auxiliary)) {
+      record.auxiliary.forEach((aux, i) => {
+        if (isObject(aux) && typeof aux.url === "string" && hasCredentials(aux.url)) problems.push(invalid("bad_location", `/auxiliary/${i}/url`));
+      });
+    }
+  }
   if (record.kind === "source_text" && isObject(record.original)) {
     const { form, files, description, held_at: held } = record.original;
     const list = Array.isArray(files) ? files : [];

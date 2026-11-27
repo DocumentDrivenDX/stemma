@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-mc4serk0cckhz9w73yea",
+  "intake": "parsed",
+  "key": "pgbouncer",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "29"
+  },
+  "passage": "psg-qzhjq7hes0xpa5skb8jx",
+  "quotation": "This mode breaks a few session-based features of PostgreSQL. You can use it only when the application cooperates by not using features that break.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "2c860bb7f1accab79f50fe6b22c92bf7ed5d0be268dfb4ae56cf7eaa1c2082ed",
+    "text": "In PgBouncer’s transaction mode a client holds a server connection only while a transaction lasts, and the project states the price: “This mode breaks a few session-based features of PostgreSQL. You can use it only when the application cooperates by not using features that break.”"
+  }
+}

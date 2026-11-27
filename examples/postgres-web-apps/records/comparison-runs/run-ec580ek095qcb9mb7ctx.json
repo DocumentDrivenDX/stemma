@@ -1,0 +1,89 @@
+{
+  "against": "a fresh conversion of the original with the recorded settings",
+  "created": {
+    "at": "2026-11-27T18:02:38Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "run-ec580ek095qcb9mb7ctx",
+  "independent": false,
+  "kind": "comparison_run",
+  "method": "reconversion",
+  "original_sha256": "0cbc43ae81904349f42c339fb619edaff8ac2789bf2da3d4aa908dd662b31788",
+  "pages": [
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 0,
+      "sha256": "5f57fafad5360ac8e685bbf93e5107fb9a290dcd634508e933aaf9a598a5c9dc",
+      "words": 61
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 1,
+      "sha256": "86f394d3dea7272485e0d66744005423da142ad65034af5449c0d8bbb56473fd",
+      "words": 206
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 2,
+      "sha256": "591265846ecb5b1d4cb9545a7ab0916d0a0d3763fe686e206e5718d440121389",
+      "words": 242
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 3,
+      "sha256": "371f9d6e90a15f69d7f8894332787afe35adc44ec887d2b32e2355190b7a9ad9",
+      "words": 1194
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 4,
+      "sha256": "a539053f991e8405e10cb96741b603e4a28a9c500ef5747bb1fb74da5d9bb590",
+      "words": 545
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 5,
+      "sha256": "42fc13674fb720b4b6b9cabb3ed7b26c8ba30aec2bcce1d87181c4e0f4bc60bb",
+      "words": 455
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 6,
+      "sha256": "6a31ee6f8a78568a1b6dcd5d239c87185269468cb64d9323e8939a314be0c8e0",
+      "words": 100
+    }
+  ],
+  "run": {
+    "at": "2026-11-27T18:02:38.046Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "text": "txt-r399jtz3g4qna2srbhje",
+  "tools": [
+    {
+      "name": "stemma-convert",
+      "version": "1"
+    }
+  ]
+}

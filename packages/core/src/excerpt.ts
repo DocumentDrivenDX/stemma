@@ -62,7 +62,9 @@ export function excerptPages(corpus: Corpus, source: string, range: string): Exc
   const texts = new SourceTexts(corpus);
   if (texts.idsOf(source).length === 0) throw new InvalidInput(`The source ${source} has no source file. Capture its text first.`);
   const { views } = texts.of(source);
-  if (views.length === 0) throw new InvalidInput("The source file of this source is damaged. `check` explains why.");
+  if (views.length === 0) {
+    throw new InvalidInput(texts.notHeld(texts.idsOf(source)) ? "The text of this source is not held here. `check` explains how to fetch it again." : "The source file of this source is damaged. `check` explains why.");
+  }
   const pagesFor = (view: TextView, label: string) => view.parts.filter((p) => p.label === label);
   // The newest source file that labels every requested page.
   const created = (v: TextView) => String((v.loaded.manifest.data!.created as { at?: string }).at);

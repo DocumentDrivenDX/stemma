@@ -272,6 +272,14 @@
         ]
       },
       {
+        "reason": "text_not_held",
+        "message": "A locator could not be checked: the text of this source is not in this copy of the project.",
+        "why": "Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.",
+        "suggestions": [
+          "See the source.pages finding for that source file, and fetch its text again."
+        ]
+      },
+      {
         "reason": "check_error",
         "message": "The check itself failed while running, so this was not checked.",
         "why": "This is a defect in Stemma, not a pass.",
@@ -347,6 +355,14 @@
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
         "suggestions": [
           "See the source.pages finding and repair the source file."
+        ]
+      },
+      {
+        "reason": "text_not_held",
+        "message": "The source's details could not be compared with a copy: its text is not in this copy of the project.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "See the source.pages finding for that source file, and fetch its text again."
         ]
       },
       {
@@ -709,7 +725,7 @@
         "message": "Whether what this rests on has changed could not be checked: something it depends on cannot be read.",
         "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
         "suggestions": [
-          "Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."
+          "See the record.valid and source.pages findings: repair the file, or fetch text that is not held here, then run `check` again."
         ]
       },
       {
@@ -799,6 +815,14 @@
         ]
       },
       {
+        "reason": "text_not_held",
+        "message": "The text of this cited source is not in this copy of the project, so this citation could not be checked.",
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.",
+        "suggestions": [
+          "See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have."
+        ]
+      },
+      {
         "reason": "check_error",
         "message": "The check itself failed while running, so this was not checked.",
         "why": "This is a defect in Stemma, not a pass.",
@@ -885,6 +909,14 @@
         ]
       },
       {
+        "reason": "text_not_held",
+        "message": "A source file's text is not here, so it was not compared with its original.",
+        "why": "The chain from the original to your citation rests on the source file being what the original gives.",
+        "suggestions": [
+          "See the source.pages finding for this source file."
+        ]
+      },
+      {
         "reason": "check_error",
         "message": "The check itself failed while running, so this was not checked.",
         "why": "This is a defect in Stemma, not a pass.",
@@ -899,6 +931,14 @@
     "summary": "Each source file's manifest and its page or section files must agree: none missing, extra, out of order, unreadable or edited without being sealed, and as many pages as the original has.",
     "limits": "It shows that the files are complete and unchanged, not that their text is right. The count of pages in the original is the one recorded at conversion.",
     "findings": [
+      {
+        "reason": "not_held",
+        "message": "The source's text is not held here: its manifest is present and none of its page or section files is. Nothing shows that anything is damaged.",
+        "why": "Quotations, pages and anything else that rests on this text cannot be checked in this copy of the project.",
+        "suggestions": [
+          "Fetch it again with `ingest --fetch --actor <kind>:<name>`, which asks the recorded addresses, or give a copy of the original with `ingest --originals <dir>`. The text is written only if it is exactly what the manifest records. If you keep the text elsewhere, or it was typed or recognized by another tool, copy it back."
+        ]
+      },
       {
         "reason": "part_missing",
         "message": "A page or section file that the manifest lists is missing.",

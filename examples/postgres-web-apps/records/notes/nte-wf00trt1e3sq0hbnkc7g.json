@@ -1,0 +1,24 @@
+{
+  "body": "In a research system, no version storage scheme did best everywhere: delta storage won on wide rows with one field touched, append-only did better on a TPC-C-based test. The measurements are not of PostgreSQL.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-wf00trt1e3sq0hbnkc7g",
+  "kind": "note",
+  "passages": [
+    "psg-f28qhb50tksqhqeyk4jp",
+    "psg-41w7smcqm0e270dty0dj",
+    "psg-zryxnajrv4qhqq7tvk14",
+    "psg-40dgmq759162w1dx39kf"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-h7njqhwyqcz4hesxe37z",
+  "type": "paraphrase"
+}

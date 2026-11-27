@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-3c9awc7n5hm7qxyafxae",
+  "kind": "claim",
+  "reason": "Notion and Figma say so of their own systems, and Sentry reports an outage on a write-heavy one. Three self-selected accounts cannot show how common this is or at what size it happens; Figma also names processor and input and output limits.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "On large or heavily written databases, vacuum upkeep was reported to give trouble before a single server’s size limit was reached, and was among the reasons for sharding."
+}

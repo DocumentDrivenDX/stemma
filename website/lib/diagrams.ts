@@ -20,9 +20,10 @@ const CYCLE: { name: string; who: Who[]; does: string }[] = [
 
 /** The research cycle: five steps in order, and the way back to the start. */
 export function cycle(): string {
-  return `<figure class="cycle">
+  return `<figure class="cycle plate">
 <ol aria-label="The research cycle">${CYCLE.map((s) => `<li><h3>${s.name}</h3><p class="who">${s.who.map((w, i) => (i > 0 && w === "Scripts" ? "scripts" : w)).join(" and ")}</p><p>${s.does}</p></li>`).join("")}</ol>
 <p class="cycle-return">Then go round again: a new source, a better scan, a corrected sentence. Check as often as you like.</p>
+<figcaption>This site’s drawing of one round of research. The steps are the order of work; none holds back the next.</figcaption>
 </figure>`;
 }
 
@@ -41,7 +42,7 @@ export function rounds(): string {
     ["Its text is added", "Text for a scan of the book is supplied. Nothing is open. The report says what it could not cover: nothing shows the title page, and the invented book is in no catalogue."],
   ];
   if (counts.length !== ROUNDS.length) throw new Error(`the demo now checks that project ${counts.length} times; redraw its rounds`);
-  return `<figure class="rounds">
+  return `<figure class="rounds plate">
 <ol aria-label="Three checks of the demo project, in order">${ROUNDS.map(([title, what], i) => `<li><h3>${title}</h3><dl><div><dt>Problems</dt><dd>${counts[i]!.problems}</dd></div><div><dt>Could not check</dt><dd>${counts[i]!.unchecked}</dd></div></dl><p>${what}</p></li>`).join("")}</ol>
 <figcaption>This site's drawing of three runs in the <a href="examples.html#demo">demo</a>, with the counts each run printed. All names and sources in the demo are invented.</figcaption>
 </figure>`;
@@ -49,12 +50,13 @@ export function rounds(): string {
 
 /** Where a project's material is kept, and what reaches the AI model. */
 export function places(): string {
-  return `<figure class="places">
+  return `<figure class="places plate">
 <ul aria-label="Where things are kept">
 <li><h3>Your project folder</h3><p>Plain files you can open, compare and back up like any others.</p><ul><li>The text of your sources, with its pages</li><li>A record for each source, passage and citation</li><li>Your standing rules, in <code>rules.md</code></li></ul><p>Anyone who can read the folder can read your sources, so publishing it publishes them.</p></li>
 <li><h3>Your original files</h3><p>PDFs, page images and the like stay out of the project's published files.</p><ul><li>The project notes where each came from and its digital fingerprint</li><li>Keep them to convert and compare again</li></ul></li>
 <li><h3>The AI model</h3><p>Claude is instructed to read only the pages a task needs.</p><ul><li>Stemma holds back no source: anything in a project may be sent</li><li>If something may not go to a hosted model, leave it out of the project</li></ul></li>
 </ul>
+<figcaption>This site’s drawing of where a project’s material is kept, and what reaches the model.</figcaption>
 </figure>`;
 }
 
@@ -68,7 +70,7 @@ export function pageMap(): string {
       : i === runs.length - 1 ? "No page label, including a publisher's list that has its own numbers" : "No page label",
   }));
   if (parts.length !== 3 || !parts[1]!.mapped) throw new Error("the example's page labels no longer form one run; redraw them");
-  return `<figure class="pagemap">
+  return `<figure class="pagemap plate">
 <ol aria-label="Pages of the PDF, in order">${parts.map((p) => `<li${p.mapped ? ' class="mapped"' : ""} style="flex-grow: ${p.pages}"><p><strong>${escape(p.label)}</strong></p><p>PDF pages ${p.from} to ${p.to}, counting from 0 (${p.pages} pages)</p></li>`).join("")}</ol>
 <figcaption>This site's drawing of the page labels in the book's source files, which cover a PDF of ${pages.length} pages. Widths are roughly in proportion.</figcaption>
 </figure>`;

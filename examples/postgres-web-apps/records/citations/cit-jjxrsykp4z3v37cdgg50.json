@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-jjxrsykp4z3v37cdgg50",
+  "intake": "parsed",
+  "key": "sentry2015",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "156"
+  },
+  "passage": "psg-402na0z2fkfnfnfzbxqw",
+  "quotation": "we made the decision that we were willing to risk all data in the table if it meant we could recover immediately.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "1f784ac502d24ec160c62c894d5d1bdfaaea24d919116d5914cfbe53ab7c81b3",
+    "text": "Service returned after the team emptied one very large table whose contents it could risk losing; as Cramer put it, “we made the decision that we were willing to risk all data in the table if it meant we could recover immediately.”"
+  }
+}

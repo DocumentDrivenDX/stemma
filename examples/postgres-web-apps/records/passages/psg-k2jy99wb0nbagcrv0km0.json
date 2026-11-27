@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2041,
+      "index": 11,
+      "page_sha256": "0dee6d3c8dd3fc1648f4714672cafe08a8c5eebb618eb802b5cd49077e8fd68e",
+      "start": 1860,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:29Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-k2jy99wb0nbagcrv0km0",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "1861"
+  },
+  "quote": {
+    "exact": "Our experiments show\nthat this serializable mode provides performance similar to snapshot\nisolation and considerably outperforms strict two-phase locking on\nread-intensive workloads"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-8jrmssahm9f1stb929c7",
+  "source_record_sha256": "693b0af4457995ee69d213211e8d76b6573d0421515df5536ea75b971ea708bd",
+  "text": "txt-156d9jnzqm5sp5kn4v9x"
+}

@@ -13,6 +13,8 @@ import { grouped } from "./corpus-index.ts";
 
 /** Facts that keep a project from being checked clean: they can be explained, not dismissed. */
 const NOT_DISMISSIBLE = new Set(["source.held", "record.valid", "build.uncommitted"]);
+/** A project with text that is not here is never checked clean (FR-104), so that finding cannot be dismissed either. */
+const dismissible = (found: Result): boolean => !NOT_DISMISSIBLE.has(found.check) && !(found.check === "source.pages" && found.reason_code === "not_held");
 
 /** What a note on this finding binds to, copied from the finding and never from a caller. */
 function bindingOf(corpus: Corpus, found: Result): Record<string, unknown> {
@@ -60,7 +62,7 @@ export function annotate(corpus: Corpus, results: Result[]): Result[] {
       return [{ id: idOf(file)!, effect: String(note.effect), by: `${String(by.kind)} ${String(by.name)}`, person: by.kind === "person", reason: String(note.reason) }];
     });
     if (applying.length === 0) return found;
-    const dismissed = !NOT_DISMISSIBLE.has(found.check) && applying.some((n) => n.effect === "dismiss" && n.person);
+    const dismissed = dismissible(found) && applying.some((n) => n.effect === "dismiss" && n.person);
     return { ...found, annotations: applying.map(({ person: _p, ...n }) => n), open: found.open && !dismissed };
   });
 }
@@ -81,7 +83,7 @@ export function planAnnotation(corpus: Corpus, results: Result[], request: Annot
   if (request.reason.trim() === "") throw new InvalidInput("The reason is empty.");
   if (request.effect === "dismiss") {
     if (request.actor.kind !== "person") throw new InvalidInput("Only a person can dismiss a finding. A model or script records what it found with --effect explain, and the finding stays open.");
-    if (NOT_DISMISSIBLE.has(found.check)) throw new InvalidInput(`A ${found.check} finding can be explained, not dismissed.`);
+    if (!dismissible(found)) throw new InvalidInput(`${found.reason_code === "not_held" ? "A finding that a source's text is not here" : `A ${found.check} finding`} can be explained, not dismissed.`);
   }
   const id = `${KINDS.annotation!.prefix}${request.token()}`;
   const stamp = { at: request.now.toISOString().replace(/\.\d+Z$/, "Z"), by: { ...request.actor } };

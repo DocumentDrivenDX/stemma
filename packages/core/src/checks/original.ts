@@ -28,6 +28,13 @@ export function originalResults(corpus: Corpus, tools: Record<string, string>): 
       return [result({ ...shared, outcome: "fail", reason: "original_not_upstream", locus: `${id}#upstream`, evidence: [...evidence, ...upstreams.map((u) => at("upstream_file", u.path))] })];
     }
     const upstreamWords = upstreams.length > 0 ? [meta("upstream", "the original's digest matches an upstream record")] : [];
+    if (text.notHeld) {
+      // source.pages holds the open finding; this says only that nothing was compared.
+      return [result({
+        ...shared, outcome: "unverifiable", reason: "text_not_held", locus: id, coverage: true,
+        evidence: [...evidence, ...upstreamWords, meta("coverage", "not compared with its original: its text is not here")],
+      })];
+    }
     if (runs.length === 0) {
       return [result({ ...shared, outcome: "pass", locus: id, evidence: [...evidence, ...upstreamWords, meta("fresh_conversion", "none recorded: this says nothing about the text against the original")] })];
     }

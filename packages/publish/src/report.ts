@@ -32,7 +32,9 @@ export interface ReportSpec {
 }
 
 export interface Rendered {
-  id: string; cites: string; text: string; locator: string; joined: string[]; spec: QuotationSpec;
+  id: string; cites: string; text: string; locator: string;
+  /** The kind of place the passages give, such as page or paragraph (CONTRACT-006 G). */
+  label: string; joined: string[]; spec: QuotationSpec;
   provenance: { passage: string; address: string; labelBasis: string[] }[];
 }
 export interface Note { number: number; clusters: Cluster[]; passages: string[]; inline: string[]; comment?: string; text: string }
@@ -73,6 +75,7 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
   const container = containerOf(corpus, cited);
   const pieces: string[] = [];
   const locators: string[] = [];
+  const labels = new Set<string>();
   const provenance: Rendered["provenance"] = [];
   spec.passages.forEach((segment, n) => {
     const passage = corpus.byId.get(segment.passage)?.data;
@@ -82,6 +85,10 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
     }
     const at = textAt(texts, passage);
     if (at.state === "changed") throw new ReportError(`${spec.id}: page ${at.index} of ${String(passage.text)} has changed since ${segment.passage} was captured`);
+    if (at.state === "unavailable") {
+      const why = texts.notHeld([String(passage.text)]) ? "it is not held here" : "a part of it is missing or damaged";
+      throw new ReportError(`${spec.id}: the text of ${String(passage.text)} cannot be read, so ${segment.passage} cannot be copied from it; ${why}, as \`check\` explains`);
+    }
     if (at.state !== "ok" || !isObject(passage.quote) || at.text !== passage.quote.exact) {
       throw new ReportError(`${spec.id}: the source file no longer gives the text ${segment.passage} captured`);
     }
@@ -98,6 +105,7 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
     if (n > 0) pieces.push(segment.join ?? " ");
     pieces.push(at.text);
     locators.push(String((passage.locator as JsonObject).value));
+    labels.add(String((passage.locator as JsonObject).label));
   });
   let text = pieces.join("");
   const keep = new Set(spec.keep_hyphens ?? []);
@@ -121,9 +129,12 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
     text = text.replaceAll(word, `*${word}*`);
   }
   const seen = [...new Set(locators)];
+  const [label = "page", ...others] = [...labels];
+  if (others.length > 0) throw new ReportError(`${spec.id}: its passages are located by ${[label, ...others].join(" and ")}, which one citation cannot give`);
+  if (spec.note && label !== "page") throw new ReportError(`${spec.id}: "note" marks a note on a page, and this passage is located by ${label}`);
   let locator = seen.length === 1 ? seen[0]! : pageRange(seen[0]!, seen.at(-1)!);
   if (spec.note) locator += /\d$/.test(locator) ? "n" : " n";
-  return { id: spec.id, cites: spec.cites, text, locator, joined, spec, provenance };
+  return { id: spec.id, cites: spec.cites, text, locator, label, joined, spec, provenance };
 }
 
 /**
@@ -133,8 +144,8 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
  */
 export const quotedInNote = (text: string): string => `“${text}${/[.?!]$/.test(text) ? "" : "."}”`;
 
-/** What a note's citation is made from: one quotation, with no page and no text when it cannot be built. */
-export interface Member { id: string; locator?: string; text?: string }
+/** What a note's citation is made from: one quotation, with no locator and no text when it cannot be built. A locator with no label is a page. */
+export interface Member { id: string; locator?: string; label?: string; text?: string }
 
 /**
  * The citations of one note. Each run of consecutive quotations from the same
@@ -150,12 +161,13 @@ function noteCitations(note: number, groups: { cites: string; members: Member[] 
       const before = p.text === undefined ? "" : `${quotedInNote(p.text)} `;
       const last = citations.at(-1);
       const item = last?.cluster.items[0];
-      if (last && item && p.locator !== undefined && item.key === cites && item.locator === p.locator && last.cluster.items.length === 1) {
+      const label = p.label ?? "page";
+      if (last && item && p.locator !== undefined && item.key === cites && item.locator === p.locator && item.label === label && last.cluster.items.length === 1) {
         item.before = `${item.before}${before}`;
         last.quotations.push(p.id);
       } else {
         citations.push({
-          cluster: { note, items: [{ key: cites, ...(p.locator === undefined ? {} : { label: "page", locator: p.locator }), before }] },
+          cluster: { note, items: [{ key: cites, ...(p.locator === undefined ? {} : { label, locator: p.locator }), before }] },
           quotations: [p.id],
         });
       }
@@ -165,7 +177,7 @@ function noteCitations(note: number, groups: { cites: string; members: Member[] 
 }
 
 /** The citations of one note, without the IDs of their quotations. */
-export const noteClusters = (note: number, groups: { cites: string; members: { locator: string; text: string }[] }[]): Cluster[] =>
+export const noteClusters = (note: number, groups: { cites: string; members: { locator: string; label?: string; text: string }[] }[]): Cluster[] =>
   noteCitations(note, groups.map((g) => ({ cites: g.cites, members: g.members.map((m) => ({ ...m, id: "" })) }))).map((c) => c.cluster);
 
 /** A piece of the manuscript as the template gives it. */
@@ -184,7 +196,7 @@ export interface AssembledNote {
 export interface Assembly { paragraphs: Paragraph[]; notes: AssembledNote[] }
 
 /** What the assembly needs of a quotation: the work it is cited to and, when it can be built, its page and words. */
-export type Resolve = (id: string, where: string) => { cites?: string; locator?: string; text?: string };
+export type Resolve = (id: string, where: string) => { cites?: string; locator?: string; label?: string; text?: string };
 
 /** The manuscript template as segments: the one reading of it, behind both `report.md` and the manuscript view. */
 export function assemble(manuscript: string, resolve: Resolve): Assembly {
@@ -246,7 +258,10 @@ export function assemble(manuscript: string, resolve: Resolve): Assembly {
           continue;
         }
         if (groups.at(-1)?.cites !== found.cites) groups.push({ cites: found.cites, members: [] });
-        groups.at(-1)!.members.push({ id, ...(found.locator === undefined ? {} : { locator: found.locator }), ...(found.text === undefined ? {} : { text: found.text }) });
+        groups.at(-1)!.members.push({
+          id, ...(found.locator === undefined ? {} : { locator: found.locator }), ...(found.label === undefined ? {} : { label: found.label }),
+          ...(found.text === undefined ? {} : { text: found.text }),
+        });
       }
       close();
       notes.push({
@@ -402,11 +417,12 @@ export const changesOf = (p: Rendered): string[] => [
 ];
 
 function verification(corpus: Corpus, spec: ReportSpec, notes: Note[], passages: Map<string, Rendered>, items: Record<string, unknown>): string {
+  const allPages = [...passages.values()].every((p) => p.label === "page");
   const rows = [
     "# Verification of the report’s notes", "",
     "This table is generated by `stemma build report` from the project's passage and source records and the report's quotation list (`report.json`). It is separate from the report and is not part of the publication.", "",
     ...(spec.verification?.preamble ?? []).flatMap((p) => [p, ""]),
-    "| Note | Passage | Source file, page index, characters | Printed page | How verified | Changes from the text layer |",
+    `| Note | Passage | Source file, page index, characters | ${allPages ? "Printed page" : "Place"} | How verified | Changes from the text layer |`,
     "|---|---|---|---|---|---|",
   ];
   for (const n of notes) {
@@ -415,7 +431,7 @@ function verification(corpus: Corpus, spec: ReportSpec, notes: Note[], passages:
       const p = passages.get(id)!;
       const address = p.provenance.map((pr) => `\`${pr.address}\` (record \`${pr.passage}\`)`).join("<br>");
       const changes = changesOf(p);
-      rows.push(`| ${n.number} | ${id}${n.inline.includes(id) ? " (quoted in the text)" : ""} | ${address} | ${p.locator} | ${p.spec.checked ?? "not recorded"} | ${changes.join("; ") || "none"} |`);
+      rows.push(`| ${n.number} | ${id}${n.inline.includes(id) ? " (quoted in the text)" : ""} | ${address} | ${p.label === "page" ? p.locator : `${p.label} ${p.locator}`} | ${p.spec.checked ?? "not recorded"} | ${changes.join("; ") || "none"} |`);
     }
   }
   rows.push("", "## Bibliographic details", "",

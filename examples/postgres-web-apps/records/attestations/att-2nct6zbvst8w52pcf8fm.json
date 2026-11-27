@@ -1,0 +1,18 @@
+{
+  "claim": "clm-nvh3391pmtjc8czbkcnt",
+  "created": {
+    "at": "2026-11-27T18:09:22Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "evidence": "nte-q3g0jwp9fnfgw87qh0td",
+  "id": "att-2nct6zbvst8w52pcf8fm",
+  "kind": "attestation",
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "stance": "qualifies"
+}

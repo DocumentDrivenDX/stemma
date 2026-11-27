@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-dy3688j17pdtyyf224vm",
+  "intake": "parsed",
+  "key": "pg18hot",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "16"
+  },
+  "passage": "psg-2307e9efgasgtsg2qkz7",
+  "quotation": "Specifically, updates require new versions of rows to be added to tables. This can also require new index entries for each updated row, and removal of old versions of rows and their index entries can be expensive.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "87aece1306607a45d2f4a47861022f31b06882690baa36bbe0310dfd2ec8ae1f",
+    "text": "“Specifically, updates require new versions of rows to be added to tables. This can also require new index entries for each updated row, and removal of old versions of rows and their index entries can be expensive.”"
+  }
+}

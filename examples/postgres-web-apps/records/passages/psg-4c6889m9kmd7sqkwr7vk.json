@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2394,
+      "index": 2,
+      "page_sha256": "4970d5eb2ab2073bd871aff80e02088cb12d4da8d34185a41f90097c166a34a1",
+      "start": 2219,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:02Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-4c6889m9kmd7sqkwr7vk",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "87"
+  },
+  "quote": {
+    "exact": "Our highest write tables were growing so quickly that we would soon exceed the maximum IO operations per second (IOPS) supported by Amazon’s Relational Database Service (RDS)."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "source_record_sha256": "cc1865e63cbaf1de7b62b23d9997f948a0ca290998913913f563f5f7e01556e5",
+  "text": "txt-0rfw84rtpxz3jxy7g3bn"
+}

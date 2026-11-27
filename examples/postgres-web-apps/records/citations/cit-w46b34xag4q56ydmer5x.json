@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-w46b34xag4q56ydmer5x",
+  "intake": "parsed",
+  "key": "pg18json",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "27"
+  },
+  "passage": "psg-h47f17a07mbvymw30cvf",
+  "quotation": "In general, most applications should prefer to store JSON data as jsonb",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "3cac642b0522d9c709a8dd67ce8dbefeb7c2b2cbe392ed03a752c5dc72ef6654",
+    "text": "PostgreSQL has two JSON types, and its advice favors the binary one: “In general, most applications should prefer to store JSON data as jsonb”."
+  }
+}

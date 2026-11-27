@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 19153,
+      "index": 1,
+      "page_sha256": "bb4de07b5f4ab7b5451a44fd5c1ff8fead8dbbdc47be3eaae58129ec3e317c6b",
+      "start": 18859,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-y08ps9hf6nbkc8gwnz50",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "80"
+  },
+  "quote": {
+    "exact": "PostgreSQL streaming replication is asynchronous by default. If the primary server crashes then some transactions that were committed may not have been replicated to the standby server, causing data loss. The amount of data loss is proportional to the replication delay at the time of failover."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-01n2wr6cy5qmwqd6fc3t",
+  "source_record_sha256": "245572773c61b04711fbcfe687c31a753915b24684bb6302450afc5c18782f8a",
+  "text": "txt-5qewjb0e62fyn2pycfp5"
+}

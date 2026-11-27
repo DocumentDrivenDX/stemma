@@ -1,0 +1,21 @@
+{
+  "body": "Each client connection is served by its own server process, forked for it.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-pd90f85235xyze7vw8fc",
+  "kind": "note",
+  "passages": [
+    "psg-mfrftwxvgr0q3sd5nsz8"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-4tn0091eh4cc829322kj",
+  "type": "paraphrase"
+}

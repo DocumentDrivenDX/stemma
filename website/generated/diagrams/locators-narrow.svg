@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-129 -746 258 1492" width="258" height="1492" class="lini" role="img" aria-labelledby="dgm-locators-narrow-title dgm-locators-narrow-desc">
+  <title id="dgm-locators-narrow-title">What Stemma reads, and how each is cited</title>
+  <desc id="dgm-locators-narrow-desc">6 kinds of source, from each to how a place in it is cited. Each box on the left leads to the box beside it on the right.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-157" y="-774" width="314" height="1548" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(0,-709.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">PDF paper or manual</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(0,-580.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Printed page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(0,-451.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Web page you saved</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(0,-322.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Paragraph or chapter</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,-193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">EPUB book</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(0,-64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Page where it is marked</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(0,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Word document</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(0,193.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Never a page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n9" transform="translate(0,322.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Markdown or plain text</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n10" style="stroke-width: 2" transform="translate(0,451.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Chapter or paragraph</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n11" transform="translate(0,580.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Scan or page images</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n12" style="stroke-width: 2" transform="translate(0,709.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Text you supply</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M 0 -681 L 0 -612.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-608.5 -4.5,-617.5 4.5,-617.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 0 -423 L 0 -354.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-350.5 -4.5,-359.5 4.5,-359.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 0 -165 L 0 -96.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-92.5 -4.5,-101.5 4.5,-101.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n8">
+      <path d="M 0 93 L 0 161.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,165.5 -4.5,156.5 4.5,156.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n9" data-to="visual.n10">
+      <path d="M 0 351 L 0 419.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,423.5 -4.5,414.5 4.5,414.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n11" data-to="visual.n12">
+      <path d="M 0 609 L 0 677.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,681.5 -4.5,672.5 4.5,672.5"/>
+    </g>
+  </g>
+</svg>

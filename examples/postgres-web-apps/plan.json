@@ -1,0 +1,100 @@
+{
+ "captures": [
+  {
+   "source": "src-4tn0091eh4cc829322kj",
+   "url": "https://www.postgresql.org/docs/18/tutorial-arch.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-0n87kc5wgjgwp0fxjwg0",
+   "url": "https://www.postgresql.org/docs/18/runtime-config-connection.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-seb0h7jfjxxsweary6a5",
+   "url": "https://www.postgresql.org/docs/18/routine-vacuuming.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-r7741gv5gb10aq6fv2bz",
+   "url": "https://www.postgresql.org/docs/18/storage-hot.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-01n2wr6cy5qmwqd6fc3t",
+   "url": "https://www.postgresql.org/docs/18/warm-standby.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-gf8p7mknx1fgq150x3k6",
+   "url": "https://www.postgresql.org/docs/18/different-replication-solutions.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-jzgwnaqrcsjhpegjbn7z",
+   "url": "https://www.postgresql.org/docs/18/transaction-iso.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-kvfq6m31x122sa7qgs53",
+   "url": "https://www.postgresql.org/docs/18/datatype-json.html",
+   "version": "PostgreSQL 18 documentation"
+  },
+  {
+   "source": "src-mfaaxnw4et2z8359btzf",
+   "url": "https://www.postgresql.org/docs/19/release-19.html",
+   "version": "PostgreSQL 19 documentation"
+  },
+  {
+   "source": "src-qmw5m7hjrx4a41abv94v",
+   "url": "https://www.postgresql.org/docs/release/9.6.0/",
+   "version": "PostgreSQL 9.6.0 release notes"
+  },
+  {
+   "source": "src-y7k7tzzv3s40j0p1e5tq",
+   "url": "https://www.pgbouncer.org/features.html"
+  },
+  {
+   "source": "src-8jrmssahm9f1stb929c7",
+   "url": "https://www.vldb.org/pvldb/vol5/p1850_danrkports_vldb2012.pdf",
+   "convert": {
+    "method": "text_layer",
+    "identity": {
+     "title_pages": [
+      0
+     ],
+     "basis": "A title or names, where given, are the PDF's own document information, not read from the page. The first page of the PDF was taken by a model (claude-sonnet-5-5) as the title page; no person has confirmed it"
+    }
+   }
+  },
+  {
+   "source": "src-h7njqhwyqcz4hesxe37z",
+   "url": "https://www.vldb.org/pvldb/vol10/p781-Wu.pdf",
+   "convert": {
+    "method": "text_layer",
+    "identity": {
+     "title_pages": [
+      0
+     ],
+     "basis": "A title or names, where given, are the PDF's own document information, not read from the page. The first page of the PDF was taken by a model (claude-sonnet-5-5) as the title page; no person has confirmed it"
+    }
+   }
+  },
+  {
+   "source": "src-927xc3h01n3ns1ewxfjg",
+   "url": "https://blog.sentry.io/transaction-id-wraparound-in-postgres/"
+  },
+  {
+   "source": "src-v9mg0p5d9mcmyyedvwek",
+   "url": "https://www.notion.com/blog/sharding-postgres-at-notion"
+  },
+  {
+   "source": "src-bhya83cxjbhya1bpxjg5",
+   "url": "https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/"
+  },
+  {
+   "source": "src-nen925hmc37x2yzp9231",
+   "url": "https://www.cs.cmu.edu/~pavlo/blog/2023/04/the-part-of-postgresql-we-hate-the-most.html"
+  }
+ ]
+}

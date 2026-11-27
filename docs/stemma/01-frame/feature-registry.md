@@ -11,9 +11,13 @@ ddx:
 
 # Feature Registry
 
-**Last Updated**: 2026-11-26
+**Last Updated**: 2026-11-27
 
 ## Active Features
+
+The focus is research into technical subjects (PRD summary). FR-98 to FR-108
+state what it adds; [build iterations](../04-build/build-iterations.md) says what
+is built.
 
 Each feature maps to one PRD subsystem with the same number. Feature
 specifications own the depth. The priority is the highest priority among a
@@ -22,13 +26,13 @@ feature's requirements; the PRD ranks each requirement.
 | ID | Name | Description | Priority | Owner | Source | Updated |
 |----|------|-------------|----------|-------|--------|---------|
 | FEAT-001 | Workspace and governance | Project setup, thesis, constructs and methodology inputs, standing rules, registers, AI roles | P0 | product owner | Subsystem 1: FR-1 to FR-5, FR-60 | 2026-11-26 |
-| FEAT-002 | Source corpus | Capture, conversion to source files in the repository, reverification, structure checks, comparisons and reviews, iterative capture of library details and tags, passage capture, change tracking, excerpts for hosted models | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61, FR-84 to FR-90, FR-94 | 2026-11-26 |
-| FEAT-003 | Citation store | Official bibliography records, keys, typed locators, legacy library exchange | P0 | product owner | Subsystem 3: FR-11 to FR-15 | 2026-11-26 |
+| FEAT-002 | Source corpus | Capture, conversion to source files in the repository, reverification, structure checks, comparisons and reviews, iterative capture of library details and tags, passage capture, change tracking, excerpts for hosted models, several locations per original, text not held in a copy, pinned versions, repository files, findable places, exact code and tables, a web page's own content | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61, FR-84 to FR-90, FR-94, FR-98 to FR-104 | 2026-11-27 |
+| FEAT-003 | Citation store | Official bibliography records, keys, typed locators, legacy library exchange, technical citation forms | P0 | product owner | Subsystem 3: FR-11 to FR-15, FR-106 | 2026-11-27 |
 | FEAT-004 | Research and discovery | Candidate search, the author's admission decisions, coverage log | P0 | product owner | Subsystem 4: FR-16 to FR-19 | 2026-11-26 |
-| FEAT-005 | Notes, claims, constructs | Passage-anchored notes, claim ledger and claim relations, construct register | P0 | product owner | Subsystem 5: FR-20 to FR-23, FR-80 | 2026-11-26 |
+| FEAT-005 | Notes, claims, constructs | Passage-anchored notes, claim ledger and claim relations, construct register, records behind a report in one run | P0 | product owner | Subsystem 5: FR-20 to FR-23, FR-80, FR-105 | 2026-11-27 |
 | FEAT-006 | Composition | Outline, chapter specifications, drafting from claims, rival readings | P0 | product owner | Subsystem 6: FR-24 to FR-28 | 2026-11-26 |
-| FEAT-007 | Verification and reports | Scripted checks, explained findings, claim-support records, annotations, the checked-clean label | P0 | product owner | Subsystem 7: FR-29 to FR-34, FR-52 to FR-54, FR-74 | 2026-11-26 |
-| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91, FR-96 | 2026-11-26 |
+| FEAT-007 | Verification and reports | Scripted checks, explained findings, claim-support records, annotations, the checked-clean label, reading technical text | P0 | product owner | Subsystem 7: FR-29 to FR-34, FR-52 to FR-54, FR-74, FR-107 | 2026-11-27 |
+| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF, quoted code and tables | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91, FR-96, FR-108 | 2026-11-27 |
 | FEAT-009 | Evolution, audit, review | Changelog, errata, audits, AI-use disclosure, evidence ledger, reviewer package and reviewer comments | P0 | product owner | Subsystem 9: FR-41 to FR-47, FR-79, FR-97 | 2026-11-27 |
 | FEAT-010 | Plugin, skill, and distribution | One skill with modes, command line shipped inside the plugin, self-setup of the pinned Bun, tools on three systems, desktop install on macOS and Windows, marketplace install, install tests | P0 | product owner | Subsystem 10: FR-48 to FR-51, FR-75, FR-77, FR-78 | 2026-11-26 |
 | FEAT-011 | Evidence graph and graph engine | Record files as the graph; arras-compatible TypeScript and SQLite engine, reads first | P0 | product owner | Subsystem 11: FR-62, FR-63 | 2026-11-26 |
@@ -95,8 +99,8 @@ Boundaries:
 
 | Step | Scope | Features that contribute |
 |------|-------|--------------------------|
-| M1 | Checks, takeover, and a basic PDF: the first pilot | FEAT-002, FEAT-003 (including FR-15), FEAT-005, FEAT-007, FEAT-010, FEAT-011, FEAT-015, FEAT-001 standing rules, and FEAT-008 FR-83, the FR-35 working copy, and the FR-39 reports of those builds; also the FEAT-009 evidence ledger (FR-97) |
-| M2 | New project to camera-ready PDF | FEAT-001, FEAT-004, FEAT-006, FEAT-008, FEAT-009, FEAT-014, FEAT-005 constructs and claim relations, FEAT-015 FR-82 |
+| M1 | Checks, takeover, and a basic PDF: the first pilot | FEAT-002, FEAT-003 (including FR-15), FEAT-005, FEAT-007, FEAT-010, FEAT-011, FEAT-015, FEAT-001 standing rules, and FEAT-008 FR-83, the FR-35 working copy, and the FR-39 reports of those builds; also the FEAT-009 evidence ledger (FR-97); from technical research, FEAT-002 FR-98 and FR-104 and FEAT-007 FR-107 |
+| M2 | New project to camera-ready PDF | FEAT-001, FEAT-004, FEAT-006, FEAT-008, FEAT-009, FEAT-014, FEAT-005 constructs and claim relations, FEAT-015 FR-82; from technical research, FEAT-002 FR-99 to FR-103, FEAT-003 FR-106, and FEAT-008 FR-108. FEAT-005 FR-105 is P1 |
 | M3 | Explorer and maps | FEAT-012, FEAT-013, and the FEAT-009 reviewer package with comments |
 
 ## Relevant References

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 4862,
+      "index": 7,
+      "page_sha256": "67dfac3ae09d3afe8b8b6e6efb6749ab606f6140b32b60be4042503153c5a0fb",
+      "start": 4577,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:59Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-hycxddpg12q802jx2qs6",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "88"
+  },
+  "quote": {
+    "exact": "Formerly, anti-wraparound vacuum had to visit every page of a table, even pages where there was nothing to do. Now, pages containing only already-frozen tuples are identified in the table's visibility map, and can be skipped by vacuum even when doing transaction wraparound prevention."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-qmw5m7hjrx4a41abv94v",
+  "source_record_sha256": "689ba60f6bda7cc6457acfa9affa689a8d31a0450000ffca66c12204bfc33f26",
+  "text": "txt-6gam9bvmx6dntbg13v0r"
+}

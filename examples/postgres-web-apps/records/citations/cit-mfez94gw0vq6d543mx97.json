@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-mfez94gw0vq6d543mx97",
+  "intake": "parsed",
+  "key": "wu2017",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "790"
+  },
+  "passage": "psg-zryxnajrv4qhqq7tvk14",
+  "quotation": "The results in Fig. 17a show that append-only storage achieves comparatively better performance than the other two schemes.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "71c455cd34702c46f6d3f03764862a330f275cdb1f9c3ee44d691e13b389f519",
+    "text": "In a test based on the TPC-C benchmark, “The results in Fig. 17a show that append-only storage achieves comparatively better performance than the other two schemes.”"
+  }
+}

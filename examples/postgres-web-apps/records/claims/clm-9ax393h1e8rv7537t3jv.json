@@ -1,0 +1,19 @@
+{
+  "confidence": "low",
+  "created": {
+    "at": "2026-11-27T18:09:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-9ax393h1e8rv7537t3jv",
+  "kind": "claim",
+  "reason": "Pavlo argues this and the documentation confirms parts of the mechanism. The research evidence read here is mixed and does not measure PostgreSQL, so the ranking is not established.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "rival_reading",
+  "schema": "stemma.record/0",
+  "text": "PostgreSQL’s multiversion design is the worst among widely used relational databases, so its update costs are a reason against it."
+}

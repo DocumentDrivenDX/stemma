@@ -167,7 +167,7 @@ Filtering happens before any file is written; the page does no filtering.
   when it is an absolute POSIX path of two or more segments in any directory, or
   a `~user/` path: `Original.held_at`, `Original.obtained_from`, `Upstream.url`,
   `Upstream.note` (also after the words `Obtained from: ` that Stemma writes),
-  `AuxiliaryFile.url`, `Resolution.url`, `CandidateOrigin.location`,
+  `UpstreamLocation.url`, `UpstreamLocation.label`, `AuxiliaryFile.url`, `Resolution.url`, `CandidateOrigin.location`,
   `InputDigest.input`, `GoverningRecord.identity`, `SourceChange.value` and
   `previous` and `from`, and the value of a bibliography field named `file`,
   `local-url`, `localfile`, `pdf`, or `path`. A web address is not such a path.

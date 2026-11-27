@@ -12,6 +12,8 @@ import {
 } from "@stemma/workspace";
 import { createHash } from "node:crypto";
 import { CommandError, namedFile, openCorpus, type Options, requireActor, requireProject, tools, usageError, USER_AGENT } from "./context.ts";
+import { fetchOriginal, type Other, privateLabels } from "./locate.ts";
+import { restoreText } from "./restore.ts";
 import { convertAndWrite, lookUp, reconvert } from "./sources.ts";
 
 const list = (value: unknown): JsonObject[] => (Array.isArray(value) ? value.filter(isObject) : []);
@@ -143,29 +145,45 @@ export async function ingest(options: Options, check: (options: Options) => numb
     const mine = [...corpus.texts].filter(([, t]) => t.manifest.data!.source === data.source && !isRetired(t.manifest.data!)
       && list((t.manifest.data!.original as JsonObject).files).some((f) => f.sha256 === data.sha256));
     // A current comparison need not be made again; --reconvert makes it all the same.
-    const todo = mine.map(([id, t]) => ({ id, loaded: t, standing: reconversions(corpus, id).find((r) => currentRun(r.data!, t, tools()))?.data }))
-      .filter((m) => options.reconvert || !m.standing);
-    current += mine.length - todo.length;
     const wanted = { sha256: String(data.sha256), size: Number(data.size) };
     let path = findOriginal(root, wanted, places);
-    if (!path && options.fetch && text(data.url)) {
-      try {
-        const response = await fetchBytes(String(data.url), USER_AGENT);
-        const original = asOriginal(response.bytes, new URL(String(data.url)).pathname);
-        if (original.sha256 !== wanted.sha256) say(`  ${label}: what the address gives now differs from the recorded original (sha256 ${original.sha256}). It was not used.`);
-        else path = cacheOriginal(root, original.bytes, original.sha256);
-      } catch (error) {
-        if (!(error instanceof FetchRefused)) throw error;
-        say(`  ${label}: ${error.message} Nothing was retried another way.`);
+    const others: Other[] = [];
+    const absent = mine.filter(([, t]) => t.notHeld);
+    if (!path && options.fetch) path = await fetchOriginal(root, data, label, say, absent.length > 0 ? others : undefined);
+    else if (path && absent.length > 0 && Array.isArray(data.locations)) say(`  ${label}: the recorded original is in .stemma/originals/ or a place given with --originals, so no address was asked.`);
+    // The digest was matched when the file was found; it is read as that kind of original.
+    const original = path ? { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type), name: path } : undefined;
+    // Text that is not here is written again first, so that it can then be compared like any other.
+    for (const [, loaded] of absent) {
+      const entry = entries.find((e) => e.source === data.source && text(e.url) === text(data.url));
+      if (original) {
+        say(`  ${label}: ${(await restoreText(root, loaded, original, entry, base)).said}`);
+        continue;
       }
+      // Bytes that are not the original may still hold the same text. Only the manifest's digests can say so.
+      let restored = false;
+      for (const other of others) {
+        if (mediaType(other.bytes, new URL(other.url).pathname) !== data.media_type) continue;
+        const done = await restoreText(root, loaded, { ...other, size: other.bytes.length, media_type: String(data.media_type), name: other.url }, entry, base, other.url);
+        say(`  ${label}: ${done.said}`);
+        if ((restored = done.restored)) break;
+      }
+      if (!restored) say(`  ${label}: the text of ${loaded.directory}/ is not held here, and its original was not available, so it was not restored.`);
     }
-    if (!path) {
+    const now = openCorpus(root);
+    const todo = mine.map(([id]) => {
+      const loaded = now.texts.get(id)!;
+      return { id, loaded, standing: reconversions(now, id).find((r) => currentRun(r.data!, loaded, tools()))?.data };
+    }).filter((m) => options.reconvert || !m.standing);
+    current += mine.length - todo.length;
+    if (!original) {
+      for (const privately of privateLabels(data)) say(`  ${label}: a private copy is recorded as "${privately}", and no file with the original's digest was found. Give the copy or its folder with --originals.`);
       unavailable.push(label);
       continue;
     }
-    // The digest was matched when the file was found; it is read as that kind of original.
-    const original = { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type), name: path };
     for (const { id, loaded, standing } of todo) {
+      // Already reported above.
+      if (loaded.notHeld) continue;
       if (!loaded.usable) {
         say(`  ${label}: ${loaded.directory} is damaged, so it was not compared.`);
         continue;

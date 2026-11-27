@@ -197,7 +197,8 @@ controls cover only its instructions and its own commands.
 - **SEC-012**: TIFF and EPS (Encapsulated PostScript, which is executable code)
   conversion uses a pinned converter with no network and no file access beyond
   its input and output. A hostile EPS fixture shows it.
-- **SEC-013**: A fetch by `ingest` or `resolve` accepts only HTTPS. It caps size
+- **SEC-013**: A fetch by `ingest`, `resolve`, or `source locate --fetch`
+  accepts only HTTPS. It caps size
   and time, refuses loopback, link-local, and private addresses after each
   redirect, sends only the address and a user-agent naming Stemma and its
   version, and never renders or executes what it receives. A refusal is

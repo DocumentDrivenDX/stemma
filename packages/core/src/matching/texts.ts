@@ -156,6 +156,11 @@ export class SourceTexts {
     return [...(this.bySource.get(source) ?? [])];
   }
 
+  /** Whether every one of these source files is unused only because its text is not here. */
+  notHeld(ids: string[]): boolean {
+    return ids.length > 0 && ids.every((id) => this.corpus.texts.get(id)?.notHeld === true);
+  }
+
   /** The usable views of a source, and how many source files could not be used. */
   of(source: string): { views: TextView[]; unusable: number } {
     const ids = this.idsOf(source);

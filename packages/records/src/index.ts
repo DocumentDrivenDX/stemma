@@ -8,3 +8,4 @@ export { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generate
 export * from "./validate.ts";
 export * from "./local-path.ts";
 export * from "./visible.ts";
+export * from "./locations.ts";

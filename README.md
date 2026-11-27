@@ -2,17 +2,23 @@
 
 **Create academically rigorous research reports and books.**
 
-Research and write with Claude. The Stemma plugin keeps your sources in your
-project, checks your citations and quotations against them, and explains what it
-finds in plain language. Ask in plain words; there is nothing else to set up.
+Research technical subjects with Claude: documentation for the version you name,
+release notes, papers and engineering write-ups. The Stemma plugin keeps their
+text in your project, checks your citations and quotations against it, and
+explains what it finds in plain language. Books and articles in any field work
+the same way. Ask in plain words; there is nothing else to set up.
 
 A *stemma codicum* is the family tree of a text's manuscripts: it shows which copy
 derives from which. Stemma gives your citations a line of descent back to each
 original source.
 
 Pre-release. [Read more on the website](https://documentdrivendx.github.io/stemma/),
-including [how it works](https://documentdrivendx.github.io/stemma/how.html) and a
-[worked example](https://documentdrivendx.github.io/stemma/darwin.html).
+including [how it works](https://documentdrivendx.github.io/stemma/how.html) and
+two worked examples that an AI model made and no person has reviewed:
+[PostgreSQL for web applications](https://documentdrivendx.github.io/stemma/postgres.html),
+a technical research report, and
+[Darwin and coral reefs](https://documentdrivendx.github.io/stemma/darwin.html),
+from the history of science.
 
 ## Research in rounds
 
@@ -85,6 +91,14 @@ PDFs and page images stay out of the repository.
   text layer, EPUB, HTML, DOCX, Markdown, Project Gutenberg and plain text, and
   text that you or your recognition tool supply for paper or page images. Each
   file is tied to its original by a digest, with where and when it came from.
+- Records more than one place an original can be had, such as its web address
+  and a copy in a web archive. Only a file with the recorded digest counts as
+  that original.
+- Where a copy of your project has a source's records and not its text, reports
+  the text as not held, and what could not be checked. When you ask, it fetches
+  the original again, or reads the very file recorded if you have it, and writes
+  the text only if it matches what the project recorded. A web page that has
+  changed may no longer give it.
 - Keeps one file per PDF page, or per chapter or section where there are no
   pages, with the structure marked. What cannot be determined is marked as such.
   Printed page numbers are proposed from the numbers on the pages, for review.
@@ -145,14 +159,14 @@ are not read by the checks.
 skills/stemma/    the single public skill
 packages/         the command line inside the plugin, and its libraries
 scripts/          the plugin's launcher, and tools for building the plugin
-examples/         a worked example: records and source files; no originals
+examples/         two worked examples: records and source files; no originals
 fixtures/, tests/
 website/          microsite sources and generated documentation
 docs/stemma/      Stemma's own governed documents
 ```
 
 [`website/`](website/) is a static microsite whose examples and screenshots are
-generated from real runs; recorded runs of the worked example are kept under
+generated from real runs; recorded runs of the worked examples are kept under
 `website/recorded/`. The product requirements and design are under
 [`docs/stemma/`](docs/stemma/).
 

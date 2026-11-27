@@ -387,6 +387,9 @@ export function sourceHistory(corpus: Corpus, name: string): { source: string; e
     const kind = String(data.kind);
     if (kind === "upstream") {
       add(data.created, id, `original captured: sha256 ${String(data.sha256).slice(0, 12)}, ${String(data.size)} bytes, ${String(data.media_type)}, got ${String(data.retrieved_at)}`, str(data.url) ?? str(data.note));
+      for (const location of list(data.locations)) {
+        add(location.added, id, `location recorded: ${String(location.kind)}`, str(location.url) ?? str(location.label));
+      }
     } else if (kind === "source_text") {
       const original = isObject(data.original) ? data.original : {};
       const conversion = isObject(data.conversion) ? data.conversion : {};

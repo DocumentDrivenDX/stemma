@@ -1,0 +1,23 @@
+{
+  "body": "Sentry reports a 2015 outage from transaction ID exhaustion, ended by giving up the data in one table, and states an intention to move away from SQL.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-extqq7vnr250t35kwgt0",
+  "kind": "note",
+  "passages": [
+    "psg-ck5an87zrkx8dpzzndwm",
+    "psg-402na0z2fkfnfnfzbxqw",
+    "psg-bwanpsczp20r4qyb1de4"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-927xc3h01n3ns1ewxfjg",
+  "type": "paraphrase"
+}

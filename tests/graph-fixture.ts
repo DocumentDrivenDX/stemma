@@ -75,6 +75,11 @@ function fix(record: Value, n: number): Value {
     const text = normalizeSentence(`Fixture sentence ${n}.`);
     record.sentence = { text, sha256: sha256(text) };
   }
+  // A location has an address or, for a private copy, a label: one of each, so that both fields are made.
+  if (kind === "upstream") {
+    const { url: _url, label: _label, ...shared } = (record.locations as Value[])[0]!;
+    record.locations = [{ ...shared, kind: "web_archive", url: "https://fixture.invalid/capture" }, { ...shared, kind: "private", label: "fixture copy" }];
+  }
   if (kind === "authorship_mark") record.text_sha256 = sha256(normalizeSentence(String(record.text)));
   if (kind === "resolution") record.response_sha256 = sha256(String(record.response));
   if (kind === "passage") record.anchor = [{ index: 0, page_sha256: sha256("page"), stream: (TYPES.PageAnchor!.stream!.values ?? ["main"])[0], start: 0, end: 4 }];

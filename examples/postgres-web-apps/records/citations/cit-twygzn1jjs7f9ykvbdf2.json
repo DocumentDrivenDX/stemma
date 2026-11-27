@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-twygzn1jjs7f9ykvbdf2",
+  "intake": "parsed",
+  "key": "wu2017",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "792"
+  },
+  "passage": "psg-40dgmq759162w1dx39kf",
+  "quotation": "We then implemented them in the Peloton DBMS and evaluated them using OLTP workloads to highlight their trade-offs.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "eed4402c688513adb9a9dd5b88406ded08bce3d4156a41fe1a75ed26f1f0626f",
+    "text": "The authors built each scheme into one research system: “We then implemented them in the Peloton DBMS and evaluated them using OLTP workloads to highlight their trade-offs.”"
+  }
+}

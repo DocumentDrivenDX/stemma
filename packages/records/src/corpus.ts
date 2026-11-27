@@ -118,6 +118,8 @@ export interface LoadedText {
   damage: Damage[];
   /** Intact, with nothing wrong in its manifest's or parts' form: checks may use the text. */
   usable: boolean;
+  /** The manifest is sound and none of the parts it lists is here (CONTRACT-007 H). This is not damage. */
+  notHeld: boolean;
 }
 
 export interface Corpus {
@@ -285,8 +287,11 @@ function loadText(directory: string, files: Map<string, SourceFile>, manifest: L
       partFiles.push(loadPart(file, paged).loaded);
     } else strays.push(file);
   }
-  const usable = manifest.state === "ok" && !blocking(manifest.problems) && damage.length === 0 && partFiles.every((f) => f.state === "ok" && !blocking(f.problems));
-  return { text: { manifest, directory, parts, damage, usable }, partFiles, strays };
+  const sound = manifest.state === "ok" && !blocking(manifest.problems);
+  const usable = sound && damage.length === 0 && partFiles.every((f) => f.state === "ok" && !blocking(f.problems));
+  // Every listed part is missing and nothing else is wrong: the text is simply not in this copy.
+  const notHeld = sound && entries.length > 0 && partFiles.length === 0 && damage.length === entries.length && damage.every((d) => d.code === "part_missing");
+  return { text: { manifest, directory, parts, damage, usable, notHeld }, partFiles, strays };
 }
 
 /** Source directories, their manifests and parts, and files that do not belong. */

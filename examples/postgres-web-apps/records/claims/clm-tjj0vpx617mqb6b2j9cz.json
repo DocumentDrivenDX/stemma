@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-tjj0vpx617mqb6b2j9cz",
+  "kind": "claim",
+  "reason": "Stated in the documentation for vacuuming and heap-only tuples; Pavlo’s account agrees on the mechanism.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Updates and deletes leave old row versions for vacuum, and updates avoid new index entries only under stated conditions."
+}

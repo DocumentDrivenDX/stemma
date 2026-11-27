@@ -1,0 +1,800 @@
+$ stemma check --all --project $PROJECTS/postgres-web-apps-trial
+OPEN FINDINGS: 4 problem(s), 155 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 769 result(s) passed.
+
+1. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent, 4 places]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-0bp6k5hy18g5sb43f5jy
+       citation file: records/citations/cit-0bp6k5hy18g5sb43f5jy.json
+       key: pavlo2023
+       locator: paragraph 36
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+   - cit-5wmj2bs1txd22qjb7n2q
+       citation file: records/citations/cit-5wmj2bs1txd22qjb7n2q.json
+       key: pavlo2023
+       locator: paragraph 6
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+   - cit-q88339smdwpcyy612ctg
+       citation file: records/citations/cit-q88339smdwpcyy612ctg.json
+       key: pavlo2023
+       locator: paragraph 32
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+   - cit-w2fvk8z34wvfw0prn4hb
+       citation file: records/citations/cit-w2fvk8z34wvfw0prn4hb.json
+       key: pavlo2023
+       locator: paragraph 5
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+
+2. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent, 3 places]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-0k1b957qfvznvkvj6e4y
+       citation file: records/citations/cit-0k1b957qfvznvkvj6e4y.json
+       key: notion2021
+       locator: paragraph 43
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+   - cit-nc8vps2tm3ek9h0rvhm9
+       citation file: records/citations/cit-nc8vps2tm3ek9h0rvhm9.json
+       key: notion2021
+       locator: paragraph 100
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+   - cit-pxn1gyr2h5v0qnajngcz
+       citation file: records/citations/cit-pxn1gyr2h5v0qnajngcz.json
+       key: notion2021
+       locator: paragraph 41
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+
+3. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent, 4 places]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-7qhn7167yz9esc2vd8ea
+       citation file: records/citations/cit-7qhn7167yz9esc2vd8ea.json
+       key: figma2024
+       locator: paragraph 103
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+   - cit-bk02fvbrbbnrys9gkczr
+       citation file: records/citations/cit-bk02fvbrbbnrys9gkczr.json
+       key: figma2024
+       locator: paragraph 97
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+   - cit-ka6068afma42rg2k3p4p
+       citation file: records/citations/cit-ka6068afma42rg2k3p4p.json
+       key: figma2024
+       locator: paragraph 87
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+   - cit-sscdxn28cyz5pv6jmhxz
+       citation file: records/citations/cit-sscdxn28cyz5pv6jmhxz.json
+       key: figma2024
+       locator: paragraph 87
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+
+4. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent, 4 places]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-gkq1201f65nbes55f3h7
+       citation file: records/citations/cit-gkq1201f65nbes55f3h7.json
+       key: wu2017
+       locator: page 789
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+   - cit-mfez94gw0vq6d543mx97
+       citation file: records/citations/cit-mfez94gw0vq6d543mx97.json
+       key: wu2017
+       locator: page 790
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+   - cit-rxmqp114s1fpzvvc11h8
+       citation file: records/citations/cit-rxmqp114s1fpzvvc11h8.json
+       key: wu2017
+       locator: page 785
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+   - cit-twygzn1jjs7f9ykvbdf2
+       citation file: records/citations/cit-twygzn1jjs7f9ykvbdf2.json
+       key: wu2017
+       locator: page 792
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+
+5. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent, 3 places]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-jjxrsykp4z3v37cdgg50
+       citation file: records/citations/cit-jjxrsykp4z3v37cdgg50.json
+       key: sentry2015
+       locator: paragraph 156
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+   - cit-jm80w537jx4g4mheg17y
+       citation file: records/citations/cit-jm80w537jx4g4mheg17y.json
+       key: sentry2015
+       locator: paragraph 133
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+   - cit-y8d2b7x72d23zjchc56x
+       citation file: records/citations/cit-y8d2b7x72d23zjchc56x.json
+       key: sentry2015
+       locator: paragraph 169
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+
+6. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-mc4serk0cckhz9w73yea
+       citation file: records/citations/cit-mc4serk0cckhz9w73yea.json
+       key: pgbouncer
+       locator: paragraph 29
+       source file: records/sources/src-y7k7tzzv3s40j0p1e5tq.json
+
+7. COULD NOT CHECK: A locator could not be checked: the text of this source is not in this copy of the project.  [locator.extent]
+   Why it matters: Until the locator can be compared with the work's pages or extent, a wrong one would go unnoticed.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - cit-zg4zm968e73e8n2et6cb
+       citation file: records/citations/cit-zg4zm968e73e8n2et6cb.json
+       key: ports2012
+       locator: page 1861
+       source file: records/sources/src-8jrmssahm9f1stb929c7.json
+
+8. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-8jrmssahm9f1stb929c7
+       source file: records/sources/src-8jrmssahm9f1stb929c7.json
+       key: ports2012
+
+9. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-927xc3h01n3ns1ewxfjg
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+       key: sentry2015
+
+10. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-bhya83cxjbhya1bpxjg5
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+       key: figma2024
+
+11. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-h7njqhwyqcz4hesxe37z
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+       key: wu2017
+
+12. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-nen925hmc37x2yzp9231
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+       key: pavlo2023
+
+13. PROBLEM: The source record disagrees with what the captured copy states about itself.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one.
+   - src-qmw5m7hjrx4a41abv94v
+       source file: records/sources/src-qmw5m7hjrx4a41abv94v.json
+       key: pg96notes
+       source text: sources/pg96notes/source.md
+       identity basis: the document's title and meta elements
+       title page parts: index 0, 1
+       title in record: Release 9.6
+       title the copy states: PostgreSQL: Release Notes
+       title result: the copy states otherwise, and the title page text does not show the record's value
+       authors in record: PostgreSQL Global Development Group
+       authors result: not found in what the copy states or in its title page text
+       year in record: 2016
+       year result: not found in what the copy states or in its title page text
+       venue in record: PostgreSQL Release Notes
+       venue result: not found in what the copy states or in its title page text
+       finding key: ca24987ff5530c3a86db2138633f269f86298cef7dfb2de8763e25a9db7cfaf6
+       explained by model claude-sonnet-5-5 (ann-jw9dbw4kb5sasm35grwm): The page's own title is the general 'PostgreSQL: Release Notes', and the parts taken as its title page are navigation. The converted text states 'E.25. Release 9.6' and 'Release date: 2016-09-29' in section 4. A model's reading, not a person's review.
+
+14. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-v9mg0p5d9mcmyyedvwek
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+       key: notion2021
+
+15. COULD NOT CHECK: The source's details could not be compared with a copy: its text is not in this copy of the project.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: See the source.pages finding for that source file, and fetch its text again.
+   - src-y7k7tzzv3s40j0p1e5tq
+       source file: records/sources/src-y7k7tzzv3s40j0p1e5tq.json
+       key: pgbouncer
+
+16. COULD NOT CHECK: A figure could not be compared: the source has no usable text.  [number.present]
+   Why it matters: A figure attributed to a source that does not hold it misreports the source.
+   What to do: Capture or repair the source's text.
+   - cit-zg4zm968e73e8n2et6cb
+       citation file: records/citations/cit-zg4zm968e73e8n2et6cb.json
+       key: ports2012
+       figures: 9.1
+
+17. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+   Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
+   What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
+   - cit-cs670qx1rx2s7se8ydx7
+       citation file: records/citations/cit-cs670qx1rx2s7se8ydx7.json
+       key: pg18vacuum
+       locator: paragraph 32
+       source text: sources/pg18vacuum/source.md
+       found on: section 1 "24.1. Routine Vacuuming #"
+       address: txt-4brymw2wbhf991zas33z/1:main:307-402
+
+18. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 4 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-0bp6k5hy18g5sb43f5jy
+       citation file: records/citations/cit-0bp6k5hy18g5sb43f5jy.json
+       key: pavlo2023
+       cited text: Unless the DBMS stores the new version in the same page as the previous version (HOT update), the system does this for every update.
+       profile: quote-fold/0
+   - cit-5wmj2bs1txd22qjb7n2q
+       citation file: records/citations/cit-5wmj2bs1txd22qjb7n2q.json
+       key: pavlo2023
+       cited text: its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.
+       profile: quote-fold/0
+   - cit-q88339smdwpcyy612ctg
+       citation file: records/citations/cit-q88339smdwpcyy612ctg.json
+       key: pavlo2023
+       cited text: write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.
+       profile: quote-fold/0
+   - cit-w2fvk8z34wvfw0prn4hb
+       citation file: records/citations/cit-w2fvk8z34wvfw0prn4hb.json
+       key: pavlo2023
+       cited text: It’s dependable, feature-rich, extensible, and well-suited for most operational workloads.
+       profile: quote-fold/0
+
+19. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 3 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-0k1b957qfvznvkvj6e4y
+       citation file: records/citations/cit-0k1b957qfvznvkvj6e4y.json
+       key: notion2021
+       cited text: Query performance and upkeep processes often begin to degrade well before a table reaches the maximum hardware-bound size
+       profile: quote-fold/0
+   - cit-nc8vps2tm3ek9h0rvhm9
+       citation file: records/citations/cit-nc8vps2tm3ek9h0rvhm9.json
+       key: notion2021
+       cited text: we waited until our existing database was heavily strained
+       profile: quote-fold/0
+   - cit-pxn1gyr2h5v0qnajngcz
+       citation file: records/citations/cit-pxn1gyr2h5v0qnajngcz.json
+       key: notion2021
+       cited text: For us, the inflection point arrived when the Postgres VACUUM process began to stall consistently, preventing the database from reclaiming disk space from dead tuples.
+       profile: quote-fold/0
+
+20. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 4 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-7qhn7167yz9esc2vd8ea
+       citation file: records/citations/cit-7qhn7167yz9esc2vd8ea.json
+       key: figma2024
+       cited text: Schema changes must be coordinated across all shards to ensure the databases stay in sync. Foreign keys and globally unique indexes can no longer be enforced by Postgres.
+       profile: quote-fold/0
+   - cit-bk02fvbrbbnrys9gkczr
+       citation file: records/citations/cit-bk02fvbrbbnrys9gkczr.json
+       key: figma2024
+       cited text: However, we have a very complex relational data model built on top of our current Postgres architecture and NoSQL APIs don’t offer this kind of versatility. We wanted to keep our engineers focused on shipping great features and building new products instead of rewriting almost our entire backend application; NoSQL wasn’t a viable solution.
+       profile: quote-fold/0
+   - cit-ka6068afma42rg2k3p4p
+       citation file: records/citations/cit-ka6068afma42rg2k3p4p.json
+       key: figma2024
+       cited text: At this size, we began to see reliability impact during Postgres vacuums, which are essential background operations that keep Postgres from running out of transaction IDs and breaking down.
+       profile: quote-fold/0
+   - cit-sscdxn28cyz5pv6jmhxz
+       citation file: records/citations/cit-sscdxn28cyz5pv6jmhxz.json
+       key: figma2024
+       cited text: Our highest write tables were growing so quickly that we would soon exceed the maximum IO operations per second (IOPS) supported by Amazon’s Relational Database Service (RDS).
+       profile: quote-fold/0
+
+21. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 4 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-gkq1201f65nbes55f3h7
+       citation file: records/citations/cit-gkq1201f65nbes55f3h7.json
+       key: wu2017
+       cited text: the delta scheme achieves ∼2× better performance than append-only and time-travel schemes because it uses less memory.
+       profile: quote-fold/0
+   - cit-mfez94gw0vq6d543mx97
+       citation file: records/citations/cit-mfez94gw0vq6d543mx97.json
+       key: wu2017
+       cited text: The results in Fig. 17a show that append-only storage achieves comparatively better performance than the other two schemes.
+       profile: quote-fold/0
+   - cit-rxmqp114s1fpzvvc11h8
+       citation file: records/citations/cit-rxmqp114s1fpzvvc11h8.json
+       key: wu2017
+       cited text: These schemes have different characteristics that affect their behavior for OLTP workloads. As such, none of them achieve optimal performance for either workload type.
+       profile: quote-fold/0
+   - cit-twygzn1jjs7f9ykvbdf2
+       citation file: records/citations/cit-twygzn1jjs7f9ykvbdf2.json
+       key: wu2017
+       cited text: We then implemented them in the Peloton DBMS and evaluated them using OLTP workloads to highlight their trade-offs.
+       profile: quote-fold/0
+
+22. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-hfmzynsaf9666zt1attb
+       citation file: records/citations/cit-hfmzynsaf9666zt1attb.json
+       key: pg18vacuum
+       cited text: In PostgreSQL, an UPDATE or DELETE of a row does immediately remove the old version of the row.
+       match: near
+       profile: quote-fold/0
+       source passage: In PostgreSQL, an UPDATE or DELETE of a row does not immediately remove the old version of the row.
+       source text: sources/pg18vacuum/source.md
+       found on: section 1 "24.1. Routine Vacuuming #"
+       address: txt-4brymw2wbhf991zas33z/1:main:2544-2643
+       text method: markup, quality unassessed
+
+23. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 3 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-jjxrsykp4z3v37cdgg50
+       citation file: records/citations/cit-jjxrsykp4z3v37cdgg50.json
+       key: sentry2015
+       cited text: we made the decision that we were willing to risk all data in the table if it meant we could recover immediately.
+       profile: quote-fold/0
+   - cit-jm80w537jx4g4mheg17y
+       citation file: records/citations/cit-jm80w537jx4g4mheg17y.json
+       key: sentry2015
+       cited text: One such problem caused a major outage of the hosted Sentry service earlier this week. That problem is Postgres’ transaction ID (XID).
+       profile: quote-fold/0
+   - cit-y8d2b7x72d23zjchc56x
+       citation file: records/citations/cit-y8d2b7x72d23zjchc56x.json
+       key: sentry2015
+       cited text: ultimately we’re going to be moving away from a SQL-based architecture.
+       profile: quote-fold/0
+
+24. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-mc4serk0cckhz9w73yea
+       citation file: records/citations/cit-mc4serk0cckhz9w73yea.json
+       key: pgbouncer
+       cited text: This mode breaks a few session-based features of PostgreSQL. You can use it only when the application cooperates by not using features that break.
+       profile: quote-fold/0
+
+25. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - cit-zg4zm968e73e8n2et6cb
+       citation file: records/citations/cit-zg4zm968e73e8n2et6cb.json
+       key: ports2012
+       cited text: Our experiments show that this serializable mode provides performance similar to snapshot isolation and considerably outperforms strict two-phase locking on read-intensive workloads
+       profile: quote-fold/0
+
+26. COULD NOT CHECK: A quotation could not be compared: the text of its source cannot be used here.  [quote.present, 20 places]
+   Why it matters: Until the quotation can be compared with the source's text, it is unchecked.
+   What to do: See the source.held and source.pages findings, then capture or repair the source's text.
+   - psg-00pvjc4gwhwmw05f28dx
+       record file: records/passages/psg-00pvjc4gwhwmw05f28dx.json
+       cited text: For us, the inflection point arrived when the Postgres VACUUM process began to stall consistently, preventing the database from reclaiming disk space from dead tuples.
+       profile: quote-fold/0
+   - psg-402na0z2fkfnfnfzbxqw
+       record file: records/passages/psg-402na0z2fkfnfnfzbxqw.json
+       cited text: we made the decision that we were willing to risk all data in the table if it meant we could recover immediately.
+       profile: quote-fold/0
+   - psg-40dgmq759162w1dx39kf
+       record file: records/passages/psg-40dgmq759162w1dx39kf.json
+       cited text: We then implemented them in the Peloton ⏎ DBMS and evaluated them using OLTP workloads to highlight their ⏎ trade-offs.
+       profile: quote-fold/0
+   - psg-41w7smcqm0e270dty0dj
+       record file: records/passages/psg-41w7smcqm0e270dty0dj.json
+       cited text: the ⏎ delta scheme achieves ∼2× better performance than append-only ⏎ and time-travel schemes because it uses less memory.
+       profile: quote-fold/0
+   - psg-4c6889m9kmd7sqkwr7vk
+       record file: records/passages/psg-4c6889m9kmd7sqkwr7vk.json
+       cited text: Our highest write tables were growing so quickly that we would soon exceed the maximum IO operations per second (IOPS) supported by Amazon’s Relational Database Service (RDS).
+       profile: quote-fold/0
+   - psg-5ahgrh9m7qraddzpx5tp
+       record file: records/passages/psg-5ahgrh9m7qraddzpx5tp.json
+       cited text: its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.
+       profile: quote-fold/0
+   - psg-bwanpsczp20r4qyb1de4
+       record file: records/passages/psg-bwanpsczp20r4qyb1de4.json
+       cited text: ultimately we’re going to be moving away from a SQL-based architecture.
+       profile: quote-fold/0
+   - psg-cj2c6r3ptp5sxz7j2rta
+       record file: records/passages/psg-cj2c6r3ptp5sxz7j2rta.json
+       cited text: At this size, we began to see reliability impact during Postgres vacuums, which are essential background operations that keep Postgres from running out of transaction IDs and breaking down.
+       profile: quote-fold/0
+   - psg-ck5an87zrkx8dpzzndwm
+       record file: records/passages/psg-ck5an87zrkx8dpzzndwm.json
+       cited text: One such problem caused a major outage of the hosted Sentry service earlier this week. That problem is Postgres’ transaction ID (XID).
+       profile: quote-fold/0
+   - psg-cs3yegg6wgft25g2h9qx
+       record file: records/passages/psg-cs3yegg6wgft25g2h9qx.json
+       cited text: It’s dependable, feature-rich, extensible, and well-suited for most operational workloads.
+       profile: quote-fold/0
+   - psg-db071bnkq9akp1esr4yh
+       record file: records/passages/psg-db071bnkq9akp1esr4yh.json
+       cited text: However, we have a very complex relational data model built on top of our current Postgres architecture and NoSQL APIs don’t offer this kind of versatility. We wanted to keep our engineers focused on shipping great features and building new products instead of rewriting almost our entire backend application; NoSQL wasn’t a viable solution.
+       profile: quote-fold/0
+   - psg-f28qhb50tksqhqeyk4jp
+       record file: records/passages/psg-f28qhb50tksqhqeyk4jp.json
+       cited text: These schemes have different characteristics that affect their be- ⏎ havior for OLTP workloads. As such, none of them achieve optimal ⏎ performance for either workload type.
+       profile: quote-fold/0
+   - psg-h0ntab0cxr94k53ntsv5
+       record file: records/passages/psg-h0ntab0cxr94k53ntsv5.json
+       cited text: write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.
+       profile: quote-fold/0
+   - psg-k2jy99wb0nbagcrv0km0
+       record file: records/passages/psg-k2jy99wb0nbagcrv0km0.json
+       cited text: Our experiments show ⏎ that this serializable mode provides performance similar to snapshot ⏎ isolation and considerably outperforms strict two-phase locking on ⏎ read-intensive workloads
+       profile: quote-fold/0
+   - psg-kkcfsb1hwa6w7a2ngfqy
+       record file: records/passages/psg-kkcfsb1hwa6w7a2ngfqy.json
+       cited text: Unless the DBMS stores the new version in the same page as the previous version (HOT update), the system does this for every update.
+       profile: quote-fold/0
+   - psg-kmv4ytexzzbw6aq5hbvn
+       record file: records/passages/psg-kmv4ytexzzbw6aq5hbvn.json
+       cited text: Query performance and upkeep processes often begin to degrade well before a table reaches the maximum hardware-bound size
+       profile: quote-fold/0
+   - psg-qzhjq7hes0xpa5skb8jx
+       record file: records/passages/psg-qzhjq7hes0xpa5skb8jx.json
+       cited text: This mode breaks a few session-based features of PostgreSQL. You can use it only when the application cooperates by not using features that break.
+       profile: quote-fold/0
+   - psg-sttqqf9g9kxhcgcr7a1a
+       record file: records/passages/psg-sttqqf9g9kxhcgcr7a1a.json
+       cited text: we waited until our existing database was heavily strained
+       profile: quote-fold/0
+   - psg-zryxnajrv4qhqq7tvk14
+       record file: records/passages/psg-zryxnajrv4qhqq7tvk14.json
+       cited text: The results in Fig. 17a show that append-only storage achieves ⏎ comparatively better performance than the other two schemes.
+       profile: quote-fold/0
+   - psg-zymf2tqz7twm518df057
+       record file: records/passages/psg-zymf2tqz7twm518df057.json
+       cited text: Schema changes must be coordinated across all shards to ensure the databases stay in sync. Foreign keys and globally unique indexes can no longer be enforced by Postgres.
+       profile: quote-fold/0
+
+27. COULD NOT CHECK: Whether what this rests on has changed could not be checked: something it depends on cannot be read.  [source.changed, 60 places]
+   Why it matters: What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.
+   What to do: See the record.valid and source.pages findings: repair the file, or fetch text that is not held here, then run `check` again.
+   - cit-0bp6k5hy18g5sb43f5jy
+       citation file: records/citations/cit-0bp6k5hy18g5sb43f5jy.json
+   - cit-0k1b957qfvznvkvj6e4y
+       citation file: records/citations/cit-0k1b957qfvznvkvj6e4y.json
+   - cit-5wmj2bs1txd22qjb7n2q
+       citation file: records/citations/cit-5wmj2bs1txd22qjb7n2q.json
+   - cit-7qhn7167yz9esc2vd8ea
+       citation file: records/citations/cit-7qhn7167yz9esc2vd8ea.json
+   - cit-bk02fvbrbbnrys9gkczr
+       citation file: records/citations/cit-bk02fvbrbbnrys9gkczr.json
+   - cit-gkq1201f65nbes55f3h7
+       citation file: records/citations/cit-gkq1201f65nbes55f3h7.json
+   - cit-jjxrsykp4z3v37cdgg50
+       citation file: records/citations/cit-jjxrsykp4z3v37cdgg50.json
+   - cit-jm80w537jx4g4mheg17y
+       citation file: records/citations/cit-jm80w537jx4g4mheg17y.json
+   - cit-ka6068afma42rg2k3p4p
+       citation file: records/citations/cit-ka6068afma42rg2k3p4p.json
+   - cit-mc4serk0cckhz9w73yea
+       citation file: records/citations/cit-mc4serk0cckhz9w73yea.json
+   - cit-mfez94gw0vq6d543mx97
+       citation file: records/citations/cit-mfez94gw0vq6d543mx97.json
+   - cit-nc8vps2tm3ek9h0rvhm9
+       citation file: records/citations/cit-nc8vps2tm3ek9h0rvhm9.json
+   - cit-pxn1gyr2h5v0qnajngcz
+       citation file: records/citations/cit-pxn1gyr2h5v0qnajngcz.json
+   - cit-q88339smdwpcyy612ctg
+       citation file: records/citations/cit-q88339smdwpcyy612ctg.json
+   - cit-rxmqp114s1fpzvvc11h8
+       citation file: records/citations/cit-rxmqp114s1fpzvvc11h8.json
+   - cit-sscdxn28cyz5pv6jmhxz
+       citation file: records/citations/cit-sscdxn28cyz5pv6jmhxz.json
+   - cit-twygzn1jjs7f9ykvbdf2
+       citation file: records/citations/cit-twygzn1jjs7f9ykvbdf2.json
+   - cit-w2fvk8z34wvfw0prn4hb
+       citation file: records/citations/cit-w2fvk8z34wvfw0prn4hb.json
+   - cit-y8d2b7x72d23zjchc56x
+       citation file: records/citations/cit-y8d2b7x72d23zjchc56x.json
+   - cit-zg4zm968e73e8n2et6cb
+       citation file: records/citations/cit-zg4zm968e73e8n2et6cb.json
+   - clm-2fyt7cvq5y12tszwrap4
+       claim file: records/claims/clm-2fyt7cvq5y12tszwrap4.json
+   - clm-3c9awc7n5hm7qxyafxae
+       claim file: records/claims/clm-3c9awc7n5hm7qxyafxae.json
+   - clm-9ax393h1e8rv7537t3jv
+       claim file: records/claims/clm-9ax393h1e8rv7537t3jv.json
+   - clm-bzwtz15x4e56x8ze168v
+       claim file: records/claims/clm-bzwtz15x4e56x8ze168v.json
+   - clm-d5kc2bb1wa1898356j0j
+       claim file: records/claims/clm-d5kc2bb1wa1898356j0j.json
+   - clm-mgvr9mf8et3kbgdfrfgt
+       claim file: records/claims/clm-mgvr9mf8et3kbgdfrfgt.json
+   - clm-mja4t4wy82dwkgvh0sfc
+       claim file: records/claims/clm-mja4t4wy82dwkgvh0sfc.json
+   - clm-nvh3391pmtjc8czbkcnt
+       claim file: records/claims/clm-nvh3391pmtjc8czbkcnt.json
+   - clm-tjj0vpx617mqb6b2j9cz
+       claim file: records/claims/clm-tjj0vpx617mqb6b2j9cz.json
+   - nte-2tncj02cay7nfz8xk2v2
+       note file: records/notes/nte-2tncj02cay7nfz8xk2v2.json
+   - nte-6nv1dz2g7pn9b0ygdzz3
+       note file: records/notes/nte-6nv1dz2g7pn9b0ygdzz3.json
+   - nte-apac9gxs26c1jp8nx5g7
+       note file: records/notes/nte-apac9gxs26c1jp8nx5g7.json
+   - nte-e3pkjfnm60np9wjepk6h
+       note file: records/notes/nte-e3pkjfnm60np9wjepk6h.json
+   - nte-extqq7vnr250t35kwgt0
+       note file: records/notes/nte-extqq7vnr250t35kwgt0.json
+   - nte-fddnakbxqvq00fk3vdzv
+       note file: records/notes/nte-fddnakbxqvq00fk3vdzv.json
+   - nte-mabgf0awfak5k1kjzcqt
+       note file: records/notes/nte-mabgf0awfak5k1kjzcqt.json
+   - nte-r3513b0dtz6pqw2ygrps
+       note file: records/notes/nte-r3513b0dtz6pqw2ygrps.json
+   - nte-wf00trt1e3sq0hbnkc7g
+       note file: records/notes/nte-wf00trt1e3sq0hbnkc7g.json
+   - nte-y16ej5f2k0kb7g95fj0t
+       note file: records/notes/nte-y16ej5f2k0kb7g95fj0t.json
+   - nte-ywpckf4k5y7wsfwrydwz
+       note file: records/notes/nte-ywpckf4k5y7wsfwrydwz.json
+   - psg-00pvjc4gwhwmw05f28dx
+       passage file: records/passages/psg-00pvjc4gwhwmw05f28dx.json
+   - psg-402na0z2fkfnfnfzbxqw
+       passage file: records/passages/psg-402na0z2fkfnfnfzbxqw.json
+   - psg-40dgmq759162w1dx39kf
+       passage file: records/passages/psg-40dgmq759162w1dx39kf.json
+   - psg-41w7smcqm0e270dty0dj
+       passage file: records/passages/psg-41w7smcqm0e270dty0dj.json
+   - psg-4c6889m9kmd7sqkwr7vk
+       passage file: records/passages/psg-4c6889m9kmd7sqkwr7vk.json
+   - psg-5ahgrh9m7qraddzpx5tp
+       passage file: records/passages/psg-5ahgrh9m7qraddzpx5tp.json
+   - psg-bwanpsczp20r4qyb1de4
+       passage file: records/passages/psg-bwanpsczp20r4qyb1de4.json
+   - psg-cj2c6r3ptp5sxz7j2rta
+       passage file: records/passages/psg-cj2c6r3ptp5sxz7j2rta.json
+   - psg-ck5an87zrkx8dpzzndwm
+       passage file: records/passages/psg-ck5an87zrkx8dpzzndwm.json
+   - psg-cs3yegg6wgft25g2h9qx
+       passage file: records/passages/psg-cs3yegg6wgft25g2h9qx.json
+   - psg-db071bnkq9akp1esr4yh
+       passage file: records/passages/psg-db071bnkq9akp1esr4yh.json
+   - psg-f28qhb50tksqhqeyk4jp
+       passage file: records/passages/psg-f28qhb50tksqhqeyk4jp.json
+   - psg-h0ntab0cxr94k53ntsv5
+       passage file: records/passages/psg-h0ntab0cxr94k53ntsv5.json
+   - psg-k2jy99wb0nbagcrv0km0
+       passage file: records/passages/psg-k2jy99wb0nbagcrv0km0.json
+   - psg-kkcfsb1hwa6w7a2ngfqy
+       passage file: records/passages/psg-kkcfsb1hwa6w7a2ngfqy.json
+   - psg-kmv4ytexzzbw6aq5hbvn
+       passage file: records/passages/psg-kmv4ytexzzbw6aq5hbvn.json
+   - psg-qzhjq7hes0xpa5skb8jx
+       passage file: records/passages/psg-qzhjq7hes0xpa5skb8jx.json
+   - psg-sttqqf9g9kxhcgcr7a1a
+       passage file: records/passages/psg-sttqqf9g9kxhcgcr7a1a.json
+   - psg-zryxnajrv4qhqq7tvk14
+       passage file: records/passages/psg-zryxnajrv4qhqq7tvk14.json
+   - psg-zymf2tqz7twm518df057
+       passage file: records/passages/psg-zymf2tqz7twm518df057.json
+
+28. PROBLEM: A note has no marker in the text of its page or section.  [source.footnotes]
+   Why it matters: A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.
+   What to do: Compare the page with the original. If the note continues from an earlier page, mark its block continued.
+   - txt-t7p2y2hxdtsg7e4whwp7
+       file: sources/pg18json/source.md
+       where: the text
+       note label: 7
+       finding key: d7853929243575b9f21aaa11e6609db6b6f061f55498e8e07971317fd21088c5
+       explained by model claude-sonnet-5-5 (ann-qg899cezk1pwmxnejytz): The stored HTML marks footnote 7's marker with a link and a superscript of class 'footnote', which the converter treats as a note body and not as a note reference. The marker's characters and the note's words are both in the text, and no quotation comes from the note. A model's reading, not a person's review.
+
+29. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held, 4 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-0bp6k5hy18g5sb43f5jy
+       citation file: records/citations/cit-0bp6k5hy18g5sb43f5jy.json
+       key: pavlo2023
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+       source text: sources/pavlo2023/source.md
+   - cit-5wmj2bs1txd22qjb7n2q
+       citation file: records/citations/cit-5wmj2bs1txd22qjb7n2q.json
+       key: pavlo2023
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+       source text: sources/pavlo2023/source.md
+   - cit-q88339smdwpcyy612ctg
+       citation file: records/citations/cit-q88339smdwpcyy612ctg.json
+       key: pavlo2023
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+       source text: sources/pavlo2023/source.md
+   - cit-w2fvk8z34wvfw0prn4hb
+       citation file: records/citations/cit-w2fvk8z34wvfw0prn4hb.json
+       key: pavlo2023
+       source file: records/sources/src-nen925hmc37x2yzp9231.json
+       source text: sources/pavlo2023/source.md
+
+30. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held, 3 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-0k1b957qfvznvkvj6e4y
+       citation file: records/citations/cit-0k1b957qfvznvkvj6e4y.json
+       key: notion2021
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+       source text: sources/notion2021/source.md
+   - cit-nc8vps2tm3ek9h0rvhm9
+       citation file: records/citations/cit-nc8vps2tm3ek9h0rvhm9.json
+       key: notion2021
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+       source text: sources/notion2021/source.md
+   - cit-pxn1gyr2h5v0qnajngcz
+       citation file: records/citations/cit-pxn1gyr2h5v0qnajngcz.json
+       key: notion2021
+       source file: records/sources/src-v9mg0p5d9mcmyyedvwek.json
+       source text: sources/notion2021/source.md
+
+31. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held, 4 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-7qhn7167yz9esc2vd8ea
+       citation file: records/citations/cit-7qhn7167yz9esc2vd8ea.json
+       key: figma2024
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+       source text: sources/figma2024/source.md
+   - cit-bk02fvbrbbnrys9gkczr
+       citation file: records/citations/cit-bk02fvbrbbnrys9gkczr.json
+       key: figma2024
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+       source text: sources/figma2024/source.md
+   - cit-ka6068afma42rg2k3p4p
+       citation file: records/citations/cit-ka6068afma42rg2k3p4p.json
+       key: figma2024
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+       source text: sources/figma2024/source.md
+   - cit-sscdxn28cyz5pv6jmhxz
+       citation file: records/citations/cit-sscdxn28cyz5pv6jmhxz.json
+       key: figma2024
+       source file: records/sources/src-bhya83cxjbhya1bpxjg5.json
+       source text: sources/figma2024/source.md
+
+32. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held, 4 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-gkq1201f65nbes55f3h7
+       citation file: records/citations/cit-gkq1201f65nbes55f3h7.json
+       key: wu2017
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+       source text: sources/wu2017/source.md
+   - cit-mfez94gw0vq6d543mx97
+       citation file: records/citations/cit-mfez94gw0vq6d543mx97.json
+       key: wu2017
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+       source text: sources/wu2017/source.md
+   - cit-rxmqp114s1fpzvvc11h8
+       citation file: records/citations/cit-rxmqp114s1fpzvvc11h8.json
+       key: wu2017
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+       source text: sources/wu2017/source.md
+   - cit-twygzn1jjs7f9ykvbdf2
+       citation file: records/citations/cit-twygzn1jjs7f9ykvbdf2.json
+       key: wu2017
+       source file: records/sources/src-h7njqhwyqcz4hesxe37z.json
+       source text: sources/wu2017/source.md
+
+33. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held, 3 places]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-jjxrsykp4z3v37cdgg50
+       citation file: records/citations/cit-jjxrsykp4z3v37cdgg50.json
+       key: sentry2015
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+       source text: sources/sentry2015/source.md
+   - cit-jm80w537jx4g4mheg17y
+       citation file: records/citations/cit-jm80w537jx4g4mheg17y.json
+       key: sentry2015
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+       source text: sources/sentry2015/source.md
+   - cit-y8d2b7x72d23zjchc56x
+       citation file: records/citations/cit-y8d2b7x72d23zjchc56x.json
+       key: sentry2015
+       source file: records/sources/src-927xc3h01n3ns1ewxfjg.json
+       source text: sources/sentry2015/source.md
+
+34. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-mc4serk0cckhz9w73yea
+       citation file: records/citations/cit-mc4serk0cckhz9w73yea.json
+       key: pgbouncer
+       source file: records/sources/src-y7k7tzzv3s40j0p1e5tq.json
+       source text: sources/pgbouncer/source.md
+
+35. COULD NOT CHECK: The text of this cited source is not in this copy of the project, so this citation could not be checked.  [source.held]
+   Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
+   What to do: See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have.
+   - cit-zg4zm968e73e8n2et6cb
+       citation file: records/citations/cit-zg4zm968e73e8n2et6cb.json
+       key: ports2012
+       source file: records/sources/src-8jrmssahm9f1stb929c7.json
+       source text: sources/ports2012/source.md
+
+36. COULD NOT CHECK: The source's text is not held here: its manifest is present and none of its page or section files is. Nothing shows that anything is damaged.  [source.pages, 7 places]
+   Why it matters: Quotations, pages and anything else that rests on this text cannot be checked in this copy of the project.
+   What to do: Fetch it again with `ingest --fetch --actor <kind>:<name>`, which asks the recorded addresses, or give a copy of the original with `ingest --originals <dir>`. The text is written only if it is exactly what the manifest records. If you keep the text elsewhere, or it was typed or recognized by another tool, copy it back.
+   - txt-0rfw84rtpxz3jxy7g3bn
+       source text: sources/figma2024/source.md
+       parts: none of the 17 listed section files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-156d9jnzqm5sp5kn4v9x
+       source text: sources/ports2012/source.md
+       parts: none of the 12 listed page files is here
+       rests on it: 1 passage(s) and 1 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-44w8mtetezbxysnrekak
+       source text: sources/pavlo2023/source.md
+       parts: none of the 6 listed section files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-a8vhfj4nsh105h8w3gf8
+       source text: sources/wu2017/source.md
+       parts: none of the 12 listed page files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-f62s1msgvp2hxn56ekew
+       source text: sources/sentry2015/source.md
+       parts: none of the 8 listed section files is here
+       rests on it: 3 passage(s) and 3 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-kzpqm7d8sd0z9bh1ejh0
+       source text: sources/pgbouncer/source.md
+       parts: none of the 5 listed section files is here
+       rests on it: 1 passage(s) and 1 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+   - txt-r399jtz3g4qna2srbhje
+       source text: sources/notion2021/source.md
+       parts: none of the 7 listed section files is here
+       rests on it: 3 passage(s) and 3 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor <kind>:<name>, or ingest --originals <dir> when you have the original
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: figma2024, notion2021, pavlo2023, pg18arch, pg18connections, pg18ha, pg18hot, pg18isolation, pg18json, pg18standby, pg18vacuum, pg19notes, pg96notes, pgbouncer, ports2012, sentry2015, wu2017
+   - not compared with its original: its text is not here: txt-0rfw84rtpxz3jxy7g3bn, txt-156d9jnzqm5sp5kn4v9x, txt-44w8mtetezbxysnrekak, txt-a8vhfj4nsh105h8w3gf8, txt-f62s1msgvp2hxn56ekew, txt-kzpqm7d8sd0z9bh1ejh0, txt-r399jtz3g4qna2srbhje
+   - not corroborated: neither the title page text nor a saved catalogue record shows the authors or the venue: pg18arch, pg18connections, pg18ha, pg18hot, pg18isolation, pg18json, pg18vacuum, pg19notes
+   - not corroborated: neither the title page text nor a saved catalogue record shows the venue: pg18standby
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/figma2024 (markup): its text is not held here
+   - sources/notion2021 (markup): its text is not held here
+   - sources/pavlo2023 (markup): its text is not held here
+   - sources/pg18arch (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18connections (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18ha (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18hot (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18isolation (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18json (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18standby (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18vacuum (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg19notes (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg96notes (markup): 0 of 9 parts reviewed whole by a person; fresh conversion: 9 of 9 parts agree
+   - sources/pgbouncer (markup): its text is not held here
+   - sources/ports2012 (text_layer): its text is not held here
+   - sources/sentry2015 (markup): its text is not held here
+   - sources/wu2017 (text_layer): its text is not held here
+
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - your own claims presented as quotations from a source  [quote.self]
+   - whether each cited claim has a current claim-support record  [support.current]
+
+For information, not a finding: 17 cited item(s) are unreviewed or not admitted.
+   - src-01n2wr6cy5qmwqd6fc3t (not admitted)
+   - src-0n87kc5wgjgwp0fxjwg0 (not admitted)
+   - src-4tn0091eh4cc829322kj (not admitted)
+   - src-8jrmssahm9f1stb929c7 (not admitted)
+   - src-927xc3h01n3ns1ewxfjg (not admitted)
+   - src-bhya83cxjbhya1bpxjg5 (not admitted)
+   - src-gf8p7mknx1fgq150x3k6 (not admitted)
+   - src-h7njqhwyqcz4hesxe37z (not admitted)
+   - src-jzgwnaqrcsjhpegjbn7z (not admitted)
+   - src-kvfq6m31x122sa7qgs53 (not admitted)
+   - src-mfaaxnw4et2z8359btzf (not admitted)
+   - src-nen925hmc37x2yzp9231 (not admitted)
+   - src-qmw5m7hjrx4a41abv94v (not admitted)
+   - src-r7741gv5gb10aq6fv2bz (not admitted)
+   - src-seb0h7jfjxxsweary6a5 (not admitted)
+   - src-v9mg0p5d9mcmyyedvwek (not admitted)
+   - src-y7k7tzzv3s40j0p1e5tq (not admitted)
+
+Full report: $PROJECTS/postgres-web-apps-trial/.stemma/reports/check.json
+[exit 1]

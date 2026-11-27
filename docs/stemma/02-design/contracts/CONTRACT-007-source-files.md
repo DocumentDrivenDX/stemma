@@ -23,7 +23,7 @@ ddx:
 **Contract ID**: CONTRACT-007
 **Type**: schema (text format)
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-010, FR-6, FR-8, FR-9, FR-10, FR-29, FR-84 to FR-89
+**Related**: ADR-010, FR-6, FR-8, FR-9, FR-10, FR-29, FR-84 to FR-89, FR-98, FR-104
 
 ## Purpose
 
@@ -259,6 +259,32 @@ joined the same way. Each offset range maps back to the parts it lies in.
   never edits.
 - A source file is retired, never deleted by a command (CONTRACT-001 C).
 
+**Text that is not here (FR-104).** A copy of a project may hold a source file's
+manifest and none of its parts, for example because the author does not commit
+that text. This is the case **text not held** when the manifest is sound, it
+lists at least one part, every listed part file is absent, and no other rule of
+H is broken. The manifest, with each part's digest, is still the record of what
+the text was. A source file with some parts missing or changed is **damaged**.
+Either way the text is not used.
+
+**Restoring text that is not held.** Given the original, a converter may write
+the absent parts again. It converts with the settings the manifest records:
+whether the text was recognized, and the original's type. Page labels are in the
+parts, not the manifest, so it tries each way it knows to set them: the page map
+and page-number data a supplied ingest plan names for that original, the labels
+proposed from the pages' own text, and no labels. It writes parts only when one
+conversion gives exactly the listed part files, each with the digest the
+manifest records; then it writes only those files. Otherwise it writes nothing
+and reports what differed. Supplied or typed text, text a person corrected or
+relabelled by hand, and text made by other converter versions may not be
+reproducible this way; it then has to come from wherever the author keeps it.
+No step uses a part's expected digest to shape a conversion.
+
+The same conversion and the same condition apply to bytes a recorded address
+gave that are not the original, as when a page differs on each request. Parts
+that all match are the recorded text; the bytes are still not the original and
+are treated as nothing else.
+
 ### I. Conversion rules by format
 
 | Original | Parts | Structure taken from | Identity taken from |
@@ -347,7 +373,8 @@ a `basis` records those states; with neither, the page is `undetermined`.
 | Front matter unreadable | `record_unreadable`; the source file is not used | no | Repair the file or restore it from git |
 | A field or rule of B to D broken | `record_invalid` with the field | no | Correct the field |
 | Unknown or unclosed annotation, raw `<`, text outside a block, a correction not by a person | `record_invalid` naming the file and line | no | Correct the markup |
-| Part missing, unlisted, edited without sealing, or out of sequence | `source.pages` fails; dependants cannot be checked | yes | Restore the file from git, or review the edit and run `source seal` |
+| Some parts missing, or a part unlisted, edited without sealing, or out of sequence | `source.pages` fails; dependants cannot be checked | yes | Restore the file from git, or review the edit and run `source seal` |
+| Every listed part absent, the manifest sound (text not held, H) | `source.pages` cannot check (`not_held`), once for the source file; dependants cannot be checked | yes | Fetch and convert it again with `ingest --fetch`, or give the original with `ingest --originals` |
 | A binary or other stray file in `sources/` | `record_misplaced` | no | Move it out of the repository |
 | A binary file elsewhere in the repository | `project.binary` fails (CONTRACT-002 C) | no | Keep it outside the repository; convert it if it is to be read or cited |
 
@@ -391,6 +418,8 @@ note is in the notes stream, and the running head in the furniture stream.
   next to the words it describes.
 - Markdown headings and lists in a part body are not interpreted, so a line from
   a source that starts with `#` stays ordinary text.
+- A copy of a project without some source files' parts is an ordinary state, not
+  damage; what rests on them cannot be checked in that copy.
 - A repository that holds source files shows their full text to anyone who can
   read it, so publishing the repository publishes them.
 

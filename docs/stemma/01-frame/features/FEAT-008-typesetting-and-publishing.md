@@ -18,7 +18,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 8. Typesetting and publishing
-**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-83, FR-91, FR-96
+**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-83, FR-91, FR-96, FR-108
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -167,6 +167,15 @@ unverified.
   up. These outputs obey BLD-05 and BLD-07
   (assumption).
 
+#### Quoted code and tables
+
+- **EXQ-01** (FR-108, FR-96, P0, M2). A build must print a quotation of
+  preformatted text or of a table as a block, in a note or in the body, with the
+  passage's lines, indentation, rows, and cells, and set code in a fixed-width
+  face. It must not reflow or retype it. **Not built.**
+- **EXQ-02** (FR-108, P0, M2). Where an output cannot keep the layout, the build
+  must say so and must not present the altered text as exact. **Not built.**
+
 #### Footnotes and the finished text
 
 - **FTN-01** (FR-91, FR-96, P0, M2). A build must generate each footnote or
@@ -262,7 +271,7 @@ unverified.
   consumes the reviewer build and build record; FEAT-012 owns browser preview.
 - **External services**: Typst, citeproc-js, and pinned converters; exact
   surfaces belong in Contract artifacts.
-- **PRD requirements**: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91; related FR-15, FR-30, FR-90,
+- **PRD requirements**: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91, FR-96, FR-108; related FR-15, FR-30, FR-90, FR-102,
   FR-31, FR-53.
 
 ## Out of Scope

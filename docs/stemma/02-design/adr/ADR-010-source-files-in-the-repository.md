@@ -27,7 +27,10 @@ files with Stemma annotations: one directory for each conversion, a manifest
 record, and one file for each page of a paged original, in the format of
 CONTRACT-007. Binaries and paper originals stay outside the repository and are
 tied by content hash and size, or by a description and where they are held.
-Checks, excerpts, builds, and the explorer read the source files. Verifying
+Checks, excerpts, builds, and the explorer read the source files. A copy of a
+project may hold a source's records and manifest and not its text; what needs
+that text is then reported as not held and could not be checked (FR-104,
+CONTRACT-007 H). Verifying
 against an original held elsewhere is optional, by path and digest.
 
 Text-native originals are the core path: plain text, Markdown, HTML, EPUB, DOCX,
@@ -61,7 +64,7 @@ An author could not comfortably read or correct it.
 
 ## Consequences
 
-**Good**: A clone holds the text every check reads. Corrections and comparisons
+**Good**: A clone that holds the source files holds the text every check reads. Corrections and comparisons
 are visible in git. A missing, reordered, or edited page is detected by script.
 
 **Trade-offs**: The repository holds full source texts, many under copyright, and

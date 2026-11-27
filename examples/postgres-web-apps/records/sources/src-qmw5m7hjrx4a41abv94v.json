@@ -1,0 +1,77 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "PostgreSQL Release Notes"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.postgresql.org/docs/release/9.6.0/"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T18:08:31Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T18:08:31Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "issued",
+      "from": "the page's own line 'Release date: 2016-09-29' (captured copy)",
+      "value": "2016-09-29"
+    }
+  ],
+  "citation_key": "pg96notes",
+  "contributions": [
+    {
+      "as_printed": {
+        "literal": "PostgreSQL Global Development Group"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:25Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-qmw5m7hjrx4a41abv94v",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2016-09-29"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "PostgreSQL License",
+    "permission_note": "Licence read at https://www.postgresql.org/about/licence/ (PostgreSQL is released under the PostgreSQL License) and on the documentation's legal notice, https://www.postgresql.org/docs/18/legalnotice.html, which covers the software and its documentation, 2026-11-27. Full text is committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Release 9.6"
+  },
+  "type": "webpage"
+}

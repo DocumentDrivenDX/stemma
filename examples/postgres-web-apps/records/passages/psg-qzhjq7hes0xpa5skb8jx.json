@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 666,
+      "index": 3,
+      "page_sha256": "2a3083f63c5467a1df8eb4f17eabb43d18e982b8ddda25c3b6bedb1ea38691d1",
+      "start": 520,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:53Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-qzhjq7hes0xpa5skb8jx",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "29"
+  },
+  "quote": {
+    "exact": "This mode breaks a few session-based features of PostgreSQL. You can use it only when the application cooperates by not using features that break."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-y7k7tzzv3s40j0p1e5tq",
+  "source_record_sha256": "f18f2f216d52f5f401efaea7a46cf2d5250dfb820941606955f441b75928fa22",
+  "text": "txt-kzpqm7d8sd0z9bh1ejh0"
+}

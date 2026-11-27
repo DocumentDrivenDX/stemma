@@ -1,0 +1,58 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Notion Blog"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.notion.com/blog/sharding-postgres-at-notion"
+      }
+    }
+  ],
+  "citation_key": "notion2021",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Fidalgo",
+        "given": "Garrett"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-v9mg0p5d9mcmyyedvwek",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2021-10-06"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "No licence statement found",
+    "permission_note": "No licence statement on the article page, whose footer reads © 2026 Notion Labs, Inc., read 2026-11-27. Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Herding Elephants: Lessons Learned from Sharding Postgres at Notion"
+  },
+  "type": "post-weblog"
+}

@@ -1,7 +1,7 @@
 // Regenerates website/generated/ from real runs of the built command line: the
 // demo, and check runs over the fixtures the tests assert on. Machine-specific
 // paths and values are replaced, so the same code gives the same bytes.
-//   ./scripts/dev.sh docs         rewrite transcripts, reports, check list, screenshots
+//   ./scripts/dev.sh docs         rewrite transcripts, reports, check list, diagrams, screenshots
 //   ./scripts/dev.sh docs-check   fail if the committed content is stale
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -177,6 +177,10 @@ export async function generateText(): Promise<Map<string, string>> {
       return { id, ...note, findings };
     });
     files.set("checks.json", `${JSON.stringify(checks, null, 2)}\n`);
+
+    // Imported only here: loading umf-visual takes several seconds, and nothing else needs it.
+    const { renderDiagrams } = await import("./lib/render-diagrams.ts");
+    for (const [name, svg] of await renderDiagrams()) files.set(`diagrams/${name}`, normalise(svg, []));
     return files;
   } finally {
     rmSync(work, { recursive: true, force: true });

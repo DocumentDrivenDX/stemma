@@ -78,6 +78,15 @@ An export is never edited or read back.
   retrieval time, hash, size, and identifiers of each fetched or supplied
   original; the manifest keeps the hash and size of what was converted, or the
   description and holder of a paper or physical original.
+- An upstream record may list other locations of the same original, in order
+  (FR-98; CONTRACT-001 G): live and archive addresses, and private copies named
+  by a label. They are references; no copy is committed and no path of a private
+  copy is recorded. A location's bytes count only when their digest is the
+  original's.
+- A copy of a project may hold a source file's manifest without its parts. That
+  text is "not held" (FR-104): checks say they could not check what rests on it
+  (CONTRACT-002 C), and `ingest` writes the parts again from the original only
+  when every part has its recorded digest (CONTRACT-007 H).
 - Verifying against an original is optional. Given the file, by path or from the
   originals cache, `source verify` and `ingest` match its hash, convert it again
   with the recorded settings, and record the per-page comparison.

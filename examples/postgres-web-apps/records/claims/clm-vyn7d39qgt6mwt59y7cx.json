@@ -1,0 +1,19 @@
+{
+  "confidence": "medium",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-vyn7d39qgt6mwt59y7cx",
+  "kind": "claim",
+  "reason": "The documentation supports both halves. Whether this removes the need for a document store depends on the application, which no source here tests.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Binary JSON lets one database hold loosely structured data, but an update to a stored document locks its whole row."
+}

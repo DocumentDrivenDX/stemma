@@ -19,12 +19,12 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 5. Notes, claims, and constructs
-**Covered PRD Requirements**: FR-20, FR-21, FR-22, FR-23, FR-80
+**Covered PRD Requirements**: FR-20, FR-21, FR-22, FR-23, FR-80, FR-105 (P1)
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
-This feature records what the author takes from sources and what the book asserts: anchored reading notes, a claim ledger, and a construct register (PRD FR-20 to FR-22). Entries the assistant proposes take effect at once, marked unreviewed, and the author reviews or corrects them whenever they like (FR-23). The ledger also records which notes support or oppose a claim and how claims relate (FR-80).
+This feature records what the author takes from sources and what the book asserts: anchored reading notes, a claim ledger, and a construct register (PRD FR-20 to FR-22). Entries the assistant proposes take effect at once, marked unreviewed, and the author reviews or corrects them whenever they like (FR-23). The ledger also records which notes support or oppose a claim and how claims relate (FR-80). The records behind a report can be created in one run (FR-105).
 
 ## Ideal Future State
 
@@ -95,6 +95,12 @@ ACC-03 (FR-23, P0, M1). A review mark must be recorded with its date, and must b
 
 ACC-04 (FR-23, P0, M1). A change the assistant makes to a reviewed entry must make it unreviewed again while it stays in effect; the author's own edit keeps it reviewed. The author may edit or retire any entry at any time, and reports must show what is unreviewed.
 
+#### Records in one run
+
+RUN-01 (FR-105, P1). One run must create the notes, claims, attestations, and citations listed in a file, including a report's sentences with the passages each cites. Each record must be validated, attributed to its actor, and marked unreviewed under ACC-01, with quotations and locators copied by script. **Not built**: records are added one at a time.
+
+RUN-02 (FR-105, P1). The run must report each entry it did not write and why, and must invent no confidence, reason, or link. **Not built.**
+
 ### Non-Functional Requirements
 
 - **Reliability**: The extract and register checks give identical results on repeated runs with the same inputs and tool versions.
@@ -133,7 +139,7 @@ ACC-04 (FR-23, P0, M1). A change the assistant makes to a reviewed entry must ma
 
 - **Other features**: FEAT-002 source files, passages, and change flags; FEAT-003 keys and locators; FEAT-001 project and FR-60 inputs; FEAT-007 checks and reports; FEAT-006 drafting; FEAT-011 records.
 - **External services**: None. Exact interfaces belong to Contract artifacts.
-- **PRD requirements**: FR-20, FR-21, FR-23 (P0, M1); FR-22, FR-80 (P0, M2).
+- **PRD requirements**: FR-20, FR-21, FR-23 (P0, M1); FR-22, FR-80 (P0, M2); FR-105 (P1).
 
 ## Out of Scope
 

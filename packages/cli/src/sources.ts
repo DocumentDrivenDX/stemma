@@ -281,6 +281,12 @@ export function sourceSeal(options: Options, text: string | undefined): number {
   return 0;
 }
 
+/** Whether Stemma made a source file's text from its original, and so can make it again. */
+export function canConvertAgain(conversion: JsonObject, media: string): boolean {
+  const used = (conversion.tools as JsonObject[]).map((t) => String(t.name));
+  return media === "application/pdf" ? used.includes("pdfjs-dist") : !IMAGE_TYPES.includes(media) && ["born_text", "markup"].includes(String(conversion.method));
+}
+
 /** Converts an original again with a source file's recorded settings and compares each part. */
 export async function reconvert(
   root: string, corpus: Corpus, id: string, original: Original & { name: string }, actor: ConvertRequest["actor"],
@@ -296,10 +302,7 @@ export async function reconvert(
     throw new InvalidInput(`That file's digest, ${original.sha256}, is not the original this source file was converted from.`);
   }
   const conversion = data.conversion as JsonObject;
-  const used = (conversion.tools as JsonObject[]).map((t) => String(t.name));
-  const reconvertible = original.media_type === "application/pdf" ? used.includes("pdfjs-dist")
-    : !IMAGE_TYPES.includes(original.media_type) && ["born_text", "markup"].includes(String(conversion.method));
-  if (!reconvertible) return { reconvertible: false as const };
+  if (!canConvertAgain(conversion, original.media_type)) return { reconvertible: false as const };
   const labels = new Map(text.parts.map((p) => [p.index, {
     status: String(p.front.label_status) as "labelled", ...(typeof p.front.label === "string" ? { label: p.front.label } : {}),
   }]));
@@ -441,11 +444,15 @@ export function passageFind(options: Options, words: string | undefined): number
   const root = requireProject(options);
   const corpus = openCorpus(root);
   const found = findPassages(corpus, options.source, words);
-  const unusable = new SourceTexts(corpus).of(options.source).unusable;
+  const texts = new SourceTexts(corpus);
+  const unusable = texts.of(options.source).unusable;
   const lines = found.length === 0 ? ["The words were not found in this source's text."] : found.flatMap((f) => [
     `${f.address}`, `  ${f.places.join("; ")}; ${f.match} match${f.locator ? `; ${f.locator.label} ${f.locator.value}` : "; no locator can be copied here"}`,
     `  quoted data: ${printable(f.quotation)}`]);
-  if (unusable > 0) lines.push(`${unusable} source file(s) of this source are damaged and were not searched.`);
+  if (unusable > 0) {
+    const absent = texts.idsOf(options.source).filter((id) => texts.notHeld([id])).length;
+    lines.push(`${unusable} source file(s) of this source ${absent === unusable ? "have no text here" : "are damaged or have no text here"} and were not searched.`);
+  }
   emit(options, { found, unusable }, `${lines.join("\n")}\n`);
   return found.length === 0 ? 1 : 0;
 }

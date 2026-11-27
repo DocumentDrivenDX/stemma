@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 415,
+      "index": 1,
+      "page_sha256": "959db9c6ac9529fe7ee3c3584dbce263014a2e09201e4f6427457aff7afa0c84",
+      "start": 216,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:59Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-fpv4amf110rbsd333831",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "20"
+  },
+  "quote": {
+    "exact": "New REPACK command that reclaims disk space and reorganizes table contents, which can improve query performance. REPACK (CONCURRENTLY) allows repacking without blocking reads and writes to the table."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-mfaaxnw4et2z8359btzf",
+  "source_record_sha256": "259b9fbf0f133ffc01037b6aaba92ff29f4d29729f1e46c65fc8a789066fd75c",
+  "text": "txt-acpq4g943waz57jbtk62"
+}

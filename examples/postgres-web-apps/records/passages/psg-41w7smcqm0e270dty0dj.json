@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 4309,
+      "index": 8,
+      "page_sha256": "c4ef9eaa0109889e67664c520ba6ac999158960107257c57648f5e428da24bfc",
+      "start": 4191,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:06:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-41w7smcqm0e270dty0dj",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "789"
+  },
+  "quote": {
+    "exact": "the\ndelta scheme achieves ∼2× better performance than append-only\nand time-travel schemes because it uses less memory."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-h7njqhwyqcz4hesxe37z",
+  "source_record_sha256": "9290b597129a789e7e5a7fa84505f5f1b6b2be29870015a004e199d25ad67365",
+  "text": "txt-a8vhfj4nsh105h8w3gf8"
+}

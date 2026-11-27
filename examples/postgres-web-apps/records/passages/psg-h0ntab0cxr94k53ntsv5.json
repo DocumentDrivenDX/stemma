@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2284,
+      "index": 4,
+      "page_sha256": "5f8b251297b77393ee36f928f682bb482c847b010c294e9e3c0a89cc94745f56",
+      "start": 2156,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:04Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-h0ntab0cxr94k53ntsv5",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "32"
+  },
+  "quote": {
+    "exact": "write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "source_record_sha256": "c5f9ad6df398a5cdaed0c7bff8258b77c8af09809098219a348c7c2ff38c42a0",
+  "text": "txt-44w8mtetezbxysnrekak"
+}

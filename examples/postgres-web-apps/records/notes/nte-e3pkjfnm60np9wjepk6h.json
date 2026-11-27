@@ -1,0 +1,21 @@
+{
+  "body": "Pavlo judges the multiversion implementation the worst among the widely used relational systems he names.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-e3pkjfnm60np9wjepk6h",
+  "kind": "note",
+  "passages": [
+    "psg-5ahgrh9m7qraddzpx5tp"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "type": "paraphrase"
+}

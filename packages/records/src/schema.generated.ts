@@ -4086,6 +4086,48 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "required": true
   }
  },
+ "LocationComparison": {
+  "at": {
+   "type": "date-time",
+   "required": true
+  },
+  "sha256": {
+   "type": "string",
+   "required": true
+  }
+ },
+ "UpstreamLocation": {
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "publisher",
+    "web_archive",
+    "archive",
+    "private"
+   ]
+  },
+  "url": {
+   "type": "string"
+  },
+  "label": {
+   "type": "string"
+  },
+  "added": {
+   "type": {
+    "value": "Stamp"
+   },
+   "required": true
+  },
+  "compared": {
+   "type": {
+    "value": "LocationComparison"
+   }
+  },
+  "note": {
+   "type": "string"
+  }
+ },
  "Upstream": {
   "schema": {
    "type": "string",
@@ -4162,6 +4204,12 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   "identifiers": {
    "type": {
     "value": "Identifier"
+   },
+   "many": true
+  },
+  "locations": {
+   "type": {
+    "value": "UpstreamLocation"
    },
    "many": true
   },
@@ -5468,6 +5516,9 @@ export const REFERENCES: Record<string, string[]> = {
   "import_batch"
  ],
  "upstream.retired.stamp.import": [
+  "import_batch"
+ ],
+ "upstream.locations.added.import": [
   "import_batch"
  ],
  "upstream.legacy.import": [

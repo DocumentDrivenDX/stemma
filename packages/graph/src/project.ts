@@ -27,7 +27,7 @@ const PART_LISTS = new Set(["SourceText.pages"]);
  * whole a path on a machine is left out, whichever directory it begins in.
  */
 const LOCATION_FIELDS = new Set([
-  "Original.held_at", "Original.obtained_from", "Upstream.url", "Upstream.note", "AuxiliaryFile.url", "Resolution.url",
+  "Original.held_at", "Original.obtained_from", "Upstream.url", "Upstream.note", "UpstreamLocation.url", "UpstreamLocation.label", "AuxiliaryFile.url", "Resolution.url",
   "CandidateOrigin.location", "InputDigest.input", "GoverningRecord.identity", "SourceChange.value", "SourceChange.previous", "SourceChange.from",
 ]);
 /** Bibliography fields that name a file. */

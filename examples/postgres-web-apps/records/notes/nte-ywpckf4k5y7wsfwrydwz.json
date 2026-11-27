@@ -1,0 +1,21 @@
+{
+  "body": "Figma kept PostgreSQL in part because rewriting an application built on its relational model for a non-relational store was not viable.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-ywpckf4k5y7wsfwrydwz",
+  "kind": "note",
+  "passages": [
+    "psg-db071bnkq9akp1esr4yh"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "type": "paraphrase"
+}

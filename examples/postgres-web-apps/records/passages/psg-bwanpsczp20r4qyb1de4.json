@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1430,
+      "index": 7,
+      "page_sha256": "dc0a5777314a723fb82612549de93dcd1389c13aa064cfabf4145f0b1dcb1ddf",
+      "start": 1359,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-bwanpsczp20r4qyb1de4",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "169"
+  },
+  "quote": {
+    "exact": "ultimately we’re going to be moving away from a SQL-based architecture."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-927xc3h01n3ns1ewxfjg",
+  "source_record_sha256": "a00eea12ddab5b2ccdac526212876a70e1b03024d2a656f5ca577c5c4861136c",
+  "text": "txt-f62s1msgvp2hxn56ekew"
+}

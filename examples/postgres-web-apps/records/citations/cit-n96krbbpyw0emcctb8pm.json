@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-n96krbbpyw0emcctb8pm",
+  "intake": "parsed",
+  "key": "pg18standby",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "80"
+  },
+  "passage": "psg-y08ps9hf6nbkc8gwnz50",
+  "quotation": "PostgreSQL streaming replication is asynchronous by default. If the primary server crashes then some transactions that were committed may not have been replicated to the standby server, causing data loss. The amount of data loss is proportional to the replication delay at the time of failover.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "49297b377f2d950aa93adfc0e9afc0daf1251dd34e406fec74a42b78a352bdaf",
+    "text": "The default favors speed over certainty: “PostgreSQL streaming replication is asynchronous by default. If the primary server crashes then some transactions that were committed may not have been replicated to the standby server, causing data loss. The amount of data loss is proportional to the replication delay at the time of failover.”"
+  }
+}

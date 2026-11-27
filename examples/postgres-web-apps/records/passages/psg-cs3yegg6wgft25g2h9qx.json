@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 802,
+      "index": 1,
+      "page_sha256": "e1af3e9562b5f0ddb6ec74a0cf3f94f71c195b7c3236e440b84aa77d6f34654a",
+      "start": 712,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:04Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-cs3yegg6wgft25g2h9qx",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "5"
+  },
+  "quote": {
+    "exact": "It’s dependable, feature-rich, extensible, and well-suited for most operational workloads."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "source_record_sha256": "c5f9ad6df398a5cdaed0c7bff8258b77c8af09809098219a348c7c2ff38c42a0",
+  "text": "txt-44w8mtetezbxysnrekak"
+}

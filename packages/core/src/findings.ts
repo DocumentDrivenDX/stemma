@@ -140,7 +140,14 @@ export const TEMPLATES = {
   "source.held:source_damaged": explain(
     "A cited source has a source file that is damaged, so it is not used and this citation is unchecked.", HELD_WHY,
     ["See the source.pages and record.valid findings on that source file. Restore it from git, or record your own edit with `source seal`."], ["restore_source"]),
+  "source.held:text_not_held": explain(
+    "The text of this cited source is not in this copy of the project, so this citation could not be checked.", HELD_WHY,
+    ["See the source.pages finding for that source file. `ingest --fetch` fetches the original again and writes the text if it converts to exactly what the manifest records; `ingest --originals <dir>` does the same from a copy you have."], ["capture_source"]),
   "source.held:check_error": CHECK_FAILED,
+  "source.pages:not_held": explain(
+    "The source's text is not held here: its manifest is present and none of its page or section files is. Nothing shows that anything is damaged.",
+    "Quotations, pages and anything else that rests on this text cannot be checked in this copy of the project.",
+    ["Fetch it again with `ingest --fetch --actor <kind>:<name>`, which asks the recorded addresses, or give a copy of the original with `ingest --originals <dir>`. The text is written only if it is exactly what the manifest records. If you keep the text elsewhere, or it was typed or recognized by another tool, copy it back."], ["capture_source"]),
   "source.pages:part_missing": explain(
     "A page or section file that the manifest lists is missing.", STRUCTURE_WHY,
     ["Restore the file from git."], ["restore_source"]),
@@ -195,6 +202,9 @@ export const TEMPLATES = {
   "source.original:comparison_stale": explain(
     "The text or the tools changed after the last fresh conversion was compared, so it no longer says anything.", ORIGINAL_WHY,
     ["Run `source verify <text id> --original <file>`, or `ingest` with the originals."], ["verify_original"]),
+  "source.original:text_not_held": explain(
+    "A source file's text is not here, so it was not compared with its original.", ORIGINAL_WHY,
+    ["See the source.pages finding for this source file."]),
   "source.original:check_error": CHECK_FAILED,
   "claim.complete:claim_incomplete": explain(
     "A claim in the ledger is incomplete: the evidence names what is missing of a note behind it, a confidence level and a reason.", CLAIM_WHY,
@@ -214,7 +224,7 @@ export const TEMPLATES = {
     ["Check that the passage still belongs to the source as it is now recorded, and capture it again if it does."]),
   "source.changed:record_unreadable": explain(
     "Whether what this rests on has changed could not be checked: something it depends on cannot be read.", CHANGED_WHY,
-    ["Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."]),
+    ["See the record.valid and source.pages findings: repair the file, or fetch text that is not held here, then run `check` again."]),
   "source.changed:retired_text_not_followed": explain(
     "A source file of this source was retired, and a citation with no record does not say whether it was written before or after.",
     CHANGED_WHY,
@@ -277,6 +287,9 @@ export const TEMPLATES = {
   "locator.extent:record_unreadable": explain(
     "A locator could not be checked: a source file of this source cannot be read or is damaged.", UNLOCATED_WHY,
     ["See the record.valid and source.pages findings, repair the source file, then run `check` again."]),
+  "locator.extent:text_not_held": explain(
+    "A locator could not be checked: the text of this source is not in this copy of the project.", UNLOCATED_WHY,
+    ["See the source.pages finding for that source file, and fetch its text again."]),
   "locator.extent:check_error": CHECK_FAILED,
   "meta.source:mismatch": explain(
     "The source record disagrees with what the captured copy states about itself.", META_WHY,
@@ -284,6 +297,9 @@ export const TEMPLATES = {
   "meta.source:source_damaged": explain(
     "The source's details could not be compared with a copy: its source file is damaged.", META_WHY,
     ["See the source.pages finding and repair the source file."], ["restore_source"]),
+  "meta.source:text_not_held": explain(
+    "The source's details could not be compared with a copy: its text is not in this copy of the project.", META_WHY,
+    ["See the source.pages finding for that source file, and fetch its text again."], ["capture_source"]),
   "meta.source:not_found_in_copy": explain(
     "Some of the source's details are shown neither by the copy's title page text nor by a saved catalogue record, and nothing contradicts them.", META_WHY,
     ["Nothing needs doing: this is a limit of what was covered. A saved lookup or a copy with a clearer text would corroborate more. The author may also record what the title page shows (`review add --scope source_details`)."]),
@@ -378,6 +394,7 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   bad_part: "the part is not in the source file format",
   model_verification: "a model's review can only flag; it is never a person's verification",
   response_digest_mismatch: "the saved response does not match its digest",
+  bad_location: "a location is an http or https address with no user name or password, or, for a private copy, a name that is no path or address; none is listed twice",
   bad_address: "a passage address needs, for each part, a start before its end",
   bad_binding: "an annotation binds a sentence and its source, or one record, never both",
   note_without_passage: "an extract or paraphrase note names no passage, so nothing shows where in its source it comes from; capture the passage (`passage capture`) and name it in `passages`, or make the note a comment if it is a remark of your own",

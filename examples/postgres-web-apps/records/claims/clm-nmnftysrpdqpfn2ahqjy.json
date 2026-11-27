@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-nmnftysrpdqpfn2ahqjy",
+  "kind": "claim",
+  "reason": "Stated in the documentation’s comparison of solutions. The same page lists other multi-primary arrangements, so this is not a claim that no tool allows several writers.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Built-in replication does not offer synchronous multimaster operation, and spreading writes by partitioning leaves each data set with one writing server."
+}

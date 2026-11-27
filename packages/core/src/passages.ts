@@ -115,7 +115,10 @@ export function capturePassage(corpus: Corpus, request: CaptureRequest) {
   if (!corpus.texts.has(address.text)) throw new InvalidInput(`No source file has the ID ${address.text}.`);
   if (isRetired(corpus.texts.get(address.text)!.manifest.data!)) throw new InvalidInput(`The source file ${address.text} is retired.`);
   const view = texts.view(address.text);
-  if (!view) throw new InvalidInput("That source file is damaged, so nothing is copied from it. `check` explains why.");
+  if (!view) {
+    throw new InvalidInput(texts.notHeld([address.text]) ? "That source file's text is not held here, so nothing can be copied from it. `check` explains how to fetch it again."
+      : "That source file is damaged, so nothing is copied from it. `check` explains why.");
+  }
   const { start, end } = resolveSpan(view, address);
   const exact = view.streams[address.stream].text.slice(start, end);
   if (!/\S/u.test(exact)) throw new InvalidInput("The address holds only white space.");

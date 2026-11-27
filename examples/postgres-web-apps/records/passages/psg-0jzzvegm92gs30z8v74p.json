@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 812,
+      "index": 1,
+      "page_sha256": "0fb1b5825925706e1b7c32b3d0909c25d498142f7fbd9301de18216262877616",
+      "start": 726,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:05:02Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-0jzzvegm92gs30z8v74p",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "19"
+  },
+  "quote": {
+    "exact": "There is sufficient free space on the page containing the old row for the updated row."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-r7741gv5gb10aq6fv2bz",
+  "source_record_sha256": "424efd89f33dc9b7e9a2cedeb2ad8e9909b41c606c21e8f914355b7e600239ec",
+  "text": "txt-as7yx1dqj00zc85cb8pf"
+}
