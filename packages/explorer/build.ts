@@ -46,7 +46,8 @@ export function servedLicenses(): Record<string, string> {
     ["openjpeg.txt", join(pdfjs, "wasm/LICENSE_OPENJPEG")],
     ["pdfjs-jbig2.txt", join(pdfjs, "wasm/LICENSE_PDFJS_JBIG2")],
     ["jbig2.txt", join(pdfjs, "wasm/LICENSE_JBIG2")],
-    ["core-js.txt", join(import.meta.dir, "licenses/core-js-LICENSE.txt")],
+    // The polyfills are inside the pdf.js files; the license comes from the package of the version they name.
+    ["core-js.txt", join(packageDir("core-js", root), "LICENSE")],
   ];
   return Object.fromEntries(files.map(([name, path]) => [name, unixText(path)]));
 }

@@ -304,3 +304,11 @@ describe.skipIf(!browser)("the explorer page from a local file", () => {
     expect(await alert.innerText()).toContain("stemma.graph.json, entity stemma.Nothing:clm-fixture0000");
   });
 });
+
+test("the core-js license shipped is that of the version inside the pdf.js build", () => {
+  const modules = join(import.meta.dir, "../node_modules");
+  const bundled = new Set(["pdf.mjs", "pdf.worker.mjs"].flatMap((name) =>
+    [...readFileSync(join(modules, "pdfjs-dist/legacy/build", name), "utf8").matchAll(/core-js\/blob\/v([0-9.]+)\//g)].map((m) => m[1]!)));
+  expect([...bundled]).toEqual([(JSON.parse(readFileSync(join(modules, "core-js/package.json"), "utf8")) as { version: string }).version]);
+  expect(servedLicenses()["core-js.txt"]).toBe(readFileSync(join(modules, "core-js/LICENSE"), "utf8"));
+});
