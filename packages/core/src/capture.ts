@@ -167,6 +167,16 @@ function directoryFor(corpus: Corpus, wanted: string | undefined, key: unknown, 
   return `sources/${id}`;
 }
 
+/** The part files a conversion gives, each with its place under the source file's directory and its digest. */
+export function partTexts(converted: ConvertedInput): { index: number; file: string; sha256: string; text: string }[] {
+  return converted.parts.map((part) => {
+    const front = partFront(part, converted.paged, converted.method);
+    assertValid("SourcePage", "source_page", canonical(front));
+    const text = serializePart(front, part.blocks);
+    return { index: part.index, file: partFile(converted.paged, part.index), sha256: fileDigest(text), text };
+  });
+}
+
 export function planSourceText(corpus: Corpus, request: NewSourceText): SourceTextPlan {
   const { actor, now, token, converted, original } = request;
   if (actor.kind === "model" && converted.method === "manual") {
@@ -190,14 +200,10 @@ export function planSourceText(corpus: Corpus, request: NewSourceText): SourceTe
   const directory = directoryFor(corpus, request.name, named?.citation_key, id);
   const files: FileWrite[] = [];
   let size = 0;
-  const entries = converted.parts.map((part) => {
-    const front = partFront(part, converted.paged, converted.method);
-    assertValid("SourcePage", "source_page", canonical(front));
-    const text = serializePart(front, part.blocks);
+  const entries = partTexts(converted).map(({ index, file, sha256, text }) => {
     size += Buffer.byteLength(text);
-    const file = partFile(converted.paged, part.index);
     files.push({ path: `${directory}/${file}`, text });
-    return { index: part.index, file, sha256: fileDigest(text) };
+    return { index, file, sha256 };
   });
   if (size > LIMITS.text_bytes) throw new InvalidInput("The converted text is larger than the limit of 100 MiB.");
   const identity = { ...converted.identity, ...request.identity };

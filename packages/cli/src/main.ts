@@ -19,6 +19,7 @@ import { sourceCapture, sourceEnrich, sourceHistoryCommand, sourceList, sourceTa
 import { excerpt } from "./excerpt.ts";
 import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
+import { sourceLocate } from "./locate.ts";
 import { buildReportCommand, citeFormat } from "./publish.ts";
 import { browse } from "./browse.ts";
 import { reviewed, unreviewedList } from "./reviewed.ts";
@@ -46,6 +47,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   source tag <id|key>... --actor <kind>:<name> [--add <tag>]... [--remove <tag>]... [--from <text>]
   source list [--tag <tag|namespace:>]... [--stage record|captured|text] [--has identifiers|lookup|tags]...
   source history <id|key>
+  source locate <upstream id|source id|key> --actor <kind>:<name> [--note <text>]
+             (--url <address> --kind publisher|web_archive|archive [--fetch] | --private <label> [--original <file>])
+             adds another place an original can be had from, or compares one; only the upstream record changes
   source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
              [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...
@@ -90,7 +94,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
              the plugin declares it, and the host starts it
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
-Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
+Only ingest --fetch, ingest --refresh-lookups, source locate --fetch and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.
 `;
@@ -117,6 +121,7 @@ const OPTIONS = {
   citation: STRING, quotation: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
   finding: STRING, effect: STRING, "add-identifier": LIST, set: LIST, author: LIST, lookup: STRING, replace: FLAG, from: STRING,
+  url: STRING, kind: STRING, private: STRING,
   add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST, audience: STRING, page: FLAG, chapter: STRING, "no-open": FLAG, "idle-minutes": STRING, opener: STRING,
 };
 
@@ -126,6 +131,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "source capture": ["actor", "source", "origin", "acquired-at", "source-version"],
   "source enrich": ["actor", "from", "add-identifier", "set", "author", "lookup", "replace"],
   "source tag": ["actor", "from", "add", "remove"], "source list": ["tag", "stage", "has"], "source history": [],
+  "source locate": ["actor", "url", "kind", "private", "note", "fetch", "original"],
   "source pages": ["text-layer", "page-numbers", "out"],
   "source label": ["actor", "page-map"],
   "source seal": ["actor", "note"],
@@ -349,6 +355,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "source tag": return sourceTag(options, rest);
     case "source list": only(0); return sourceList(options);
     case "source history": only(1); return sourceHistoryCommand(options, rest[0]);
+    case "source locate": only(1); return sourceLocate(options, rest[0]);
     case "source pages": only(1); return sourcePages(options, rest[0]);
     case "source convert": only(1); return sourceConvert(options, rest);
     case "source label": only(1); return sourceLabel(options, rest[0]);

@@ -24,7 +24,7 @@ ddx:
 **Contract ID**: CONTRACT-001
 **Type**: schema
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-002, ADR-003, ADR-010, CONTRACT-007, FR-6 to FR-14, FR-20 to FR-23, FR-32, FR-54, FR-62, FR-67, FR-68, FR-72, FR-73, FR-88 to FR-90
+**Related**: ADR-002, ADR-003, ADR-010, CONTRACT-007, FR-6 to FR-14, FR-20 to FR-23, FR-32, FR-54, FR-62, FR-67, FR-68, FR-72, FR-73, FR-88 to FR-90, FR-98
 
 ## Purpose
 
@@ -110,7 +110,7 @@ assigned once, is never reused, and carries no meaning. The file name is
 | `source` | `src-` | `sources` | The one official bibliography record per source: fields, rights, intake, admission |
 | `agent` | `agt-` | `agents` | Person or organization |
 | `source_text` | `txt-` | `sources/<name>/source.md` | One conversion of an original: identity, ties to the original, converter, and part digests (CONTRACT-007) |
-| `upstream` | `ups-` | `upstreams` | One fetched or supplied original: address, retrieval time, hash, identifiers, lookups to make |
+| `upstream` | `ups-` | `upstreams` | One fetched or supplied original: address, retrieval time, hash, other locations of it, identifiers, lookups to make |
 | `text_review` | `rvw-` | `text-reviews` | One review of source text by a person, or a model's flag |
 | `comparison_run` | `run-` | `comparison-runs` | One recorded comparison of source text, with each page's agreement |
 | `passage` | `psg-` | `passages` | Selected text at a passage address, with typed locator |
@@ -256,6 +256,42 @@ it (`page_numbers` data, which conversion may compare with, and a library's
 make for its source. Where a
 source has upstream records, each of its source files' originals MUST match one
 of them by hash (checked by `source.original`).
+
+**Locations of an original (FR-98).** One upstream is one original, identified
+by its `sha256` and `size`. `url` stays the address those bytes were retrieved
+from. `locations` is optional: an ordered list of other places the author names
+for the same original, such as the publisher's live address, a web archive's
+snapshot, another archival copy, or a private copy the author keeps. A location
+is a reference only: no copy is kept in the repository. A record without
+`locations` means what it did before this field. A version of Stemma older than
+the field reports it as an unknown field. Each entry (`UpstreamLocation`) holds:
+
+| Field | Holds |
+|---|---|
+| `kind` | `publisher` (the publisher's or another live address), `web_archive` (a web archive's snapshot), `archive` (another archival copy at an address), or `private` (a copy the author keeps) |
+| `url` | An `http` or `https` address, with no user name or password in it. Present for every kind but `private`, and absent for `private` |
+| `label` | For `private` only: a name the author chooses, 1 to 80 letters, digits, spaces, and `. _ ' ( ) -`, starting with a letter or digit. It cannot hold a path separator or a colon, so it cannot be a path or an address |
+| `added` | A stamp: when the location was recorded and by whom |
+| `compared` | Optional. `at` and `sha256`: when bytes from this location were last compared, and their digest. They are the original exactly when `sha256` equals the upstream's. Absent means never compared: the location is only a reference |
+| `note` | Free text |
+
+No two entries have the same `url`, or the same `label`. A breach of these rules
+is `record_invalid` (`bad_location`). A private copy's path is never recorded:
+it is found by the original's digest in `.stemma/originals/` or in the files and
+folders given when a command runs (CONTRACT-002 B). An address can hold an
+access token in its query that no rule here recognizes, so a copy behind such an
+address is recorded as `private`, by label. `compared` is a record of what one
+request or one file gave at that time, not a promise about what the location
+gives now: wherever bytes are used, their digest is matched again.
+
+A web archive's ordinary page for a snapshot generally adds its own markup to an
+HTML page, so its bytes are not the original's. The Internet Archive documents a
+form that gives a capture as stored, with `id_` after the timestamp
+(`https://web.archive.org/web/<timestamp>id_/<address>`). Observed on
+2026-11-27: for two PDFs and two HTML pages that form gave bytes equal to the
+recorded originals; for others it gave a different capture of the page. Stemma
+rewrites no address; the author records the one to use, and the comparison says
+what it gave.
 
 **Saved lookups.** A `resolution` holds the resolver, the identifier looked up,
 the address queried and when, the outcome, the response as received or reduced
@@ -603,6 +639,7 @@ expects it to stay reviewed.
 
 | Element | Evidence | Not shown |
 |---|---|---|
+| Upstream locations | Tests with invented records and faked fetches on one macOS system; the PostgreSQL worked example records real web-archive locations and what each gave on one day | That any location keeps giving what it gave |
 | UMF schema file | UMF SDK 0.10.13 reported it valid, with and without the `umf.ddd` package, on one macOS system, run again after the latest record additions; every diagnostic was a warning (unknown extension, uninterpreted relationship qualifier, unchecked extension semantics). A generation-time check confirmed members, value targets, reference target kinds, and unique relationship names | UMF checks no `umf.ddd` semantics, and in a feasibility test accepted a bad scalar, a field mismatch, and a multi-source relationship that arras rejects. No record has been validated against this schema, and no validator has been generated from it |
 | Canonical form | A feasibility test wrote 70 synthetic records canonically on one system. It applied Unicode normalization, which this contract forbids | This exact form, on any system |
 | Digest and applicability rules, links, `LegacyField` mapping | Design only | All |
