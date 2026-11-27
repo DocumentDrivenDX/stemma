@@ -73,7 +73,15 @@ that is not in the Stemma repository.
 file, named `documentdrivendx`, lists `stemma` at `./plugins/stemma`.
 `dev.sh publish-plugin <checkout>` copies the release tree (manifest, skill,
 launcher, bundle, library data, license) there, changes nothing else, and
-commits and pushes nothing; publishing is the owner's commit and push. An author
+commits and pushes nothing. Publishing is the owner's push of a release tag
+`v<version>`: a GitHub Actions workflow (`.github/workflows/publish.yml`) checks
+that the tag names the manifest's version, builds, runs that command, and
+commits and pushes `plugins/stemma` with a short-lived token of a GitHub App
+installed only on the marketplace repository. It runs no tests and no check waits on it.
+Each release tag has a GitHub release: the workflow creates one when the tag has
+none, even if publishing fails, and publishing a release on GitHub for a new tag
+creates the tag. A release therefore does not show that the version reached the
+marketplace; the workflow run does. Deleting a tag or a release leaves the other. An author
 installs with `claude plugin marketplace add DocumentDrivenDX/plugins` and
 `claude plugin install stemma@documentdrivendx`.
 
@@ -169,7 +177,7 @@ The harness runs locally during development and in one workflow triggered only b
 
 **Runtime configuration.** On Bun 1.4.5 (macOS), `bunfig.toml` and `.env` in the working directory were loaded even with `--no-install`; adding `--no-env-file --config=/dev/null` stopped both. The invocation uses all three flags, starts in the plugin root, and passes absolute paths (CONTRACT-002 A); the guard exits 4 without `--no-install`. A seeded-file test covers SEC-014. Windows is untested. The author's own global Bun settings and environment, such as `BUN_OPTIONS`, are outside this control.
 
-**Release integrity and delivery.** Each release is one commit in the marketplace repository that replaces `plugins/stemma`; the publish script refuses different content under a published version and pushes nothing. The install check compares the installed bundle with the built one (SEC-028). Whoever can push to that repository can change what installs; a digest from the same publisher does not protect against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
+**Release integrity and delivery.** Each release is one commit in the marketplace repository that replaces `plugins/stemma`; the publish script refuses different content under a published version, or a version older than the published one, and pushes nothing itself. The install check compares the installed bundle with the built one (SEC-028). Whoever can push to that repository, or push a release tag to Stemma's, can change what installs; a digest from the same publisher does not protect against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
 
 ### Component Interactions
 
