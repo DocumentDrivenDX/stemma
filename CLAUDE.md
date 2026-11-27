@@ -11,16 +11,19 @@ If the `helix` skill is not available, tell the user and give them these
 commands. Install it only if they ask you to. In a Claude Code session:
 
 ```text
-/plugin marketplace add https://github.com/DocumentDrivenDX/helix
-/plugin install helix@helix
+/plugin marketplace add DocumentDrivenDX/plugins
+/plugin install helix@documentdrivendx
 ```
 
 Or from a terminal:
 
 ```sh
-claude plugin marketplace add https://github.com/DocumentDrivenDX/helix
-claude plugin install helix@helix --scope user
+claude plugin marketplace add DocumentDrivenDX/plugins
+claude plugin install helix@documentdrivendx --scope user
 ```
+
+If you added that marketplace before it listed HELIX, run
+`claude plugin marketplace update documentdrivendx` before installing.
 
 For Codex and other hosts, follow HELIX's
 [install guide](https://github.com/DocumentDrivenDX/helix/blob/main/docs/install/README.md).
