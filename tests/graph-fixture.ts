@@ -75,6 +75,7 @@ function fix(record: Value, n: number): Value {
     const text = normalizeSentence(`Fixture sentence ${n}.`);
     record.sentence = { text, sha256: sha256(text) };
   }
+  if (kind === "chapter") record.manuscript_path = `manuscript/${String(record.id)}.md`;
   if (kind === "authorship_mark") record.text_sha256 = sha256(normalizeSentence(String(record.text)));
   if (kind === "resolution") record.response_sha256 = sha256(String(record.response));
   if (kind === "passage") record.anchor = [{ index: 0, page_sha256: sha256("page"), stream: (TYPES.PageAnchor!.stream!.values ?? ["main"])[0], start: 0, end: 4 }];

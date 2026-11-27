@@ -11008,6 +11008,10 @@
       {
        "module": "stemma_record",
        "element": "ImportBatch.losses"
+      },
+      {
+       "module": "stemma_record",
+       "element": "ImportBatch.separate"
       }
      ],
      "extensions": {
@@ -11129,6 +11133,13 @@
           }
          },
          "cardinality": "many"
+        },
+        "separate": {
+         "type": {
+          "kind": "scalar",
+          "name": "boolean"
+         },
+         "cardinality": "optional"
         },
         "losses": {
          "type": {
@@ -11304,6 +11315,15 @@
      "name": "blocks",
      "nullability": "absent-allowed",
      "extensions": {}
+    },
+    {
+     "id": "ImportBatch.separate",
+     "kind": "field",
+     "name": "separate",
+     "nullability": "absent-allowed",
+     "extensions": {},
+     "cardinality": "one",
+     "scalarType": "boolean"
     },
     {
      "id": "ImportBatch.losses",

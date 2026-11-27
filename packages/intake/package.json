@@ -4,6 +4,8 @@
   "type": "module",
   "exports": "./src/index.ts",
   "dependencies": {
+    "@stemma/core": "workspace:*",
+    "@stemma/manuscript": "workspace:*",
     "@stemma/records": "workspace:*"
   }
 }

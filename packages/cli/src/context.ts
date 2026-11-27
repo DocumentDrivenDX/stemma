@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { type Actor, InvalidInput, renderFindings, type Result, validateFiles } from "@stemma/core";
 import { CONVERTER_VERSION, PDFJS_VERSION } from "@stemma/extract";
 import { canonical, type Corpus, loadCorpus } from "@stemma/records";
-import { findProject, readProject } from "@stemma/workspace";
+import { findProject, readProject, withWriteLock, writeInterrupted } from "@stemma/workspace";
 import manifest from "../../../.claude-plugin/plugin.json";
 
 export const VERSION: string = manifest.version;
@@ -29,6 +29,7 @@ export interface Options {
   finding?: string; effect?: string; "add-identifier"?: string[]; set?: string[]; author?: string[]; lookup?: string;
   replace?: boolean; from?: string; add?: string[]; remove?: string[]; tag?: string[]; stage?: string; has?: string[];
   audience?: string; page?: boolean; chapter?: string; citation?: string; quotation?: string;
+  separate?: boolean; again?: boolean; library?: string[];
   check?: boolean; pdf?: boolean; "no-open"?: boolean; "idle-minutes"?: string; opener?: string;
 }
 
@@ -57,6 +58,8 @@ export function requireProject(options: Options): string {
 }
 
 export function openCorpus(root: string): Corpus {
+  // A write that was interrupted is finished before anything is read (Data Design, Consistency).
+  if (writeInterrupted(root)) withWriteLock(root, () => {});
   const corpus = loadCorpus(readProject(root));
   const { state, data } = corpus.settings;
   if (state === "version_unsupported") {

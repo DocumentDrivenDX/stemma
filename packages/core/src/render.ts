@@ -4,11 +4,14 @@ import { compareCodePoints } from "@stemma/records";
 import { CHECK_DESCRIPTIONS } from "./checks/not-run.ts";
 import { type Coverage, coverageWords } from "./verification.ts";
 import type { Result, ReportBody } from "./report.ts";
+import { renderOpenTakeover, whereToStart } from "./render-takeover.ts";
+export { renderTakeover } from "./render-takeover.ts";
 
 export function groupResults(results: Result[]): Result[][] {
   const groups = new Map<string, Result[]>();
   for (const result of results) {
-    const key = result.evidence.find((e) => e.name === "key" || e.name === "points_at");
+    // Entries listed and never cited share one cause, whichever works they are.
+    const key = result.check === "bib.uncited" ? undefined : result.evidence.find((e) => e.name === "key" || e.name === "points_at");
     // Findings share a cause when the same check fails for the same reason on the same thing.
     const cause = [result.check, result.reason_code ?? "", key?.value ?? ""].join("\u0000");
     groups.set(cause, [...(groups.get(cause) ?? []), result]);
@@ -102,6 +105,8 @@ export function renderReport(body: ReportBody): string {
     lines.push(`OPEN FINDINGS: ${parts.join(", ")}. Nothing is blocked.`);
   }
   lines.push(`Checked the whole project: ${summary.pass} result(s) passed.`);
+  // A taken-over project starts with many findings, so its causes are listed first.
+  if (body.takeover) lines.push(...whereToStart(body));
   lines.push(...renderFindings(body.results));
   lines.push(...coverageSummary(body.results));
   lines.push(...quotationNotes(body.results));
@@ -110,6 +115,7 @@ export function renderReport(body: ReportBody): string {
     lines.push("", "For information: a person dismissed these findings. The check still finds what it found.");
     for (const r of dismissed) lines.push(`   - ${printable(r.subject)} [${r.check}] ${r.message}`, ...noteLines(r));
   }
+  if (body.takeover) lines.push(...renderOpenTakeover(body.takeover));
   const confirmed = body.results.filter((r) => r.confirmed_by !== undefined);
   if (confirmed.length > 0) {
     lines.push("", "For information: a person recorded what they saw for these details, which nothing else here shows. They are confirmed by the author, not verified.");

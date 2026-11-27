@@ -32,6 +32,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   passage capture --address <address> --actor <kind>:<name>
   cite format --input <file|->
   build report [<dir>] [--check] [--pdf]
+  takeover <file.docx> [--actor <kind>:<name>] [--separate]
+             take one Word chapter into the project: records, an unverified graph and a Stemma copy;
+             the original is only read. Run once for each file
   record add <kind> --input <file|-> [--actor <kind>:<name>]
   resolve <source id>... --actor <kind>:<name> [--via crossref|internet_archive --identifier <value>]
   validate [paths]

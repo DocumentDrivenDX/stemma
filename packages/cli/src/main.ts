@@ -10,11 +10,13 @@ import {
 import { Unconvertible } from "@stemma/extract";
 import { canonical, type Corpus, KINDS, loadCorpus } from "@stemma/records";
 import {
-  AlreadyInitialized, initProject, projectRelative, randomToken, readProject, UnsafePath, UnsupportedFile, writeProjectFile,
+  AlreadyInitialized, initProject, ProjectBusy, projectRelative, randomToken, readProject, StaleInput, UnsafePath, UnsupportedFile, writeProjectFile,
 } from "@stemma/workspace";
 import {
   actorOf, CommandError, emit, openCorpus, type Options, reportRecords, requireActor, requireProject, tools, usageError, VERSION,
 } from "./context.ts";
+import { takeover } from "./takeover.ts";
+import { WORD_LIMITS } from "@stemma/intake";
 import { sourceCapture, sourceEnrich, sourceHistoryCommand, sourceList, sourceTag } from "./enrich.ts";
 import { excerpt } from "./excerpt.ts";
 import { graphExport, graphStatus } from "./graph.ts";
@@ -66,6 +68,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   passage capture --address <address> --actor <kind>:<name>
   cite format --input <file|->
   build report [<dir>] [--check] [--pdf]
+  takeover <file.docx> [--actor <kind>:<name>] [--separate]
+             take one Word chapter into the project: records, an unverified graph and a Stemma copy;
+             the original is only read. Run once for each file
   record add <kind> --input <file|-> [--actor <kind>:<name>]
   resolve <source id>... --actor <kind>:<name> [--via crossref|internet_archive --identifier <value>]
   validate [paths]
@@ -98,7 +103,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 /** Commands CONTRACT-002 B names that this version does not have yet. */
 const NOT_YET = new Set([
   "migrate", "key", "rounds",
-  "support", "import", "export", "takeover", "index", "setup", "log", "activity",
+  "support", "import", "export", "index", "setup", "log", "activity",
   "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "disclosure", "scan", "map",
 ]);
 
@@ -117,6 +122,7 @@ const OPTIONS = {
   citation: STRING, quotation: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
   finding: STRING, effect: STRING, "add-identifier": LIST, set: LIST, author: LIST, lookup: STRING, replace: FLAG, from: STRING,
+  separate: FLAG, again: FLAG, library: LIST,
   add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST, audience: STRING, page: FLAG, chapter: STRING, "no-open": FLAG, "idle-minutes": STRING, opener: STRING,
 };
 
@@ -127,6 +133,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "source enrich": ["actor", "from", "add-identifier", "set", "author", "lookup", "replace"],
   "source tag": ["actor", "from", "add", "remove"], "source list": ["tag", "stage", "has"], "source history": [],
   "source pages": ["text-layer", "page-numbers", "out"],
+  takeover: ["actor", "separate", "again", "library"],
   "source label": ["actor", "page-map"],
   "source seal": ["actor", "note"],
   "source verify": ["actor", "original"],
@@ -160,6 +167,7 @@ function doctor(options: Options): number {
     platform: `${process.platform}-${process.arch}`,
     platform_status: "Development tests have run on macOS (Apple silicon) only. No release has been observed in a desktop app; other systems are untested.",
     source_limits: LIMITS,
+    word_limits: WORD_LIMITS,
     originals_cache: project ? existsSync(join(project, ".stemma/originals")) : false,
   };
   const missing = ISOLATION_FLAGS.filter((f) => !flags[f]);
@@ -173,6 +181,7 @@ function doctor(options: Options): number {
     `Project: ${project || "none named"}`,
     `Platform: ${info.platform}. ${info.platform_status}`,
     `Limits on originals: ${LIMITS.input_bytes / 1048576} MiB a file, ${LIMITS.text_bytes / 1048576} MiB of text and ${LIMITS.parts} pages or sections. Reading a PDF is stopped past ${LIMITS.pdf_memory_bytes / 1073741824} GiB of memory.`,
+    `Limits on a Word manuscript: ${WORD_LIMITS.file_bytes / 1048576} MiB a file, ${WORD_LIMITS.total_bytes / 1048576} MiB expanded, ${WORD_LIMITS.entries} archive entries. No Word file saved by a real tool has been tested.`,
     missing.length === 0
       ? "Start flags: no run-time downloads, and no .env or bunfig.toml is loaded."
       : `WARNING: started without ${missing.join(" ")}. A .env or bunfig.toml in the working directory could run code or change settings.`,
@@ -333,6 +342,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "version": only(0); return version(options);
     case "doctor": only(0); return doctor(options);
     case "init": only(0); return init(options);
+    case "takeover": return takeover(options, rest);
     case "validate": return validate(options, rest);
     case "fmt": return fmt(options, rest);
     case "check": only(0); return check(options);
@@ -413,6 +423,8 @@ export async function main(argv: string[]): Promise<number> {
       : error instanceof UnsupportedFile ? new CommandError(5, "unsupported_file", error.message)
       : error instanceof Unconvertible ? new CommandError(5, "invalid_input", `${error.message} Nothing was written.`)
       : error instanceof DuplicateOriginal ? new CommandError(5, "already_held", `A source file already holds this original: ${error.holders.map((h) => `source ${h.source} (${h.text})`).join(", ")}. Nothing was written and nothing was merged. To add another conversion or attach it to another source, name that source with --source.`, error.holders.map((h) => h.source))
+      : error instanceof ProjectBusy ? new CommandError(3, "busy", "Another Stemma command is writing in this project. Wait for it to finish. If none is running, delete .stemma/write.lock.")
+      : error instanceof StaleInput ? new CommandError(5, "stale_input", "A file changed while the command ran, so nothing was written. Run it again.", [error.message])
       : error instanceof ActorNeeded ? usageError("The input has no `created` stamp, so say who is adding it with --actor.")
       : error instanceof UnsafePath ? new CommandError(5, "unsafe_path", "That path leaves the project, is not a plain file, or would overwrite something. Nothing was written there.", [error.message])
       : error instanceof AlreadyInitialized ? new CommandError(5, "already_initialized", "This directory already holds stemma.json; init changed nothing.")

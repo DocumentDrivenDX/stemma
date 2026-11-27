@@ -2692,6 +2692,9 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "value": "LossItem"
    },
    "many": true
+  },
+  "separate": {
+   "type": "boolean"
   }
  },
  "Project": {

@@ -11,6 +11,7 @@
     "@stemma/graph": "workspace:*",
     "@stemma/server": "workspace:*",
     "@stemma/cite": "workspace:*",
-    "@stemma/publish": "workspace:*"
+    "@stemma/publish": "workspace:*",
+    "@stemma/intake": "workspace:*"
   }
 }

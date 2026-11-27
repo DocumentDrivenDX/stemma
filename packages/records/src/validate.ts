@@ -125,7 +125,11 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
   const size = (value: Json | undefined, field: string) => {
     if (typeof value === "number" && value < 0) problems.push(invalid("bad_size", field));
   };
-  if (record.kind === "upstream") size(record.size, "/size");
+  if (record.kind === "upstream" || record.kind === "import_batch") size(record.size, "/size");
+  // CONTRACT-006 A: a chapter's file is named by its record.
+  if (record.kind === "chapter" && typeof record.manuscript_path === "string" && record.manuscript_path !== `manuscript/${String(record.id)}.md`) {
+    problems.push(invalid("bad_address", "/manuscript_path"));
+  }
   if (record.kind === "source_text" && isObject(record.original)) {
     const { form, files, description, held_at: held } = record.original;
     const list = Array.isArray(files) ? files : [];

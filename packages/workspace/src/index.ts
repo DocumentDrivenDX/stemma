@@ -13,6 +13,7 @@ export * from "./fetch.ts";
 export * from "./inputs.ts";
 export * from "./originals.ts";
 export * from "./outputs.ts";
+export * from "./staged.ts";
 
 export function findProject(start: string): string | undefined {
   for (let dir = resolve(start); ; dir = dirname(dir)) {
@@ -168,7 +169,7 @@ export function projectRelative(root: string, path: string): string {
   return relative(base, target).split(sep).join("/");
 }
 
-function safeTarget(root: string, path: string): string {
+export function safeTarget(root: string, path: string): string {
   const full = resolve(root, path);
   if (!inside(root, full)) throw new UnsafePath(path);
   // The deepest existing parent must really be inside the project.

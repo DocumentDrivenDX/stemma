@@ -7,3 +7,4 @@ export { readWord, WORD_LIMITS, WordError, type WordLimits } from "./word.ts";
 export * from "./legacy.ts";
 export * from "./legacy-import.ts";
 export * from "./legacy-export.ts";
+export { type IntakeReport, planTakeover, RepeatedChapter, TAKEOVER_COVERAGE, TakeoverDefect, type TakeoverPlan, type TakeoverRequest, TakeoverRefused } from "./takeover.ts";

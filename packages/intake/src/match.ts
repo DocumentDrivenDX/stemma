@@ -31,6 +31,8 @@ export type CitationItem = Cited & {
   year: string;
   suffix: string;
   narrative: boolean;
+  /** The part of the brackets it came from, from 0. A lead-in belongs to its part, not to each year. */
+  part: number;
   prefix?: string;
   /** A page locator, as printed. */
   locator?: string;
@@ -472,8 +474,8 @@ export function matchAuthorDate(documents: Document[]): AuthorDateResult {
           brackets.push({ ...place, state: "unlinked", ...reading });
           continue;
         }
-        const items: CitationItem[] = reading.cited.flatMap((part) => part.items.map((item) => ({
-          ...part.cited, ...item, narrative: part.narrative, ...(part.prefix ? { prefix: part.prefix } : {}),
+        const items: CitationItem[] = reading.cited.flatMap((part, n) => part.items.map((item) => ({
+          ...part.cited, ...item, part: n, narrative: part.narrative, ...(part.prefix ? { prefix: part.prefix } : {}),
           ...link(part.cited, part.narrative, item, serving, lists),
         })));
         brackets.push({ ...place, state: items.every((i) => i.state === "linked") ? "linked" : "unresolved", items });

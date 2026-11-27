@@ -33,3 +33,5 @@ export * from "./original-pages.ts";
 export * from "./highlight.ts";
 export * from "./highlight-target.ts";
 export * from "./manuscript-view.ts";
+export * from "./intake-groups.ts";
+export { manuscriptFileResults } from "./checks/manuscript-files.ts";

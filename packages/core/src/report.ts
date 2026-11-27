@@ -1,4 +1,5 @@
 // The stemma.check-report/0 shapes (CONTRACT-002 C and E).
+import type { OpenTakeover } from "./intake-groups.ts";
 import type { Coverage } from "./verification.ts";
 
 export type Outcome = "pass" | "fail" | "unverifiable";
@@ -50,6 +51,8 @@ export interface ReportBody {
   /** What has been compared with and reviewed for each source file. Not findings. */
   verification: Coverage[];
   unreviewed: Unreviewed[];
+  /** Open takeover items grouped by cause. Present only where takeover left any. They are not findings. */
+  takeover?: OpenTakeover;
   redaction: "none";
   label: "checked_clean" | "open_findings";
   summary: Summary;

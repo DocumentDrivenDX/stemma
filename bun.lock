@@ -38,6 +38,7 @@
         "@stemma/core": "workspace:*",
         "@stemma/extract": "workspace:*",
         "@stemma/graph": "workspace:*",
+        "@stemma/intake": "workspace:*",
         "@stemma/publish": "workspace:*",
         "@stemma/records": "workspace:*",
         "@stemma/server": "workspace:*",
@@ -67,6 +68,8 @@
     "packages/intake": {
       "name": "@stemma/intake",
       "dependencies": {
+        "@stemma/core": "workspace:*",
+        "@stemma/manuscript": "workspace:*",
         "@stemma/records": "workspace:*",
       },
     },

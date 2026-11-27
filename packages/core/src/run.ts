@@ -19,6 +19,7 @@ import { quotePageResults, quoteResults } from "./checks/quotes.ts";
 import { activeTexts, footnoteResults, labelResults, pageResults } from "./checks/structure.ts";
 import { SourceTexts } from "./matching/texts.ts";
 import { coverageOf } from "./verification.ts";
+import { openTakeover } from "./intake-groups.ts";
 import { fileResults, rulesResults } from "./checks/records.ts";
 import { result, sortResults } from "./findings.ts";
 import { claimReach, isReviewed } from "./review.ts";
@@ -115,6 +116,7 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>): { body
     .flatMap(([check, run]) => guarded(check, corpus, (c) => run(c, context), errors))));
   const skipped = notRun(corpus);
   const unreviewed = unreviewedItems(corpus);
+  const takeover = openTakeover(corpus);
   const count = (test: (r: Result) => boolean) => results.filter(test).length;
   const summary: Summary = {
     pass: count((r) => r.outcome === "pass"),
@@ -149,6 +151,7 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>): { body
     not_run: skipped,
     verification: activeTexts(corpus).map(([, text]) => coverageOf(corpus, text, tools)),
     unreviewed,
+    ...(takeover.groups.length > 0 || takeover.left_unlinked.count > 0 ? { takeover } : {}),
     redaction: "none",
     label: label(results, skipped),
     summary,
