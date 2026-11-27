@@ -1,0 +1,27 @@
+{
+  "check": "source.footnotes",
+  "created": {
+    "at": "2026-11-27T18:12:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "effect": "explain",
+  "finding_key": "d7853929243575b9f21aaa11e6609db6b6f061f55498e8e07971317fd21088c5",
+  "id": "ann-qg899cezk1pwmxnejytz",
+  "item": {
+    "content_sha256": "8955c9cee1c1f87c222e169940f6ddb715cc449bd633f63d65196042b8f1ca36",
+    "record": "txt-t7p2y2hxdtsg7e4whwp7"
+  },
+  "kind": "annotation",
+  "reason": "The stored HTML marks footnote 7's marker with a link and a superscript of class 'footnote', which the converter treats as a note body and not as a note reference. The marker's characters and the note's words are both in the text, and no quotation comes from the note. A model's reading, not a person's review.",
+  "schema": "stemma.record/0",
+  "written": {
+    "at": "2026-11-27T18:12:12Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  }
+}

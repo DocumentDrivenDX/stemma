@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-mam3jqr1h14nk0jfsc2z",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "b71906d9855074e4eaf2a27b87b0f0e1f62184693956bbe4c1c6fa53544c6050",
+  "size": 16789,
+  "source": "src-4tn0091eh4cc829322kj",
+  "url": "https://www.postgresql.org/docs/18/tutorial-arch.html",
+  "version": "PostgreSQL 18 documentation"
+}

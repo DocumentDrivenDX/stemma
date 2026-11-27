@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-ka6068afma42rg2k3p4p",
+  "intake": "parsed",
+  "key": "figma2024",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "87"
+  },
+  "passage": "psg-cj2c6r3ptp5sxz7j2rta",
+  "quotation": "At this size, we began to see reliability impact during Postgres vacuums, which are essential background operations that keep Postgres from running out of transaction IDs and breaking down.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "0ea4196569ce0298f67b4288cad8e0c0fc2db7d025a466933f07db3cc40f34c3",
+    "text": "“At this size, we began to see reliability impact during Postgres vacuums, which are essential background operations that keep Postgres from running out of transaction IDs and breaking down.”"
+  }
+}

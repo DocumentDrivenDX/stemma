@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 402,
+      "index": 1,
+      "page_sha256": "2160a7f028c04852b904af826ae1914520516da7ca99277ece12fb2f8c0f7bc2",
+      "start": 307,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:53Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-wz6dkr1sm59cznsv71g4",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "22"
+  },
+  "quote": {
+    "exact": "For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-seb0h7jfjxxsweary6a5",
+  "source_record_sha256": "aa9624853dc36039b7aed01f4dd8660a79616d5407f1b32696abfd903bb65e2f",
+  "text": "txt-4brymw2wbhf991zas33z"
+}

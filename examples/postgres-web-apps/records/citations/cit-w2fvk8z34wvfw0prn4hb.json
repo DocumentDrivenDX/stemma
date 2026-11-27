@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-w2fvk8z34wvfw0prn4hb",
+  "intake": "parsed",
+  "key": "pavlo2023",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "5"
+  },
+  "passage": "psg-cs3yegg6wgft25g2h9qx",
+  "quotation": "It’s dependable, feature-rich, extensible, and well-suited for most operational workloads.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "8a7494061b808b8b365acb0280557e04f979d856114688f990d86dc145081e89",
+    "text": "In an article written with Bohan Zhang, Andy Pavlo describes the system in these words: “It’s dependable, feature-rich, extensible, and well-suited for most operational workloads.”"
+  }
+}

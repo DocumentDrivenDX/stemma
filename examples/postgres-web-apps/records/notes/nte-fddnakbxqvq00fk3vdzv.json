@@ -1,0 +1,21 @@
+{
+  "body": "A critic of the storage design nonetheless calls the system well suited to most operational workloads.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-fddnakbxqvq00fk3vdzv",
+  "kind": "note",
+  "passages": [
+    "psg-cs3yegg6wgft25g2h9qx"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "type": "paraphrase"
+}

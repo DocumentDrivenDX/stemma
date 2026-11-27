@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:35Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-7p2jhkhv4pn0ff6mx4zz",
+  "kind": "upstream",
+  "media_type": "application/pdf",
+  "retrieved_at": "2026-11-27T18:02:35Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "29ea89b404b68db56c801abf0550cef46ec7e1ca94f07005811702f1c685850a",
+  "size": 236601,
+  "source": "src-8jrmssahm9f1stb929c7",
+  "url": "https://www.vldb.org/pvldb/vol5/p1850_danrkports_vldb2012.pdf"
+}

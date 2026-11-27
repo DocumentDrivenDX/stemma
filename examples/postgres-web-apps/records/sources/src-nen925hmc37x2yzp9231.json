@@ -1,0 +1,66 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Andy Pavlo’s blog"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.cs.cmu.edu/~pavlo/blog/2023/04/the-part-of-postgresql-we-hate-the-most.html"
+      }
+    }
+  ],
+  "citation_key": "pavlo2023",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Pavlo",
+        "given": "Andy"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Zhang",
+        "given": "Bohan"
+      },
+      "lid": "a2",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-nen925hmc37x2yzp9231",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2023-04-26"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "No licence statement found",
+    "permission_note": "No licence statement found on the article page, read 2026-11-27. Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "The Part of PostgreSQL We Hate the Most"
+  },
+  "type": "post-weblog"
+}

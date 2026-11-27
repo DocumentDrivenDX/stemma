@@ -1,0 +1,21 @@
+{
+  "body": "Version 18 documentation says single-user mode is no longer needed or wanted for recovery.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-mqymvkht796tgp3a4jdh",
+  "kind": "note",
+  "passages": [
+    "psg-9njy4s9hp9wkdfvhmkms"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-seb0h7jfjxxsweary6a5",
+  "type": "paraphrase"
+}

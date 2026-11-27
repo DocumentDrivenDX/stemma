@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 5713,
+      "index": 1,
+      "page_sha256": "44fa01cef75bf3ff012038b652ed2e84c8523c3d5dc5891c6398b7e3a62e65d7",
+      "start": 5663,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:56Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-59g5qqe8zdmvht506ymk",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "36"
+  },
+  "quote": {
+    "exact": "PostgreSQL does not offer this type of replication"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-gf8p7mknx1fgq150x3k6",
+  "source_record_sha256": "caa113c87afcb6b7890626b42be8bd244c4368b39726936ddf385737b214197e",
+  "text": "txt-e3e458zswyx3bsr282m9"
+}

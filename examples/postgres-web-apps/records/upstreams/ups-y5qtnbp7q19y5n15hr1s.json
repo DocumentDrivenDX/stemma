@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-y5qtnbp7q19y5n15hr1s",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "10631652012554065034c7185845d30c2ec57a9cf8300216b85055663fc71163",
+  "size": 29064,
+  "source": "src-gf8p7mknx1fgq150x3k6",
+  "url": "https://www.postgresql.org/docs/18/different-replication-solutions.html",
+  "version": "PostgreSQL 18 documentation"
+}

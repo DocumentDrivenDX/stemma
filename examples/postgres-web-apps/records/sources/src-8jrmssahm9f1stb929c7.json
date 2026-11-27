@@ -1,0 +1,84 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Proceedings of the VLDB Endowment"
+      }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "5"
+      }
+    },
+    {
+      "name": "issue",
+      "value": {
+        "value": "12"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "1850–61"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://www.vldb.org/pvldb/vol5/p1850_danrkports_vldb2012.pdf"
+      }
+    }
+  ],
+  "citation_key": "ports2012",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Ports",
+        "given": "Dan R. K."
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Grittner",
+        "given": "Kevin"
+      },
+      "lid": "a2",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-8jrmssahm9f1stb929c7",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2012"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "CC BY-NC-ND 3.0",
+    "permission_note": "Licence statement read on the first page of https://www.vldb.org/pvldb/vol5/p1850_danrkports_vldb2012.pdf, 2026-11-27. Treated as not redistributable (non-commercial, no derivatives; a converted text may be a derivative). Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Serializable Snapshot Isolation in PostgreSQL"
+  },
+  "type": "paper-conference"
+}

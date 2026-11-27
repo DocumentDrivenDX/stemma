@@ -1,0 +1,21 @@
+{
+  "body": "Version 9.6 let the anti-wraparound vacuum skip pages already frozen.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-q3g0jwp9fnfgw87qh0td",
+  "kind": "note",
+  "passages": [
+    "psg-hycxddpg12q802jx2qs6"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-qmw5m7hjrx4a41abv94v",
+  "type": "paraphrase"
+}

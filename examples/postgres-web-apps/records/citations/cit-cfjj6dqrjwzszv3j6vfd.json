@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-cfjj6dqrjwzszv3j6vfd",
+  "intake": "parsed",
+  "key": "pg18arch",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "21"
+  },
+  "passage": "psg-mfrftwxvgr0q3sd5nsz8",
+  "quotation": "The PostgreSQL server can handle multiple concurrent connections from clients. To achieve this it starts (“forks”) a new process for each connection.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "49743958cf16feedeb91af69b2afd3052cec6b30be95d32892eedae03a7dbca2",
+    "text": "“The PostgreSQL server can handle multiple concurrent connections from clients. To achieve this it starts (“forks”) a new process for each connection.”"
+  }
+}

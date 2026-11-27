@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-kvye21vc57tnn02jgz3s",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "b9502f9f8ca2520f60a0ef1e0f0cfae02ae8faffe10198fee536d3d8cdd2621d",
+  "size": 60240,
+  "source": "src-kvfq6m31x122sa7qgs53",
+  "url": "https://www.postgresql.org/docs/18/datatype-json.html",
+  "version": "PostgreSQL 18 documentation"
+}

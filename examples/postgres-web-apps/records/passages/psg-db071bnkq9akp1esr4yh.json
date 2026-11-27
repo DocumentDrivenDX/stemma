@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1469,
+      "index": 4,
+      "page_sha256": "3590a7eecea5a2c8039e723375f7f2db3e3ebd06ab0e56ebb35e8fd67189782b",
+      "start": 1128,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:03Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-db071bnkq9akp1esr4yh",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "97"
+  },
+  "quote": {
+    "exact": "However, we have a very complex relational data model built on top of our current Postgres architecture and NoSQL APIs don’t offer this kind of versatility. We wanted to keep our engineers focused on shipping great features and building new products instead of rewriting almost our entire backend application; NoSQL wasn’t a viable solution."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "source_record_sha256": "cc1865e63cbaf1de7b62b23d9997f948a0ca290998913913f563f5f7e01556e5",
+  "text": "txt-0rfw84rtpxz3jxy7g3bn"
+}

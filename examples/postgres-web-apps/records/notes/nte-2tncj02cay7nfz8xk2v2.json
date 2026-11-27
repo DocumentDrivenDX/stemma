@@ -1,0 +1,21 @@
+{
+  "body": "The pooler project says its transaction mode breaks some session features, so the application has to avoid them.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-2tncj02cay7nfz8xk2v2",
+  "kind": "note",
+  "passages": [
+    "psg-qzhjq7hes0xpa5skb8jx"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-y7k7tzzv3s40j0p1e5tq",
+  "type": "paraphrase"
+}

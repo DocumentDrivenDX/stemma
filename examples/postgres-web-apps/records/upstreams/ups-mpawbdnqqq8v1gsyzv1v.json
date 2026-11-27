@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:37Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-mpawbdnqqq8v1gsyzv1v",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:37Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "e5f81c0e7d8ef68b1e328f5f2346249803737d2a1011a9ef682c5c10165ab1e6",
+  "size": 1962908,
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "url": "https://www.figma.com/blog/how-figmas-databases-team-lived-to-tell-the-scale/"
+}

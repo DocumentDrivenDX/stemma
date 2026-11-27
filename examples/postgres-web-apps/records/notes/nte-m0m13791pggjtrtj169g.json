@@ -1,0 +1,22 @@
+{
+  "body": "The default level is not the strictest one. The strictest is available, and an application that uses it has to be able to retry a transaction.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-m0m13791pggjtrtj169g",
+  "kind": "note",
+  "passages": [
+    "psg-p1sp5sne61v4hyv6p30t",
+    "psg-8jvhq3vazb1acmk1qc2c"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-jzgwnaqrcsjhpegjbn7z",
+  "type": "paraphrase"
+}

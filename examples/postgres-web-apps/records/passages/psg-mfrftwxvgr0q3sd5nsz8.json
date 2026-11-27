@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1488,
+      "index": 1,
+      "page_sha256": "cd43c78ef2daf710096c35f250890f9d8095e8be37f4503ad8f4579e2c9378e7",
+      "start": 1339,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-mfrftwxvgr0q3sd5nsz8",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "21"
+  },
+  "quote": {
+    "exact": "The PostgreSQL server can handle multiple concurrent connections from clients. To achieve this it starts (“forks”) a new process for each connection."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-4tn0091eh4cc829322kj",
+  "source_record_sha256": "b0d15439b5dc8084b05dbd9be53e471c836104308787c501e174495c74c62196",
+  "text": "txt-66bgppv9xpgc2f4v52cd"
+}

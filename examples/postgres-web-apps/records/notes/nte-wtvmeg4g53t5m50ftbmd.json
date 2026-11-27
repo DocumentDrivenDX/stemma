@@ -1,0 +1,23 @@
+{
+  "body": "Updated and deleted row versions stay until vacuum reclaims them; the ordinary form mostly does not give space back to the operating system. The automatic daemon is described as enough for many installations.",
+  "created": {
+    "at": "2026-11-27T18:09:15Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-wtvmeg4g53t5m50ftbmd",
+  "kind": "note",
+  "passages": [
+    "psg-96epkgwtr7xk88qnx6wn",
+    "psg-cbtq2py4tyzk55757qfz",
+    "psg-wz6dkr1sm59cznsv71g4"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-seb0h7jfjxxsweary6a5",
+  "type": "paraphrase"
+}

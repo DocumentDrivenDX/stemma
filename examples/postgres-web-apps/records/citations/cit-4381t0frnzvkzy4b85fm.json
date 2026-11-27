@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-4381t0frnzvkzy4b85fm",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "32"
+  },
+  "passage": "psg-cbtq2py4tyzk55757qfz",
+  "quotation": "However, it will not return the space to the operating system, except in the special case where one or more pages at the end of a table become entirely free and an exclusive table lock can be easily obtained.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "23021e9212c12d11053d77e63f43b57996acc679abeb231f7061e8819899636a",
+    "text": "“However, it will not return the space to the operating system, except in the special case where one or more pages at the end of a table become entirely free and an exclusive table lock can be easily obtained.”"
+  }
+}

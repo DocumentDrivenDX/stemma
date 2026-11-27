@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-cw9kb7d2qwz6e9j9chw9",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "0a80486df4b6714d349b15188496bc10751228ee7c478a8c802a9e88d09c86e6",
+  "size": 165876,
+  "source": "src-mfaaxnw4et2z8359btzf",
+  "url": "https://www.postgresql.org/docs/19/release-19.html",
+  "version": "PostgreSQL 19 documentation"
+}

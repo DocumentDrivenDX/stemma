@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 371,
+      "index": 5,
+      "page_sha256": "dbfe5592c1fbed11d9c2c94b4426e2762e692c18cfeb6e1bbfbbd59fa86581ce",
+      "start": 313,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:06:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-sttqqf9g9kxhcgcr7a1a",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "100"
+  },
+  "quote": {
+    "exact": "we waited until our existing database was heavily strained"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "source_record_sha256": "fc8eb424dd22bb13609f3ad4f28aa1559a5cd690369dd564edffcbed46cca4af",
+  "text": "txt-r399jtz3g4qna2srbhje"
+}

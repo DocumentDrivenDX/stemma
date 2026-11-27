@@ -1,0 +1,81 @@
+{
+  "against": "a fresh conversion of the original with the recorded settings",
+  "created": {
+    "at": "2026-11-27T18:02:38Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "run-kwhzvncdkw7phjed48fy",
+  "independent": false,
+  "kind": "comparison_run",
+  "method": "reconversion",
+  "original_sha256": "245a237b2d26c0e81069f4ebd51426fe433de45f87242f813b020c50823268a6",
+  "pages": [
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 0,
+      "sha256": "57b7e9d22e574ae084a45ccaef660ed37ee0f9fc6fadd1711d7f8487dacd5d4e",
+      "words": 4
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 1,
+      "sha256": "3cbdf3bc1f0049a44fec852a574e4b2e160ee8696ef48a77c71f6d838b9c8c65",
+      "words": 294
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 2,
+      "sha256": "06cd8ae41e88c8cb564418ccf48073e2a0c51abe7f5454cfb646721ce2fa93c5",
+      "words": 392
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 3,
+      "sha256": "78951bdbc713308dbb031ae37c2ad7f347ac1e96420f80441fb6e2820fd9d4f7",
+      "words": 1200
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 4,
+      "sha256": "ef829a54d618553a849a8db607c5ec031b6d6b4d4f6277ff88fa8b7a792dabad",
+      "words": 1751
+    },
+    {
+      "agreement_permille": 1000,
+      "differences": [],
+      "differing_words": 0,
+      "index": 5,
+      "sha256": "f31da1a75c012beb1a0f5c90c6a2c6791f94be4e3c7458b53c3585690fab6853",
+      "words": 138
+    }
+  ],
+  "run": {
+    "at": "2026-11-27T18:02:38.492Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nen925hmc37x2yzp9231",
+  "text": "txt-44w8mtetezbxysnrekak",
+  "tools": [
+    {
+      "name": "stemma-convert",
+      "version": "1"
+    }
+  ]
+}

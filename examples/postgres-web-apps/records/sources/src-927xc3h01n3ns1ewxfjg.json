@@ -1,0 +1,58 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "container-title",
+      "value": {
+        "value": "Sentry Blog"
+      }
+    },
+    {
+      "name": "URL",
+      "value": {
+        "value": "https://blog.sentry.io/transaction-id-wraparound-in-postgres/"
+      }
+    }
+  ],
+  "citation_key": "sentry2015",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Cramer",
+        "given": "David"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:02:26Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "2026-11-27"
+      },
+      "variable": "accessed"
+    }
+  ],
+  "id": "src-927xc3h01n3ns1ewxfjg",
+  "intake": "parsed",
+  "issued": {
+    "edtf": "2015-07-23"
+  },
+  "kind": "source",
+  "rights": {
+    "license": "No licence statement found",
+    "permission_note": "No licence statement on the article page (its footer asserts trademarks), read 2026-11-27. Full text is not committed."
+  },
+  "schema": "stemma.record/0",
+  "title": {
+    "value": "Transaction ID Wraparound in Postgres"
+  },
+  "type": "post-weblog"
+}

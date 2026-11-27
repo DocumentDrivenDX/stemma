@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1951,
+      "index": 1,
+      "page_sha256": "2f3f9280b69e9b9b37989bcb669f659f5cab99394553a40cf7a786437d38329c",
+      "start": 1776,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:03:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-hwnx4e4a9c6n6m4jwspz",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "27"
+  },
+  "quote": {
+    "exact": "PostgreSQL sizes certain resources based directly on the value of max_connections. Increasing its value leads to higher allocation of those resources, including shared memory."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-0n87kc5wgjgwp0fxjwg0",
+  "source_record_sha256": "d354b0138262a826953230afe41e1042195a5185f22d7131224d2d235320e17b",
+  "text": "txt-d2kmkwvw0dnmhk46t5sj"
+}

@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-7ytkbvc7yy7698k6n9y2",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "8df41abd8d28f110b767a863a2362097e1080d1023573750364af33f2c01455a",
+  "size": 62735,
+  "source": "src-01n2wr6cy5qmwqd6fc3t",
+  "url": "https://www.postgresql.org/docs/18/warm-standby.html",
+  "version": "PostgreSQL 18 documentation"
+}

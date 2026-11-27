@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:35Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-0tvtmxxmvv3vvvw6qhj4",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:35Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "346a32009066815575bdfe042c0726984a2b4a7416e75cad276123c7642af6f3",
+  "size": 92265,
+  "source": "src-qmw5m7hjrx4a41abv94v",
+  "url": "https://www.postgresql.org/docs/release/9.6.0/",
+  "version": "PostgreSQL 9.6.0 release notes"
+}

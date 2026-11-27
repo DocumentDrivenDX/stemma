@@ -1,0 +1,23 @@
+{
+  "body": "Streaming replication is asynchronous unless configured otherwise: a crash can lose committed work, standbys usually trail by under a second if they keep up, and careless synchronous use costs latency and contention.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-fcr6bca1eskh3p55qbt8",
+  "kind": "note",
+  "passages": [
+    "psg-y08ps9hf6nbkc8gwnz50",
+    "psg-fee5fg7pfq2061ba3bdr",
+    "psg-brtemwr44nsqk6nhnnz2"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-01n2wr6cy5qmwqd6fc3t",
+  "type": "paraphrase"
+}

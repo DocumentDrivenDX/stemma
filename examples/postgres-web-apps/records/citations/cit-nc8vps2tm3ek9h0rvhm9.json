@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-nc8vps2tm3ek9h0rvhm9",
+  "intake": "parsed",
+  "key": "notion2021",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "100"
+  },
+  "passage": "psg-sttqqf9g9kxhcgcr7a1a",
+  "quotation": "we waited until our existing database was heavily strained",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "87beb367fa5e8d7959aa070069f467c8fa605da028b3e95d84e369428595c4fc",
+    "text": "Treat dividing data among writers as a design change to begin while the server still has room; looking back, Notion’s account says that “we waited until our existing database was heavily strained”."
+  }
+}

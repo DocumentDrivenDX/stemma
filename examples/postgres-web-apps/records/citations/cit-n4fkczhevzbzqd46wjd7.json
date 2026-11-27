@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-n4fkczhevzbzqd46wjd7",
+  "intake": "parsed",
+  "key": "pg18json",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "45"
+  },
+  "passage": "psg-52bdyrvn4pf9vhz65d6z",
+  "quotation": "Although storing large documents is practicable, keep in mind that any update acquires a row-level lock on the whole row.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "b2fae8e2e13582e408938dc456f3b1e5585f7a74d02d47944b1e8c6800341730",
+    "text": "A large JSON column is still one value in one row: “Although storing large documents is practicable, keep in mind that any update acquires a row-level lock on the whole row.”"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "claim": "clm-mgvr9mf8et3kbgdfrfgt",
+  "created": {
+    "at": "2026-11-27T18:09:19Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "evidence": "nte-0mssxhkm183d4wn7a17e",
+  "id": "att-pmvmtyx2h5f9fe07ggs3",
+  "kind": "attestation",
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "stance": "partly_supports"
+}

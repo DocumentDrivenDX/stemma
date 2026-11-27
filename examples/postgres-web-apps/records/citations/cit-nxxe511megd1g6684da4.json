@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-nxxe511megd1g6684da4",
+  "intake": "parsed",
+  "key": "pg18connections",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "27"
+  },
+  "passage": "psg-hwnx4e4a9c6n6m4jwspz",
+  "quotation": "PostgreSQL sizes certain resources based directly on the value of max_connections. Increasing its value leads to higher allocation of those resources, including shared memory.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "d364e27843315089abb63048f6664887bfd8baa2d2f2451bbedd597fd23b9f17",
+    "text": "The number of connections is capped by a setting, and raising the cap is not free: “PostgreSQL sizes certain resources based directly on the value of max_connections. Increasing its value leads to higher allocation of those resources, including shared memory.”"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "body": "The version 19 release notes announce online table repacking and a command for reading one’s own writes on a standby.",
+  "created": {
+    "at": "2026-11-27T18:09:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-557w7g02frgy189wr6zk",
+  "kind": "note",
+  "passages": [
+    "psg-fpv4amf110rbsd333831",
+    "psg-60zna773e29kaaarf1fy"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-mfaaxnw4et2z8359btzf",
+  "type": "paraphrase"
+}

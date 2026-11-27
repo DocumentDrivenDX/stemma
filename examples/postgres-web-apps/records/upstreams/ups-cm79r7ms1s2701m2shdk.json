@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:37Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-cm79r7ms1s2701m2shdk",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:37Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "245a237b2d26c0e81069f4ebd51426fe433de45f87242f813b020c50823268a6",
+  "size": 34964,
+  "source": "src-nen925hmc37x2yzp9231",
+  "url": "https://www.cs.cmu.edu/~pavlo/blog/2023/04/the-part-of-postgresql-we-hate-the-most.html"
+}

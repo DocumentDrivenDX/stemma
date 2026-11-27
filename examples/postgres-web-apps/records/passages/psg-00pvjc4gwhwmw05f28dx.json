@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1244,
+      "index": 2,
+      "page_sha256": "c3b63105faa0cfb2b7e782b59e8e9f0b1867a90cac4fb2e0bf2110025629b84f",
+      "start": 1077,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T18:04:01Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "psg-00pvjc4gwhwmw05f28dx",
+  "kind": "passage",
+  "locator": {
+    "label": "paragraph",
+    "value": "41"
+  },
+  "quote": {
+    "exact": "For us, the inflection point arrived when the Postgres VACUUM process began to stall consistently, preventing the database from reclaiming disk space from dead tuples."
+  },
+  "schema": "stemma.record/0",
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "source_record_sha256": "fc8eb424dd22bb13609f3ad4f28aa1559a5cd690369dd564edffcbed46cca4af",
+  "text": "txt-r399jtz3g4qna2srbhje"
+}

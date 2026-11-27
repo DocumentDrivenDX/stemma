@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-7f5g5t06px7dq92t6mnm",
+  "intake": "parsed",
+  "key": "pg18hot",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "18"
+  },
+  "passage": "psg-dbht3j8za8ay73rvetk2",
+  "quotation": "The update does not modify any columns referenced by the table's indexes, not including summarizing indexes.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "46551c81eb50564e448e47ca4f9825f0d076b3457853b116d6dd7d38c92dc716",
+    "text": "In the documentation’s words, the first: “The update does not modify any columns referenced by the table's indexes, not including summarizing indexes.”"
+  }
+}

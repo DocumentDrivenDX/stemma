@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-b972yw7nh3046nsq0cf9",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "71"
+  },
+  "passage": "psg-cnneb21vnvpjn3gtcpt1",
+  "quotation": "In this condition any transactions already in progress can continue, but only read-only transactions can be started. Operations that modify database records or truncate relations will fail.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "14f892a2d26f39c49aeed4611e881cf7d8101a79aad0cb2c24cb969d731d9f96",
+    "text": "If the work still falls too far behind, the server issues warnings and then stops assigning identifiers: “In this condition any transactions already in progress can continue, but only read-only transactions can be started. Operations that modify database records or truncate relations will fail.”"
+  }
+}

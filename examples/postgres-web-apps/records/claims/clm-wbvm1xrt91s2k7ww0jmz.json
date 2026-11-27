@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "created": {
+    "at": "2026-11-27T18:09:18Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "clm-wbvm1xrt91s2k7ww0jmz",
+  "kind": "claim",
+  "reason": "Stated in the version 18 documentation on standby servers.",
+  "review": {
+    "state": "unreviewed"
+  },
+  "role": "claim",
+  "schema": "stemma.record/0",
+  "text": "Streaming replication is asynchronous by default; waiting for standbys buys durability or read visibility at the price of latency."
+}

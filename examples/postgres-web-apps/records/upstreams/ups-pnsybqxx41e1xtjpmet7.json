@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-pnsybqxx41e1xtjpmet7",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "128db6c3456045624d5842ca25cea9c1247d2278ab73557aa34c23f204b1220c",
+  "size": 14563,
+  "source": "src-r7741gv5gb10aq6fv2bz",
+  "url": "https://www.postgresql.org/docs/18/storage-hot.html",
+  "version": "PostgreSQL 18 documentation"
+}

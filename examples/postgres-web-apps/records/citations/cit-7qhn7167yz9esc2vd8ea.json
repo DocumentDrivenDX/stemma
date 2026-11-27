@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-7qhn7167yz9esc2vd8ea",
+  "intake": "parsed",
+  "key": "figma2024",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "103"
+  },
+  "passage": "psg-zymf2tqz7twm518df057",
+  "quotation": "Schema changes must be coordinated across all shards to ensure the databases stay in sync. Foreign keys and globally unique indexes can no longer be enforced by Postgres.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "b0722bcd4e9040dd5b07a2801fbf8ad00003a89bef20cdcf4a273dab314f9a2b",
+    "text": "The account is also plain about what splitting tables costs: “Schema changes must be coordinated across all shards to ensure the databases stay in sync. Foreign keys and globally unique indexes can no longer be enforced by Postgres.”"
+  }
+}

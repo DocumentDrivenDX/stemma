@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:36Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-b8re4y61kjzd68f1xxqn",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:36Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "b9cccdf01e9d5347596dd9314dc0a5e9df6d8a359646e03bfadf1da4ad43797c",
+  "size": 197015,
+  "source": "src-927xc3h01n3ns1ewxfjg",
+  "url": "https://blog.sentry.io/transaction-id-wraparound-in-postgres/"
+}

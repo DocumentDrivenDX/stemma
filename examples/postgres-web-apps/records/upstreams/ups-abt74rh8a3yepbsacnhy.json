@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-abt74rh8a3yepbsacnhy",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "1cac28b4e541684f3ce0be1d2dbd09d30aca08b0bcf32213281df5581fbe3308",
+  "size": 60292,
+  "source": "src-0n87kc5wgjgwp0fxjwg0",
+  "url": "https://www.postgresql.org/docs/18/runtime-config-connection.html",
+  "version": "PostgreSQL 18 documentation"
+}

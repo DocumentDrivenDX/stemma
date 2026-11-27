@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-kfhnsg515nf1wsc0vc8j",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "693b9857f69158f8777369be46c774908e68df1d82d56af83570adc7ea6e04ea",
+  "size": 67459,
+  "source": "src-seb0h7jfjxxsweary6a5",
+  "url": "https://www.postgresql.org/docs/18/routine-vacuuming.html",
+  "version": "PostgreSQL 18 documentation"
+}

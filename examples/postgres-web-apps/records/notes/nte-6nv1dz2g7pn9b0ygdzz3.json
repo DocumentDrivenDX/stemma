@@ -1,0 +1,22 @@
+{
+  "body": "Figma reports reliability effects during vacuums on its largest tables, and write growth approaching the input and output limit of its managed service.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-6nv1dz2g7pn9b0ygdzz3",
+  "kind": "note",
+  "passages": [
+    "psg-cj2c6r3ptp5sxz7j2rta",
+    "psg-4c6889m9kmd7sqkwr7vk"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-bhya83cxjbhya1bpxjg5",
+  "type": "paraphrase"
+}

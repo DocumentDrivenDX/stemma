@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-8yv5xr11wbp7kgxcc577",
+  "intake": "parsed",
+  "key": "pg18standby",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "100"
+  },
+  "passage": "psg-brtemwr44nsqk6nhnnz2",
+  "quotation": "As a result, incautious use of synchronous replication will reduce performance for database applications because of increased response times and higher contention.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "4ef971177930e1eaf4a56744cc099440b48910076a0b658623cf50226f3ec255",
+    "text": "The price is latency: “As a result, incautious use of synchronous replication will reduce performance for database applications because of increased response times and higher contention.”"
+  }
+}

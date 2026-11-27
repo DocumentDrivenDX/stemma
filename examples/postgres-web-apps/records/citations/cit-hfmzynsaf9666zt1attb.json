@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-hfmzynsaf9666zt1attb",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "31"
+  },
+  "passage": "psg-96epkgwtr7xk88qnx6wn",
+  "quotation": "In PostgreSQL, an UPDATE or DELETE of a row does not immediately remove the old version of the row.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "c2a8abce670ab3202d65ae41b746ded81786c6c73201870ed571c3eb65d1862c",
+    "text": "“In PostgreSQL, an UPDATE or DELETE of a row does not immediately remove the old version of the row.”"
+  }
+}

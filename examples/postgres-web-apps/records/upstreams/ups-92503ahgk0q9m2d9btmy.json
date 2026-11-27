@@ -1,0 +1,22 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:36Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-92503ahgk0q9m2d9btmy",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:36Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "0cbc43ae81904349f42c339fb619edaff8ac2789bf2da3d4aa908dd662b31788",
+  "size": 181800,
+  "source": "src-v9mg0p5d9mcmyyedvwek",
+  "url": "https://www.notion.com/blog/sharding-postgres-at-notion"
+}

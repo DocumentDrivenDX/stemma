@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-tfrm9gqwy88w0gswtcrf",
+  "intake": "parsed",
+  "key": "pg96notes",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "88"
+  },
+  "passage": "psg-hycxddpg12q802jx2qs6",
+  "quotation": "Formerly, anti-wraparound vacuum had to visit every page of a table, even pages where there was nothing to do. Now, pages containing only already-frozen tuples are identified in the table's visibility map, and can be skipped by vacuum even when doing transaction wraparound prevention.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "24a544d5181df70ff0820ecf7a14c3bf6b3414d1d601d116243090c876f0d734",
+    "text": "PostgreSQL 9.6, released in 2016, also reduced the work of the protective vacuum: “Formerly, anti-wraparound vacuum had to visit every page of a table, even pages where there was nothing to do. Now, pages containing only already-frozen tuples are identified in the table's visibility map, and can be skipped by vacuum even when doing transaction wraparound prevention.”"
+  }
+}

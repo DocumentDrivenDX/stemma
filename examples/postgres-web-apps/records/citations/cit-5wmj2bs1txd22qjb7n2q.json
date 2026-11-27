@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-5wmj2bs1txd22qjb7n2q",
+  "intake": "parsed",
+  "key": "pavlo2023",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "6"
+  },
+  "passage": "psg-5ahgrh9m7qraddzpx5tp",
+  "quotation": "its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "789f84a0b1983ab3bda90870e2120e1903aa1731a152c62e0fc77d2b4bd3faf2",
+    "text": "Pavlo says of PostgreSQL’s method of keeping row versions that “its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.”"
+  }
+}

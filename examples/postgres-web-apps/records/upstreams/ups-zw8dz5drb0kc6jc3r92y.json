@@ -1,0 +1,23 @@
+{
+  "created": {
+    "at": "2026-11-27T18:02:34Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "ups-zw8dz5drb0kc6jc3r92y",
+  "kind": "upstream",
+  "media_type": "text/html",
+  "retrieved_at": "2026-11-27T18:02:34Z",
+  "retrieved_by": {
+    "kind": "model",
+    "name": "claude-sonnet-5-5"
+  },
+  "schema": "stemma.record/0",
+  "sha256": "5a27541956450ac98f7459c0060cd6009ef6c90159be0db67357a91c8f574a50",
+  "size": 47604,
+  "source": "src-jzgwnaqrcsjhpegjbn7z",
+  "url": "https://www.postgresql.org/docs/18/transaction-iso.html",
+  "version": "PostgreSQL 18 documentation"
+}

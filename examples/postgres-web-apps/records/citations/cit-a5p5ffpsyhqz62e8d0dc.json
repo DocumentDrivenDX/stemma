@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-a5p5ffpsyhqz62e8d0dc",
+  "intake": "parsed",
+  "key": "pg18hot",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "19"
+  },
+  "passage": "psg-0jzzvegm92gs30z8v74p",
+  "quotation": "There is sufficient free space on the page containing the old row for the updated row.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "d4f399867b3a1327ed3784a9b76e64de14b9bff9da2aac364ac9b7391d884d95",
+    "text": "The second: “There is sufficient free space on the page containing the old row for the updated row.”"
+  }
+}

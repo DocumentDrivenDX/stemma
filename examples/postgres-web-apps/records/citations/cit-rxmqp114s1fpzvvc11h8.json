@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:45Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-rxmqp114s1fpzvvc11h8",
+  "intake": "parsed",
+  "key": "wu2017",
+  "kind": "citation",
+  "locator": {
+    "label": "page",
+    "value": "785"
+  },
+  "passage": "psg-f28qhb50tksqhqeyk4jp",
+  "quotation": "These schemes have different characteristics that affect their behavior for OLTP workloads. As such, none of them achieve optimal performance for either workload type.",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "f2a385677efb8b639a8e7c1c1f2c6736217210c0184aabbe7bcab640b404343d",
+    "text": "Of the schemes compared they write: “These schemes have different characteristics that affect their behavior for OLTP workloads. As such, none of them achieve optimal performance for either workload type.”"
+  }
+}

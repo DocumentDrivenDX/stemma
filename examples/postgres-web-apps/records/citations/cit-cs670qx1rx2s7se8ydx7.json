@@ -1,0 +1,24 @@
+{
+  "created": {
+    "at": "2026-11-27T18:09:42Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "cit-cs670qx1rx2s7se8ydx7",
+  "intake": "parsed",
+  "key": "pg18vacuum",
+  "kind": "citation",
+  "locator": {
+    "label": "paragraph",
+    "value": "22"
+  },
+  "passage": "psg-wz6dkr1sm59cznsv71g4",
+  "quotation": "For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon",
+  "schema": "stemma.record/0",
+  "sentence": {
+    "sha256": "3fa753b75a62fc7e8acfec355cd3ee87c721bbf35305f99bb39ffabfd09d2ba5",
+    "text": "Vacuum normally runs by itself, and the documentation calls this enough for much ordinary use: “For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon”."
+  }
+}

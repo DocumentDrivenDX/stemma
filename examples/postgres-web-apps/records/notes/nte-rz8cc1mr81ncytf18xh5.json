@@ -1,0 +1,22 @@
+{
+  "body": "Every table has to be vacuumed within a bound of two billion transactions; if the counter gets too close to wraparound, only read-only transactions can be started.",
+  "created": {
+    "at": "2026-11-27T18:09:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "id": "nte-rz8cc1mr81ncytf18xh5",
+  "kind": "note",
+  "passages": [
+    "psg-tb1c9y9hbvvb64yyw00m",
+    "psg-cnneb21vnvpjn3gtcpt1"
+  ],
+  "review": {
+    "state": "unreviewed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-seb0h7jfjxxsweary6a5",
+  "type": "paraphrase"
+}
