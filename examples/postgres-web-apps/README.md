@@ -14,11 +14,10 @@ records are candidates that nobody has admitted.
 | Folder or file | What it holds |
 |---|---|
 | `sources/` | One folder per work: `source.md`, the manifest, and the converted text, one file per section of a web page or per page of a PDF. The text of seven works is **not committed** (see below); their manifests are |
-| `records/` | A record of each work, with its licence and where that was read; where each original came from (address, retrieval time, SHA-256); each comparison with the original; the passages quoted; paraphrase notes; claims, with confidence and reason, linked to the notes by attestations that support, qualify or contradict them; and one citation for each quotation |
+| `records/` | A record of each work, with its licence and where that was read; where each original came from (address, retrieval time, SHA-256) and other [locations](#where-else-each-original-was-looked-for) of it; each comparison with the original; the passages quoted; paraphrase notes; claims, with confidence and reason, linked to the notes by attestations that support, qualify or contradict them; and one citation for each quotation |
 | `plan.json` | What was captured, from which address, and how it was converted |
 | `report/` | The research report, *The Cost of One Writer*: its manuscript (`report.src`), quotation list (`report.json`), the built `report.md` and `report.typ`, the verification table, the evidence ledger, and the research log |
 | `research/` | A note on how sources were chosen, how they were reached, and what is missing |
-| `tools/restore-text.ts` | A script of this example that brings back the text that is not committed |
 | `NOTICE-PostgreSQL` | The copyright and permission notice for the committed PostgreSQL pages |
 
 No original, PDF or image is committed. The typeset `report.pdf` is rebuilt, not
@@ -72,36 +71,65 @@ stemma build report report --check                            # fails if stale
 
 ### Fetching the text that is not committed
 
-This uses the network, and asks each site for one page or paper.
+This uses the network. It asks for each original that is not already in the
+project's ignored `.stemma/originals/` folder, those of the committed works
+included. After the `stemma()` line above:
 
 ```sh
-./.tools/bun --no-install --no-env-file --config=/dev/null examples/postgres-web-apps/tools/restore-text.ts dist/stemma.js
+stemma ingest --fetch --actor person:<your name>
 ```
 
-For each work whose text is absent, the script has `stemma ingest --fetch`
-fetch and convert it, from the address in `plan.json`, in a throwaway project. It
-copies the text here only if every part has the digest that the committed
-manifest records, so that each passage again points at the words it was copied
-from. A work whose address now gives different text, or refuses the request, is
-reported and left out; it is not fetched any other way. A web article can change
-at any time, so this may stop working for any of them.
+For each work, it asks the recorded address, then the other locations in the
+work's upstream record, until one gives bytes with the recorded SHA-256. It then
+converts the original again and writes the missing text only if every part has
+the digest that the committed manifest records, so that each passage again
+points at the words it was copied from. It says what each address gave.
 
-`stemma ingest --fetch` on this project is not enough by itself: it fetches the
-originals and compares their digests, but does not write back text that is
-missing.
+When no address gives the recorded bytes, it converts what they did give, and
+writes the text only under the same condition. It then says that the text is
+restored and that the fetched copy is not the recorded original. This applies to
+`notion2021`, whose server gave different bytes on each request seen: one fetch
+restored its text this way, and an attempt with another fetch converted to
+different text and gave none. Any web article can change at any time, so this may
+stop working for any of them. A refused request is reported and not worked
+around.
+
+If you have a copy of an original, give its file or folder instead, with no
+network: `stemma ingest --originals <folder> --actor person:<your name>`. It is
+used only when its SHA-256 is the recorded one.
+
+### Where else each original was looked for
+
+Each upstream record in `records/upstreams/` lists one capture at the Internet
+Archive, found with its
+[availability API](https://archive.org/wayback/available?url=https://www.pgbouncer.org/features.html)
+and asked for on 2026-11-27 with `stemma source locate --fetch`, in the form with
+`id_` after the timestamp, which gives a capture without the archive's own
+markup. No new capture was requested. The record holds the digest of what each
+gave. A location is a reference: nothing from it is stored here, and it may give
+something else later.
+
+| Gave | Works |
+|---|---|
+| The recorded original, byte for byte | `pavlo2023`, `pgbouncer`, `ports2012`, `wu2017` |
+| Other bytes, so it is not the original | the ten PostgreSQL pages, `figma2024`, `notion2021`, `sentry2015` |
+
+For `pg18arch`, the one capture compared line by line, the differences are those
+of an earlier day's page, such as its news banner and style-sheet versions. The
+others were not examined. `notion2021` also lists its live address, which gave
+other bytes than the recorded ones.
 
 ## Without the text that is not committed
 
 In a copy holding only what is committed:
 
 - `build report` and `build report --check` stop with exit code 5, naming the
-  first quotation whose text cannot be read. They write nothing, and cannot say
-  whether the report is stale.
-- `check --all` does not pass those works. Their source files are reported as
-  damaged (parts listed in the manifest are missing), and their quotations,
-  passages and whatever rests on them are reported as failed or as not checkable.
-  Its advice to restore the files from Git does not apply: they were never in
-  Git. Use the command above.
+  first quotation whose text is not held. They write nothing, and say that
+  whether the report is current cannot be told.
+- `check --all` does not pass those works. For each of the seven it reports once
+  that the source's text is not held here. Their quotations, pages and places,
+  and what rests on them, could not be checked. Nothing is reported as damaged or
+  as failed for this.
 
 The report as committed, with its quotations, can still be read. Its quotations
 from those seven works cannot be checked from this repository alone.

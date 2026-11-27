@@ -150,7 +150,7 @@ export async function ingest(options: Options, check: (options: Options) => numb
     const others: Other[] = [];
     const absent = mine.filter(([, t]) => t.notHeld);
     if (!path && options.fetch) path = await fetchOriginal(root, data, label, say, absent.length > 0 ? others : undefined);
-    else if (path && Array.isArray(data.locations)) say(`  ${label}: the recorded original is in .stemma/originals/ or a place given with --originals, so no address was asked.`);
+    else if (path && absent.length > 0 && Array.isArray(data.locations)) say(`  ${label}: the recorded original is in .stemma/originals/ or a place given with --originals, so no address was asked.`);
     // The digest was matched when the file was found; it is read as that kind of original.
     const original = path ? { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type), name: path } : undefined;
     // Text that is not here is written again first, so that it can then be compared like any other.

@@ -206,8 +206,8 @@ is printed for a command's first reading only.
 
 **Where `ingest` looks.** First by hash in `.stemma/originals/` and in the files
 and folders named with `--originals`, which needs no request; this is how a
-private copy is used, and for an upstream with `locations` it says that no
-address was asked. Then,
+private copy is used. When it restores text from such a file and the upstream
+has `locations`, it says that no address was asked. Then,
 with `--fetch`, at the addresses: the upstream's `url`, then each entry of
 `locations` that has an address, in order, an address listed twice once. It
 stops at the first that gives bytes with the recorded digest, and keeps them in
