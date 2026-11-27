@@ -26,7 +26,7 @@ ddx:
 
 - Covers the runtime, the bundled command line, the plugin and its one skill, release packages, install delivery, and install tests.
 - Governed by the Architecture, ADR-001, ADR-003, ADR-004, ADR-007, CONTRACT-002 (commands, reports, exit codes), CONTRACT-004 (plugin, modes, agent obligations, host claims), and Project Concerns.
-- M1, first in the design order. A first part is built: the plugin launcher that sets up the pinned runtime, the runtime guard, the bundle script, part of the command line, the distribution repository script, and a local check that installs through a marketplace entry with the Claude command-line tool. Install and host behaviour below is otherwise unverified unless a row says so.
+- M1, first in the design order. A first part is built: the plugin launcher that sets up the pinned runtime, the runtime guard, the bundle script, part of the command line, the script that copies a release into the marketplace repository, and a local check that installs through a marketplace entry with the Claude command-line tool. Install and host behaviour below is otherwise unverified unless a row says so.
 
 ## Requirements Mapping
 
@@ -41,7 +41,7 @@ FEAT-010 identifiers carry the PRD requirement in parentheses.
 | CLI-01 to CLI-03 (FR-49) | One bundle for terminal and agent; distinct exit codes | `cli` | P0 |
 | CLI-04, CLI-05 (FR-49) | Each function is a command over a core operation that interfaces also use | `cli`, `core` | P0 |
 | RUN-01 to RUN-06 (FR-75) | One pinned Bun set up by the plugin, tool record, no run-time packages, platform rules | Launcher, runtime guard, bundler, release check | P0 |
-| DST-01, DST-06 (FR-50) | Self-contained release tree delivered by the repository marketplace from a distribution repository | Packager, manifests | P0 |
+| DST-01, DST-06 (FR-50) | Self-contained release tree published as `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository | Packager, manifests | P0 |
 | DST-02, DST-03, DST-05 (FR-50) | Support statement and skill wording per session type | Skill, README, release report | P0 |
 | DST-04 (FR-77) | Same package; claim withheld until observed | Manifests | P1 |
 | PER-01 to PER-03 (FR-51) | Persona settings read by the skill only | Skill, project settings | P1 |
@@ -58,7 +58,7 @@ FEAT-010 identifiers carry the PRD requirement in parentheses.
 
 ## Solution Approaches
 
-The choice is how installing from the repository marketplace delivers a bundle
+The choice is how installing from a marketplace delivers a bundle
 that is not in the Stemma repository.
 
 | Approach | Finding | Decision |
@@ -67,20 +67,23 @@ that is not in the Stemma repository.
 | Fetch the bundle on first run | The installed plugin would download its own code while in use | Rejected |
 | Marketplace `archive` source naming a release archive | Documented by the vendor with a SHA-256. In Claude command-line tool 2.1.236, `plugin validate` rejects the source, and an install requires a public HTTPS address, so it cannot be shown to work before publishing | Not selected; revisit when the target hosts accept it |
 | Marketplace `npm` source | Adds a package registry as a publishing surface and its tooling on the author's side | Not selected |
-| Marketplace `url` source naming a separate distribution repository at a version tag | Observed to install with the Claude command-line tool against a local stand-in repository. Allowed by owner decision when needed | Selected |
+| The built tree at `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository, a relative marketplace source | Family marketplace; observed to install with the Claude command-line tool from a local stand-in and, for 0.0.2, from GitHub | Selected |
 
-**Selected Approach**: `.claude-plugin/marketplace.json` on the default branch
-installs `https://github.com/DocumentDrivenDX/stemma-dist.git` at `v<version>`.
-`dev.sh release-repo` builds that repository locally: its tree is exactly the
-release tree (manifests, skill, launcher, bundle, license), one commit and one
-tag per version, and a tag is never moved. Publishing is pushing it, which the
-owner does.
+**Selected Approach**: The DocumentDrivenDX/plugins repository's marketplace
+file, named `documentdrivendx`, lists `stemma` at `./plugins/stemma`.
+`dev.sh publish-plugin <checkout>` copies the release tree (manifest, skill,
+launcher, bundle, library data, license) there, changes nothing else, and
+commits and pushes nothing; publishing is the owner's commit and push. An author
+installs with `claude plugin marketplace add DocumentDrivenDX/plugins` and
+`claude plugin install stemma@documentdrivendx`.
 
-**Not shown.** Installation from GitHub, any install or run in Claude desktop,
-an update from one version to the next, and operation with the network denied
-after setup.
+**Observed.** Version 0.0.2 installed from GitHub with the Claude command-line
+tool.
 
-**Architecture/ADR impact**: No change now. The proof result is recorded in the Architecture, and in an ADR if the distribution repository is used.
+**Not shown.** Any install or run in Claude desktop, an update from one version
+to the next, and operation with the network denied after setup.
+
+**Architecture/ADR impact**: None.
 
 ## Domain Model
 
@@ -142,7 +145,7 @@ Stemma does not enforce these instructions against an agent with file access (CO
 - **Interfaces**: CONTRACT-002.
 - **Owned by TDs**: US-081, US-085.
 
-A desktop app can start with a different environment from a terminal. If a store directory variable differs, results can differ because one run cannot find blobs. `doctor` shows the resolved paths, and a missing blob is `unverifiable`, never a pass.
+A desktop app can start with a different environment from a terminal. Checks read only the project, so results do not depend on that environment; `doctor` shows the resolved paths.
 
 ### Component: Bundler and release packager (`scripts/`)
 
@@ -166,15 +169,15 @@ The harness runs locally during development and in one workflow triggered only b
 
 **Runtime configuration.** On Bun 1.4.5 (macOS), `bunfig.toml` and `.env` in the working directory were loaded even with `--no-install`; adding `--no-env-file --config=/dev/null` stopped both. The invocation uses all three flags, starts in the plugin root, and passes absolute paths (CONTRACT-002 A); the guard exits 4 without `--no-install`. A seeded-file test covers SEC-014. Windows is untested. The author's own global Bun settings and environment, such as `BUN_OPTIONS`, are outside this control.
 
-**Release integrity and delivery.** Each release is one tagged commit of the distribution repository. The install check compares the installed bundle with the built one (SEC-028). A tag can be moved by whoever can push to that repository; neither it nor a digest from the same publisher protects against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
+**Release integrity and delivery.** Each release is one commit in the marketplace repository that replaces `plugins/stemma`; the publish script refuses different content under a published version and pushes nothing. The install check compares the installed bundle with the built one (SEC-028). Whoever can push to that repository can change what installs; a digest from the same publisher does not protect against a compromised publisher account. Claude's command-line tool may drive repeatable install tests; its results are recorded as command-line observations and never as desktop ones.
 
 ### Component Interactions
 
 ```mermaid
 graph TD
     Source["Repository source"] --> Packager
-    Packager --> Package["Tagged tree in distribution repository"]
-    Entry["Marketplace entry"] -->|"url and tag"| Package
+    Packager --> Package["plugins/stemma in DocumentDrivenDX/plugins"]
+    Entry["Marketplace file"] -->|"relative source"| Package
     Package --> Host["Agent host plugin cache"]
     Host --> Skill
     Skill --> Launcher["Launcher: set up pinned Bun in plugin data"]
@@ -250,7 +253,7 @@ The domain model above only explains release concepts and adds no record kind. P
 
 | Risk | Prob | Impact | Mitigation |
 |---|---|---|---|
-| Claude desktop does not install from the distribution repository | M | H | Observe it before any support claim; the owner decides what changes |
+| Claude desktop does not install from the marketplace repository | M | H | Observe it before any support claim; the owner decides what changes |
 | A desktop app or sandbox blocks the setup download or the fetched program | M | H | BR-1007 message; hand check per system; claim only observed cells |
 | A bundled library needs files or native code that bundling breaks | M | M | BR-1003; run extraction and citation fixtures from the installed package |
 | The skill claims a check ran, or paraphrases a result | M | H | CONTRACT-004 C; hand checks; the author can rerun from a terminal; not enforceable |

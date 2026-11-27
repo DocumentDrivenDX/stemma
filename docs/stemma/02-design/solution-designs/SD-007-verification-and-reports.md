@@ -122,8 +122,8 @@ Result and report shapes are CONTRACT-002; stored records are CONTRACT-001. The 
 
 - **BR-705** — Both texts are folded by the same Stemma code, applying only the listed differences, with an offset map back to the unchanged originals. Evidence shows original text.
 - **BR-706** — A pass requires the folded quotation to occur as one contiguous span that starts and ends at word boundaries, so a fragment of a longer word does not pass. An apostrophe or hyphen between letters is part of the word. Han, Hiragana, Katakana, Thai, Lao, Khmer, and Myanmar text is written without spaces, so a boundary may fall between any two of its characters (assumption). A match never ends inside a character with its combining marks or inside a ligature.
-- **BR-707** — The line-end join applies only where the stored text has a hyphen, or soft hyphen, directly before a line break inside a word. The result records each join. A true compound broken at its own hyphen then appears as a near match when quoted correctly, and a quotation without that hyphen passes.
-- **BR-708** — Search covers non-retired extractions of the cited source's captures; a note extract searches only its anchor. Evidence names the extraction and, where mapped, the printed page found. No usable text, or only `poor` quality text without a pass, is unverifiable. `unassessed` text is searched (assumption; this answers the level SD-002 leaves open).
+- **BR-707** — The line-end join applies only where the source text has a hyphen, or soft hyphen, directly before a line break inside a word, a page break included. The result records each join. A true compound broken at its own hyphen then appears as a near match when quoted correctly, and a quotation without that hyphen passes.
+- **BR-708** — Search covers the main stream of each non-retired, intact source file of the cited source, then its notes stream; running heads, folios, and boilerplate are never searched. A note extract searches only its passages. Evidence names the source file, the pages or section found, and the passage address. No usable text, or only `poor` quality text without a pass, is unverifiable. `unassessed` text is searched (assumption).
 - **BR-709** — With no pass, a bounded approximate alignment finds the closest span, widens it to whole words, and measures the edit distance on that span. It is `near` when the distance is at most 15 percent of the folded quotation's length, else `none`. A `none` result still shows the closest span within 40 percent, as US-024-AC1 asks (both values are starting values, to be tuned on pilot sources). The story's "all fields" against "some fields" is one such case: 4 changes in 25 characters is just over the near share. Alignment never turns a result into a pass.
 - **BR-710** — Ellipses, bracketed edits, case changes, and translations are not on the approved list. They fail, or are unverifiable where no comparable text exists. The author fixes them or annotates the finding.
 
@@ -136,11 +136,11 @@ Result and report shapes are CONTRACT-002; stored records are CONTRACT-001. The 
 
 **Other matching**
 
-- **BR-715** — `locator.extent`: a recorded extent for the locator's term governs; otherwise the page map of the cited source's non-retired capture does, for pages and folios. Printed labels compare within one numbering style. An unparsable locator or missing extent is unverifiable. It tests range only, not that a quotation is on the cited page.
-- **BR-716** — Metadata comparison folds case, white space, punctuation, and canonical Unicode form only. Titles compare as whole strings; a missing subtitle fails. Authors compare as ordered family names, with initials compatible with matching given names. Years compare exactly. A field either side lacks is unverifiable.
+- **BR-715** — `locator.extent`: a recorded extent for the locator's term governs; otherwise the printed labels, chapters, or paragraph counts of the cited source's source files do. Printed labels compare within one numbering style. An unparsable locator or missing extent is unverifiable. It tests range only; `quote.page` tests that quoted words lie on the cited pages or in the cited chapter, over every occurrence.
+- **BR-716** — Metadata comparison folds case, white space, punctuation, diacritics, line-end hyphens, and canonical Unicode form only. Matching rules are those of CONTRACT-002 C. A field either side lacks is listed as not compared; a result with nothing compared is unverifiable.
 - **BR-717** — `id.resolves` applies only to sources with an identifier. The newest saved resolution for the same source and identifier governs, and its date is shown. No maximum age applies while that question is open.
 - **BR-718** — `quote.self` compares attributed quotations of eight or more words with claims in effect that are the book's own (CONTRACT-001 G, `claim.own`). A folded quotation equal to, or contained in, claim text fails. Shorter quotations give no result.
-- **BR-719** — `number.present` applies to digit-written figures, percentages, and decimals outside quotations and locators in a cited sentence. Four-digit years, dates, and ordinals are not figures (assumption). A figure passes when the same whole numeric token occurs in the cited source's stored text. Several citation items, or ambiguous separators, give unverifiable. Spelled-out numbers are not detected. A pass shows presence only.
+- **BR-719** — `number.present` applies to digit-written figures, percentages, and decimals outside quotations and locators in a cited sentence. Four-digit years, dates, and ordinals are not figures (assumption). A figure passes when the same whole numeric token occurs in the cited source's main or notes stream. Several citation items, or ambiguous separators, give unverifiable. Spelled-out numbers are not detected. A pass shows presence only.
 - **BR-720** — `construct.credit` (M2) reads only fixed patterns joining a registered construct label to a person: possessive, parenthetical, and listed credit verbs. A match to a registered originator passes, another name fails, and a label beside a person's name outside the patterns is unverifiable.
 
 **Support and annotations**
@@ -148,7 +148,7 @@ Result and report shapes are CONTRACT-002; stored records are CONTRACT-001. The 
 - **BR-721** — A cited claim is a claim in effect in a claim span that contains a citation, reviewed or not. Its supporting passages are those reached by attestations with stance `supports` or `partly_supports` (assumption). One that reaches none is reported as unsupported (`no_source_passage`).
 - **BR-722** — Currency is computed from the CONTRACT-001 digests and required fields. Manuscript sentences are not an input.
 - **BR-723** — Every current `partly_supported` or `unsupported` record for a pair stays reported until its inputs change or the author dismisses it. A later `supported` run on unchanged inputs does not replace it, so rerunning until a model agrees does not remove the finding (assumption).
-- **BR-724** — An annotation applies only when check, finding key, and every bound value equal current values. Applicability is recomputed each run; the result keeps its outcome. Age is never read. A confirmation applies while its source and capture digests equal current values.
+- **BR-724** — An annotation applies only when check, finding key, and every bound value equal current values. Applicability is recomputed each run; the result keeps its outcome. Age is never read. A source-details review applies while its pages' digests and the source's bibliographic digest equal current values.
 - **BR-725** — An annotation is created only from a current result of a full-input evaluation, with bindings copied from it. Effects follow CONTRACT-002 F.
 - **BR-726** — Redaction is applied to the report structure before any renderer, by evidence class, failing closed for unclassified entries. The leak search then tests the rendered outputs (CONTRACT-002 E1).
 
@@ -242,7 +242,7 @@ graph TD
 | CHK-01 | Checks | `cite.key`, `bib.uncited` | Seeded unknown key; listed uncited source; unreadable manuscript stops the command |
 | CHK-02, CHK-16, CHK-17 | Text matching | BR-705 to BR-710 | One pass case per allowed difference; probes for changed hyphen, joined ellipsis, word fragment, case, omission; compound broken at line end |
 | CHK-03 | Checks | BR-715 | Out-of-range page and non-page extent; roman front matter; no extent |
-| CHK-04 | Checks | BR-716 | Wrong author, title, year, venue against extraction metadata and saved resolution |
+| CHK-04 | Checks | BR-716 | Wrong author, title, year, venue against the copy's stated identity, its title page, and a saved lookup |
 | CHK-05 | Checks | BR-717 | Saved not-found and other-work responses; none saved |
 | CHK-06 | Checks | BR-718 | Quotation equal to a claim; short quotation |
 | CHK-07 | Checks | BR-719 | Absent figure; ambiguous separator; two cited sources |
@@ -295,7 +295,7 @@ Agent turns are in [UF-007](../flows/UF-007-check-feedback/UF-007.md) and follow
 | Risk | Prob | Impact | Mitigation |
 |---|---|---|---|
 | Real publisher PDFs and scans cause mass near or unverifiable results, burying real findings | H | H | Test on pilot sources first; group by cause; record recognition quality |
-| OCR text with fluent errors confirms a wrong quotation | M | H | Show extraction quality; ask the author to check page images |
+| Recognized text with errors confirms a wrong quotation | M | H | Label recognized text; show comparisons and review coverage |
 | Line-end join passes a wrong quotation | M | M | Record each join; tune on pilot sources |
 | A quotation or figure on the wrong page passes | M | H | Show the page found; no check covers it |
 | Citations the reader does not mark up, or claims outside spans, are never checked | M | H | State detection limits in the report; report unlinked citations |

@@ -77,4 +77,4 @@ The first pilot takes over one existing chapter. Support for an input is promise
 
 - Library files (US-100).
 - PDF-only or LaTeX manuscripts.
-- Acquiring stored copies.
+- Capturing sources.

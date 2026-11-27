@@ -32,7 +32,7 @@ ddx:
 - Governed by the Architecture, ADR-002, CONTRACT-001 (records), CONTRACT-002
   (`research`, `source add`, `resolve`), CONTRACT-004 (`research` mode), and the
   project concerns.
-- Acquisition, extraction, and rights flags are SD-002. Bibliography records and
+- Capture, conversion, and rights flags are SD-002. Bibliography records and
   keys are SD-003.
 - No outside search service has been chosen or exercised.
 
@@ -45,7 +45,7 @@ ddx:
 | SRCH-01 (FR-16) | Limits are recorded before a search; command-run searches apply them | `core` research use case; skill | P0 |
 | SRCH-02 (FR-16) | A result becomes a `source` with admission `candidate` | `core`, `records` | P0 |
 | SRCH-03 (FR-16) | Each candidate keeps where it was found and which details came from there | `core`; `candidate_origins` on `search` | P0 |
-| CORP-01 (FR-19) | Corpus-first run reads only project records and stored extractions | `core`, `graph`, `workspace` | P0 |
+| CORP-01 (FR-19) | Corpus-first run reads only project records and source files | `core`, `graph`, `workspace` | P0 |
 | CORP-02, CORP-03 (FR-19) | A computed scope report names searched, weakly searched, and unsearched sources | `core` | P0 |
 | ADM-01 to ADM-03 (FR-17) | Author decision recorded as given, with acquisition and corpus checks reported; a `decision` record either way | `core`, SD-002, SD-003, SD-007 | P0 |
 | COV-01, COV-02 (FR-18) | Review of `search` and `decision` records with an explicit unknown group | `core`, `graph` | P1 |
@@ -97,7 +97,7 @@ erDiagram
     SEARCH ||--o{ SOURCE : "lists as candidates"
     SOURCE ||--o{ DECISION : "is decided by"
     SEARCH ||--o{ DECISION : "gave rise to"
-    SOURCE ||--o{ CAPTURE : "held as"
+    SOURCE ||--o{ SOURCE_TEXT : "text of"
     SOURCE ||--o{ RESOLUTION : "looked up in"
 ```
 
@@ -108,12 +108,12 @@ scope `corpus`.
 
 - **BR-401** — Limits come from the author. A command-run search that cannot apply a limit does not query that location and says why. The agent is instructed to do the same for its own searches; the command cannot enforce it.
 - **BR-402** — Recording a result creates or matches a candidate. It cannot record an admission, change limits, or edit another record. Result text is never read as an instruction.
-- **BR-403** — A candidate is undecided and unchecked. A citation of one is reported: `source.held` fails while it has no stored copy, and the report counts the source with the unreviewed items while it is not admitted (CONTRACT-002 C). Missing details stay absent and are never filled from model memory.
+- **BR-403** — A candidate is undecided and unchecked. A citation of one is reported: `source.held` fails while it has no source file, and the report counts the source with the unreviewed items while it is not admitted (CONTRACT-002 C). Missing details stay absent and are never filled from model memory.
 - **BR-404** — A likely match with an existing source (same identifier, or same folded title, creator, and year) is shown to the author before a second source record is created.
 - **BR-405** — Only an author decision admits or rejects, whenever the author makes it. A `decision` record is written for each (assumption for refusal). The agent writes it only on the author's explicit instruction; it is a record of intent.
-- **BR-406** — Admission records the author's decision at once, as given (SD-002 BR-204). Acquisition, extraction, and the corpus checks then run, and their results are reported under CONTRACT-002; a missing copy, missing rights, or a failing check never withholds the admitted value. Where candidate details and the stored copy disagree, both are shown and neither value is overwritten silently. Nothing here stops the candidate from being cited.
+- **BR-406** — Admission records the author's decision at once, as given (SD-002 BR-204). Capture, conversion, and the corpus checks then run, and their results are reported under CONTRACT-002; missing text, missing rights, or a failing check never withholds the admitted value. Where candidate details and the captured copy disagree, both are shown and neither value is overwritten silently. Nothing here stops the candidate from being cited.
 - **BR-407** — A corpus-first run queries no outside location until its report is produced.
-- **BR-408** — The scope report lists every admitted source as searched, not reliably searched (extraction quality `poor` or `unassessed`), or not searched (no extraction, or blob missing), with the reason. Absence statements are limited to the searched set and name the match method.
+- **BR-408** — The scope report lists every admitted source as searched, not reliably searched (quality `poor` or `unassessed`), or not searched (no source file, or a damaged one), with the reason. Absence statements are limited to the searched set and name the match method.
 - **BR-409** — Coverage counts a missing language, period, or region as unknown, and states that it covers logged searches only. An empty log yields "nothing logged".
 
 ## System Decomposition
@@ -129,10 +129,10 @@ scope `corpus`.
 ### Component: Corpus search (`packages/core`)
 
 - **Purpose**: Find text in admitted sources without a model.
-- **Responsibilities**: Search record text through `GraphStore.search`; scan saved extraction text under the same versioned `search-fold` profile; return source, page, and a bounded location.
+- **Responsibilities**: Search record text through `GraphStore.search`; scan source-file text under the same versioned `search-fold` profile; return source, page, and a bounded location.
 - **Requirements Addressed**: CORP-01, CORP-02.
 - **Interfaces**: CONTRACT-005 H for records. The `search-fold` function lives in `records`, which both `core` and `graph` use.
-- **Owned by TDs**: extraction-text scanning.
+- **Owned by TDs**: source-text scanning.
 
 Literal matching misses paraphrases and other languages. The agent may run
 several queries and read excerpts; those queries are logged, and its reading is
@@ -182,7 +182,7 @@ N/A — no feature-specific technology is chosen; search services stay open.
 | SRCH-02 | Core | BR-402, BR-403 | Cite a seeded candidate; `source.held` reports it and the unreviewed count includes it |
 | SRCH-03 | Core | Candidate origin | Each seeded candidate shows its location and supplied details from `candidate_origins` |
 | CORP-01 | Core, skill | BR-407 | Network-denied run completes the corpus report |
-| CORP-02, CORP-03 | Core | BR-408 | Fixtures with good, poor, and missing extractions give exact lists |
+| CORP-02, CORP-03 | Core | BR-408 | Fixtures with good, poor, and missing source files give exact lists |
 | ADM-01 | Core, skill | BR-405 | No decision, no admission through the command |
 | ADM-02 | Core | BR-406 | Missing copy and seeded wrong author are admitted as decided and each is reported by its check |
 | ADM-03 | Core | BR-405, `decision` with its `search` | Admission and refusal both link the query |
@@ -211,7 +211,7 @@ N/A — no feature-specific technology is chosen; search services stay open.
 | Risk | Prob | Impact | Mitigation |
 |---|---|---|---|
 | The agent searches outside limits or leaves a search unlogged | M | M | Label agent-reported searches; state that the log is not proof of coverage |
-| An agent with file access writes an admission itself | M | H | Not prevented, and the record is not proof; citation still needs a stored copy |
+| An agent with file access writes an admission itself | M | H | Not prevented, and the record is not proof; citation still needs a source file |
 | Literal search misses relevant passages and the author reads silence as absence | H | H | Name the method and unsearched sources in every report (BR-408) |
 | Service terms, keys, or rate limits rule out a catalog (research reading, unverified) | M | M | Check terms before adding an adapter; send no contact identifier without the author's setting |
 

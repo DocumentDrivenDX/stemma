@@ -183,10 +183,10 @@ distorting current commitments.
 - **Type**: Deferred
 - **Artifact Type**: Solution Design
 - **Source**: FR-50
-- **Rationale**: v1 installs from the project's repository marketplace.
+- **Rationale**: v1 installs from the DocumentDrivenDX marketplace.
 - **Impact if Omitted**: Authors add the marketplace by address, which an organization may restrict.
 - **Dependencies**: FEAT-010
-- **Revisit Trigger**: v1 is released from the repository marketplace and a directory review is wanted or needed by pilot users.
+- **Revisit Trigger**: v1 is released from the DocumentDrivenDX marketplace and a directory review is wanted or needed by pilot users.
 - **Target Activity/Milestone**: After v1
 - **Owner**: product owner
 - **Last Reviewed**: 2026-11-26

@@ -50,7 +50,7 @@ it `untested`.
 
 ### B. Common import rules
 
-1. The original file is read only. Its bytes go to the content store, and an
+1. The original file is read only and is not copied into the project. An
    `import_batch` records format, codec version, original name, size, digest,
    entry count, file-level `blocks`, and losses.
 2. Each entry creates or proposes one `source` with `intake` `parsed` (or `raw`),
@@ -105,15 +105,16 @@ a preserved unmapped value and an edited mapped value claim the same native
 field, the record wins and the report shows the conflict. Retired sources are
 not exported.
 
-An exporter MAY emit the original bytes when every record of a batch is
-unchanged, the whole batch is requested, and the blob is present.
+When every record of a batch is unchanged, the whole batch is requested, and the
+author supplies the original file whose digest the batch records, an exporter MAY
+emit those bytes.
 
 ### E. Export of Stemma data, and cross-format export
 
 Export always produces a `stemma.loss-report/0` JSON document: target format and,
 per record, items `{path, class, note?}` with class `unrepresented` (no home in
 the target), `approximated`, or `representation_change`. Passages, notes, claims,
-links, places, captures, and provenance are normally `unrepresented`. With
+links, places, source files, and provenance are normally `unrepresented`. With
 `--policy report` (default) output and report are written. With
 `--policy strict` any item other than `representation_change` writes no output.
 Exporting to a different format than the origin is never covered by C, and
@@ -194,8 +195,7 @@ by `doctor`. Cap values are set by the takeover solution design.
 | Corrupt or encrypted `.docx` | `docx_unreadable` | no | Save an unencrypted copy |
 | Embedded field present but undecodable | Intake continues; listed with raw location | no | Author resolves manually |
 | Strict export would lose data | Exit 5, report only | yes | Use `report` policy |
-| Original blob missing | Byte replay unavailable; regeneration still meets C | yes | Restore the blob |
-| Blob of a preserved value that holds a local path is missing (CONTRACT-001 B) | Export writes the rest, lists each missing value in the loss report, and makes no same-information claim | yes | Restore the blob |
+| Original file not supplied | Byte replay unavailable; regeneration still meets C | yes | Supply the original |
 
 ## Examples
 

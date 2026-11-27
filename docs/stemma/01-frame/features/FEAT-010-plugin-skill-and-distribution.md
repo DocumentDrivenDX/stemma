@@ -141,9 +141,9 @@ N/A — the tasks are traced in the user stories.
     (FR-77, P1). Until that is observed, no such support is claimed. FR-77 delays
   neither the pilot nor the first Claude release.
 - DST-06. The bundled command line must not be committed to the Stemma
-  repository. The repository marketplace install must deliver it (FR-50), from a
-  version tag of a separate distribution repository that holds built release
-  trees.
+  repository. Installing from the DocumentDrivenDX marketplace must deliver it
+  (FR-50), from the built release tree at `plugins/stemma` in the
+  DocumentDrivenDX/plugins repository.
 - DST-05. The product must describe use with a local model as an unsupported
   experiment: not blocked, not promised, and not tested (PRD Non-Goals; FR-50
   promises Claude desktop's local Code tab only).
@@ -223,7 +223,9 @@ feature.
   `plugin-distribution` concerns to modes and sessions the product cannot serve.
 - **Unverified**: Installation of the release tree through a marketplace entry
   and first-use setup were observed with the Claude command-line tool on one
-  macOS system, against a local stand-in for the distribution repository.
+  macOS system, against a local stand-in for the marketplace repository, and for
+  version 0.0.2 from GitHub with the command-line tool. Claude desktop is
+  untested.
 - **Unverified**: One repository layout installed and listed in the Claude Code
   and Codex command-line tools on one macOS machine. Desktop apps, Linux,
   Windows, and hooks in a live session were not tested.

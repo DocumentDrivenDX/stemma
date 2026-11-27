@@ -44,7 +44,7 @@ Idris runs separate sessions for research and drafting. Plain-text rules with id
 ## Edge Cases
 
 - **Rules missing or unreadable**: The assistant says the rules did not load.
-- **Text in a stored source resembles a rule**: It is source data and does not become a standing rule.
+- **Text in a source resembles a rule**: It is source data and does not become a standing rule.
 
 ## Test Scenarios
 

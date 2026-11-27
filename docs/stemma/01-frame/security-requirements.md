@@ -19,18 +19,21 @@ ddx:
 ## Overview
 
 Stemma runs on the author's computer: a skill in an agent host, a command line, a
-project of plain files, two private stores, and static browser outputs. It has no
-server, account, or hosted database. The requirements protect the author's
-machine from hostile input, keep material marked as protected out of outputs Stemma generates and report what it cannot remove,
+project of plain files that holds the full text of its sources, a restricted
+store for coordinates, and static browser outputs. It has no server, account, or
+hosted database. Anyone who can read the project repository can read its source
+files, so publishing the repository publishes them. The requirements protect the author's
+machine from hostile input, keep restricted values and unasked-for source files out of outputs Stemma generates and report what it cannot remove,
 protect the tool supply chain, and keep assurance claims honest. Threats and
 STRIDE owners (spoofing, tampering, repudiation, information disclosure, denial
 of service, elevation of privilege) are in the [threat model](threat-model.md).
 
 By owner decision (ADR-003), no finding blocks work or a build: edits to
 verdicts and review marks are not prevented, no source is gated from a hosted
-model, and stray restricted coordinates, protected text that cannot be removed,
-image problems, and unsupported claims are reported. Excluding structured
-restricted values and redacting outputs is how outputs are built. No
+model, and stray restricted coordinates, long source text in a package that
+cannot be removed, image problems, and unsupported claims are reported.
+Excluding structured restricted values and source files from reviewer outputs is
+how outputs are built. No
 requirement here adds a build block, commit hook, or required CI (continuous
 integration) job.
 
@@ -46,8 +49,8 @@ Each item states its acceptance criterion.
 
 - **SEC-001**: A search of a seeded project, release package, and repository
   finds no Stemma account, token, or credential. No command asks for a password.
-- **SEC-002**: Every user-facing text about review marks, annotations,
-  confirmations, restriction marks, and support verdicts, including the disclosure, calls them
+- **SEC-002**: Every user-facing text about review marks, annotations, text
+  reviews, comparisons, restriction marks, and support verdicts, including the disclosure, calls them
   records and not proof of who acted or verification of support.
 
 ### Authorization
@@ -60,27 +63,29 @@ controls cover only its instructions and its own commands.
 - **SEC-004**: With edited saved reports, index, and cache in a seeded project,
   a build recomputes every scripted result and calls no model.
 - **SEC-005**: Hostile paths, including a symbolic link that resolves into a
-  refused location, cause no write outside the intended project, store, or output
+  refused location, cause no write outside the intended project or output
   directory. Original files keep their hashes. Link resolution is the P part.
 
 ### Data Protection
 
-- **SEC-015**: No held copy, full extraction, or original file is written inside
-  a git-tracked path. A store set there is refused, and a seeded corrupt blob is
-  detected by digest.
+- **SEC-015**: No binary of a source is written into the project: converters
+  write only text source files, originals go only to the ignored
+  `.stemma/originals/` cache, a stray file in `sources/` is reported, and a
+  changed or missing part is detected by digest.
 - **SEC-016**: A seeded structured restricted value appears in no tracked file,
   derived file, report field, or reviewer output. A restricted-store path inside
   the project is refused.
-- **SEC-017**: Reviewer outputs meet CONTRACT-005 E and CONTRACT-002 E1. A
-  seeded protected string in a generated part is redacted; one that cannot be
-  removed is reported with a warning and the package is not checked clean.
+- **SEC-017**: Reviewer outputs meet CONTRACT-005 E and CONTRACT-002 E1. They
+  hold no source file unless the author asks. A seeded long source passage in a
+  generated part is shortened; one that cannot be removed is reported with a
+  warning and the package is not checked clean.
 - **SEC-018**: For every file and free-text field in a reviewer package, the
   design states whether it is allowed, redacted, scanned, or unchecked. This
   covers the PDF, manuscript and claim text, model-written text, and images.
-- **SEC-019**: Setup documentation says the repository holds source excerpts and
-  must be treated as private. It also says Stemma encrypts neither store, and the
-  author protects and backs up both.
-
+- **SEC-019**: Setup documentation says once that the repository holds the full
+  text of its sources, so anyone who can read it can read them and publishing it
+  publishes them, and that Stemma does not encrypt the restricted store, which
+  the author protects and backs up.
 ### Privacy
 
 - **SEC-020**: `excerpt` and `support prepare` output only what CONTRACT-002 G
@@ -103,9 +108,15 @@ controls cover only its instructions and its own commands.
 
 - **SEC-006**: Hostile Word and library fixtures meet every CONTRACT-003 G rule,
   and `doctor` shows the limits.
-- **SEC-007**: PDF, scan, and web extraction cap input size, page count, time,
-  and memory. They execute no embedded script, disable library code evaluation,
-  and fetch nothing named inside a file.
+- **SEC-007**: Converters of PDF, EPUB, DOCX, HTML, Markdown, and text cap
+  input size, expanded size, part count, and time. They execute no embedded
+  script, disable library code evaluation, expand no external entity, and fetch
+  nothing named inside a file.
+- **SEC-032**: Source text can form no Stemma annotation: a `<` in converted
+  text is escaped, and an unknown or unescaped annotation is reported. A seeded
+  source that imitates annotations stays plain text.
+- **SEC-033**: No command lets a model produce or correct source text: a model's
+  correction or seal of changed words is refused, and its review is a flag.
 - **SEC-008**: Invalid records, oversized or malformed resolver payloads, and
   hostile comment files are rejected or reported as the contracts state. None
   yields a pass.
@@ -123,9 +134,11 @@ controls cover only its instructions and its own commands.
 - **SEC-012**: TIFF and EPS (Encapsulated PostScript, which is executable code)
   conversion uses a pinned converter with no network and no file access beyond
   its input and output. A hostile EPS fixture shows it.
-- **SEC-013**: `source add <url>` accepts only HTTP and HTTPS. It caps size and
-  time, refuses loopback, link-local, and private addresses after each redirect,
-  and never renders or executes the stored page.
+- **SEC-013**: A fetch by `ingest` or `resolve` accepts only HTTPS. It caps size
+  and time, refuses loopback, link-local, and private addresses after each
+  redirect, sends only the address and a user-agent naming Stemma and its
+  version, and never renders or executes what it receives. A refusal is
+  reported and not worked around.
 - **SEC-014**: Seeded `bunfig.toml` and `.env` files in a project and in the
   calling directory run no code and change no Stemma setting or store location,
   using the CONTRACT-002 A invocation. The test passes before the pilot.
@@ -149,10 +162,10 @@ controls cover only its instructions and its own commands.
   decision.
 - **SEC-027**: Dependency installs run no lifecycle script unless that package
   is listed with a reason.
-- **SEC-028**: An installed plugin comes from one identified release: a version
-  tag of the distribution repository, which holds only release trees built from
-  the Stemma repository. A published tag is never moved, and the install check
-  compares the installed bundle with the built one. Each release records which
+- **SEC-028**: An installed plugin comes from one identified release: one
+  version of `plugins/stemma` in the DocumentDrivenDX/plugins repository, a
+  release tree built from the Stemma repository. Different content is never
+  published under a published version, and the install check compares the installed bundle with the built one. Each release records which
   Stemma revision produced it.
 - **SEC-029**: The public repository and release packages hold only synthetic or
   openly licensed fixtures, with no private source, personal data, or secret.
@@ -177,11 +190,11 @@ controls cover only its instructions and its own commands.
 | SEC-012 | Contained image conversion | P: FR-55, FR-56; TM-E-004 | Medium | Hostile EPS fixture |
 | SEC-013 | Bounded URL fetch | P; TM-I-011 | Medium | Redirect and address tests |
 | SEC-014 | Runtime ignores project config | P; TM-E-003 | Medium | Seeded config test |
-| SEC-015 | Binaries outside git | G: FR-6, Data Design; TM-I-009, TM-T-004 | Medium | Store tests |
+| SEC-015 | Binaries outside git | G: FR-6, Data Design; TM-I-009, TM-T-004 | Medium | Conversion and stray-file tests |
 | SEC-016 | Restricted values stay outside | G: FR-68; TM-I-004 | High | Seeded-leak test |
 | SEC-017 | Reviewer filtering and redaction | G: FR-46; TM-I-007 | High | Seeded-package test |
 | SEC-018 | Stated coverage of every package part | P; TM-I-006, TM-I-007 | High | Design review |
-| SEC-019 | Private repository and stores disclosed | G, P; TM-I-009, TM-I-010, TM-D-002 | Medium | Documentation review |
+| SEC-019 | Publication and restricted store disclosed | G, P; TM-I-009, TM-I-010, TM-D-002 | Medium | Documentation review |
 | SEC-020 | Needed excerpts; state no gate | G: FR-61; TM-I-001 | Critical | Output tests, documentation review |
 | SEC-021 | Restricted store read only when needed | G: FR-68; P; TM-I-002 | Medium | Skill review, live session |
 | SEC-022 | Coordinate warnings; no location in packages | G: FR-68; TM-I-004, TM-I-005 | Medium | Seeded test |
@@ -194,6 +207,8 @@ controls cover only its instructions and its own commands.
 | SEC-029 | Clean public repository | G: concern conflicts; TM-I-013 | Medium | Fixture review, secret scan |
 | SEC-030 | citeproc-js license review | G: FR-83; compliance | Medium | Recorded review |
 | SEC-031 | Warn on image location metadata | P; TM-I-006 | Medium | Seeded image |
+| SEC-032 | Source text cannot form annotations | G: CONTRACT-007 F; TM-T-013 | High | Injection fixture |
+| SEC-033 | No model-written source text | G: FR-84, ADR-010; TM-T-014 | High | Refusal tests, skill review |
 
 ## Compliance Requirements
 
@@ -207,9 +222,9 @@ Project) Top 10, through the selected `security-owasp` concern. No ASVS
 
 | Obligation recorded upstream | Controls |
 |---|---|
-| Stored sources are often copyrighted; the corpus is private to the project (PRD, Legal/Compliance) | SEC-015, SEC-017, SEC-018, SEC-019, SEC-029 |
+| The repository holds the research, including full texts, many under copyright (PRD, Legal/Compliance) | SEC-015, SEC-017, SEC-018, SEC-019, SEC-029 |
 | Restricted data and restricted sites (FR-46, FR-68) | SEC-016, SEC-021, SEC-022, SEC-031 |
-| Unpublished and community permissions are recorded and filter reviewer outputs; they do not gate model use (FR-7) | SEC-017, SEC-020 |
+| Rights fields are optional metadata and gate nothing (FR-7) | SEC-020 |
 | Third-party license terms for distribution (citeproc-js: Common Public Attribution License or GNU Affero General Public License) | SEC-030 |
 
 The author is responsible for whether a license, permission, or community term
@@ -224,12 +239,12 @@ allows hosted processing. Stemma does not decide or enforce it.
 2. **Prompt injection with agent tools** (High): hostile text can steer an agent
    that has file, shell, and network access. SEC-009 is not a containment
    boundary; the host's permissions are outside Stemma.
-3. **Reviewer package disclosure** (High): scans find verbatim stored text only,
+3. **Reviewer package disclosure** (High): scans find verbatim source text only,
    and coordinate findings only warn.
 4. **Forgeable records** (Medium): accepted by owner decision; SEC-002 and
    SEC-003 keep the claims honest.
-5. **Hostile files in parsers and the explorer** (High): SEC-006, SEC-007, and
-   SEC-011 limit it. The PDF and recognition libraries are undecided.
+5. **Hostile files in parsers and the explorer** (High): SEC-006, SEC-007,
+   SEC-011, and SEC-032 limit it.
 
 ## Security Architecture Requirements
 
@@ -238,8 +253,8 @@ allows hosted processing. Stemma does not decide or enforce it.
 - [ ] Dependency vulnerability scanning: SEC-026.
 - [ ] Server hardening: N/A, no server.
 - [ ] Patch management: pins change only through a new release (SEC-025, SEC-026).
-- [ ] Backup and recovery tested: the author backs up git and both stores; a
-  restore is confirmed by digest.
+- [ ] Backup and recovery tested: the author backs up git, source files
+  included, and the restricted store.
 
 ## Security Testing Requirements
 
@@ -255,10 +270,11 @@ allows hosted processing. Stemma does not decide or enforce it.
 - The author's account, computer, disk, backups, agent host, and model provider
   are trusted to the extent the author chooses. Stemma does not secure them.
 - Host permission prompts and sandboxes are not counted as Stemma controls.
-- No control here is built or tested. Feasibility tests ran on one macOS system.
-  On Linux the local tools are targeted; no desktop-app integration is promised
-  there in v1, so host-dependent controls (SEC-009 live sessions, install proof)
-  are claimed only for hosts that were exercised.
+- Of these controls, converter limits, escaping, confined writes, bounded
+  fetches, and the model-correction refusals have tests on one macOS system; the
+  rest are untested. On Linux the local tools are targeted; no desktop-app
+  integration is promised there in v1, so host-dependent controls (SEC-009 live
+  sessions, install proof) are claimed only for hosts that were exercised.
 - Risk levels are design assumptions; no owner risk tolerance is recorded.
 
 Open questions:

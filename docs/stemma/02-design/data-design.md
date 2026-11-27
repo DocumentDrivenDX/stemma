@@ -9,9 +9,11 @@ ddx:
     - stemma.architecture
     - stemma.adr-002
     - stemma.adr-006
+    - stemma.adr-010
     - CONTRACT-001
     - CONTRACT-005
     - CONTRACT-006
+    - CONTRACT-007
   schemas:
     - id: stemma.record
       version: "0"
@@ -24,13 +26,13 @@ ddx:
 
 ## Data Summary
 
-- Scope: storage for one author's project: the evidence graph, binaries, derived
-  data, and their lifecycle. Shapes and rules are in CONTRACT-001; graph exports
-  and the query port are in CONTRACT-005.
-- Storage systems: record files in git, a separate private content-addressed
-  store, a restricted store, a SQLite index, and generated outputs.
-- Main concerns: one source of truth, deterministic rebuild, copyrighted and
-  restricted material, large binaries, three operating systems.
+- Scope: storage for one author's project: the evidence graph, source files,
+  derived data, and their lifecycle. Shapes and rules are in CONTRACT-001, source
+  files in CONTRACT-007; graph exports and the query port are in CONTRACT-005.
+- Storage systems: record files and source files in git, an ignored originals
+  cache, a restricted store, a SQLite index, and generated outputs.
+- Main concerns: one source of truth, deterministic rebuild, a chain from each
+  original to each citation, restricted material, three operating systems.
 - Data Architecture, the HELIX artifact for data pipelines, is not applicable:
   Stemma has no pipeline platform or medallion layers.
 
@@ -41,9 +43,10 @@ ddx:
 | Record files | The evidence graph and source of truth | `id`, `kind` (CONTRACT-001 C) | Hundreds of sources for a large humanities book (assumption); passages and links assumed in the thousands to tens of thousands | In git; one record per file |
 | `stemma.json`, `rules.md` | Settings, trim size, and standing rules | `project_id`, rule IDs | One each | In git |
 | `manuscript/` | Stemma's copy of the manuscript, marked-up Markdown (CONTRACT-006) | chapter ID file names | One book | In git; takeover and fixes write here, never to originals |
-| Content store | Held copies, extracted text, original files and import bytes | SHA-256 | Gigabytes with scans and images (assumption) | Private, outside git; the author backs it up |
+| Source files | Each captured source's whole text, page by page or section by section (CONTRACT-007) | manifest `id`, part digests | About a megabyte of text for a book, one file per page (assumption) | In git under `sources/` |
+| Originals cache | Originals fetched or supplied for conversion and comparison | SHA-256 | As large as the originals | `.stemma/originals/`, ignored; nothing depends on it |
 | Restricted store | Exact restricted coordinates | location ID | Small | Outside the project |
-| Resolver responses | Saved network results that checks read | source, query, date | Per lookup | `resolution` records, in git |
+| Saved lookups | Catalogue and identifier responses that checks read | source, identifier, query, date | Per lookup | `resolution` records, in git, with the response |
 | SQLite index | Disposable queries | record ID | Proportional to records | `.stemma/`, ignored |
 | Reports | Latest check reports | corpus digest | Per run | `.stemma/`, ignored |
 | Build outputs | PDFs, packages, build records | commit, report digest | Per build | `build/`, ignored; an author keeps releases deliberately |
@@ -54,9 +57,10 @@ ddx:
 | Data | Committed |
 |---|---|
 | The graph as record files, settings, rules, manuscript text | Yes |
-| Record excerpts of sources (passage quotes, note extracts) | Yes, inside records, so the repository is private material even when blobs are absent |
-| Preserved legacy values | Yes, inside records |
-| Held copies, full extracted text, original files | No; digests only. Preserved legacy values that hold a local path are also kept only there (CONTRACT-001 B) |
+| The whole text of every captured source, as source files | Yes. Anyone who can read the repository can read it |
+| Passage quotes and note extracts | Yes, inside records |
+| Preserved legacy values | Yes, inside records, as imported |
+| Originals: binaries, page images, paper | Never; tied to the text by hash and size, or by description and where held |
 | Restricted exact values, and hashes of them | Never |
 | Index and reports | Never |
 | Generated browser graph, typeset outputs | Never; rebuilt when needed |
@@ -65,29 +69,25 @@ Record files are canonical. After a fresh clone, `graph export --audience author
 --page` rebuilds the browser graph from the repository alone (CONTRACT-005 C).
 An export is never edited or read back.
 
-### Content store and large binaries
+### Source files and originals
 
-- Large binaries live in a separate private content-hash store. The repository
-  holds references only, and the author backs the store up. Its location rule is
-  in CONTRACT-001 B.
-- A blob's address is the digest of its raw bytes: `sha256/<2>/<64>`.
-  Blobs are immutable. A write goes to a temporary file, is verified, and is
-  renamed into place.
-- Records hold digests and sizes: captures, extractions, and import batches. The
-  referenced set is the manifest of what a restore needs.
-- Extracted and recognized text is stored as a blob and never regenerated in
-  place, so checks read saved text even if a tool is later nondeterministic.
-- Line-ending settings never apply to blobs.
-- A missing or corrupt blob makes dependent results `unverifiable`.
-- Removing a source retires records and keeps blobs. Stemma deletes no blob:
-  `store verify --unreferenced` lists blobs that no record references, and the
-  author may delete those files from the private store. A blob committed by
-  mistake remains in git history until the history is rewritten.
-- The `BlobStore` port is `has`, `get`, `put`, `verify`. `store verify`
-  (CONTRACT-002) lists referenced digests that are missing or corrupt, which is
-  how a restore on a clean checkout is confirmed (FR-59). Stemma moves no blob off the
-  machine: copying the store to another machine or backup is the author's step.
-  git LFS (Large File Storage) is not used.
+- A source file is the working text of one captured original: its manifest is a
+  `source_text` record, and its parts are one file for each page or section
+  (CONTRACT-007). Every check, excerpt, build, and view reads these files.
+- Originals are never committed. An `upstream` record keeps the address,
+  retrieval time, hash, size, and identifiers of each fetched or supplied
+  original; the manifest keeps the hash and size of what was converted, or the
+  description and holder of a paper or physical original.
+- Verifying against an original is optional. Given the file, by path or from the
+  originals cache, `source verify` and `ingest` match its hash, convert it again
+  with the recorded settings, and record the per-page comparison.
+- A part edited by hand is reported until `source seal` records the new digests.
+  git keeps the history. Reviews and comparison runs bind to page text digests,
+  so they go stale on a change of words and not on a change of layout.
+- Retiring a source file rewrites only its manifest. Removing text from git
+  history is the author's step.
+- The repository holds no binary of a source. A book's own image files (FR-58)
+  are the author's files, named by path and hash in their image records.
 
 ## Relationships
 
@@ -96,9 +96,12 @@ The ones that shape storage:
 
 | From | To | Type | Cardinality | On Delete |
 |------|----|------|-------------|-----------|
-| capture | source | held copy of | N:1 | RESTRICT: retire, flag dependants |
-| extraction | capture | derived from | N:1 | RESTRICT; never edited |
-| passage | extraction, capture, source | anchored in | N:1 each | RESTRICT |
+| upstream | source | original of | N:1 | Kept as history |
+| source_text | source | text of | N:1 | RESTRICT: retire, flag dependants |
+| passage | source_text, source | anchored in page or section digests | N:1 each | RESTRICT |
+| citation | passage | quotes | N:1 | RESTRICT |
+| resolution | source | catalogue response about | N:1 | Kept |
+| text_review, comparison_run | source_text, source | judged or compared pages at digests | N:1 | Kept; stale when the pages change |
 | note | passage, source | reports | N:M, N:1 | RESTRICT |
 | attestation | claim, note or passage | evidence with stance | N:1 each | RESTRICT |
 | inference | claims or attestations; claim or inference | argument relation | N:M; N:1 | RESTRICT |
@@ -107,7 +110,6 @@ The ones that shape storage:
 | review_comment | claim | outside comment | N:1 | Kept; marked when claim text differs |
 | support_record | claim, passage | saved verdict | N:1 each | Kept; becomes stale |
 | annotation | sentence and source, one item of any kind, or only the finding | explains or dismisses a finding | N:1 | Kept; ends when bound content changes |
-| confirmation | source, capture | author-checked title page | N:1 each | Kept; ends when bindings change |
 | plan, ai_activity, audit_finding, governing, voice, image, and other feature records | chapters, claims, sources | CONTRACT-001 G | N:M | Kept |
 | place records | place, evidence | sourced assertion | N:1, N:M | RESTRICT |
 
@@ -119,12 +121,12 @@ reference silently dangles. A file deleted by hand yields `reference_dangling`.
 | Access Pattern | Frequency | Performance Need | Supporting Index or Cache |
 |----------------|-----------|------------------|---------------------------|
 | Record by ID or citation key | Constant | Interactive | `record`, `source_key` |
-| Changed records and dependants (FR-10, FR-31) | Each agent edit | Within the `check --changed` target | Digest comparison, reverse `link` closure |
+| Changed records, parts, and dependants (FR-10, FR-31) | Each agent edit | Within the `check --changed` target | Digest comparison, reverse `link` closure |
 | Uncited entries, incomplete claims, stale support | Each check | Seconds | `link` anti-joins |
 | Search names, titles, claims, and optionally passages across scripts | Often | Interactive | Folded `search_text` |
 | Evidence chain, argument and map subgraphs | Views | Interactive | `link` traversal |
 | Full export | On request | Seconds | Ordered scans |
-| Quotation matching | Each affected check | Bounded by cited sources | Extraction blob, per-run cache |
+| Quotation matching | Each affected check | Bounded by cited sources | Source file streams, per-run cache |
 
 Logical index tables (internal; they may change with the index version):
 
@@ -141,7 +143,7 @@ A full-text virtual table may be built over `search_text`.
 
 **Rebuild determinism**
 
-- Input is only the record files, `stemma.json`, and `rules.md`. The index holds
+- Input is only the record files, source files, `stemma.json`, and `rules.md`. The index holds
   no fact of its own: no generated ID, sequence, or timestamp.
 - Files are processed in path order by code point, never directory order.
 - `index dump` writes each logical table in the order above, rows sorted by
@@ -157,7 +159,7 @@ A full-text virtual table may be built over `search_text`.
   trusted as proof of sameness.
 - A schema or fold version change deletes and rebuilds the index.
 - Change flags and staleness also depend on inputs that are not references:
-  citation keys, blob digests, rules, settings, and saved resolutions. The
+  citation keys, part digests, rules, settings, and saved resolutions. The
   closure includes them.
 
 A relational interface specification (UMF TableSpec per table) is omitted: no
@@ -189,14 +191,13 @@ other systems are unmeasured.
 | All records | Schema and CONTRACT-001 rules | Reject on read; no partial repair |
 | Record file names | Lowercase prefix and token | Safe on case-insensitive systems and Windows |
 | Source text, library fields, manuscript text, resolver payloads | Untrusted data | Size limits, no execution, never instructions |
-| Rights fields | Permissions, unpublished and community markers, each possibly unstated | Govern reviewer outputs; they do not gate model use |
-| Source excerpts in records | Often copyrighted | Private repository assumed; left out of reviewer outputs apart from allowed short excerpts |
-| Unpublished and community-restricted sources | Sensitive | Withheld from reviewer exports and reports |
-| Source text quoted in check evidence | Often copyrighted | Classed `source_text`; redacted in any report that leaves the project (CONTRACT-002 E1) |
+| Rights fields | Optional metadata the author states | They gate nothing |
+| Source files and excerpts in records | Often copyrighted | In the author's repository; reviewer packages leave out source files unless asked |
+| Source text quoted in check evidence | Often copyrighted | Classed `source_text`; shortened in a report that leaves the project (CONTRACT-002 E1) |
 | Reviewer comment files | Untrusted | Limits, plain text only, writes only comment records |
 | Restricted coordinates | Sensitive; only locations marked restricted | Outside store, no derived hash; the agent reads it only when a task needs exact values, which then reach its model; structured values excluded from outputs. Release and package scans warn of stray coordinates. Unmarked locations are public; other identifiers can still disclose a site |
 | Place names and prose | Can disclose a site | Scan reports listed forms only; author review |
-| Review marks, support records, annotations, confirmations | Records of what was said or judged | Not forgery-proof; applicability and staleness recomputed |
+| Review marks, support records, annotations, text reviews, comparison runs | Records of what was said, judged, or compared | Not forgery-proof; applicability and staleness recomputed |
 
 The restricted store is not encrypted by Stemma. Its protection is the author's
 account and disk protection.
@@ -212,7 +213,7 @@ account and disk protection.
   migration is deterministic and repeatable, needs a project whose records are
   valid, writes through the staged write above, and reports every changed file.
   Running it twice changes nothing. It preserves `legacy`, `x`, unknown fields,
-  and IDs. It changes no blob, and it never rewrites a binding to keep one
+  and IDs. It changes no source text, and it never rewrites a binding to keep one
   alive.
 - Rollback: the author commits before migrating, and rollback is git. `migrate`
   warns when the tree is not clean. Older tools open newer projects read-only.
@@ -229,6 +230,7 @@ generated projection (CONTRACT-005). Index tables are internal.
 ## Cross-References
 
 - Architecture: module ownership and ports.
-- CONTRACT-001, CONTRACT-003, CONTRACT-005: exact shapes and rules.
+- CONTRACT-001, CONTRACT-003, CONTRACT-005, CONTRACT-007: exact shapes and
+  rules.
 - Data quality expectations: not authored; the check catalogue in CONTRACT-002
   is the executable rule set.

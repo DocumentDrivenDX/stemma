@@ -25,7 +25,7 @@ ddx:
 
 ## Context
 
-A record shows what a model judged on stored inputs. A change to any of them makes it stale.
+A record shows what a model judged on recorded inputs. A change to any of them makes it stale.
 
 ## Walkthrough
 
@@ -56,8 +56,8 @@ Inputs are synthetic.
 | Scenario | AC ID | Input / State | Action | Expected Result |
 |----------|-------|---------------|--------|-----------------|
 | Claim | US-034-AC1 | "some fields" changed to "all fields" | Check currency | Stale |
-| Passage | US-034-AC2 | Passage text differs after re-extraction | Check currency | Stale |
-| Source | US-034-AC3 | Stored file replaced | Check currency | Stale |
+| Passage | US-034-AC2 | A page of the passage changes | Check currency | Stale |
+| Source | US-034-AC3 | Source file replaced | Check currency | Stale |
 | Incomplete record | US-034-AC4 | Record with no prompt version | Check | Not current |
 | Record | US-034-AC5 | Completed check | Read record | All five present |
 | Sentence only | US-034-AC6 | Sentence changed from `some` to `all`; claim record unchanged | Check staleness | Current; the stated limit applies |

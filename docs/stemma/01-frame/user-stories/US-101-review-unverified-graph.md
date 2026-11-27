@@ -41,7 +41,7 @@ Typed footnotes with short forms and ibid. can point to the wrong work. A protot
 - [ ] **US-101-AC4** — Given a typed footnote that cannot be resolved with certainty, when takeover runs, then it goes to her with candidates and the reason, and no source is assigned.
 - [ ] **US-101-AC5** — Given the same originals and tool versions, when takeover resolves footnotes twice, then the automatic resolutions are identical and use no model judgment.
 - [ ] **US-101-AC6** — Given a partial reference, when it is created, then missing data stays missing.
-- [ ] **US-101-AC7** — Given a recovered reference with no stored copy, when a check evaluates its citation, then it is reported as unchecked.
+- [ ] **US-101-AC7** — Given a recovered reference with no source file, when a check evaluates its citation, then it is reported as unchecked.
 - [ ] **US-101-AC8** — Given extracted claims that Margit has not reviewed, when the ledger and checks run, then the claims are in effect and shown as unreviewed.
 - [ ] **US-101-AC9** — Given a batch of extracted claims, when she chooses to review it, then each is shown with its original passage and she can mark the batch reviewed.
 - [ ] **US-101-AC10** — Given a claim in a batch, when she edits or retires it, then her edited version is in effect or the retired claim is not, and review changes no check result.
@@ -62,7 +62,7 @@ Typed footnotes with short forms and ibid. can point to the wrong work. A protot
 | Ambiguous | US-101-AC4 | Short form `Author, Short Title, 12` matching two works | Take over | Sent to author with both |
 | Repeat | US-101-AC5 | Same fixtures | Run twice | Same resolutions, no model call for them |
 | Partial | US-101-AC6 | Footnote with author and page only | Inspect | Title and year absent |
-| No copy | US-101-AC7 | Recovered reference without a stored file | Run checks | Reported unchecked |
+| No copy | US-101-AC7 | Recovered reference without a source file | Run checks | Reported unchecked |
 | Pending | US-101-AC8 | Extracted claim, no decision | Use ledger | In effect; shown unreviewed |
 | Batch | US-101-AC9 | 3 extracted claims | Review | 3 passages shown; batch can be marked reviewed |
 | Edit and retire | US-101-AC10 | Edit 1, retire 1, mark 1 reviewed | Apply | Edited and reviewed in effect; check results unchanged by review; retired not |
@@ -73,7 +73,7 @@ Typed footnotes with short forms and ibid. can point to the wrong work. A protot
 - **Feature Spec**: FEAT-015
 - **Feature Requirements**: GRF-01, GRF-02, GRF-03, GRF-04, GRF-05, GRF-06, GRF-07, GRF-08, GRF-09
 - **PRD Requirements**: FR-72
-- **External**: FEAT-005 (claims and notes), FEAT-002 (stored copies), FEAT-007 (checks).
+- **External**: FEAT-005 (claims and notes), FEAT-002 (source files), FEAT-007 (checks).
 
 ## Out of Scope
 

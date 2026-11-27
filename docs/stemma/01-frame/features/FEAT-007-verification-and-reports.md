@@ -61,7 +61,7 @@ Domain terms. These stay distinct:
 
 CHK-01 (FR-29, P0, M1). Scripted checks must detect a citation key with no bibliography entry and a source listed for the built bibliography (FR-15) that is cited nowhere, or report that they cannot check it. A corpus source that is not listed is not an uncited entry.
 
-CHK-02 (FR-29, P0, M1). Scripted checks must detect a quotation absent from the stored source text, or report that they cannot check it.
+CHK-02 (FR-29, P0, M1). Scripted checks must detect a quotation absent from the source text, or report that they cannot check it.
 
 CHK-03 (FR-29, P0, M1). Scripted checks must detect a locator outside the cited work's printed page range or other recorded extent, or report that they cannot check it.
 
@@ -77,7 +77,7 @@ CHK-08 (FR-29, P0, M2). Scripted checks must detect a construct credited to some
 
 CHK-09 (FR-30, P0, M1). Each scripted check must report pass, fail, or unverifiable with the evidence.
 
-CHK-10 (FR-33, P0, M1). Checks must run offline against the stored corpus.
+CHK-10 (FR-33, P0, M1). Checks must run offline against the project's source files and saved lookups.
 
 CHK-11 (FR-33, P0, M1). Checks that need a network resolver must be separate, and their results must be cached with the query and date.
 
@@ -89,15 +89,15 @@ CHK-14 (FR-34, P0, M1). A seeded-error test set must verify each check, with a s
 
 CHK-15 (FR-34, P0, M1). A model judgment must never be a scripted check result.
 
-CHK-16 (FR-29, P0, M1). A quotation or note extract must pass only when it matches the stored text apart from these differences: white space and line breaks; soft hyphens; Latin presentation ligatures; Unicode canonical equivalence; straight and curly quotation marks of the same level; and a word split by a hyphen at a line end, which is joined. CONTRACT-002 defines the profile.
+CHK-16 (FR-29, P0, M1). A quotation or note extract must pass only when it matches the source text apart from these differences: white space and line breaks; soft hyphens; Latin presentation ligatures; Unicode canonical equivalence; straight and curly quotation marks of the same level; and a word split by a hyphen at a line end, which is joined. CONTRACT-002 defines the profile.
 
 CHK-17 (FR-29, P0, M1). Any other near match must be reported with both texts until it is fixed or the author dismisses it under EXC-01.
 
-CHK-18 (FR-30, P0, M1). When source details cannot be verified automatically, the author may record which stored title page or equivalent was checked and confirm them. The result must then be shown as confirmed by the author, not verified, and must stop being open. A missing confirmation leaves it open, and a mismatch must stay reported until fixed or dismissed.
+CHK-18 (FR-30, P0, M1). When source details cannot be verified automatically, a person may record a review naming the title page or equivalent checked and the details confirmed (FR-89). The result must then be shown as confirmed by the author, not verified, and must stop being open. A missing confirmation leaves it open, and a mismatch must stay reported until fixed or dismissed.
 
 #### Claim support
 
-SUP-01 (FR-52, P0, M1). A claim-support check must compare each claim with the stored passage it cites and report supported, partly supported, or unsupported, quoting the passage.
+SUP-01 (FR-52, P0, M1). A claim-support check must compare each claim with the source passage it cites and report supported, partly supported, or unsupported, quoting the passage.
 
 SUP-02 (FR-52, P0, M1). It must run in a context separate from the one that drafted the claim.
 
@@ -127,7 +127,7 @@ EXC-05 (FR-32, P0, M1). Every annotation must be listed in reports and be availa
 
 EXC-06 (FR-32, P0, M1). An annotation of a finding with no sentence, such as an uncited entry, must be bound to the exact item and its current content.
 
-EXC-07 (FR-32, P0, M1). A missing stored copy, an unreadable record, and uncommitted changes must not be dismissible, though they may be explained (assumption).
+EXC-07 (FR-32, P0, M1). A missing source file, an unreadable record, and uncommitted changes must not be dismissible, though they may be explained (assumption).
 
 #### Reports and the label
 
@@ -199,7 +199,7 @@ FBK-06 (FR-74, P0, M1). A finding without an explanation, a repeat that adds not
 ## Constraints and Assumptions
 
 - The build checks records; it cannot show that a verdict is correct. Verdict accuracy is unmeasured, and verdicts can vary between runs.
-- **Risks**: quote and locator checks were tried only on synthetic material on one macOS system, with some adversarial probes passing. Text extraction from the tool's own PDF output needed hyphen recovery. Resolver services, claim-support behavior, real files, scans, Linux, and Windows are untested.
+- **Risks**: quote and locator checks were tried only on synthetic material on one macOS system, with some adversarial probes passing. Reading text from the tool's own PDF output needed hyphen recovery. Resolver services, claim-support behavior, real files, scans, Linux, and Windows are untested.
 - **Risk**: a separate context reduces shared drafting bias but does not establish independence. Whether a host can provide it is unverified.
 - Project automation makes no paid model calls (ADR-007), so acceptance criteria that depend on model behavior need recorded local or manual runs. Record handling is testable with saved model output.
 - CHK-06 to CHK-08 have no sourced matching rules; design must define what they compare and when they report unverifiable.
@@ -210,7 +210,7 @@ FBK-06 (FR-74, P0, M1). A finding without an explanation, a repeat that adds not
 - **Risk**: the quotation profile is owner-approved and untested. Joining a line-end hyphen can pass a wrong quotation where the source's hyphen belongs to the word.
 - **Risk**: nothing stops a book or package with open findings. The report and its label are the control, so noisy or unclear findings defeat them.
 
-- Open: which changes to a "source" end an annotation: the stored file, the bibliography record, or both?
+- Open: which changes to a "source" end an annotation: the source file, the bibliography record, or both?
 - Open: does a cached resolver result have a maximum age?
 
 ## Dependencies

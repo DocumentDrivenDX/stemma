@@ -37,7 +37,7 @@ Idris has a large corpus and wants to find what it lacks. A search result that l
 
 - [ ] **US-040-AC1** — Given limits set by the author, when the assistant searches, then no search runs outside the limits.
 - [ ] **US-040-AC2** — Given a completed search, when results are presented, then each is marked as a candidate and shows where it was found.
-- [ ] **US-040-AC3** — Given a manuscript citation that points to an unadmitted candidate, when the corpus checks run, then the citation is reported as unreviewed, and as unchecked while no copy is stored.
+- [ ] **US-040-AC3** — Given a manuscript citation that points to an unadmitted candidate, when the corpus checks run, then the citation is reported as unreviewed, and as unchecked while it has no source file.
 
 ## Edge Cases
 

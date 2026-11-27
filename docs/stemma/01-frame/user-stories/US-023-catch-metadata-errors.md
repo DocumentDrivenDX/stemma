@@ -25,7 +25,7 @@ ddx:
 
 ## Context
 
-AI assistants attach real titles to wrong authors. The check compares record values with stored source metadata or a cached resolver result. It shows disagreement; it does not decide which side is right.
+AI assistants attach real titles to wrong authors. The check compares record values with what the captured copy states or a saved catalogue lookup. It shows disagreement; it does not decide which side is right.
 
 ## Walkthrough
 
@@ -40,8 +40,8 @@ AI assistants attach real titles to wrong authors. The check compares record val
 - [ ] **US-023-AC2** — Given an identifier whose cached resolution found no work, when the check runs, then it fails with the query and date.
 - [ ] **US-023-AC3** — Given an identifier that resolves to a different work, when the check runs, then it fails and shows both works.
 - [ ] **US-023-AC4** — Given no source metadata and no resolver result for a value, when the check runs, then it reports unverifiable.
-- [ ] **US-023-AC5** — Given source details that cannot be verified automatically, when the author records the stored title page or equivalent checked and confirms the details, then the result is shown as confirmed by the author, not verified, and is no longer open; without that record it stays open and the report says so.
-- [ ] **US-023-AC6** — Given a confirmation, when a detail disagrees with the held copy or a resolver, then the mismatch is still reported until fixed or dismissed.
+- [ ] **US-023-AC5** — Given source details that cannot be verified automatically, when a person records a review of the title page or equivalent confirming the details, then the result is shown as confirmed by the author, not verified, and is no longer open; without that record it stays open and the report says so.
+- [ ] **US-023-AC6** — Given a confirmation, when a detail disagrees with the copy or a saved lookup, then the mismatch is still reported until fixed or dismissed.
 
 ## Edge Cases
 

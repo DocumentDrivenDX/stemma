@@ -30,7 +30,7 @@ Cautious users abandon a tool that refuses without explanation. The agent explai
 ## Walkthrough
 
 1. Margit types a wrong page number and the check fails.
-2. The agent explains the failure and shows the recorded range and stored text.
+2. The agent explains the failure and shows the recorded range and source text.
 3. The agent offers fixes and Margit chooses to repoint the citation.
 4. The agent applies that choice and reports the new result from the rerun.
 

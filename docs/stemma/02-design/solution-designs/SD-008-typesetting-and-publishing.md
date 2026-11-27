@@ -32,7 +32,7 @@ ddx:
 
 ## Scope
 
-- Covers the Markdown reader's consumers, citation formatting, Typst conversion, and builds (FR-35 to FR-39, FR-55 to FR-59, FR-83). FR-40 is deferred.
+- Covers the Markdown reader's consumers, citation formatting, Typst conversion, and builds (FR-35 to FR-39, FR-55 to FR-58, FR-83, FR-91). FR-40 is deferred.
 - **Pilot (M1)**: `build draft` and an unwatermarked basic PDF through `build camera-ready`, both whatever the findings, at 6 x 9 in, 5.5 x 8.5 in, or A5, with the CONTRACT-006 M1 features. It is not print-ready.
 - **M2**: full book apparatus, remaining features, images, print PDF and PDF/A, approved Chicago examples. **M3**: reviewer build. Preview is SD-012; the package is SD-009.
 - Depends on CONTRACT-006 (markup and conversion), SD-007 (report and label), and SD-003 (bibliography records).
@@ -54,7 +54,7 @@ ddx:
 | IMG-07, IMG-08 (FR-58) | Image records and gap findings | Image pipeline | P1 / after M2 |
 | OUT-01 to OUT-03, OUT-06 (FR-57) | Print PDF and PDF/A | Typesetter | P0 / M2 |
 | OUT-04 (FR-40) | Editable formats | None; deferred | P2 / past v1 |
-| BIN-01, BIN-02 (FR-59) | Content-hash store and `store verify` | SD-002 stores (Data Design) | P1 |
+| FTN-01, FTN-02 (FR-91) | Footnotes generated from passage records; no tool commentary in output | `cite`, `publish` | P0, M2 |
 
 ### NFR Impact on Architecture
 
@@ -107,11 +107,11 @@ A snapshot and an asset are build-time concepts, not records. Report and build r
 
 ### Business Rules
 
-- **BR-801** — One snapshot: records, settings, manuscript, and referenced blobs are read once and digested. Checks and conversion use exactly those bytes. A change during the build cannot enter the PDF unchecked.
+- **BR-801** — One snapshot: records, source files, settings, manuscript, and named image files are read once and digested. Checks and conversion use exactly those bytes. A change during the build cannot enter the PDF unchecked.
 - **BR-802** — Order: validate and parse, run all checks, convert, format, compile, verify, compute the label, publish the files. No finding stops a step; only a tool failure does.
 - **BR-803** — Publication: output is compiled in a staging directory and moved into place with its report only after the tool steps succeed. On a tool failure no earlier Stemma output at the requested path is presented as current: it is removed, and any other existing file makes the command stop at the start with a path error (assumption).
 - **BR-804** — Watermark and label: draft pages are all watermarked; camera-ready pages carry no watermark or other mark, and the report states the status. The label comes from the report alone and appears in command output and the build record; no setting changes it.
-- **BR-805** — Draft report: it lists check, subject, location, outcome, explanation, and suggested action. Any copy meant to circulate omits source-text evidence, so it does not copy stored source text.
+- **BR-805** — Draft report: it lists check, subject, location, outcome, explanation, and suggested action. Any copy meant to circulate omits source-text evidence, so it does not copy source text.
 - **BR-806** — Warnings carried: coordinate, removal, and other disclosure warnings are printed on screen first and kept in the report.
 - **BR-807** — No hand-made citation text: formatting comes from citeproc-js. A cluster it cannot format is shown visibly marked in every build mode and reported by `cite.format`.
 - **BR-808** — Bibliography: it is the cited sources plus `bibliography_include`, projected deterministically. An unbound occurrence prints its found text, marked, in drafts.
@@ -119,7 +119,7 @@ A snapshot and an asset are build-time concepts, not records. Report and build r
 - **BR-810** — Style label: output is labelled unverified in the build output and build record for any style other than Chicago notes and bibliography, and for Chicago until the approved example set passes.
 - **BR-811** — Nothing dropped silently: unconverted blocks are typeset marked and listed; an unsupported or unresolved structure is reported with its location. A parse error stops the build.
 - **BR-812** — Fonts: a missing glyph or substituted font is reported with the text location. Only a layout that cannot complete is a tool failure (assumption).
-- **BR-813** — Images: every resolution, alternative text, credit, permission, vector, and location-metadata finding is reported. An image that cannot be placed (no converter, missing blob, rejected format) appears as a labelled placeholder with a finding; nothing is substituted silently (assumption). Location metadata in placed raster images, such as EXIF position data, is reported by `image.metadata`; originals are not changed, and whether the compiled PDF carries it is unverified.
+- **BR-813** — Images: every resolution, alternative text, credit, permission, vector, and location-metadata finding is reported. An image that cannot be placed (no converter, missing file, rejected format) appears as a labelled placeholder with a finding; nothing is substituted silently (assumption). Location metadata in placed raster images, such as EXIF position data, is reported by `image.metadata`; originals are not changed, and whether the compiled PDF carries it is unverified.
 - **BR-814** — Conversion of TIFF and EPS is a recorded step with tool, version, input digest, and output digest. Originals are unchanged; loss of color or depth is reported.
 - **BR-815** — Tool limits: when Typst cannot produce the PDF/A, the build says it is a tool limit, names the cause, and still produces the other outputs. No output is claimed to conform to PDF/A, to be accessible, or to be PDF/X unless verified, and no bleed box or crop marks are promised.
 - **BR-816** — Provenance: the build record states the commit if any, uncommitted changes, tools, label, and report digest. Uncommitted changes are reported by `build.uncommitted` and keep the build from being labelled checked clean.
@@ -167,7 +167,7 @@ BR numbers for this feature start at 801 so that designs written in parallel can
 - **Purpose**: Inspect, convert, place, and report on images.
 - **Responsibilities**: BR-813, BR-814; effective resolution from pixel dimensions and placed size; inspection of vector content for features that vanish, rasterize, or substitute fonts.
 - **Requirements Addressed**: IMG-01 to IMG-09.
-- **Interfaces**: Image check IDs of CONTRACT-002; `image` and `conversion` records (CONTRACT-001); blobs through `BlobStore`.
+- **Interfaces**: Image check IDs of CONTRACT-002; `image` and `conversion` records (CONTRACT-001); image files named by path and hash.
 
 **Hostile image input.** TIFF and EPS (which is executable code) are converted only by a pinned converter with no network and no file access beyond its input and output, under starting caps (design assumptions to test): 500 MiB and 20,000 by 20,000 pixels per image, and 120 s per conversion. A hostile EPS fixture tests the containment. Without a converter that can be contained, EPS is not converted and the image is reported.
 
@@ -225,7 +225,7 @@ TIFF and EPS converters are not chosen. Any converter must be pinned, run native
 | OUT-02, OUT-06 | Typesetter | BR-815 | RGB book yields two files or a stated tool limit; CMYK states no promise |
 | OUT-03 | Typesetter | BR-815 | No label or metadata claims PDF/X |
 | OUT-04 | None | Deferred | N/A |
-| BIN-01, BIN-02 | SD-002 stores | Data Design content store | `store verify` on a clean checkout names missing and mismatched files |
+| FTN-01, FTN-02 | `publish` | Footnote generation | A built footnote holds the citation, locator, and verbatim quotation of its passage, and no tool wording |
 
 Cross-cutting: build twice offline and compare bytes; check that no network or package fetch occurs.
 

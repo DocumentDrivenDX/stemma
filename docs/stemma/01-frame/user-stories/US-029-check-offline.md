@@ -25,7 +25,7 @@ ddx:
 
 ## Context
 
-Corpus checks depend only on stored files. Network lookups are a separate step whose cached results carry the query and date.
+Corpus checks depend only on the project's source files and saved lookups. Network lookups are a separate step whose cached results carry the query and date.
 
 ## Walkthrough
 

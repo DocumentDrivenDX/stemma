@@ -118,7 +118,7 @@ and claims say what they said before.
 ## Constraints and Assumptions
 
 - Concerns: `honest-assurance` (a script can compare quotation text with the
-  stored source; no script proves a rewrite kept a claim's meaning, so AMD-03
+  source; no script proves a rewrite kept a claim's meaning, so AMD-03
   rests on instruction and the author for assertions in manuscript sentences),
   `ai-disclosure` (record the profile in use and the model and prompt version
   behind a change), `plain-file-graph` (project profiles diff and merge as

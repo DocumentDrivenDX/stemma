@@ -9,6 +9,7 @@ ddx:
     - stemma.prd
     - stemma.adr-002
     - stemma.adr-003
+    - stemma.adr-010
     - stemma.architecture
   schemas:
     - id: stemma.record
@@ -23,13 +24,14 @@ ddx:
 **Contract ID**: CONTRACT-001
 **Type**: schema
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-002, ADR-003, FR-6 to FR-14, FR-20 to FR-23, FR-32, FR-54, FR-62, FR-67, FR-68, FR-72, FR-73
+**Related**: ADR-002, ADR-003, ADR-010, CONTRACT-007, FR-6 to FR-14, FR-20 to FR-23, FR-32, FR-54, FR-62, FR-67, FR-68, FR-72, FR-73, FR-88 to FR-90
 
 ## Purpose
 
 Defines the files that make up a project's evidence graph: record layout,
 identifiers, canonical form, digests, links, preserved legacy values, and
-restricted coordinates. Any tool that reads or writes a Stemma project
+restricted coordinates. Source files, whose manifests are records, are defined
+in CONTRACT-007. Any tool that reads or writes a Stemma project
 implements this contract.
 
 ## Scope and Boundaries
@@ -67,32 +69,26 @@ DocumentDrivenDX schema format) core `0.10.0` document using the `umf.ddd`
 | `rules.md` | Standing rules (J) | yes |
 | `records/<kind directory>/<id>.json` | One record per file | yes |
 | `manuscript/` | Stemma's own copy of the manuscript, one marked-up Markdown file per chapter (CONTRACT-006) | yes |
-| `.gitattributes` | `eol=lf` for the four paths above | yes |
-| `.stemma/` | Derived index and reports | no |
+| `sources/<name>/` | Source files: a manifest record and its page or section files (CONTRACT-007) | yes |
+| `.gitattributes` | `eol=lf` for the five paths above | yes |
+| `.stemma/` | Derived index, reports, and the originals cache `originals/<sha256>` | no |
 | `build/` | Build outputs and graph exports (CONTRACT-005) | no, except as CONTRACT-005 allows |
 
-The content store is a separate private directory that the author backs up. It
-holds blobs (held copies, extracted text, original import bytes and files) at
-`sha256/<first two hex>/<64 hex>`. The repository holds only their digests. It
-is chosen by `--store-dir`, then `STEMMA_STORE_DIR`, then a per-user directory
-keyed by `project_id` (location default is an assumption). A store inside a
-git-tracked path MUST be refused.
+Binaries and paper originals are not part of a project. Text captured from them
+is in source files, tied to each original by hash and size or by description
+(CONTRACT-007 C).
 
 Takeover and later fixes write only to `manuscript/` and records. Original
 files are never changed.
 
 Path fields that Stemma defines MUST be project-relative with `/` separators. A
-record MUST NOT contain an absolute local path. Titles, names, and citation keys
-MUST NOT form file names.
+record MUST NOT contain an absolute local path. Titles and names MUST NOT form
+file names; a source directory's name is taken from the citation key only when
+that is a safe name (CONTRACT-007 A).
 
-A preserved legacy value, such as a BibLaTeX `file` field, can hold a local path.
-Assumption: when `LegacyField.value`, `LegacyBlock.text`, or
-`LegacyEntry.entry_text` holds an absolute local path (a drive letter, a root or
-home-directory path, or a `file:` address), the writer omits the plain field,
-stores its exact UTF-8 bytes as a blob in the private content store, and records
-the digest in `value_blob_sha256`, `text_blob_sha256`, or
-`entry_text_blob_sha256`. Export reads the blob, so the same information is kept
-(CONTRACT-003 C). Path detection can miss unusual forms.
+A preserved legacy value, such as a BibLaTeX `file` field, can hold a local
+path. It is kept exactly as imported, and the import reports each such value so
+that the author can decide whether to keep it.
 
 ### C. Record kinds and identifiers
 
@@ -105,9 +101,11 @@ assigned once, is never reused, and carries no meaning. The file name is
 |---|---|---|---|
 | `source` | `src-` | `sources` | The one official bibliography record per source: fields, rights, intake, admission |
 | `agent` | `agt-` | `agents` | Person or organization |
-| `capture` | `cap-` | `captures` | A held copy: hash and provenance |
-| `extraction` | `ext-` | `extractions` | Versioned text, page map, quality |
-| `passage` | `psg-` | `passages` | Anchor in one extraction, with typed locator |
+| `source_text` | `txt-` | `sources/<name>/source.md` | One conversion of an original: identity, ties to the original, converter, and part digests (CONTRACT-007) |
+| `upstream` | `ups-` | `upstreams` | One fetched or supplied original: address, retrieval time, hash, identifiers, lookups to make |
+| `text_review` | `rvw-` | `text-reviews` | One review of source text by a person, or a model's flag |
+| `comparison_run` | `run-` | `comparison-runs` | One recorded comparison of source text, with each page's agreement |
+| `passage` | `psg-` | `passages` | Selected text at a passage address, with typed locator |
 | `note` | `nte-` | `notes` | Extract, paraphrase, or comment |
 | `claim` | `clm-` | `claims` | Claim, thesis, rival reading, or objection |
 | `attestation` | `att-` | `attestations` | Claim-to-evidence link with stance |
@@ -127,9 +125,8 @@ assigned once, is never reused, and carries no meaning. The file name is
 | `decision` | `dec-` | `decisions` | The author's admission decision on a source |
 | `support_record` | `sup-` | `support-records` | Saved claim-support verdict |
 | `annotation` | `ann-` | `annotations` | A note that explains or dismisses one finding |
-| `resolution` | `res-` | `resolutions` | Saved resolver response |
+| `resolution` | `res-` | `resolutions` | Saved catalogue or identifier response |
 | `import_batch` | `imp-` | `imports` | One legacy import |
-| `confirmation` | `cnf-` | `confirmations` | The author's confirmation of source details against a stored page |
 | `plan` | `pln-` | `plans` | Outline or chapter specification |
 | `checkpoint_input` | `ckp-` | `checkpoint-inputs` | The author's answer at a checkpoint |
 | `authorship_mark` | `aum-` | `authorship-marks` | Who drafted an exact passage |
@@ -143,6 +140,9 @@ assigned once, is never reused, and carries no meaning. The file name is
 | `review_baseline` | `rbl-` | `review-baselines` | Input digests that a re-review list compares with |
 | `image` | `img-` | `images` | Credit, rights, and permission of an image |
 | `conversion` | `cnv-` | `conversions` | A recorded TIFF or EPS conversion |
+
+A `source_text` record is the front matter of its manifest; every other record
+is one JSON file under `records/`.
 
 Every record has `schema` (`stemma.record/0`), `id`, `kind`, and `created`.
 Removal sets `retired`; the file stays. `replaced_by` MUST name a record of the
@@ -186,15 +186,17 @@ All digests are lowercase hexadecimal SHA-256.
 | Digest | Input |
 |---|---|
 | Record digest | The canonical form (D) of the parsed record, so working-tree line endings do not affect it. A file that cannot be parsed has no canonical form; the corpus digest uses its raw bytes |
-| Blob digest | Raw bytes; also the blob's store address |
+| Original digest | Raw bytes of an original file |
+| Part digest and text digest | CONTRACT-007 H |
 | `content_sha256` (review) | Canonical form of the record without `review`, `created`, `changed`, `legacy`, and `x` |
 | `claim_sha256`, `claim_text` | UTF-8 bytes of the claim's `text` |
+| `response_sha256` | UTF-8 bytes of a resolution's saved `response` |
 | `passage_sha256`, `passage_text` | UTF-8 bytes of the passage's `quote.exact` |
 | Sentence `sha256` | UTF-8 bytes of the sentence after each run of Unicode `White_Space` becomes one U+0020 and ends are trimmed; `text` stores that form |
 | `SourceBinding.record_sha256` | Canonical form of an object holding the source's `type`, `subtype`, `title`, `contributions`, `issued`, `dates`, `bib`, `identifiers`, `relations`, `extents`, and `locator_label`, each if present |
-| `SourceBinding.capture_sha256` | Blob digests of the source's non-retired captures, sorted |
+| `SourceBinding.text_sha256` | For each non-retired source file of the source, the digest of the canonical form of its list of part text digests; sorted |
 | `ItemBinding.content_sha256` | For a source: canonical form of its current `SourceBinding`. For another record: its `content_sha256` as defined above |
-| Corpus digest | UTF-8 lines `<path><TAB><digest>` LF, sorted by path code point, for every record file and `stemma.json` (record digest) and `rules.md` (digest of its text with LF endings) |
+| Corpus digest | UTF-8 lines `<path><TAB><digest>` LF, sorted by path code point, for every record file and `stemma.json` (record digest), every file under `sources/` (digest of its bytes with LF endings), and `rules.md` (digest of its text with LF endings) |
 
 ### F. Links
 
@@ -221,54 +223,68 @@ A link is stored in exactly one place; reverse links are derived.
 
 ### G. Rules by area
 
-**Sources and captures.** `admission` records the author's decision on a source:
+**Sources.** `admission` records the author's decision on a source:
 `candidate` until the author records one, then `admitted` or `rejected`. It
-holds the decision as given: no check result, missing copy, or missing `rights`
+holds the decision as given: no check result, missing text, or missing `rights`
 withholds it. Each decision is also saved as a `decision` record, which keeps
 the history; `admission` is the current value, and the latest `decision` by
 `decided.at` sets it. A source's citations can be checked once it has a
-non-retired capture with an extraction, whatever its admission (FR-9). A cited
+non-retired source file with text, whatever its admission (FR-9). A cited
 source that is not `admitted` is counted with the unreviewed items in reports.
 `intake` says how far intake got: `raw` (found text only), `parsed`, `resolved`
-(matched by a saved resolution), or `confirmed` (details confirmed by the
-author). No field gates model use: a project is for material that may be sent
-to its model. `rights` records permissions and decides what is kept out of
-reviewer outputs. `rights.unpublished` and `rights.community_restricted` are
-`true`, `false`, or absent. Absent means the author has not said; reviewer
-outputs treat an unstated flag as set (assumption). `bib[].name` and
-`dates[].variable` use CSL (Citation Style Language) 1.0.2 variable names and
-MUST be unique in their list. Names are in `contributions`, in order. `type` is
-a CSL item type.
+(matched by a saved lookup), or `confirmed` (details confirmed by a person).
+`rights` is optional metadata the author states; no field gates model use,
+checks, or outputs. `bib[].name` and `dates[].variable` use CSL (Citation Style
+Language) 1.0.2 variable names and MUST be unique in their list. Names are in
+`contributions`, in order. `type` is a CSL item type.
 
-**Extraction and passages.** Extracted text is a blob. Re-extraction creates a
-new extraction; an existing one MUST NOT be edited. `pages` maps zero-based file
-page indexes to printed labels in segments. `position` counts Unicode code
-points in the extraction text, `start` inclusive and `end` exclusive.
-For a paged source, `page_spans` MUST give each file page's `start` and `end` in
-that text, in the same units, so that page-range excerpts and page-bound checks
-need no re-extraction. A segment with printed labels MUST carry `evidence`:
-`printed_sequence`, `embedded_label` (confirmed by the author or agreeing with
-the printed numbers), or `author_statement`. `metadata` holds the title,
-contributors, date, and venue read from the held copy, each only when found;
-`meta.source` compares with it.
+**Source files and upstream records.** A `source_text` is defined by
+CONTRACT-007; its parts are never records of their own. An `upstream` record
+states where one original came from: `url` when it was fetched (absent for a
+file the author supplied), `retrieved_at` and `retrieved_by`, its `sha256`,
+`size`, and `media_type`, its `identifiers`, auxiliary files used in conversion
+(such as page-number data), and the `lookups` to make for its source. Where a
+source has upstream records, each of its source files' originals MUST match one
+of them by hash (checked by `source.original`).
 
-`text_size` counts the bytes of the text blob, and `capture_sha256` MUST equal
-the `sha256` of the capture the extraction names. An extraction of an
-`application/pdf` capture MUST have `page_spans`; they are in page order, do not
-overlap, and lie inside the text. Page-map segments MUST NOT overlap; an
-`arabic` or roman segment has a `first_label` in that style, an `explicit`
-segment one label for each of its pages, and an `unnumbered` segment neither.
-`normalization_profile` `utf8-lf/0` removes a leading byte-order mark, turns CR
-and CRLF into LF, and changes nothing else. In a text read or supplied under it,
-each form feed (U+000C) ends a page; text after the last one is a further page
-only if it holds something other than white space. The form feeds stay in the
-text, outside every span. A plain-text copy without a form feed has no
-`page_spans`.
+**Saved lookups.** A `resolution` holds the resolver, the identifier looked up,
+the address queried and when, the outcome, the response as received or reduced
+as it states, its digest, and `found`, the title, contributors, issue date,
+publisher, and venue read from the response, each only when present.
 
-A passage keeps `source_record_sha256`, the
-source's `SourceBinding.record_sha256` when it was anchored. A
-`locator.label` is a CSL locator term; `value` is the printed string
-(`xii`, `12r`). Moving a passage to a new extraction leaves it unreviewed.
+**Passages.** A passage records text selected from a source file: `text` (the
+source file), `anchor` (the passage address of CONTRACT-007 H), `quote.exact`
+(the stream text at that address, joined across parts by a line feed, copied by
+script), and `locator`, derived from the printed labels of the pages it lies on,
+or, for a source with no pages, from its chapter and paragraph. A writer copies
+`quote.exact` and `locator` from the source file; they are never typed.
+`created.by` records who selected the passage. A passage keeps
+`source_record_sha256`, the source's `SourceBinding.record_sha256` when it was
+selected. A `locator.label` is a CSL locator term; `value` is the printed
+string (`xii`, `12r`, `88-89`). A passage is never re-anchored silently.
+
+**Citations from passages.** A citation made from a passage names it in
+`passage`; its `quotation` is the passage's quotation under the approved joining
+rules (CONTRACT-002 D) and its `locator` is the passage's, both copied by script.
+
+**Text reviews and comparison runs.** A `text_review` names the source file, a
+`scope` (`whole_page`, `passage`, `quotations`, `page_number`, or
+`source_details`), the pages with the digest of what was reviewed (the page's
+text digest, or the digest of its label for `page_number`), what it was compared
+`against` and that original's hash when known, who reviewed it and when, the
+`outcome` (`agrees`, `corrected`, `disagrees`, or `flagged`), flags with the
+reading questioned and any suggestion, and a note. `source_details` also names
+the `fields` confirmed and the source's `record_sha256`. A review by a model or
+software actor is a flag or note, never a person's verification; a model's
+outcome MUST be `flagged`. A review is current only while its digests equal
+current values. A `comparison_run` records an automated comparison: `method`
+(`reconversion`, a fresh conversion of the original with the recorded settings;
+or `supplied_text`, another text of the same pages), whether it is
+`independent` of the converter, the tools, what it compared against and that
+file's hash, and for each part the part's text digest, the words compared, the
+words differing, agreement in thousandths, and the differing readings (up to 20
+a part, with the full count). It is current only while the part digests are
+unchanged and its tool versions match the current ones.
 
 **Notes, claims, constructs, methods.** A note of type `extract` or
 `paraphrase` MUST name at least one passage. A record is in effect from the
@@ -295,12 +311,11 @@ construct-credit check.
 argument, which `quote.self` reads (assumption: an unset value counts as own for
 role `thesis`, and as not own otherwise).
 
-**Confirmations.** When source details cannot be verified automatically, the
-author MAY record a `confirmation`: which stored title page or equivalent was
-checked (the capture, its file page indexes, and `page_basis`) and which fields
-were confirmed. `confirmed.by.kind` MUST be `person`. It applies only while its
-`source_record_sha256` and `capture_sha256` equal current values. Its absence is
-reported. It states what the author said and is not verification or proof.
+**Confirmed source details.** When source details cannot be verified
+automatically, a person MAY record a `text_review` with scope `source_details`:
+the title page or equivalent checked and the fields confirmed. It applies only
+while the pages' digests and the source's bibliographic digest are unchanged.
+It states what the person said and is not verification or proof.
 
 **Other feature records.** `plan` and `voice_profile` carry `review` as above.
 `checkpoint_input` records an author's answer at a checkpoint; an unanswered
@@ -342,7 +357,7 @@ reviewer saw.
 
 **Support records.** One record states one verdict for one claim and passage.
 It is never edited. It is current only while `claim_sha256`, `passage_sha256`,
-and `capture_sha256` all match. Staleness is computed and never stored.
+and the passage's page digests (`page_sha256`) all match. Staleness is computed and never stored.
 
 **Annotations.** An annotation explains or dismisses one finding in reports. It
 permits nothing, because no finding blocks anything. It binds `check` and
@@ -356,8 +371,8 @@ A finding with neither a sentence nor a record subject (such as
 `build.uncommitted` or `package.leak`) binds only `check` and `finding_key`.
 
 `effect` is `explain` or `dismiss`. An annotation about a near-match quotation
-SHOULD hold `compared`: the cited text, the stored text, the match profile, and
-the extraction. An annotation applies only while every bound value equals its
+SHOULD hold `compared`: the cited text, the source text, the match profile, and
+the source file. An annotation applies only while every bound value equals its
 current value and it is not retired. `written.by` records who wrote it; a
 `dismiss` takes effect only when `written.by.kind` is `person`. Which findings
 can be dismissed is in CONTRACT-002. Annotations are listed in reports and the
@@ -446,7 +461,7 @@ A writer MUST preserve unknown fields.
 | ID does not match file name or kind directory | `record_misplaced` | no | Rename or correct |
 | Reference missing or of the wrong kind | `reference_dangling` | no | Repoint or remove |
 | Newer major version | `version_unsupported`; no write | no | Update Stemma |
-| Blob absent from the store | Dependent checks are `unverifiable` | yes | Restore the blob |
+| A source file's part is missing or differs from its manifest digest | `source.pages` fails; dependent checks are `unverifiable` | yes | Restore from git, or `source seal` after review |
 | Restricted store absent while a record needs it | The release scan is `unverifiable` | yes | Supply the store |
 | Exact geometry on a non-public location | `restricted_in_project`: a warning that blocks nothing; no output includes the geometry (assumption) | no | Move the value to the restricted store; git history may still hold it |
 
@@ -498,7 +513,7 @@ expects it to stay reviewed.
   original reference list (CONTRACT-003 F). A listed source that is cited
   nowhere fails `bib.uncited` (CONTRACT-002) until the author removes it from
   the list or dismisses the finding with an annotation.
-- A support record is bound to the claim, passage, and capture digests, not to
+- A support record is bound to the claim, passage, and page digests, not to
   a manuscript sentence. A strengthened sentence leaves it current.
 - Treating places as public unless marked means a site marked late may already
   be in git history, in an export, or sent to a model.

@@ -149,7 +149,7 @@ wrote what, and is asked where their own interpretation matters.
 
 - Drafts are written in the marked-up Markdown of CONTRACT-006 (ADR-009),
   including its citation, claim, and needs-a-source markers.
-- Concerns: `citation-integrity` (drafting keeps the chain from text to stored
+- Concerns: `citation-integrity` (drafting keeps the chain from text to source
   source), `ai-disclosure` (drafting records model, prompt version, and role),
   `rights-and-permissions` (excerpts only), `security-owasp` (notes and source
   text are data, never instructions), `deterministic-checks` (model output is

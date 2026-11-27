@@ -60,7 +60,7 @@ of a build.
 
 **Trade-offs**: A book or reviewer package with open findings can be produced
 and sent. It can disclose a restricted site or protected material, cite a source
-with no stored copy, or hold unsupported or unreviewed claims. Nothing but the
+with no source file, or hold unsupported or unreviewed claims. Nothing but the
 report and the label warns of it. An altered "supported" verdict, review mark,
 or annotation goes undetected. The report is only useful if its findings are few
 enough and clear enough to read.

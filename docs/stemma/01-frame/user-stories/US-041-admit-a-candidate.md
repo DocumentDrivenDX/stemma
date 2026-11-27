@@ -20,7 +20,7 @@ ddx:
 
 **As a** Margit, the AI-cautious humanist,
 **I want** to decide on each candidate when I choose
-**So that** I can tell works I chose from ones I have not, and see which chosen works still lack a stored copy or fail a check
+**So that** I can tell works I chose from ones I have not, and see which chosen works still lack a source file or fail a check
 
 ## Context
 
@@ -38,7 +38,7 @@ Margit distrusts assistant-supplied references. Admission records her decision a
 
 - [ ] **US-041-AC1** — Given a candidate and no author decision, when the assistant continues working, then the candidate is not marked admitted, and citing it is reported as unreviewed without stopping work.
 - [ ] **US-041-AC2** — Given an admitted candidate with an obtainable copy, when admission completes, then acquisition and corpus checks have run and the query and decision are recorded.
-- [ ] **US-041-AC3** — Given a candidate the author admits with no stored copy, when admission runs, then it is admitted, the missing copy is named, and its citations are reported as unchecked.
+- [ ] **US-041-AC3** — Given a candidate the author admits with no source file, when admission runs, then it is admitted, the missing text is named, and its citations are reported as unchecked.
 - [ ] **US-041-AC4** — Given a candidate the author declines, when the decision is given, then the refusal is recorded with its query and any citation of it is reported.
 
 ## Edge Cases
@@ -68,5 +68,5 @@ Inputs are synthetic.
 
 ## Out of Scope
 
-- Extraction and page mapping behavior (FEAT-002).
+- Conversion and page mapping behavior (FEAT-002).
 - Proof of who recorded the decision.

@@ -18,13 +18,13 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 8. Typesetting and publishing
-**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-59 (P1), FR-83
+**Covered PRD Requirements**: FR-35, FR-36, FR-37, FR-38, FR-39, FR-40 (P2), FR-55, FR-56, FR-57, FR-58 (P1), FR-83, FR-91
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 Typesetting and publishing builds a book from the same project files that hold
-its evidence. It covers PRD FR-35 to FR-40, FR-55 to FR-59, and FR-83. The
+its evidence. It covers PRD FR-35 to FR-40, FR-55 to FR-58, FR-83, and FR-91. The
 basic pilot PDF (FR-83) is in delivery step M1; the other P0 requirements are
 in M2.
 
@@ -54,7 +54,7 @@ unverified.
 | Builds and settings | Can I see pages, and what is still open? | Build, configure, report, and label |
 | Images | Will my figures print well? | Place, convert, check, and record images |
 | Outputs | What can I hand to a printer or archive? | Print and PDF/A outputs; editable export is deferred |
-| Large files | Where are my large files, and can another checkout get them? | Keep large binaries in a private hash store and restore them |
+| Footnotes | Can a reader check each quotation? | Generate footnotes with verbatim quotations from passage records |
 
 ## Domain Objects
 
@@ -165,14 +165,17 @@ unverified.
   up. These outputs obey BLD-05 and BLD-07
   (assumption).
 
-#### Large files
+#### Footnotes and the finished text
 
-- **BIN-01** (FR-59, P1). Large binary files, like source files, must be kept in
-  a separate private store addressed by content hash. The repository must hold
-  the references, and the author must be told that backing up the store is their
-  task.
-- **BIN-02** (FR-59, P1). A clean checkout with access to the file store must be
-  able to restore them. A missing or mismatched file must be named.
+- **FTN-01** (FR-91, P0, M2). A build must generate each footnote that cites a
+  passage from the records: the full citation, the locator, the verbatim
+  quotation copied from the source file, and no tool commentary. The passage
+  address is kept in the build record, not printed.
+- **FTN-02** (FR-91, P0, M2). The built text must read as ordinary scholarship:
+  nothing about Stemma, records, checks, or verification status appears in its
+  body or footnotes.
+- A book's own image files are the author's; each image record names its file by
+  path and hash, and a missing or mismatched file is reported.
 
 ### Non-Functional Requirements
 
@@ -199,7 +202,6 @@ unverified.
 - [US-058 — Keep vector figures vector](../user-stories/US-058-keep-vector-figures-vector.md)
 - [US-059 — Produce print and PDF/A outputs](../user-stories/US-059-produce-print-and-archival-pdfs.md)
 - [US-060 — Record image credit and permission](../user-stories/US-060-record-image-credit-and-permission.md)
-- [US-061 — Restore large files in a clean checkout](../user-stories/US-061-restore-large-binary-files.md)
 
 ## Edge Cases and Error Handling
 
@@ -256,9 +258,9 @@ unverified.
 - **Other features**: FEAT-015 (the Stemma copy the pilot typesets), FEAT-003 (bibliography, locators, uncited entries),
   FEAT-007 (results, report, and label), FEAT-011 (records). FEAT-009
   consumes the reviewer build and build record; FEAT-012 owns browser preview.
-- **External services**: Typst, citeproc-js, pinned converters, and the binary
-  file store; exact surfaces belong in Contract artifacts.
-- **PRD requirements**: FR-35 to FR-40, FR-55 to FR-59, FR-83; related FR-15, FR-30,
+- **External services**: Typst, citeproc-js, and pinned converters; exact
+  surfaces belong in Contract artifacts.
+- **PRD requirements**: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91; related FR-15, FR-30, FR-90,
   FR-31, FR-53.
 
 ## Out of Scope

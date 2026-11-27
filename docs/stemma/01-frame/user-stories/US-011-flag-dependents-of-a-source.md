@@ -20,23 +20,23 @@ ddx:
 ## Story
 
 **As a** Idris, the AI-fluent humanist,
-**I want** to replace or remove a stored source and see everything that depended on it
+**I want** to replace or remove a source's text and see everything that depended on it
 **So that** I recheck every affected note, claim, and citation instead of trusting stale ones.
 
 ## Context
 
-Better copies and corrected editions replace earlier files. Dependents recorded against the old copy may no longer hold.
+Better conversions and corrected editions replace earlier ones. Dependents recorded against the old text may no longer hold.
 
 ## Walkthrough
 
-1. Idris replaces a cited source's file with a corrected version.
-2. Stemma records the new file and hash.
+1. Idris captures a corrected edition of a cited source and retires the earlier source file.
+2. Stemma records the new source files and the replacement.
 3. Stemma flags and lists the dependent notes, claims, and citations.
-4. Idris reviews the flagged items, and checks recompute against the new file.
+4. Idris reviews the flagged items, and checks recompute against the new text.
 
 ## Acceptance Criteria
 
-- [ ] **US-011-AC1** — Given a source with dependent notes, claims, and citations, when its file is replaced, then every one of them is flagged.
+- [ ] **US-011-AC1** — Given a source with dependent notes, claims, and citations, when its source file is replaced, then every one of them is flagged.
 - [ ] **US-011-AC2** — Given the same dependencies, when the source is removed, then every dependent is flagged and none is silently deleted.
 - [ ] **US-011-AC3** — Given a source record or file changed outside the agent, when the next check run covers it, then its dependents are flagged.
 
@@ -51,9 +51,9 @@ Inputs are synthetic.
 
 | Scenario | AC ID | Input / State | Action | Expected Result |
 |----------|-------|---------------|--------|-----------------|
-| Replace | US-011-AC1 | Source with 2 notes, 1 claim, 3 citations | Replace file | All 6 flagged |
+| Replace | US-011-AC1 | Source with 2 notes, 1 claim, 3 citations | Replace source file | All 6 flagged |
 | Remove | US-011-AC2 | Same state | Remove source | 6 flagged; none deleted |
-| Outside edit | US-011-AC3 | Stored file replaced with a file manager | Run checks | Dependents flagged |
+| Outside edit | US-011-AC3 | A page file edited in an editor | Run checks | The edit and its dependents flagged |
 
 ## Dependencies
 

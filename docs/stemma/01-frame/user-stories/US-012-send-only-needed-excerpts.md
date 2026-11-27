@@ -35,11 +35,11 @@ Stemma is for material that may be sent to a language model. It keeps what it pr
 ## Acceptance Criteria
 
 - [ ] **US-012-AC1** — Given a task that needs one passage from a source, when Stemma prepares model input, then it holds that excerpt and no other source text.
-- [ ] **US-012-AC6** — Given the author asks whether a source can be kept from a hosted model, when Stemma answers, then it says there is no per-source control, any source in the project may be sent, and an agent with file access can read stored files directly.
+- [ ] **US-012-AC6** — Given the author asks whether a source can be kept from a hosted model, when Stemma answers, then it says there is no per-source control, any source in the project may be sent, and an agent with file access can read source files directly.
 
 ## Edge Cases
 
-- **Source with community-permission limits**: Its excerpt may be sent like any other; the flag matters for reviewer packages.
+- **Source with community-permission limits**: Its excerpt may be sent like any other; the flag is metadata.
 - **Local model**: Stemma does not block it and does not claim to support it.
 
 ## Test Scenarios
@@ -57,7 +57,7 @@ Inputs are synthetic.
 - **Feature Spec**: FEAT-002 — Source corpus
 - **Feature Requirements**: RGT-02, RGT-06
 - **PRD Requirements**: FR-61
-- **External**: A hosted model through the agent host. Delivery of excerpts in each host is unverified. A local session with file access can read stored files directly.
+- **External**: A hosted model through the agent host. Delivery of excerpts in each host is unverified. A local session with file access can read source files directly.
 
 ## Out of Scope
 

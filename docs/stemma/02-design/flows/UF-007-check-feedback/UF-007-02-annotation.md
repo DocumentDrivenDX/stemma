@@ -32,7 +32,7 @@ ddx:
 [Finding]      <outcome>  <check ID>  <location>: what is wrong and why it matters
 [Binding]      Sentence: "<exact sentence>"  Source: <ID and title>
                or  Item: <record ID, current content shown>
-[Comparison]   (near match only) Cited text: "..."  Stored text: "..."  (data)
+[Comparison]   (near match only) Cited text: "..."  Source text: "..."  (data)
 [Effect]       Explain, or dismiss. The result stays <outcome>; a dismissed
                finding is no longer open; reports and the disclosure list it;
                it ends if the bound sentence, source or item changes.
@@ -58,7 +58,7 @@ ddx:
 | Limit | content | Always shown | all | US-028-AC6 |
 | Record | control | Needs finding, effect and reason from the author. An unclear reply records nothing | all | UF-007 Save annotation |
 | Leave | control | Writes nothing and stops nothing | all | UF-007 Leave without annotating |
-| Reason | feedback | A missing stored copy, unreadable record or uncommitted change, in plain words | all | US-028-AC9 |
+| Reason | feedback | A missing source file, unreadable record or uncommitted change, in plain words | all | US-028-AC9 |
 | Way forward | control | Returns to the finding and its fixes | all | UF-007 Leave without annotating |
 
 ## States and Events
@@ -114,11 +114,11 @@ stateDiagram-v2
 ## Accessibility
 
 - **Focus order**: status, finding, binding, comparison, effect, limit, then the reply.
-- **Accessible names**: the two compared texts are labelled "Cited text" and "Stored text"; differences are also described in words.
+- **Accessible names**: the two compared texts are labelled "Cited text" and "Source text"; differences are also described in words.
 - **Headings and landmarks**: the host owns them; each part has a text label.
 - **Target size and input**: typed reply only.
 
 ## Open Questions
 
-- Which source changes (stored file, bibliography record or both) end an annotation is open in FEAT-007: product owner. The turn states the binding the report carries.
+- Which source changes (source file, bibliography record or both) end an annotation is open in FEAT-007: product owner. The turn states the binding the report carries.
 - Risk: the command cannot establish who ran it or what they read.

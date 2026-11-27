@@ -48,7 +48,7 @@ An author reads and builds the whole bibliography from the project. Each in-text
 
 ### Functional Requirements by Area
 
-Domain terms: the **corpus** holds stored sources (FEAT-002). A **bibliography record** describes one source. A **built bibliography** is the list printed in a build; a corpus source need not appear in it. A **legacy library** is a BibLaTeX, CSL-JSON (Citation Style Language data), or RIS (a tagged reference format) file.
+Domain terms: the **corpus** holds the captured sources (FEAT-002). A **bibliography record** describes one source. A **built bibliography** is the list printed in a build; a corpus source need not appear in it. A **legacy library** is a BibLaTeX, CSL-JSON (Citation Style Language data), or RIS (a tagged reference format) file.
 
 #### Records and types
 
@@ -103,7 +103,7 @@ BIB-03 (FR-15, P0, M1). The corpus may hold sources the book does not cite; they
 - **Key collision on import**: Report both entries; do not overwrite or merge without the author's choice.
 - **Possible duplicate works**: Propose the match; never merge automatically.
 - **Source type outside the listed types**: Keep all its information and report that the type is not recognized.
-- **Record without a stored copy**: The record may exist, for example after import, but a citation of it is reported as unchecked (FEAT-002 CIT-01).
+- **Record without a source file**: The record may exist, for example after import, but a citation of it is reported as unchecked (FEAT-002 CIT-01).
 - **Renamed key**: In-text citations that use the earlier key are never left to point at a different record.
 
 ## Constraints and Assumptions
@@ -118,7 +118,7 @@ BIB-03 (FR-15, P0, M1). The corpus may hold sources the book does not cite; they
 
 ## Dependencies
 
-- **Other features**: FEAT-002 for stored copies; FEAT-011 for records; FEAT-007 for the scripted checks and reports; FEAT-008 for formatting and building; FEAT-015 for takeover input.
+- **Other features**: FEAT-002 for source files; FEAT-011 for records; FEAT-007 for the scripted checks and reports; FEAT-008 for formatting and building; FEAT-015 for takeover input.
 - **External services**: None required. Citation formatting depends on a pinned processor. Exact interfaces belong to Contract artifacts.
 - **PRD requirements**: FR-11 to FR-15 (P0, M1). The takeover pilot needs FR-15 in M1, because takeover lists the whole original reference list (FR-72).
 

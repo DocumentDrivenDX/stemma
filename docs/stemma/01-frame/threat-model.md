@@ -19,13 +19,13 @@ ddx:
 ## Executive Summary
 
 **System Overview**: a plugin skill, a command line, plain record files in git,
-two private stores, a Typst build, and an offline browser explorer, all run by
+a restricted coordinate store, a Typst build, and an offline browser explorer, all run by
 one author with an AI agent.
-**Key Assets**: the author's machine; unpublished and copyrighted material;
+**Key Assets**: the author's machine; the captured source texts and unpublished material;
 restricted site positions; the integrity of citation evidence; the release
 supply chain.
-**Primary Threats**: protected material reaching a hosted model (TM-I-001);
-reviewer packages disclosing protected material (TM-I-007); prompt injection
+**Primary Threats**: material reaching a hosted model against its terms (TM-I-001);
+reviewer packages disclosing more than the author means to send (TM-I-007); prompt injection
 driving the agent (TM-E-001, TM-I-003); undetected record edits (TM-T-001);
 restricted positions leaking (TM-I-002, TM-I-004 to TM-I-006).
 **Risk Level**: High. Several leading risks are accepted or only reported, by
@@ -51,7 +51,7 @@ host, any static host the author chooses, and the publisher.
 | B1 | Outside files and web content into the machine |
 | B2 | Untrusted text into the agent's context |
 | B3 | Local machine to the hosted model |
-| B4 | Agent and other local processes to project files and stores |
+| B4 | Agent and other local processes to project files and the restricted store |
 | B5 | Local machine to network services |
 | B6 | Project to reviewer, static host, or publisher |
 | B7 | Publisher of tools and releases to the author's machine |
@@ -63,10 +63,10 @@ host, any static host the author chooses, and the publisher.
 |-----------|-------------|-------------|
 | C1 Agent host, model, and skill | Reads text, runs commands, edits files | Acts with the author's rights; behavior not controllable by Stemma |
 | C2 Command line | Records, checks, packaging policy | Trusted code, untrusted data |
-| C3 Intake and extraction | Word, libraries, PDF, scans, web captures | Parses hostile input |
+| C3 Intake and conversion | Word, libraries, PDF, EPUB, HTML, DOCX, text, library fetches | Parses hostile input |
 | C4 Network clients | Resolvers, URL admission, research | Remote responses untrusted |
 | C5 Project files | Records, manuscript, rules, settings, in git | Writable by any local process or collaborator |
-| C6 Content store | Held copies, extracted text, originals | Private, unencrypted by Stemma |
+| C6 Source files | The full text of every captured source, in the repository | Readable by whoever can read the repository |
 | C7 Restricted store | Exact restricted coordinates | Most sensitive, unencrypted by Stemma |
 | C8 Derived index and reports | SQLite and saved reports | Disposable, never authoritative |
 | C9 Build | Citation formatting, image conversion, Typst, packaging | Processes untrusted content |
@@ -78,7 +78,7 @@ host, any static host the author chooses, and the publisher.
 - **External Sources**: sources as Word, PDF, scan, image, and web files;
   BibLaTeX, CSL-JSON, and RIS libraries; resolver and search results; reviewer
   comment files; collaborators' commits; tools and releases.
-- **Internal Processing**: files become blobs, extractions, and records. The
+- **Internal Processing**: originals become source files and records. The
   agent reads and writes them. Checks, builds, and exports derive outputs.
 - **External Destinations**: the hosted model, resolver and search services, the
   git remote, backups, static hosts, reviewers, and publishers.
@@ -92,7 +92,7 @@ What can reach the hosted model (B3):
 | Manuscript text, notes, claims, constructs, rules, voice samples | The agent reads or writes them in takeover, drafting, audit, and checks |
 | Source text quoted in check results, including both texts of a near match | Unredacted reports in the author's own session |
 | Intake, resolver, search, and imported comment text | Command output or file reads |
-| Anything else the agent opens, including whole store files and the restricted store | Ordinary file access; `excerpt` limits only its own output |
+| Anything else the agent opens, including whole source files and the restricted store | Ordinary file access; `excerpt` limits only its own output |
 
 No source or rights flag gates this flow. A project is for material that may be
 sent to its model. Running the whole process on a local model is an unsupported
@@ -106,7 +106,7 @@ experiment.
 |-------|---------------|-----------------|-----------|--------------|
 | Restricted coordinates | Restricted | Critical | High | Medium |
 | Unpublished and community-restricted sources | Sensitive | High | High | High |
-| Copyrighted copies, extractions, and excerpts in records | Third-party protected | High | High | High |
+| Source files and excerpts in records, many copyrighted | Third-party protected | High | High | High |
 | Manuscript, notes, claims | Private | High | High | High |
 | Review marks, annotations, confirmations, support records | Records of what was said or judged | Medium | High | Medium |
 | Reviewer package | Leaves the project | High | Medium | Low |
@@ -147,7 +147,7 @@ modules, or the product owner for accepted risks.
   TM-R-001.
 - n2: a response is data; hostile files it delivers are C3 (TM-E-002) and
   hostile text is C1 (TM-E-001).
-- n3: stored data runs nothing; execution through it is counted at the component
+- n3: saved data runs nothing; execution through it is counted at the component
   that reads it.
 - n4: no identity is presented to or by this component; forged content counts as
   tampering.
@@ -158,7 +158,7 @@ modules, or the product owner for accepted risks.
 |----|--------|---|---|-------|-------|----------|
 | TM-S-001 | Text in a source, page, or library poses as an instruction from the author, system, or Stemma | 4 | 3 | 12 | `skills/stemma` | SEC-009 |
 | TM-S-002 | Any process writes a review mark, annotation, confirmation, restriction change to public, or support record as the author, edits a reviewed item as the author so its mark stays, or claims a separate context | 4 | 3 | 12 | Product owner (accepted) | SEC-002, SEC-003 |
-| TM-S-003 | A fake or altered file, or embedded reference-manager data, passes as the cited work; stored-copy checks compare with it | 4 | 2 | 8 | Author; `intake`, `core` | None sufficient; provenance, `meta.*` checks, author review |
+| TM-S-003 | A fake or altered file, or embedded reference-manager data, passes as the cited work; checks compare with its converted text | 4 | 2 | 8 | Author; `intake`, `core` | None sufficient; provenance, `meta.*` checks, author review |
 | TM-S-004 | A look-alike marketplace, plugin, or tool download is installed as genuine | 5 | 1 | 5 | Release maintainer | SEC-001, SEC-028 |
 | TM-S-005 | A comment file claims another reviewer or package; a made-up package is shown as Stemma-checked | 2 | 2 | 4 | `core`, `publish` | SEC-002; CONTRACT-005 E2 |
 | TM-S-006 | `rules.md`, agent instruction files, or manuscript text from a shared project are followed as the author's rules | 4 | 2 | 8 | Author; `skills/stemma` | SEC-009; rules cannot relax the contract in text only |
@@ -171,14 +171,16 @@ modules, or the product owner for accepted risks.
 | TM-T-001 | Verdicts, review marks, annotations, confirmations, or round choices are altered or fabricated and a report reads cleaner than it should | 4 | 3 | 12 | Product owner (accepted) | SEC-002, SEC-003 |
 | TM-T-002 | Text in a passage or claim steers the support judgment to "supported" | 4 | 3 | 12 | `skills/stemma` | SEC-009; error rates measured (FR-52) |
 | TM-T-003 | Archive entries, paths, or links in input write outside intended directories | 4 | 2 | 8 | `intake`, `workspace` | SEC-005, SEC-006 |
-| TM-T-004 | A blob is damaged or replaced; replacing blob and record digest together goes unnoticed except in history | 3 | 2 | 6 | `workspace` | SEC-015 |
+| TM-T-004 | A source part is damaged or edited; rewriting part and digest together goes unnoticed except in history or against the original | 3 | 2 | 6 | `workspace` | SEC-015 |
+| TM-T-013 | Text in a source imitates Stemma annotations to move words between streams, fake a page, or hide text | 4 | 2 | 8 | `extract`, `records` | SEC-032 |
+| TM-T-014 | A model writes or tidies source text, so fluent invented words pass quotation checks | 4 | 3 | 12 | `cli`, `skills/stemma` | SEC-033; comparisons with the original; the agent can still edit files directly |
 | TM-T-005 | The index or a saved report is edited to hide a finding | 3 | 2 | 6 | `core`, `graph` | SEC-004 |
 | TM-T-006 | A printed sentence is strengthened while its claim is unchanged; the support record stays current | 4 | 3 | 12 | Product owner (accepted) | SEC-002 |
-| TM-T-007 | A compromised dependency, release package, tool binary, or skill text changes behavior. The marketplace entry installs a version tag of a separate distribution repository, a second publishing surface that can be altered apart from the Stemma source, and a tag can be moved by whoever can push there. The first-use setup downloads Bun, which is refused unless it matches the pinned digest | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
+| TM-T-007 | A compromised dependency, release package, tool binary, or skill text changes behavior. The plugin installs from the DocumentDrivenDX/plugins marketplace repository, a second publishing surface that whoever can push there can alter apart from the Stemma source. The first-use setup downloads Bun, which is refused unless it matches the pinned digest | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
 | TM-T-008 | A package or export is altered after production; nothing is signed | 3 | 1 | 3 | Author | None; manifest hashes detect only accidental change |
 | TM-T-009 | The agent or malware edits the installed bundle or skill | 4 | 2 | 8 | Author | SEC-028 allows comparison; nothing prevents |
 | TM-T-010 | A fix or takeover changes an original file | 4 | 1 | 4 | `intake`, `workspace` | SEC-005 |
-| TM-T-011 | Retrieved web content differs from what the author saw, or changes later | 2 | 3 | 6 | `workspace` | Stored capture with provenance (FR-6) |
+| TM-T-011 | Retrieved web content differs from what the author saw, or changes later | 2 | 3 | 6 | `workspace` | Upstream record with hash and retrieval time; source files in git (FR-6) |
 | TM-T-012 | Restricted-store entries are changed or removed, so the scan misses a value | 4 | 1 | 4 | Author | SEC-022 warns only for an absent store, not a missing entry |
 
 ### Repudiation
@@ -188,7 +190,7 @@ modules, or the product owner for accepted risks.
 | TM-R-001 | Nobody can show who made a record; stamps are self-asserted and git history can be rewritten | 3 | 3 | 9 | Product owner (accepted) | SEC-002, SEC-024 |
 | TM-R-002 | The author cannot show what was or was not sent to a model; Stemma keeps no such log | 3 | 3 | 9 | Product owner | None; disclosure records AI roles, not data sent |
 | TM-R-003 | A delivered package or PDF cannot be tied beyond doubt to a build | 2 | 2 | 4 | `publish` | SEC-024 build record |
-| TM-R-004 | A release cannot be tied to its source, since the bundle is not in the Stemma repository, or sits only in a separate distribution repository | 3 | 2 | 6 | Release maintainer | SEC-028 |
+| TM-R-004 | A release cannot be tied to its source, since the bundle is not in the Stemma repository and sits only in the marketplace repository | 3 | 2 | 6 | Release maintainer | SEC-028 |
 
 ### Information Disclosure
 
@@ -200,10 +202,10 @@ modules, or the product owner for accepted risks.
 | TM-I-004 | A restricted coordinate typed in prose, notes, or a restricted place record reaches git, a PDF, or a package; the scan only warns and knows only stored values and listed forms | 4 | 3 | 12 | Product owner (reported only) | SEC-016, SEC-022 |
 | TM-I-005 | An unmarked or late-marked site, a broad area, a place name, a gazetteer identifier, a nearby relation, or another public location discloses a position; history, exports, and model input keep it | 4 | 3 | 12 | Author | SEC-022; unmarked places are public by decision, and the restriction mark covers a location only |
 | TM-I-006 | Location or personal metadata inside images or documents travels into the PDF or package, unseen by text scans | 4 | 3 | 12 | `publish` | SEC-018, SEC-031 |
-| TM-I-007 | A reviewer package carries protected text through manuscript quotations, claim text, model-written support text, sentence fields, paraphrase, figures, or short allowed excerpts; nothing stops sending it | 4 | 4 | 16 | `publish`, `graph`, `core`; author | SEC-017, SEC-018 |
+| TM-I-007 | A reviewer package carries long source text through manuscript quotations, claim text, model-written support text, sentence fields, paraphrase, figures, or short allowed excerpts; nothing stops sending it | 4 | 4 | 16 | `publish`, `graph`, `core`; author | SEC-017, SEC-018 |
 | TM-I-008 | An author export or hosted explorer exposes passage text to anyone who gets it; the static profile has no access control | 4 | 2 | 8 | Author | CONTRACT-005 C states it |
-| TM-I-009 | The repository, with excerpts and notes, is made public, or a protected file is committed and stays in history | 4 | 2 | 8 | Author | SEC-015, SEC-019 |
-| TM-I-010 | Unencrypted stores are read by other processes, shared accounts, sync services, or backups | 4 | 2 | 8 | Author | SEC-019 |
+| TM-I-009 | The repository, with full source texts, is made public or shared more widely than the author means, or text stays in history after removal | 4 | 2 | 8 | Author | SEC-019 states it once |
+| TM-I-010 | The unencrypted restricted store and project files are read by other processes, shared accounts, sync services, or backups | 4 | 2 | 8 | Author | SEC-019 |
 | TM-I-011 | Lookups reveal research interests; an injected URL makes a fetch reach a local or private service, and the result is stored and read | 3 | 2 | 6 | `workspace` | SEC-013, SEC-023 |
 | TM-I-012 | A remote reference in explorer or package content reveals that a reviewer opened it | 3 | 2 | 6 | `explorer` | SEC-011, SEC-023 |
 | TM-I-013 | Private sources, personal data, or secrets enter the public Stemma repository or a release | 4 | 2 | 8 | Release maintainer | SEC-026, SEC-029 |
@@ -215,7 +217,7 @@ modules, or the product owner for accepted risks.
 | ID | Threat | I | L | Score | Owner | Controls |
 |----|--------|---|---|-------|-------|----------|
 | TM-D-001 | Archive bombs, deep XML, huge fields, or hostile PDFs and images exhaust memory or time | 2 | 3 | 6 | `intake`, `extract` | SEC-006, SEC-007 |
-| TM-D-002 | A store is lost, and cited checks cannot be verified or coordinates are gone | 4 | 3 | 12 | Author | SEC-019; digests verify a restore |
+| TM-D-002 | The restricted store is lost, and coordinates are gone | 4 | 3 | 12 | Author | SEC-019 |
 | TM-D-003 | A bad record or merge keeps parts of a build unreadable or stops a tool | 2 | 3 | 6 | `records` | SEC-008; named errors |
 | TM-D-004 | A very large export or comment file hangs the explorer or import | 2 | 2 | 4 | `explorer`, `core` | SEC-008; chapter scope |
 | TM-D-005 | A resolver is unavailable or throttles, leaving results unverifiable | 2 | 3 | 6 | `workspace` | SEC-023; cached resolutions |
@@ -247,7 +249,7 @@ not day counts. No owner risk tolerance is recorded.
 | Risk ID | Threat | Impact | Likelihood | Score | Priority |
 |---------|--------|--------|------------|-------|----------|
 | TM-I-001 | Material sent to a hosted model against its terms | 4 | 5 | 20 | Critical, accepted |
-| TM-I-007 | Protected text in a reviewer package | 4 | 4 | 16 | High |
+| TM-I-007 | Long source text in a reviewer package | 4 | 4 | 16 | High |
 | TM-I-003 | Injection-driven exfiltration | 5 | 3 | 15 | High |
 | TM-E-001 | Injection-driven commands and edits | 5 | 3 | 15 | High |
 
@@ -293,7 +295,7 @@ TM-E-004, TM-E-006, TM-E-007.
 | TM-I-002, TM-I-004, TM-I-005 | SEC-016, SEC-021, SEC-022; reported | M1, maps M3 | `skills/stemma`, `core`, author |
 | TM-I-006 | SEC-018, SEC-031 | M2, package M3 | `publish` |
 | TM-I-014 | No control; the author reviews records before sharing the repository | M1 | Author |
-| TM-D-002 | SEC-019; backup and restore check | M1 | Author |
+| TM-D-002 | SEC-019 | M1 | Author |
 | TM-E-002 | SEC-006, SEC-007, SEC-026 | M1 | `extract`, `intake` |
 | TM-E-003 | SEC-014; test before the pilot | M1 | `cli` |
 | TM-E-004, TM-E-006 | SEC-012, SEC-011 | M2, M3 | `publish`, `explorer` |
@@ -302,7 +304,7 @@ TM-E-004, TM-E-006, TM-E-007.
 ## Security Controls Summary
 
 - **Preventive**: input limits, escaping, inert rendering, path refusals,
-  outside stores, export allow list, redaction, pinned tools.
+  restricted store outside the project, export allow list, redaction, pinned tools.
 - **Detective**: digests, recomputed scripted checks, coordinate warnings,
   package scan, release audit and secret scan. There is no monitoring.
 - **Corrective**: fix and re-release; rebuild derived data; restore from the

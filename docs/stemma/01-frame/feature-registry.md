@@ -22,13 +22,13 @@ feature's requirements; the PRD ranks each requirement.
 | ID | Name | Description | Priority | Owner | Source | Updated |
 |----|------|-------------|----------|-------|--------|---------|
 | FEAT-001 | Workspace and governance | Project setup, thesis, constructs and methodology inputs, standing rules, registers, AI roles | P0 | product owner | Subsystem 1: FR-1 to FR-5, FR-60 | 2026-11-26 |
-| FEAT-002 | Source corpus | Admission, provenance, rights fields, excerpts for hosted models, private binary store, text and page mapping, change tracking | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61 | 2026-11-26 |
+| FEAT-002 | Source corpus | Capture, conversion to source files in the repository, reverification, structure checks, comparisons and reviews, passage capture, change tracking, excerpts for hosted models | P0 | product owner | Subsystem 2: FR-6 to FR-10, FR-61, FR-84 to FR-90 | 2026-11-26 |
 | FEAT-003 | Citation store | Official bibliography records, keys, typed locators, legacy library exchange | P0 | product owner | Subsystem 3: FR-11 to FR-15 | 2026-11-26 |
 | FEAT-004 | Research and discovery | Candidate search, the author's admission decisions, coverage log | P0 | product owner | Subsystem 4: FR-16 to FR-19 | 2026-11-26 |
 | FEAT-005 | Notes, claims, constructs | Passage-anchored notes, claim ledger and claim relations, construct register | P0 | product owner | Subsystem 5: FR-20 to FR-23, FR-80 | 2026-11-26 |
 | FEAT-006 | Composition | Outline, chapter specifications, drafting from claims, rival readings | P0 | product owner | Subsystem 6: FR-24 to FR-28 | 2026-11-26 |
 | FEAT-007 | Verification and reports | Scripted checks, explained findings, claim-support records, annotations, the checked-clean label | P0 | product owner | Subsystem 7: FR-29 to FR-34, FR-52 to FR-54, FR-74 | 2026-11-26 |
-| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-59, FR-83 | 2026-11-26 |
+| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91 | 2026-11-26 |
 | FEAT-009 | Evolution, audit, review | Changelog, errata, audits, AI-use disclosure, reviewer package and reviewer comments | P0 | product owner | Subsystem 9: FR-41 to FR-47, FR-79 | 2026-11-26 |
 | FEAT-010 | Plugin, skill, and distribution | One skill with modes, command line shipped inside the plugin, self-setup of the pinned Bun, tools on three systems, desktop install on macOS and Windows, marketplace install, install tests | P0 | product owner | Subsystem 10: FR-48 to FR-51, FR-75, FR-77, FR-78 | 2026-11-26 |
 | FEAT-011 | Evidence graph and graph engine | Record files as the graph; arras-compatible TypeScript and SQLite engine, reads first | P0 | product owner | Subsystem 11: FR-62, FR-63 | 2026-11-26 |
@@ -47,7 +47,7 @@ None recorded.
 |---------|------------|------|-------|
 | FEAT-001 | FEAT-011 | Required | Governing records are graph records |
 | FEAT-002 | FEAT-001, FEAT-011 | Required | Sources are records in a project |
-| FEAT-003 | FEAT-002, FEAT-011 | Required | Bibliography records point to stored sources |
+| FEAT-003 | FEAT-002, FEAT-011 | Required | Bibliography records describe the sources captured |
 | FEAT-004 | FEAT-011 | Required | Searches and decisions are graph records |
 | FEAT-005 | FEAT-011 | Required | Notes, claims, and constructs are graph records |
 | FEAT-006 | FEAT-011 | Required | Chapters and plans are held with the graph |
@@ -57,7 +57,7 @@ None recorded.
 | FEAT-014 | FEAT-011 | Required | Assumption: profiles, review marks, and examples are held with the project records |
 | FEAT-015 | FEAT-011 | Required | Takeover writes graph records |
 | FEAT-004 | FEAT-002, FEAT-003 | Required | Admission creates a source and a record |
-| FEAT-005 | FEAT-002, FEAT-003 | Required | Notes anchor to stored passages |
+| FEAT-005 | FEAT-002, FEAT-003 | Required | Notes anchor to passage addresses |
 | FEAT-006 | FEAT-001, FEAT-005 | Required | Drafts come from inputs and ledger entries |
 | FEAT-006 | FEAT-014 | Optional | Drafting applies a voice profile when one is set |
 | FEAT-007 | FEAT-002, FEAT-003, FEAT-005 | Required | Checks read sources, bibliography, and ledger |

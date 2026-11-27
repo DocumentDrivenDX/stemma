@@ -139,7 +139,7 @@ Formatting belongs to `packages/cite` behind `CitationFormatter` (SD-008).
 ### Component: Legacy codecs (`packages/intake`)
 
 - **Purpose**: Libraries in and out without silent loss.
-- **Responsibilities**: One versioned codec each for CSL-JSON, BibLaTeX, and RIS; store original bytes and an import batch; map and preserve; per-field export; loss report; input limits. Tests use a comparator written apart from the exporter and a native reader where one exists.
+- **Responsibilities**: One versioned codec each for CSL-JSON, BibLaTeX, and RIS; record the original's digest in an import batch; map and preserve; per-field export; loss report; input limits. Tests use a comparator written apart from the exporter and a native reader where one exists.
 - **Requirements Addressed**: XCH-01 to XCH-04.
 - **Interfaces**: CONTRACT-003; `import` and `export` (CONTRACT-002); writes go through core ports and the staged write.
 - **Owned by TDs**: US-015.
@@ -161,7 +161,7 @@ graph TD
     CLI -->|import, export| Intake["intake codecs"]
     Intake --> Core["core use cases"]
     Core --> Records["records and key registry"]
-    Core --> Blobs["original bytes"]
+    Core --> Batch["import batch: digest and preserved values"]
     Manuscript["manuscript reader"] --> Core
     Core --> Uncited["bib.uncited, cite.key"]
     Core --> Formatter["cite via CitationFormatter"]

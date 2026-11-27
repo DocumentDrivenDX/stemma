@@ -235,7 +235,7 @@ FEAT-012 has no Task Model; task names come from the UF-012 journeys.
 - [ ] No PRD User Needs row is mapped to a UF-012 task, because neither FEAT-012 nor the PRD links them.
 - [ ] The CONTRACT-005 J shapes are provisional; the command is `graph export --page`.
 - [ ] Layout parity method is untested; until proven, no page is shown as matching.
-- [ ] A fresh-clone export without the content store may lack figure bytes or other preview inputs; the page names what is missing.
+- [ ] A fresh-clone export without the author's image files lacks figure bytes; the page names what is missing.
 
 ## Concern Alignment
 

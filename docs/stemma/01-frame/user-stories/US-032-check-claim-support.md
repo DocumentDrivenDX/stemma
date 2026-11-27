@@ -36,7 +36,7 @@ The result is a model judgment, run apart from drafting and saved as a support r
 
 ## Acceptance Criteria
 
-- [ ] **US-032-AC1** — Given a claim and the stored passage it cites, when the support check completes, then it reports supported, partly supported, or unsupported and quotes the passage.
+- [ ] **US-032-AC1** — Given a claim and the source passage it cites, when the support check completes, then it reports supported, partly supported, or unsupported and quotes the passage.
 - [ ] **US-032-AC2** — Given a claim drafted in one context, when it is checked, then the check runs in a separate context that does not carry the drafting conversation.
 - [ ] **US-032-AC3** — Given a seeded claim that goes beyond, overstates, or reverses its passage, when the check completes, then it reports that problem and does not report supported.
 - [ ] **US-032-AC4** — Given a labelled set with seeded errors and a pilot-author sample, when the check's accuracy is measured, then its error rates are published and no minimum is stated before they are known.

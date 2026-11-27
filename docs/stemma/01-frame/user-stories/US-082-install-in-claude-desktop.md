@@ -28,20 +28,20 @@ The first version promises full function only in the local Code tab of Claude de
 
 ## Walkthrough
 
-1. In Claude desktop she adds the project's repository marketplace and installs the Stemma plugin.
+1. In Claude desktop she adds the DocumentDrivenDX marketplace (the DocumentDrivenDX/plugins repository) and installs the Stemma plugin.
 2. She starts a local Code tab session on her project and asks for a check.
 3. Claude says it is setting the plugin up, and she allows it if asked.
 4. A scripted check runs.
 
 ## Acceptance Criteria
 
-- [ ] **US-082-AC1** — Given a clean profile in Claude desktop and the project's repository marketplace, when Margit installs the plugin, then it loads in a local Code tab session and the Stemma skill is available.
+- [ ] **US-082-AC1** — Given a clean profile in Claude desktop and the DocumentDrivenDX marketplace, when Margit installs the plugin, then it loads in a local Code tab session and the Stemma skill is available.
 - [ ] **US-082-AC2** — Given the plugin is installed and no Bun is on the computer's search path, when she asks for a scripted check in a local Code tab session, then the plugin sets up its pinned runtime without any step of hers beyond the host's permission prompt, and the check runs on her computer and reports results.
 - [ ] **US-082-AC3** — Given a session that does not run on her computer, when she asks for a check or build, then Stemma says it makes no promise there and reports no check result it did not run.
 - [ ] **US-082-AC4** — Given setup fails or is declined, when she asks for a scripted check, then a plain-language message names the problem and says nothing was checked, and she is not asked to install anything by hand.
 - [ ] **US-082-AC5** — Given the published product description, when an author reads which sessions are supported, then it promises full function only for Claude desktop's local Code tab and says command-line results do not verify the desktop app.
 - [ ] **US-082-AC6** — Given the published product description, when an author reads about local models, then it calls their use an unsupported experiment that is not blocked, promised, or tested.
-- [ ] **US-082-AC7** — Given a release, when Margit installs from the repository marketplace, then the release's command line is delivered from the distribution repository and runs, although it is not committed to the Stemma repository.
+- [ ] **US-082-AC7** — Given a release, when Margit installs from the DocumentDrivenDX marketplace, then the release's command line is delivered in `plugins/stemma` of the marketplace repository and runs, although it is not committed to the Stemma repository.
 
 ## Edge Cases
 

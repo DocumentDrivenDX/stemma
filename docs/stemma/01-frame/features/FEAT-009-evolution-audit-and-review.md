@@ -33,7 +33,7 @@ The author can say what changed in each version, which errors were corrected,
 and what a change of thesis or evidence puts back in doubt. A chapter audit
 challenges the argument before repairing citations. A publisher or reviewer
 receives an accurate account of AI use and a package that opens offline, leaks
-no protected source material, and states what it cannot show.
+no source files unless the author includes them, and states what it cannot show.
 
 ## Problem Statement
 
@@ -41,9 +41,9 @@ no protected source material, and states what it cannot show.
   by hand and write AI-use statements from memory.
 - **Pain points**: Registers drift, good versions become untraceable, citation
   errors pass a quick check, and reviewers cannot tell how AI was used. Sharing
-  evidence risks releasing copyrighted or restricted material.
+  evidence risks releasing restricted material or more source text than the author means to send.
 - **Desired outcome**: Disclosure and packages are generated from project
-  records, protected material is left out and redacted as they are built, and
+  records, source files are left out and quoted text is shortened as they are built, and
   anything that cannot be removed is reported.
 
 ## Functional Areas
@@ -66,7 +66,7 @@ no protected source material, and states what it cannot show.
 | Audit finding | An issue marked confirmed or suspected. It is not a scripted check result |
 | AI-use disclosure | A statement about the tool's AI use. It is not the book's research methodology |
 | Check report | The build's record of check results |
-| Reviewer package | PDF, offline explorer file, check report, and disclosure, with protected material left out |
+| Reviewer package | PDF, offline explorer file, check report, and disclosure, with source files left out unless asked |
 | Comment file | A reviewer's comments, each tied to a claim, saved from the offline explorer for the author to import |
 
 ## Requirements
@@ -110,13 +110,13 @@ no protected source material, and states what it cannot show.
   methodology and must show unknown values as unknown.
 - **REL-04** (FR-46). A reviewer package must hold the PDF, an offline explorer
   file, the check report, and the AI-use disclosure.
-- **REL-05** (FR-46). Restricted and copyrighted source material must be left out
-  of or redacted from every item Stemma generates for the package. Short matching
-  excerpts of copyrighted sources are allowed; their length is not yet set.
-- **REL-06** (FR-46). Protected source material that the scan finds and Stemma
-  cannot remove must be reported with a warning that the package can disclose
-  it. It is an open finding until fixed or dismissed (FR-30); the package is
-  still produced and is not called checked clean while the finding is open.
+- **REL-05** (FR-46). Source files must be left out of the package unless the
+  author asks to include them, and source text in generated parts must be kept
+  to short excerpts; their length is not yet set. Rights fields change nothing.
+- **REL-06** (FR-46). Long source text that the scan finds and Stemma cannot
+  remove must be reported with a warning. It is an open finding until fixed or
+  dismissed (FR-30); the package is still produced and is not called checked
+  clean while the finding is open.
 - **REL-12** (FR-46). Structured restricted coordinates must be left out of
   every item. A scan must warn of stray restricted coordinates it finds. The
   warning must say that the package can disclose a restricted site's position,
@@ -124,10 +124,9 @@ no protected source material, and states what it cannot show.
   stray coordinate is open until fixed or dismissed (FR-30).
 - **REL-07** (FR-46). The package must not claim that a reviewer can rerun the
   checks from it alone.
-- **REL-08** (FR-46). Restricted and copyrighted source text quoted as evidence
-  must be redacted from the packaged check report, apart from allowed short
-  excerpts, with each result still visible. Redaction covers the report's
-  sentence fields.
+- **REL-08** (FR-46). Source text quoted as evidence in the packaged check
+  report must be shortened to the allowed excerpt, with each result still
+  visible. This covers the report's sentence fields.
 
 #### Reviewer comments
 
@@ -142,7 +141,7 @@ no protected source material, and states what it cannot show.
 
 ### Non-Functional Requirements
 
-- **Rights**: On a seeded project, 0 seeded restricted passages, protected source files, quoted protected text, or restricted coordinates from structured records appear in the parts Stemma generates, including metadata; a seeded string in the PDF is reported.
+- **Rights**: On a seeded project, 0 source files not asked for, long seeded source passages, or restricted coordinates from structured records appear in the parts Stemma generates, including metadata; a seeded string in the PDF is reported.
 - **Offline**: The explorer file opens with networking disabled and makes 0
   network requests.
 - **Reliability**: With unchanged records and tool versions, repeated disclosure
@@ -170,7 +169,7 @@ no protected source material, and states what it cannot show.
 - **Host does not expose a model identity**: It is recorded as unknown
   (assumption; what hosts expose is unverified).
 - **Ended annotation**: It is not listed as applying to current text.
-- **Check evidence quotes a stored source**: REL-08 applies.
+- **Check evidence quotes a source**: REL-08 applies.
 - **Comment on a claim whose text has changed**: It is imported and shown as
   made on earlier text. A comment on an unknown claim is reported and not
   imported (CONTRACT-005).
@@ -232,5 +231,5 @@ no protected source material, and states what it cannot show.
 - [ ] What makes an audit finding confirmed rather than suspected? Until
   decided, assume confirmed means reproduced by a scripted check or confirmed by
   the author. Product owner.
-- [ ] How long may a short matching excerpt of a copyrighted source be? Until
+- [ ] How long may a short matching excerpt of a source be? Until
   set, the explorer and report keep none. Product owner.

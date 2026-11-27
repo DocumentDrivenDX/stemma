@@ -34,7 +34,7 @@ From any claim, the author can reach the notes behind it, the source passages be
 
 - **Current situation**: Notes, claims, and concept definitions live in separate documents and chat sessions.
 - **Pain points**: Extracts drift from source wording, claims lose their evidence, concepts drift in meaning or are credited to the wrong person, and assistant suggestions pass as the author's judgment.
-- **Desired outcome**: Every claim traces to notes anchored in stored text or is shown as not doing so, and everything unreviewed is visible.
+- **Desired outcome**: Every claim traces to notes anchored in source text or is shown as not doing so, and everything unreviewed is visible.
 
 ## Functional Areas
 
@@ -55,7 +55,7 @@ Domain terms: a **note** records an extract (source wording) or a paraphrase (th
 
 NOTE-01 (FR-20, P0, M1). A reading note must anchor each extract or paraphrase to a source and a locator.
 
-NOTE-02 (FR-20, P0, M1). A scripted check must compare each extract with the stored text at its anchor and must not pass an extract that does not match.
+NOTE-02 (FR-20, P0, M1). A scripted check must compare each extract with the source text at its anchor and must not pass an extract that does not match.
 
 NOTE-03 (FR-20, P0, M1). A paraphrase must remain distinguishable from an extract, and a check of its anchor must not be reported as a match of its wording.
 
@@ -103,7 +103,7 @@ ACC-04 (FR-23, P0, M1). A change the assistant makes to a reviewed entry must ma
 
 ## User Stories
 
-- [US-018 — Anchor a reading note to stored text](../user-stories/US-018-anchor-a-reading-note.md)
+- [US-018 — Anchor a reading note to source text](../user-stories/US-018-anchor-a-reading-note.md)
 - [US-019 — Record why sources support a claim](../user-stories/US-019-record-a-claim.md)
 - [US-020 — Register the constructs the book uses](../user-stories/US-020-register-constructs.md)
 - [US-021 — Review AI-proposed items](../user-stories/US-021-review-ai-proposed-items.md)
@@ -124,14 +124,14 @@ ACC-04 (FR-23, P0, M1). A change the assistant makes to a reviewed entry must ma
 - CON-01 to CON-07 are M2, and the FR-29 construct-credit check arrives with them.
 - A retired entry is not a basis for drafting, and checks report text still linked to it.
 - An entry the author writes themselves starts reviewed, and the author's own edits keep an entry reviewed.
-- An extract passes NOTE-02 only when it differs from the stored text by defined harmless differences; another near match is reported as FR-29 states. The harmless differences are the approved, untested list in CHK-16 (FEAT-007).
+- An extract passes NOTE-02 only when it differs from the source text by defined harmless differences; another near match is reported as FR-29 states. The harmless differences are the approved, untested list in CHK-16 (FEAT-007).
 - Claims that takeover extracts take effect at once and can be reviewed in batches shown with their original passages (FR-72, FEAT-015).
 - Open: what confidence scale does CLM-01 use?
 - Takeover suggests constructs and methodology, which take effect at once, unreviewed (FR-82, FEAT-015).
 
 ## Dependencies
 
-- **Other features**: FEAT-002 stored text and change flags; FEAT-003 keys and locators; FEAT-001 project and FR-60 inputs; FEAT-007 checks and reports; FEAT-006 drafting; FEAT-011 records.
+- **Other features**: FEAT-002 source files, passages, and change flags; FEAT-003 keys and locators; FEAT-001 project and FR-60 inputs; FEAT-007 checks and reports; FEAT-006 drafting; FEAT-011 records.
 - **External services**: None. Exact interfaces belong to Contract artifacts.
 - **PRD requirements**: FR-20, FR-21, FR-23 (P0, M1); FR-22, FR-80 (P0, M2).
 

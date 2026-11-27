@@ -40,7 +40,7 @@ and the obligations the agent has toward the command line and the records.
 
 | Path | Content |
 |---|---|
-| `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Plugin and marketplace manifests |
+| `.claude-plugin/plugin.json` | Plugin manifest; the marketplace file belongs to the DocumentDrivenDX/plugins repository |
 | `skills/stemma/SKILL.md` | The only public skill |
 | `skills/stemma/modes/<mode>.md` | Instructions loaded for a mode |
 | `skills/stemma/prompts/support/<version>.md` | Versioned claim-support prompt; a released version is never edited |
@@ -50,9 +50,10 @@ and the obligations the agent has toward the command line and the records.
 | `templates/` | Files `init` copies into a project |
 
 - The plugin MUST NOT add other public skills.
-- The bundle MUST NOT be committed to the Stemma repository. The repository
-  marketplace entry MUST install the release tree from a version tag of the
-  separate distribution repository (SD-010). A published tag MUST NOT be moved.
+- The bundle MUST NOT be committed to the Stemma repository. A release MUST be
+  published as the built release tree at `plugins/stemma` in the
+  DocumentDrivenDX/plugins marketplace repository (SD-010). Different content
+  MUST NOT be published under a version already published.
 - Installing the plugin MUST be the only installation step a person takes. An
   installed plugin MUST NOT download anything but the pinned tools of D, and no
   check or build downloads.
@@ -67,13 +68,13 @@ the request's wording. When two modes fit, the agent asks.
 |---|---|---|---|
 | `start` | New project inputs; constructs and methodology asked, optional | M2 (standing rules M1) | `init`, `setup` |
 | `takeover` | Intake, optional review, and remove, repoint, or replace rounds | M1 | `takeover`, `import`, `source …`, `unreviewed list`, `reviewed`, `retire`, `rounds …`, `check` |
-| `research` | Candidates, corpus-first search, admission | M2 | `research …`, `source add` |
-| `note` | Notes, claims, and places, including restriction marks | M1; places M3 | `source text`, `excerpt`, `check`, `restricted …` |
+| `research` | Capture and reverify sources; research questions, theses, and passage selection; corpus-first search; admission | Capture M1; the rest M2 | `ingest`, `source …`, `resolve`, `research …`, `passage …` |
+| `note` | Notes, claims, and places, including restriction marks | M1; places M3 | `passage …`, `excerpt`, `check`, `restricted …` |
 | `outline` | Outline and chapter specifications | M2 | `plan record`, `check` |
 | `draft` | Drafting from the ledger with profiles | M2 | `plan bundle`, `excerpt`, `activity record`, `check` |
 | `voice` | Extend or amend profiles | M2 | `voice record`, `voice compare` |
-| `verify` | Scripted checks, claim support, and explaining findings | M1 | `check`, `resolve`, `source confirm`, `support …`, `annotate`, `unreviewed list`, `reviewed` |
-| `build` | Draft and camera-ready builds, the explorer and maps, and store checks | Basic draft and basic camera-ready M1; full camera-ready M2; explorer M3 | `build …`, `disclosure`, `graph export`, `graph status`, `store verify` |
+| `verify` | Scripted checks, comparisons, reviews, claim support, and explaining findings | M1 | `check`, `coverage`, `review …`, `source verify`, `resolve`, `support …`, `annotate`, `unreviewed list`, `reviewed` |
+| `build` | Draft and camera-ready builds, and the explorer and maps | Basic draft and basic camera-ready M1; full camera-ready M2; explorer M3 | `build …`, `disclosure`, `graph export`, `graph status` |
 | `audit` | Rival readings, then citation repair | M2 | `audit record`, `check` |
 | `review` | Reviewer package and imported reviewer comments | M3 | `build reviewer`, `scan release`, `review import` |
 
@@ -100,8 +101,10 @@ The skill MUST instruct the agent to:
    marks that record unreviewed. Stamp an edit with the author as a `person`
    actor only when it applies the author's own words as given, which keeps a
    reviewed record reviewed (CONTRACT-001 G). Mark a record `reviewed`, save an
-   `annotate`, `source confirm`, or `source admit` only on the author's explicit
-   instruction naming the items, and never write those records by hand. Ask for
+   `annotate`, a person's `review add`, or `source admit` only on the author's
+   explicit instruction naming the items, and never write those records by
+   hand. Save its own observations about source text as `flagged` reviews with a
+   `model` actor, never as a person's review. Ask for
    none of them as a condition of continuing (FR-23, FR-32).
 6. Give a model only the source text the task needs: prefer `excerpt` and
    `support prepare` to reading whole files (FR-61). There is no per-source
@@ -115,11 +118,23 @@ The skill MUST instruct the agent to:
    `support record`. If the host offers no separate context, say so, leave the
    record missing, and continue (FR-52).
 9. Never call a support verdict verification, or a review mark, annotation, or
-   confirmation proof.
+   review proof.
 10. Never edit a record, report, or cache to change a check outcome, and never
     present an output with open findings as checked clean.
-11. Never invent a source, quotation, or locator. Say when cited text has no
-    stored copy and so is unchecked.
+11. Never invent a source, quotation, or locator, and never produce, type,
+    complete, or correct source text. Select evidence by passage address and
+    let `passage capture` copy the quotation and locator; a citation made from a
+    passage takes both from it. Say when cited text has no source file and so is
+    unchecked.
+13. Drive the pipeline for the author (PRD, Core Pipeline): capture and
+    reverify with `ingest`, setting up what each check needs. For research,
+    state a specific, arguable thesis the sources might support; find the
+    passages that bear on it, contrary evidence included; test whether they
+    support it and revise it if not; then assemble the argument citing those
+    passages.
+14. Write the final output as ordinary scholarship: no commentary in its text or
+    notes about Stemma, records, checks, verification status, or what cites
+    what, and no narration of "the source".
 12. Record drafting and other AI work with `activity record`, offer advice on
     construct use or methodology as advice, and show constructs or methodology
     found in existing work with their passages.
@@ -200,8 +215,8 @@ project without network access.
 ## Non-Normative Notes
 
 - A host that installs a plain git reference to the Stemma repository would get
-  no bundle, so the marketplace entry names the distribution repository.
-- v1 installs from the project's repository marketplace; listing in an official
+  no bundle, so it is published through the marketplace repository.
+- v1 installs from the DocumentDrivenDX marketplace; listing in an official
   directory comes later.
 - Whether a host asks the author before a command runs depends on its
   permission settings. A review mark, annotation, or confirmation gains no
@@ -214,7 +229,7 @@ project without network access.
 |---|---|---|
 | Layout and install | One repository layout installed and listed in Claude Code and Codex CLI with throwaway configuration and no network, one macOS system, with a different toy runtime | The bundled `dist/stemma.js`, Bun, desktop apps, Linux, Windows |
 | Validation | `claude plugin validate` on the folder missed broken hooks; validating the plugin manifest caught them | Any host's own review rules for bundled code. Research reports that an official directory's review holds minified code, which matters for the later listing |
-| Marketplace install and setup | With Claude Code 2.1.236, one macOS system: the repository's marketplace entry, its address changed to a local stand-in for the distribution repository, installed the tagged release tree into an empty profile with one skill; with no Bun on the search path the installed launcher fetched, verified, and used Bun 1.4.5 and ran `doctor` and `check` | GitHub, the desktop app, a live session using the skill, the host's data-directory substitution, updates, network denied, Windows, Linux |
+| Marketplace install and setup | One macOS system: from a local stand-in for the marketplace repository, the release tree installed into an empty profile with one skill, and with no Bun on the search path the installed launcher fetched, verified, and used Bun 1.4.5 and ran `doctor` and `check`. Version 0.0.2 installed from GitHub with the command-line tool | The desktop app, a live session using the skill, the host's data-directory substitution, updates, network denied, Windows, Linux |
 | Separate context, agent obligations | None | All; no live agent session was run |
 
 ## Schema Basis

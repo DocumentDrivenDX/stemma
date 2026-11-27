@@ -200,7 +200,7 @@ N/A — requirement verification covers this feature.
 
 - The meaning, review state, and checks of each record type.
 - Legacy bibliography conversion (FEAT-003).
-- Storage of large source files (FEAT-002) and binary storage (FR-59).
+- Source files and their format (FEAT-002).
 - Explorer views (FEAT-012) and maps (FEAT-013).
 - Several authors editing one corpus at the same time (PRD P2).
 - Claiming conformance to Truss, a DocumentDrivenDX storage engine.

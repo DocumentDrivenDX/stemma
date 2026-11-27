@@ -34,7 +34,7 @@ ddx:
 
 - Covers reading notes, the claim ledger, the construct register, and review of AI-proposed items (FR-20 to FR-23, FR-80).
 - Delivery: **pilot (M1)** has notes, claims with completeness, review marks, and optional batch review of takeover items. **M2** adds stance and claim relations (FR-80) and the construct register (FR-22).
-- Depends on SD-002 (stored text, passages' extractions) and SD-003 (sources and locators). SD-007 runs the checks. SD-015 supplies takeover records.
+- Depends on SD-002 (source files and passage addresses) and SD-003 (sources and locators). SD-007 runs the checks. SD-015 supplies takeover records.
 - Governing: Architecture, ADR-002, ADR-003, CONTRACT-001, CONTRACT-002, CONTRACT-004, CONTRACT-006.
 
 ## Requirements Mapping
@@ -43,7 +43,7 @@ ddx:
 
 | Requirement | Technical Capability | Component | Priority / step |
 |---|---|---|---|
-| NOTE-01 to NOTE-03 (FR-20) | Notes anchor to passages; extract wording is compared with stored text; paraphrase wording is never compared | Anchor rules; SD-007 `quote.present` | P0 / M1 pilot |
+| NOTE-01 to NOTE-03 (FR-20) | Notes anchor to passages; extract wording is compared with source text; paraphrase wording is never compared | Anchor rules; SD-007 `quote.present` | P0 / M1 pilot |
 | CLM-01, CLM-02 (FR-21) | Claim joined to notes through attestations; completeness predicate | Ledger rules; `claim.complete` | P0 / M1 pilot |
 | CLM-03, CLM-04 (FR-80) | Stance on attestations; inferences and claim roles | Ledger rules | P0 / M2 |
 | CON-01 to CON-05 (FR-22) | Construct records with ownership, definition, origin, chapters | Register rules; `construct.complete` | P0 / M2 |
@@ -108,9 +108,9 @@ Field shapes and allowed values are CONTRACT-001. The schema gives claim confide
 - **BR-502** — Author entries: an entry the author writes or dictates MAY be marked reviewed at once. An entry written by a model or software starts unreviewed.
 - **BR-503** — Review: marking reviewed applies only to named records with the digest that was shown, or to a shown batch. Each gets its own dated mark; a batch shares a token. Nothing marks reviewed as a side effect, and nothing waits for it. Rejecting is retiring, with a reason.
 - **BR-504** — Shown with origin: the unreviewed listing returns each entry with its original passage or manuscript origin and its content digest. An entry with neither is listed as having no passage.
-- **BR-505** — Extract: an extract note's wording is compared with the stored text at its anchored passages under the CONTRACT-002 quotation profile. A match elsewhere in the source does not pass the anchor.
+- **BR-505** — Extract: an extract note's wording is compared with the source text at its anchored passages under the CONTRACT-002 quotation profile. A match elsewhere in the source does not pass the anchor.
 - **BR-506** — Paraphrase: only the passage anchor is tested. Its results name the passage as subject and make no statement about the paraphrase's wording. A comment note is not compared.
-- **BR-507** — Anchor stability: a passage that matches several places is resolved by its stored position. If position and context do not settle it, the result is reported as ambiguous; no tool moves an anchor.
+- **BR-507** — Anchor stability: a passage is resolved by its passage address. If the address no longer holds its text, the result is reported as ambiguous; no tool moves an anchor.
 - **BR-508** — Completeness: a claim in effect is complete when it has confidence, reason, and at least one attestation that reaches a note. The result names every missing part.
 - **BR-509** — Stance: support, opposition, and context stay distinct. A contradicting or context attestation is never counted as support (SD-007 support requirements).
 - **BR-510** — Relations: argument relations between claims are inferences; thesis, rival reading, and objection are claim roles. Stemma does not derive relations. More than one thesis is listed, not rejected (assumption).
@@ -154,7 +154,7 @@ graph TD
     Skill -->|unreviewed list, reviewed, retire| Review["review service"]
     Review --> Rules["ledger rules"]
     Rules --> Records
-    Rules --> Blobs["stored extraction text"]
+    Rules --> Sources["source files"]
     Checks["check engine, SD-007"] --> Rules
     Draft["drafting and maps, later"] --> Rules
 ```
@@ -171,7 +171,7 @@ N/A: no feature-specific technology; Architecture and ADR-004 govern.
 | NOTE-02 | Ledger rules | BR-505, BR-507 | Seeded changed extract fails; exact and harmless-difference extracts pass; a repeated phrase at another position does not pass the anchor |
 | NOTE-03 | Ledger rules | BR-506 | Paraphrase fixture yields no wording-match evidence |
 | CLM-01, CLM-02 | Ledger rules | BR-508 | One seeded case per missing part: confidence, reason, note, effective attestation |
-| CLM-03 | Ledger rules | BR-509 | Opposing attestation is stored apart and never counts as support |
+| CLM-03 | Ledger rules | BR-509 | Opposing attestation is kept apart and never counts as support |
 | CLM-04 | Ledger rules | BR-510 | Thesis, rival, objection, and each inference relation survive rebuild |
 | CON-01 to CON-03 | Ledger rules | BR-511 | Register listing shows author and borrowed entries with chapters and sources |
 | CON-04, CON-05 | Ledger rules | BR-511 | Seeded missing definition and missing origin source fail |
@@ -202,7 +202,7 @@ N/A: the feature is used through the agent and command line; FEAT-005 user stori
 
 - **Constraints**: Review marks are not forgery-proof. Anyone with file access can write one.
 - **Assumptions**: The AI role fits `created.activity`; wrong means a record-format addition. Confidence follows the schema scale. A retired record stays as a file with no effect.
-- **Dependencies**: SD-002 extraction text; SD-003 sources.
+- **Dependencies**: SD-002 source files; SD-003 sources.
 
 ## Risks
 
@@ -211,7 +211,7 @@ N/A: the feature is used through the agent and command line; FEAT-005 user stori
 | An agent writes a review mark the author did not give | M | H | Skill obligation, disclosure, git history; no enforcement claimed |
 | Unreviewed AI claims are treated as the author's | H | H | Marks and counts in reports, record views, and disclosure |
 | Batch review is marked without reading passages | M | M | Show passages; keep edit and retire per item |
-| Real extraction text makes true extracts fail | H | M | Test on pilot sources; near matches go to the author (SD-007) |
+| Converted text makes true extracts fail | H | M | Test on pilot sources; near matches go to the author (SD-007) |
 | Review marks lapse often and are ignored | M | M | Batch review; measure in the pilot |
 
 All matching behavior is unverified on real sources and on Linux and Windows.

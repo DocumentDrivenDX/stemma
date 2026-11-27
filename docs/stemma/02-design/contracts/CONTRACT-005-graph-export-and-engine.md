@@ -75,8 +75,8 @@ digest or a file digest differs.
 1. Installs the plugin and the pinned Bun.
 2. Runs `graph export --audience author --page`. It validates the records and
    builds the module, graph, and page from files in the repository and assets
-   shipped with Stemma. It needs no network, index, content store, or
-   restricted store.
+   shipped with Stemma. It needs no network, index, originals, or restricted
+   store.
 3. Opens `build/graph/author/explorer.html`.
 
 The agent runs step 2 when asked to browse, and again after records change.
@@ -117,12 +117,11 @@ Filtering happens before any file is written; the page does no filtering.
 - Both audiences omit restricted store values, local paths, `legacy`, and `x`.
 - `author` is for the author's own machine or private repository. It MAY include
   passage text.
-- `reviewer` MUST include only fields on its allow list. It omits all stored
-  source text (passage quotes and context, note extracts, manuscript origins
-  that quote sources, support-record passage and quoted text, resolver
-  payloads), apart from excerpts allowed under CONTRACT-002 E1, reduces a source
-  flagged, or unstated, as `unpublished` or `community_restricted` to its ID and
-  a `withheld` marker, gives restricted locations only the
+- `reviewer` MUST include only fields on its allow list. It omits source files
+  unless the author includes them, and otherwise all source text (passage quotes
+  and context, note extracts, manuscript origins that quote sources,
+  support-record passage and quoted text, lookup responses) apart from excerpts
+  allowed under CONTRACT-002 E1; it gives restricted locations only the
   author-set broad area or nothing, and shows all other locations. A field with no
   allow-list entry is omitted. Report data in the package follows
   CONTRACT-002 E1.

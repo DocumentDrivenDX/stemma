@@ -17,9 +17,54 @@ ddx:
     - stemma.adr-007
     - stemma.adr-008
     - stemma.adr-009
+    - stemma.adr-010
 ---
 
 # Architecture
+
+## What Stemma Does
+
+Stemma keeps an unbroken chain from original source to citation to supported
+thesis. Each link is deterministic and checkable from the repository; only the
+writing of thesis support and discussion is not.
+
+| Link | Record or file | What checks it |
+|---|---|---|
+| Upstream original | `upstream` record: address, retrieval time, hash, size | The original's bytes, when present, by hash |
+| Source files | Manifest and parts: original hash, converter and version, part digests | `source.original`, `source.pages`, `source.labels`, `source.footnotes`, comparison runs, reviews |
+| Passage | `passage`: part indexes, part text digests, offsets | `quote.present`, `source.changed` |
+| Citation | `citation`: passage, quotation and locator copied from it | `quote.present`, `quote.page`, `locator.extent`, `cite.key` |
+| Claim | `claim`, linked through attestations and spans | `claim.complete`, support records |
+| Output sentence and footnote | Manuscript and generated footnotes (M2) | The build regenerates footnotes from records |
+
+## Core Pipeline
+
+Claude drives four stages. Stages 1 and 2 are one command (`ingest`); stages 3
+and 4 build on passage capture and are not yet built.
+
+1. **Capture**: obtain each upstream original, by a library's documented route
+   for automated use or from a file the author supplies, and record it.
+2. **Convert and reverify**: write source files, then run every check that
+   applies: structure and digests, page maps, a fresh conversion compared with
+   what is committed, metadata against the copy's own statement and title page,
+   and saved catalogue and identifier lookups.
+3. **Research**: record research questions; select passages (judgment,
+   recorded) and capture them by address (mechanical).
+4. **Assemble**: build each output's context only from fully supported
+   references; generate footnotes with verbatim quotations by script.
+
+```mermaid
+graph LR
+    U["Upstream originals (outside git)"] -->|convert| S["Source files in git"]
+    S -->|capture by address| P["Passages"]
+    P --> C["Citations and claims"]
+    C --> O["Output sentences and generated footnotes"]
+```
+
+**Verification.** Deterministic checks wherever possible. Where not possible, as
+with recognized text, the step is re-runnable, compared several ways with each
+run recorded, and open to a person's review at any time; reviews go stale when
+reviewed content changes. No language model produces or corrects source text.
 
 ## Scope
 
@@ -51,7 +96,8 @@ untested.
 | Agent host (Claude first; ChatGPT and Codex P1) | External | Loads the skill, runs commands, calls its model | Plugin and skill formats, process execution |
 | Stemma | System | Evidence graph, checks, takeover, typesetting, exploration | Command line and files |
 | git repository | External | History and exchange of record files | git |
-| Bibliographic resolvers (optional) | External | DOI (Digital Object Identifier) and metadata lookups | HTTPS, only from explicit commands |
+| Bibliographic catalogues | External | DOI (Digital Object Identifier) and library catalogue lookups, saved in the project | HTTPS, only from explicit commands |
+| Source libraries | External | Original files, by their documented routes for automated use | HTTPS, only from explicit commands |
 | arras | External family library | Browser graph application | npm package, bundled at build |
 
 ```mermaid
@@ -69,9 +115,9 @@ graph TB
 | Container | Technology | Responsibilities | Communication |
 |-----------|------------|------------------|---------------|
 | Skill | Markdown in the plugin | Routes modes; states agent obligations | Runs the command line (CONTRACT-004) |
-| Command line | TypeScript, one bundle on Bun 1.4.5 | Records, intake, extraction, checks, builds, exports | JSON on standard output, files (CONTRACT-002) |
-| Project files | Canonical JSON, marked-up Markdown, and text in the author's repository | The evidence graph, manuscript copy, and settings; source of truth | Filesystem (CONTRACT-001, 006) |
-| Content store | Separate private directory, files named by SHA-256, backed up by the author | Held copies, extracted text, original files | Filesystem |
+| Command line | TypeScript, one bundle on Bun 1.4.5 | Records, capture, conversion, intake, checks, builds, exports | JSON on standard output, files (CONTRACT-002) |
+| Project files | Canonical JSON and Markdown in the author's repository | The evidence graph, source files, manuscript copy, and settings; source of truth | Filesystem (CONTRACT-001, 006, 007) |
+| Originals cache | `.stemma/originals/`, ignored by git, files named by SHA-256 | Originals fetched or supplied for conversion and optional comparison; nothing depends on it | Filesystem |
 | Restricted store | Local directory outside the project | Exact restricted coordinates | Filesystem |
 | Derived index | SQLite through `bun:sqlite` | Disposable query index; later replaced behind one port by the graph engine, also on SQLite | In process |
 | Typst compiler | Typst 0.15.1, native program | Lays out the book | Subprocess, generated files |
@@ -85,7 +131,6 @@ pinned by digest.
 graph TB
     Skill -->|bun --no-install| CLI["Command line on Bun"]
     CLI --> Files["Project files"]
-    CLI --> Store["Content store"]
     CLI --> Restricted["Restricted store"]
     CLI --> Index["SQLite index"]
     CLI -->|subprocess| Typst
@@ -124,11 +169,11 @@ Paths below are Bun workspace packages.
 
 | Module | Responsibility / Owned Types | Public API | Allowed Dependencies | Forbidden Dependencies |
 |--------|------------------------------|------------|----------------------|------------------------|
-| `packages/records` | Record types generated from the UMF schema, canonical form, digests, validation, link rules, the `search-fold` function | CONTRACT-001 types and pure functions | A pinned validation helper if the generated validator needs one | Every other package; filesystem, network, process, SQLite; Bun-only APIs |
+| `packages/records` | Record types generated from the UMF schema, canonical form, digests, validation, link rules, the source-file format (CONTRACT-007), the `search-fold` function | CONTRACT-001 types and pure functions | A pinned validation helper if the generated validator needs one | Every other package; filesystem, network, process, SQLite; Bun-only APIs |
 | `packages/manuscript` | CONTRACT-006 reader, document model, sentence and quotation rules, span edits | CONTRACT-006 types and pure functions | `records`, one pinned parsing library if chosen | `core` and adapters; filesystem, network, process; Bun-only APIs |
 | `packages/core` | Checks, explained findings, the checked-clean label, report redaction (CONTRACT-002 E1), excerpt and annotation rules, change closure, use cases; owns all ports | CONTRACT-002 types, use-case functions, port interfaces | `records`, `manuscript` | All adapter packages and `cli`; filesystem, network, process, SQLite |
-| `packages/workspace` | Adapters for record files, content and restricted stores, project settings, locking, git facts, resolvers | Port implementations | `records`, `core` | Other adapters, `cli` |
-| `packages/extract` | Text, page maps, source metadata from held copies; recognition later | `TextExtractor` implementations | `records`, `core`, one pinned library per format | Other adapters, network |
+| `packages/workspace` | Adapters for record and source files, the originals cache, the restricted store, project settings, locking, git facts, fetching | Port implementations | `records`, `core` | Other adapters, `cli` |
+| `packages/extract` | Converters from originals to source-file parts, with structure, page markers, and the metadata the original states; no model | `TextExtractor` implementations | `records`, `core`, one pinned library per format | Other adapters, network |
 | `packages/intake` | Word reader; CSL-JSON, BibLaTeX, RIS codecs; loss reports | CONTRACT-003 operations through ports | `records`, `manuscript`, `core`, pinned parsing libraries | Other adapters, network, process |
 | `packages/cite` | CSL-JSON projection, citeproc-js, citation Typst output | `CitationFormatter` | `records`, `manuscript`, `core`, citeproc-js | Other adapters; Bun-only APIs |
 | `packages/publish` | Markdown-to-Typst conversion, build orchestration, Typst process, reviewer package, which applies `core` redaction and runs the package scan | `Typesetter`, `Packager` | `records`, `manuscript`, `core`; `cite` and `graph` only through core ports | Direct citeproc-js import |
@@ -137,7 +182,7 @@ Paths below are Bun workspace packages.
 | `packages/explorer` | Browser application and host page | Built bundle | Browser-safe exports of `records`, `core` operations, `manuscript`, `cite`, and the pure Typst conversion in `publish/convert`; graph export types, React, arras UI | `workspace`, `extract`, `intake`, the rest of `publish`, `cli`; any Bun or Node API |
 | `skills/stemma` | Skill and mode instructions | CONTRACT-004 | The command line only | Importing or editing package code |
 
-**Integration Owners**: filesystem, git, resolvers -> `workspace`; PDF, scan, and web formats -> `extract`; Word and legacy libraries -> `intake`; citeproc-js -> `cite`; Typst -> `publish`; SQLite and arras export -> `graph`; arras UI and browser Typst -> `explorer`; agent host -> `skills/stemma` and plugin manifests. Native shapes are translated in the owning package and do not appear in `core` ports.
+**Integration Owners**: filesystem, git, fetching and catalogue lookups -> `workspace`; PDF, EPUB, DOCX, HTML, Markdown, and text formats -> `extract`; Word and legacy libraries -> `intake`; citeproc-js -> `cite`; Typst -> `publish`; SQLite and arras export -> `graph`; arras UI and browser Typst -> `explorer`; agent host -> `skills/stemma` and plugin manifests. Native shapes are translated in the owning package and do not appear in `core` ports.
 **Construction Policy**: only `packages/cli` constructs adapters and passes them to core use cases; the explorer entrypoint composes its own browser clients; tests substitute in-memory adapters.
 **Boundary Check**: `bun run check:boundaries`, a script that fails on a forbidden or cyclic import and on a deep import past a package's exports. It is part of the one local check command and release-tag runs, with no required hook or CI job (ADR-007). The script and its allowed and forbidden test cases precede feature code.
 
@@ -155,9 +200,9 @@ replacing there.
 
 | Port | Why it is a port |
 |---|---|
-| `RecordRepository`, `BlobStore`, `RestrictedStore` | Tests run without a filesystem; stores live outside the project |
+| `RecordRepository`, `RestrictedStore` | Tests run without a filesystem; the restricted store lives outside the project |
 | `GraphStore` | The engine replaces the disposable index (ADR-006) |
-| `TextExtractor` | The PDF library may be replaced, and the recognition engine is undecided |
+| `TextExtractor` | One converter per format; the PDF library may be replaced, and a recognition engine may come later |
 | `ManuscriptRepository` | Reads and splices the Stemma copy (CONTRACT-006) without core touching files |
 | `CitationFormatter`, `Typesetter` | The citeproc-js license review and Typst process sit behind them |
 | `Resolver`, `Clock`, `Environment` | Network and time stay out of deterministic results |
@@ -192,7 +237,6 @@ copyrighted source.
 |-----------|----------------|-----------|---------|-------------------|
 | Skill and command line | Plugin installed from the marketplace into the host's plugin cache; pinned Bun set up by the plugin in its data directory | One per host profile | Not applicable | Reinstall the same version |
 | Project files | Author's disk and chosen git remote | One working copy per machine | Bounded by record count; measured only to 25,000 synthetic records | git history |
-| Content store | Private directory outside git | One per machine | Bounded by disk | Author's backup; digests verify a restore |
 | Restricted store | Per-user directory outside the project | One per machine | Not applicable | Author's separate protected backup; Stemma copies it nowhere |
 | Derived index | `.stemma/` | One per working copy | Rebuilt | None needed |
 | Typst | Pinned program the plugin sets up in its data directory (not built) | One | Not applicable | Set up again |
@@ -203,7 +247,7 @@ graph TB
     subgraph Machine["Author's computer"]
       Host["Agent host + plugin"] --> Launcher["Plugin launcher"]
       Launcher --> Bun["Pinned Bun in plugin data, running dist/stemma.js"]
-      Bun --> Project["Project: records, store, index"]
+      Bun --> Project["Project: records, source files, index"]
       Bun --> Outside["Restricted store"]
       Bun --> TypstBin["Typst"]
       Page["Browser: offline explorer"]
@@ -214,17 +258,20 @@ graph TB
 
 Distribution: Stemma is first and foremost a Claude plugin, and installing it
 is the only installation a person does. The bundle is not committed to the
-repository. The marketplace entry installs a tagged release tree (manifests,
-skill, launcher, unminified bundle) from a separate distribution repository. On
-first use the launcher sets up the pinned Bun in the plugin's data directory from
-a digest-verified download (ADR-004); Typst, when built, arrives the same way.
-`--no-install` stops Bun from fetching packages while running. Claude desktop's
-local Code tab is the only v1 full-function promise; on Linux the command line,
-checks, and builds are targeted with no desktop-app integration promised; the
-Claude command-line tool is a test harness only. SD-010 records what has been
-observed.
-Tests run locally, and on the three systems only for release tags, as advisory
-results (ADR-007).
+Stemma repository. A release copies the built tree (manifests, skill, launcher,
+unminified bundle, and library data) into `plugins/stemma` in the
+DocumentDrivenDX/plugins marketplace repository, from which
+`claude plugin marketplace add DocumentDrivenDX/plugins` and
+`claude plugin install stemma@documentdrivendx` install it. The command-line
+install from GitHub has been verified for version 0.0.2; Claude desktop is
+untested. On first use the launcher sets up the pinned Bun in the plugin's data
+directory from a digest-verified download (ADR-004); Typst, when built, arrives
+the same way. `--no-install` stops Bun from fetching packages while running.
+Claude desktop's local Code tab is the only v1 full-function promise; on Linux
+the command line, checks, and builds are targeted with no desktop-app
+integration promised; the Claude command-line tool is a test harness only.
+SD-010 records what has been observed. Tests run locally, and on the three
+systems only for release tags, as advisory results (ADR-007).
 
 ## Data Flow
 
@@ -237,8 +284,8 @@ sequenceDiagram
     participant C as Command line
     participant F as Files and stores
     A->>G: Record a note from a source
-    G->>C: excerpt
-    C->>F: Read extraction text
+    G->>C: excerpt, passage capture
+    C->>F: Read source files
     C-->>G: Bounded excerpt
     G->>F: Write records
     G->>C: fmt, check --changed
@@ -250,7 +297,7 @@ sequenceDiagram
     C-->>A: PDF, report, label open_findings (exit 1)
 ```
 
-Failure handling: a missing blob or resolver result makes the dependent result
+Failure handling: a damaged source file or a missing saved lookup makes the dependent result
 `unverifiable`, which the report explains. No finding stops a command or a
 build. Only a tool failure, such as a manuscript that cannot be parsed or a
 compile error, stops output, and a crash is never a pass. Takeover writes
@@ -263,18 +310,18 @@ measure.
 
 | Attribute | Target | Strategy | Verification |
 |-----------|--------|----------|--------------|
-| Availability | No hosted dependency: check, build, and export make 0 network requests | Local stores; network only in named commands | Run the seeded project with network denied |
+| Availability | No hosted dependency: check, build, and export make 0 network requests | Source files and saved lookups in the repository; network only in named commands | Run the seeded project with network denied |
 | Determinism | 0 byte differences in report bodies across two runs with equal inputs and tools; same results on three systems (unproven) | CONTRACT-001 and 002 canonical forms; no clock, locale, or directory order in results | Repeat-run test; release-tag matrix |
 | Check coverage | Each CONTRACT-002 check fails its seeded error, passes clean input, or states why it cannot check | One seeded set per check | Seeded suite |
 | Performance (a, unverified) | Full rebuild of 25,000 records in 5 s or less; `check --changed` after one edit in 5 s or less; 10,000-node explorer load in 5 s or less | Disposable SQLite index, dependency closure, chapter scope | Timed runs on a stated laptop. One synthetic test rebuilt 25,000 records in about 1.1 s without checks |
 | Security | 0 executions of input content; every codec limit enforced; no known high-severity dependency advisory or secret at release without a stated decision | CONTRACT-003 limits, pinned lockfile, source text treated as data | Hostile fixtures; audit and secret scan before release |
-| Privacy and rights | 0 seeded structured restricted values in tracked files and reviewer outputs; 0 seeded stored-source strings in reviewer graph and report | Outside store, allow list, report redaction, scans. Stray coordinates only warn | Seeded-leak tests on structured values; seeded prose coordinate is warned. Prose, paraphrase, and place names can disclose |
+| Privacy | 0 seeded structured restricted values in tracked files and reviewer outputs; no source file in a reviewer package unless asked | Outside store, allow list, report redaction, scans. Stray coordinates only warn | Seeded-leak tests on structured values; seeded prose coordinate is warned. Prose, paraphrase, and place names can disclose |
 | Accessibility | WCAG (Web Content Accessibility Guidelines) 2.2 AA; 0 axe-core violations on the core flow; text alternatives for page images and maps | arras components, lists beside views | Playwright flow against the built bundle, plus manual review |
-| Disaster Recovery | RPO (recovery point): last commit for records, last author backup for both stores. RTO (recovery time): 15 minutes or less after files are restored (a) | Everything else is derived | Rebuild on a clean machine and compare dump and report |
+| Disaster Recovery | RPO (recovery point): last commit for the project, source files included; last author backup for the restricted store. RTO (recovery time): 15 minutes or less after files are restored (a) | Everything else is derived | Rebuild on a clean machine and compare dump and report |
 
 Known assurance limit: the command line governs only its own behaviour. An agent
-or person with file access can edit verdicts, review marks, and annotations, and
-can read whole store files rather than excerpts. Sources are not gated from
+or person with file access can edit verdicts, review marks, reviews, and
+annotations, and can read whole source files rather than excerpts. Sources are not gated from
 hosted models: a project is for material that may be sent to its model.
 Running everything on a local model is an unsupported experiment, so no check,
 format, or command depends on a particular model.
@@ -283,10 +330,10 @@ format, or command depends on a particular model.
 
 | Decision | Status | Rationale | Follow-up |
 |----------|--------|-----------|-----------|
-| ADR-001 to ADR-009 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy | Their stated assumptions |
+| ADR-001 to ADR-010 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy; source files in the repository | Their stated assumptions |
 | Architecture style: hexagonal, ports and adapters (HELIX `hexagonal-architecture`) | Decided by the product owner; fills the `architecture-style` slot | One core is driven by the command line and tests and drives parts that are undecided or will change: the index, extraction, recognition, manuscript form, and citation formatting. `classic-layered` would let checks depend on files and SQLite directly; onion and clean styles add layers no requirement needs. Core rules (`records`, `manuscript`, `core`) are independent of applications, databases, and file tools | Boundary check |
 | Checks are pure over ports | Proposed | Repeatable tests and one result path for agent, build, and terminal | none |
-| Ship the unminified command-line bundle in a separate distribution repository, tagged by version | Decided by the product owner (distribution repository allowed if needed); mechanism chosen in SD-010 | No built file in the Stemma repository. Trade-off: a second publishing surface; unobserved in Claude desktop | Install check before the pilot |
+| Publish the built, unminified release tree as `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository | Decided by the product owner; SD-010 | No built file in the Stemma repository. Trade-off: a second publishing surface; unobserved in Claude desktop | Desktop install check |
 | Pin Bun 1.4.5 first | Assumption | It is the version tested | Confirm at first release |
 | Generated browser graph is rebuilt, never committed | Decided by the product owner | Record files are the one official copy | Fresh-clone test |
 | First engine scope: arras static-profile reads, TypeScript on SQLite, no writes | Decided by the product owner | Bounds the engine; writes and wider server compatibility come later | CONTRACT-005 I |
@@ -302,7 +349,7 @@ Solution design numbers follow feature numbers.
 | SD-010 | Runtime, bundle, command line, plugin, install tests | CONTRACT-002, 004; ADR-004, 007 | M1, first. Marketplace install that sets itself up in Claude desktop, on three systems |
 | SD-011 | Records, validators, disposable index, change closure; later the export and the read-only engine | CONTRACT-001, 005; Data Design; SD-010 | M1, first. Engine scope is CONTRACT-005 I |
 | SD-001 | Standing rules (M1), then setup and registers | SD-011; record-shape additions to CONTRACT-001 | M1, M2 |
-| SD-002 | Admission, stores, extraction, page maps, rights | SD-011 | M1. PDF text library; recognition on pilot scans |
+| SD-002 | Capture, converters, source files, structure checks, passages, comparisons, reviews | SD-011; CONTRACT-007 | M1. Real publisher and library files |
 | SD-003 | Bibliography, keys, locators, legacy codecs | SD-002; CONTRACT-003 | M1. Real library files |
 | SD-005 | Notes, claims, review states, constructs | SD-002, SD-003 | M1; construct register M2 |
 | SD-007 | Check engine, quotation and sentence profiles, support flow, annotations, explained findings, label, report redaction | SD-002, 003, 005; CONTRACT-002, 006 | M1. Harmless-difference list on pilot sources; real publisher PDFs; separate-context support run; labelled verdict set |
@@ -325,10 +372,10 @@ on the pilot path and is untested.
 | Browser Typst compilation is untried and may be blocked | Previews may need another host page, or fall back to prebuilt pages, which would not meet FR-65 |
 | citeproc-js is licensed CPAL (Common Public Attribution License) or AGPL (GNU Affero General Public License) | May change how `cite` ships or what formats citations |
 | A host blocks script execution or the setup download | No checks there; the host cannot be claimed |
-| Real PDFs, scans, and Word files differ from synthetic fixtures | Extraction and intake designs may change |
+| Real PDFs, EPUB and Gutenberg files, and Word files differ from synthetic fixtures | Converter and intake designs may change |
 | Graph size exceeds arras's claimed 1,024 nodes | Scoped exports and measured claims |
 | The preview changes only after the agent rebuilds and the author reloads | An open page can show earlier text, so it shows its data identity |
-| Claude desktop does not install from the distribution repository | The plugin cannot be installed there |
+| Claude desktop does not install from the marketplace repository | The plugin cannot be installed there |
 | Nothing stops publication with open findings | A book or package can disclose a site or protected text, carry unusable or unpermitted images, or hold unsupported or unreviewed claims |
 | Basic typesetting joins the pilot | The citeproc-js license, Typst distribution, and the markup reader sit on the pilot path |
 | The defined Markdown features cannot carry a real chapter, or sentence and quotation reading is unstable | Takeover output, annotations, and quotation results would need a markup change |

@@ -14,7 +14,7 @@ ddx:
 # Competitive Analysis
 
 Citation checks, claim ledgers and gated agent workflows for scholarly writing
-already exist. No page read described one tool that combines stored source
+already exist. No page read described one tool that combines captured source
 copies bound by hash, scripted quote and page checks, footnote-heavy book
 manuscripts, and takeover of an existing project into a source graph that the
 author reviews. This finding covers a limited search. No competitor was
@@ -219,7 +219,7 @@ marked N were not reopened.
   caught every planted error; the first run got 19 of 20 cases right, and some
   hyphen and ellipsis attacks passed (S). The same author wrote the cases and the
   code. Scans and recognition were not tested.
-- **Sources carry use limits.** Takeover and claim checks may send stored text
+- **Sources carry use limits.** Takeover and claim checks may send source text
   to hosted models. The survey reports publisher and database terms that
   restrict this; it did not read most vendor terms, and gives no legal
   conclusion. [JSTOR terms](https://about.jstor.org/terms/) restrict AI
@@ -264,7 +264,7 @@ These are candidates to test, not proven advantages.
 
 | Differentiator | Why It Matters | Defensibility |
 |----------------|----------------|---------------|
-| Source custody: a stored copy, hash, extraction record, and page map; verdicts go stale when source, claim, or checker changes | The author can show what was checked against which bytes. | Medium. Hash and offset binding exists at toy scale in [evidence-ledger-agent](https://github.com/aamirmalik-dr/evidence-ledger-agent) (V). |
+| Source custody: source text in the repository tied to its original by hash, with page files and digests; verdicts go stale when source, claim, or checker changes | The author can show what was checked against which bytes. | Medium. Hash and offset binding exists at toy scale in [evidence-ledger-agent](https://github.com/aamirmalik-dr/evidence-ledger-agent) (V). |
 | Takeover of a partly referenced book into a reviewable graph, with the author deciding to remove, repoint, or replace | Authors with existing drafts can adopt without starting over. | Medium if it works on real footnotes; unproven and technically hard. |
 | Footnote-heavy book scale: short forms, printed-page locators, editions, archival and non-DOI sources, other scripts | This is the first persona's work. | Medium. Effort is the barrier; no accuracy evidence yet. |
 | Separate verdicts for existence, metadata, quotation, locator, support, and the author's review mark; "could not check" never counts as pass | Prevents a model opinion from reading as verification. | Low to copy; valuable for trust. |
@@ -276,7 +276,7 @@ matching, claim ledgers, agent hooks, style learning from samples, and plugin
 packaging.
 
 A claim the evidence can support, once built and tested: each quotation and
-locator Stemma passes was matched to a stored source copy, and each output
+locator Stemma passes was matched to the source's text, and each output
 labelled checked clean had no open finding in those checks. It cannot support "no
 misattributed claims" or "tamper-proof", and it says nothing about whether a
 source is right.
@@ -290,7 +290,7 @@ The [product vision](product-vision.md) states the positioning.
 
 ## Strategic Implications
 
-- **Attack**: the join between stored sources, footnote-style books, takeover
+- **Attack**: the join between captured sources, footnote-style books, takeover
   with author review, and an honest audit record.
 - **Defend**: truthful verdict labels, explained findings, recorded annotations, local handling of
   restricted sources and locations, and low author effort.

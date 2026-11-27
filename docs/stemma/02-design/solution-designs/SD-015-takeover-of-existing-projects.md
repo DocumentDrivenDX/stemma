@@ -37,7 +37,7 @@ ddx:
 
 - Covers Word intake, the Stemma copy, the unverified graph, and resolution rounds (FR-71 to FR-73), then construct and methodology suggestions (FR-82).
 - **Pilot (M1)**: everything except suggestions (**M2**). The pilot's basic PDF is SD-008.
-- Depends on SD-003 (library codecs, source records), SD-005 (review service), SD-007 (checks, annotations), and the CONTRACT-006 reader and edits. SD-002 admits stored copies. A project must be initialized first, which the takeover mode does when needed (SD-001).
+- Depends on SD-003 (library codecs, source records), SD-005 (review service), SD-007 (checks, annotations), and the CONTRACT-006 reader and edits. SD-002 captures sources. A project must be initialized first, which the takeover mode does when needed (SD-001).
 - CONTRACT-003 owns intake behavior and reports; CONTRACT-006 F owns takeover output and edits; CONTRACT-002 owns commands.
 
 ## Requirements Mapping
@@ -59,10 +59,10 @@ ddx:
 
 | NFR | Requirement | Architectural Impact | Design Decision |
 |---|---|---|---|
-| Integrity | Originals unchanged | No write path to originals | Originals are opened read-only; bytes are copied to the content store; hashes compared after intake |
+| Integrity | Originals unchanged | No write path to originals | Originals are opened read-only and not copied; their digests are recorded and compared after intake |
 | Reliability | Same results across takeovers and resume | No saved session state | Deterministic reading and binding; worklist computed from records. Record IDs differ between runs, so comparison matches on origins and findings |
 | Recovery accuracy | No uncertain footnote bound wrongly on seeded real files | Conservative binding | Bind only on one candidate under a named rule |
-| Security | No execution, outside writes, or obeyed text | Untrusted parser boundary | Limits below; no external entities or fetches; writes limited to project and store |
+| Security | No execution, outside writes, or obeyed text | Untrusted parser boundary | Limits below; no external entities or fetches; writes limited to the project |
 | Offline | No network | Local parsing | `takeover` uses no resolver |
 | Performance (assumption) | 200 footnotes and 1,000 entries within 60 s | Single pass, indexed candidates | Measure on a stated machine |
 
@@ -111,12 +111,12 @@ Shapes are CONTRACT-001. There is no round or session entity.
 
 **Intake**
 
-- **BR-1501** — Atomic import: all records and chapter files are staged, validated as one graph, and committed by the journaled write of the Data Design, or none is. A store blob left by a failed run is not an import.
+- **BR-1501** — Atomic import: all records and chapter files are staged, validated as one graph, and committed by the journaled write of the Data Design, or none is. Nothing left by a failed run is an import.
 - **BR-1502** — Accounting: every text-bearing part and element is converted, reported with position, or placed in an unconverted block. An element the reader does not know is reported, never skipped.
 - **BR-1503** — Revision view: the reader takes the view with insertions applied and deletions removed (assumption), states it, and creates no citation from deleted text.
 - **BR-1504** — Disagreement: embedded data, visible text, and library values are all kept. The citation shows each; no value is chosen silently.
 - **BR-1505** — Duplicates: possible duplicate sources become intake items. Nothing merges.
-- **BR-1506** — Partial data stays absent. Imported sources are candidates, carry no verification, and are reported as unchecked while they have no stored copy.
+- **BR-1506** — Partial data stays absent. Imported sources are candidates, carry no verification, and are reported as unchecked while they have no source file.
 
 **Binding profile** (the profile name and version are written in the intake report)
 
@@ -136,7 +136,7 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1514** — Worklist: open findings on citations, quotations, and listed entries from a current check, plus intake items without an applicable choice. It is recomputed on each call and is never required before other work.
 - **BR-1515** — One choice, one write: the effect on records and manuscript is staged, rechecked on the staged graph, and committed together with its `round_choice` and recheck. An interrupted choice is completed or rolled back at the next command.
 - **BR-1516** — Actions: `remove` takes the occurrence out of the text and retires its record. `repoint` binds it to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place, recording both (assumption on the line between the last two). `bind` settles an intake item by binding it to one of its candidates; `close` settles one that needs no citation and changes no finding (CONTRACT-002 B).
-- **BR-1517** — The command takes the author's action and target. It records no annotation, edits no result, and admits no stored copy.
+- **BR-1517** — The command takes the author's action and target. It records no annotation, edits no result, and captures no source.
 - **BR-1518** — Removal visibility: a claim left without a citation is reported by `takeover.removal` on every later check and build until it is cited again, rewritten, retired, or dismissed.
 - **BR-1519** — Reruns: identical bytes write nothing unless the author passes `--again` (CONTRACT-002 B). A changed original becomes an `original_changed` item and is not applied. No rerun overwrites a choice or an edit in the Stemma copy; a rerun with `--again` follows the same rule (assumption).
 - **BR-1520** — Reference list: every entry of a reference list or bibliography section found in the manuscript is bound by the BR-1507 and BR-1508 rules or becomes a provisional source with an intake item, and is added to `bibliography_include` (CONTRACT-003 F). The list is not copied into the chapter files. The report states the count or that no list was found; how a list is detected is a rule to test on real files.
@@ -172,7 +172,7 @@ These starting caps meet CONTRACT-003 G. They are design assumptions to test aga
 - **Owned by TDs**: US-101.
 
 ### Component: Graph builder and import coordinator (`packages/intake` using `core` ports) — M1
-- **Purpose**: Create records, intake items, the report, and store originals.
+- **Purpose**: Create records, intake items, the report, and record the originals' digests.
 - **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519.
 - **Requirements Addressed**: INT-02, INT-03, INT-05, GRF-01 to GRF-03, GRF-07, GRF-08.
 - **Interfaces**: `takeover` and `import` (CONTRACT-002 B); outputs per CONTRACT-003 F.
@@ -206,7 +206,7 @@ graph TD
     Coord --> Codecs["library codecs, SD-003"]
     Coord --> Resolve["reference resolver"]
     Coord --> Writer["manuscript writer"]
-    Coord --> Stores["records and content store"]
+    Coord --> Stores["records and manuscript copy"]
     CLI --> Review["review service, SD-005"]
     CLI --> Rounds["rounds"]
     Rounds --> Writer
@@ -236,7 +236,7 @@ graph TD
 | GRF-01 to GRF-03 | Graph builder | Origins on every record | Fixture inventory against created records |
 | GRF-04, GRF-05 | Reference resolver | BR-1507 to BR-1511 | Seeded footnote set with zero wrong bindings; two runs bind identically |
 | GRF-06 | Graph builder | BR-1506 | Partial reference keeps absent fields |
-| GRF-07 | SD-007 `source.held` | Candidate sources | Recovered reference is reported unchecked until a copy is stored |
+| GRF-07 | SD-007 `source.held` | Candidate sources | Recovered reference is reported unchecked until it has a source file |
 | GRF-08, GRF-09 | SD-005 review service | BR-1512 | Claims in effect at once; batch review with one edit and one retirement |
 | GRF-10 | Graph builder | BR-1520 | Synthetic reference list with an uncited and an unbindable entry |
 | RND-01 | Rounds | BR-1514 | Worklist equals seeded failures and items |

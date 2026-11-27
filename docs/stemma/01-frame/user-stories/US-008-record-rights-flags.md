@@ -21,22 +21,22 @@ ddx:
 
 **As a** Tomasz, the scholar outside the humanities,
 **I want** to mark which sources carry rights, unpublished-data, or community-permission limits
-**So that** Stemma and I can see each source's limits and keep protected material out of a reviewer package.
+**So that** each source's limits are recorded beside it where I and my collaborators can see them.
 
 ## Context
 
-Tomasz works with fieldwork and datasets that carry limits. The rights fields decide what a reviewer package may hold. They do not limit what is sent to a hosted model: any source in a project may be sent.
+Tomasz works with fieldwork and datasets that carry limits. The rights fields are optional metadata. They gate nothing: not checks, outputs, or what is sent to a hosted model.
 
 ## Walkthrough
 
-1. Tomasz admits an unpublished interview summary.
-2. Stemma asks about rights and permissions.
+1. Tomasz captures an unpublished interview summary.
+2. Stemma offers to record rights and permissions.
 3. Tomasz sets the unpublished-data and community-permission flags.
 4. Stemma stores the flags and shows them with the source.
 
 ## Acceptance Criteria
 
-- [ ] **US-008-AC1** — Given a source record, when the author sets a rights field, an unpublished-data flag, or a community-permission flag, then the record holds it and checks can read it.
+- [ ] **US-008-AC1** — Given a source record, when the author sets a rights field, an unpublished-data flag, or a community-permission flag, then the record holds it and shows it with the source.
 - [ ] **US-008-AC2** — Given an admission or takeover where rights were not stated, when the source is recorded, then Stemma offers to record them, records the source without them, and shows unanswered rights as unstated rather than cleared.
 - [ ] **US-008-AC3** — Given rights being recorded, when Stemma explains them, then it says that no flag keeps the source from a hosted model.
 

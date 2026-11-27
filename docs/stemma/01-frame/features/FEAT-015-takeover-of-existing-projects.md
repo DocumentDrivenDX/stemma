@@ -33,7 +33,7 @@ constructs and methodology (FR-82).
 
 An author gives Stemma a half-referenced Word manuscript and their libraries.
 The originals stay as they were. The author sees what was found, what was not
-read, and what is uncertain, all unverified. As they add stored copies, checks
+read, and what is uncertain, all unverified. As they add sources, checks
 run, and the author decides for each failing reference whether to remove,
 repoint, or replace it. They can stop at any point and resume later without
 losing a decision.
@@ -111,7 +111,7 @@ N/A — the user stories name the tasks.
   rule, not from a model's judgment.
 - GRF-06. A partial reference must keep missing data as missing; takeover must
   not fill it in unrecorded.
-- GRF-07. A recovered reference with no stored copy must be reported as
+- GRF-07. A recovered reference with no source file must be reported as
   unchecked (FR-9).
 - GRF-08. A claim takeover extracts must take effect at once, marked
   unreviewed (FR-23).
@@ -163,7 +163,7 @@ N/A — the user stories name the tasks.
   takeover reports 0 uncertain footnotes as resolved to a wrong source.
 - **Security**: A seeded hostile input causes 0 executed code, 0 writes outside
   the project, and 0 actions taken from instructions in its text.
-- **Offline**: Intake and rechecks that use stored data run with no network.
+- **Offline**: Intake and rechecks that use saved data run with no network.
 - **Performance** (assumption, pending the product owner): Intake of one
   synthetic chapter with 200 footnotes and a 1,000-entry library completes within
   60 seconds on the development machine.
@@ -210,7 +210,7 @@ N/A — the user stories name the tasks.
 - Excerpts sent to a hosted model during takeover follow FR-61 (FEAT-002).
   Rights can be recorded at takeover, because they decide what a reviewer
   package may hold; none are required, and they do not limit model use.
-- A missing stored copy cannot be dismissed (FR-32), so a reference without one
+- A missing source file cannot be dismissed (FR-32), so a reference without one
   stays open until a copy is added or the reference is removed or replaced.
 - Assumption (PRD): FR-82 arrives in M2 with the construct register.
 - **Risk**: No file saved by Word, Zotero, EndNote, or another reference manager
@@ -235,7 +235,7 @@ N/A — the user stories name the tasks.
 ## Out of Scope
 
 - PDF-only or LaTeX manuscript intake.
-- Acquiring and extracting stored copies (FEAT-002).
+- Capturing and converting sources (FEAT-002).
 - Check definitions, support checks, and annotations (FEAT-007).
 - Legacy library export (FEAT-003).
 - Rewriting the manuscript's prose without the author's choice.

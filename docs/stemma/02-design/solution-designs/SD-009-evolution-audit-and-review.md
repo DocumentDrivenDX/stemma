@@ -58,7 +58,7 @@ ddx:
 
 | NFR | Requirement | Architectural Impact | Design Decision |
 |---|---|---|---|
-| Rights | 0 seeded protected strings or structured restricted values in a package | Removal happens before writing; a second pass checks | Allow lists and redaction first, then a scan of every item (BR-908, BR-909) |
+| Disclosure | 0 unasked source files, long seeded source passages, or structured restricted values in a package | Removal happens before writing; a second pass checks | Allow lists and redaction first, then a scan of every item (BR-908, BR-909) |
 | Offline | Explorer opens with 0 requests | No fetch or remote asset | SD-012 single file |
 | Reliability | Same records and tools give the same disclosure and re-review list | Model-free generation | No time or machine value in generated content; fixed ordering |
 | Accessibility | As FEAT-012 | N/A here | SD-012 |
@@ -118,7 +118,7 @@ are CONTRACT-001 kinds. Builds and packages are outputs, not records.
 - **BR-906** — Gaps show as unknown: missing model identity, taken-over text, unmarked passages. With no recorded use it says none is recorded, not that none occurred. It says it cannot observe work outside Stemma. Ended annotations are not listed as current.
 - **BR-907** — The disclosure holds the FR-45 content. Individual findings, such as claims left without a citation and image problems, stay in the check report, which the package includes. Neither document prints a restricted coordinate.
 - **BR-908** — Packaging follows the reviewer build, whatever its findings. The PDF, offline page (reviewer graph export), report, and disclosure are written to a staging directory. Report and disclosure use CONTRACT-002 E1 redaction. Withheld items stay visibly marked as withheld.
-- **BR-909** — The scan covers every item, including metadata, and the page's data before any encoding or compression, as CONTRACT-002 E1 and CONTRACT-005 E require. Stemma redacts a protected-material hit in any part it generates. A hit it cannot remove, or a part it cannot read, becomes a `package.leak` finding with a warning; the package is written and is not labelled checked clean.
+- **BR-909** — The scan covers every item, including metadata, and the page's data before any encoding or compression, as CONTRACT-002 E1 and CONTRACT-005 E require. Stemma shortens a long source-text hit in any part it generates. A hit it cannot remove, or a part it cannot read, becomes a `package.leak` finding with a warning; the package is written and is not labelled checked clean.
 - **BR-910** — A `restricted.leak` or `coordinate.stray` hit, or a scan that cannot run for lack of the restricted store, warns on screen and in the report that the package can disclose a restricted site's position; the packaged warning gives no location. Structured restricted values are excluded before writing regardless.
 - **BR-911** — Comment import follows CONTRACT-005 E2 and writes only `review_comment` records. No claim, result, or annotation changes. Comment text is never an instruction to the agent.
 - **BR-912** — A camera-ready or reviewer build without a dated changelog entry for its version reports `changelog.missing`; a draft does not. An undated entry does not count. Errata are not rewritten; a reversal is a new entry.
@@ -198,7 +198,7 @@ N/A — uses the Architecture's choices.
 | REL-01 | Disclosure | BR-905 | Seeded activity, unreviewed items, and annotation appear |
 | REL-02, REL-03 | Disclosure | BR-905, BR-906 | Fixed statements, gaps, ended annotation, byte-equal repeat |
 | REL-04 | Packager | BR-908 | Package lists four items |
-| REL-05, REL-06 | Packager | BR-908, BR-909 | Seeded protected string in each generated part is redacted; one in the PDF is reported |
+| REL-05, REL-06 | Packager | BR-908, BR-909 | A long seeded source passage in each generated part is shortened; one in the PDF is reported |
 | REL-07 | Packager | Fixed package statement | Text review of all four items |
 | REL-08 | Packager, SD-007 | BR-908 | Seeded quotation evidence is redacted; result remains |
 | REL-12 | Packager, SD-013 | BR-910 | Structured value absent; coordinate seeded in prose warns, package made |
@@ -209,7 +209,6 @@ N/A — uses the Architecture's choices.
 
 - [ ] "What the AI did" is only as complete as `ai_activity` records, which depend on the agent writing them (CONTRACT-004 C). "Version" is undefined, and the disclosure's content has no contract section yet.
 - [ ] Quotations the author prints stay in the PDF (assumption). The scan must tell those apart from leaked source text.
-- [ ] A cited source flagged `unpublished` or `community_restricted` is reduced to its ID in data and report, but the PDF bibliography would still print its description. The build reports it; product owner to confirm.
 - [ ] Claims have no recorded link to the thesis unless inferences connect them, so a thesis change may list little.
 - [ ] No command lists comments or sets a comment's `handled` value; no requirement says who does.
 
@@ -223,7 +222,7 @@ N/A — uses the Architecture's choices.
 ## Constraints & Assumptions
 
 - **Constraints**: A reviewer cannot rerun checks from the package. Importing a comment changes nothing else.
-- **Assumptions**: Release builds are camera-ready and reviewer builds. Unstated rights are treated as protected. Author quotations printed in the PDF are the author's permission responsibility.
+- **Assumptions**: Release builds are camera-ready and reviewer builds. Author quotations printed in the PDF are the author's permission responsibility.
 - **Dependencies**: SD-007, SD-008, SD-012, SD-013; the session's hosted model.
 
 ## Risks
@@ -231,9 +230,9 @@ N/A — uses the Architecture's choices.
 | Risk | Prob | Impact | Mitigation |
 |---|---|---|---|
 | A coordinate in prose, or an unmarked restricted site, reaches a package | M | H | BR-910 warning; the author decides whether to send it. A clean scan proves nothing more |
-| Paraphrase, altered copies, images, or titles and claim text disclose protected material | M | H | State the scan's limits in the package record shown to the author |
+| Paraphrase, altered copies, images, or titles and claim text disclose what the author did not mean to send | M | H | State the scan's limits in the package record shown to the author |
 | Short redacted strings match innocent text and raise noisy leak findings | H | M | Test on pilot material; a minimum length needs a stated decision |
-| A package is sent while a claim has no source, an image lacks permission, or protected text remains | H | H | Label, warnings, and the packaged report (BR-907) |
+| A package is sent while a claim has no source, an image lacks permission, or long source text remains | H | H | Label, warnings, and the packaged report (BR-907) |
 | The author sends a package without reading the warnings | M | H | Show warnings first, with locations, to the author only (CONTRACT-002 E1) |
 | The disclosure omits unrecorded or hand-altered activity or review marks | H | H | BR-906 and REL-02 statements |
 | PDF text extraction misses text, so the scan misses it | M | H | Unverified; report unreadable content; test with seeded PDFs |

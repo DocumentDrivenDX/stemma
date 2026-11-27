@@ -29,7 +29,7 @@ Construct drift and misplaced credit are recorded error types. Constructs stated
 
 ## Walkthrough
 
-1. Idris registers a concept borrowed from a stored source.
+1. Idris registers a concept borrowed from a captured source.
 2. Idris gives its definition, source, and the chapters that use it.
 3. Stemma checks the register.
 4. The entry passes and appears alongside constructs stated at setup.

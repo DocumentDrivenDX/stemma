@@ -12,8 +12,8 @@ ddx:
 ## Mission Statement
 
 Stemma is a plugin that helps scholars research, write, and typeset books with
-AI, checking citations with scripts, explaining what it finds, and tracing claims
-to stored sources.
+AI, keeping a checkable chain from each original source to each citation and
+supported claim, and explaining what its checks find.
 
 Stemma is first and foremost a Claude plugin. The author asks Claude in plain
 words; the skill, the command line, and later the graph engine, the explorer,
@@ -21,12 +21,27 @@ and the website exist to support the plugin. The one thing a person ever
 installs is the plugin. Whatever it needs, it and Claude obtain and set up
 themselves.
 
+## What Stemma Does
+
+Stemma keeps an unbroken chain from original source to citation to supported
+thesis. Each upstream source is captured with its hashes, converted to Markdown
+source files in the author's repository, cited by passage address, linked to
+claims, and carried into the sentences and footnotes of the output. Every link is
+deterministic and checkable from the repository. The only non-deterministic step
+is writing the thesis support and discussion, and Stemma's goal is that it is
+built from verified sources and written so that a person can easily verify them,
+with detailed footnotes that quote verbatim.
+
+Claude drives this for the author as one pipeline: capture the upstream sources,
+convert and reverify them, identify research questions and capture the relevant
+references from the source files, and assemble the research outputs.
+
 ## Positioning
 
 For academic researchers who want AI to speed up research and composition but
 cannot accept fabricated or misattributed sources, Stemma is a book research and
 publishing workspace that finds citation problems, explains them honestly, and
-shows what was checked against which stored source. Unlike general chat
+shows what was checked against which source. Unlike general chat
 assistants, it does not ask the author to trust the model: the model proposes,
 scripts check what they can, and every build says what is still open. Unlike
 gatekeeping tools, it never stops the author from writing or building. Unlike
@@ -38,9 +53,10 @@ and history with the manuscript.
 
 An author hands a chapter to an AI assistant and gets back faster research and
 fluent prose in their own voice. Every citation either resolves to a record in
-the project and a stored copy of the source or is shown as unchecked. A report
+the project and the source's text in the repository or is shown as unchecked.
+Every quotation and footnote is copied from that text by script. A report
 lists, in plain language, which quotations and page locators disagree with the
-stored copy, which could not be checked, which claims lack a recorded support
+source text, which could not be checked, which claims lack a recorded support
 judgment, and what no one has reviewed yet, each with its evidence and a
 suggested next step. The author can follow any sentence back to its evidence,
 see how claims, objections, constructs, and places connect, and tell a reviewer
@@ -57,9 +73,10 @@ its report, and no output with open findings is called checked clean.
 
 A scholar with a half-referenced manuscript in Word opens it with Stemma.
 Stemma reads the manuscript and reference libraries without changing them and
-lists what it found, marked unreviewed. As the scholar adds stored copies, the
-assistant matches references and runs the checks. A page number falls outside
-an article's range: the assistant shows the note, the stored text, why it
+lists what it found, marked unreviewed. As the scholar adds sources, the
+assistant captures them, matches references, and runs the checks. A page number
+falls outside an article's range: the assistant shows the note, the source text,
+why it
 matters, and the options, and the scholar repoints it when ready. Fixes go into a
 Stemma copy; the original files stay unchanged. Another quotation cannot be
 found, and the scholar removes the reference and rewrites the sentence. They
@@ -93,7 +110,7 @@ reviewer can attach comments to claims and send back a file the scholar imports.
 |-------------------|------------------|
 | Scripted checks while the author works, rerun at every build | Citation failures surface early, with evidence and a suggested fix, and every build says whether any remain |
 | Takeover of existing manuscripts | Authors adopt Stemma without starting over |
-| Closed corpus with provenance | A cited claim traces to a stored source the author admitted, or is shown as unchecked |
+| The whole research captured in the repository | A cited claim traces to a passage of a source's text and to the original it came from, or is shown as unchecked, and anyone with a clone can check it |
 | An evidence graph with argument and geographic views | The author sees how claims, evidence, constructs, and places connect |
 | Records in plain files, with no external reference manager | The author's work stays readable, comparable, and theirs |
 | Voice and style profiles amended from the author's writing | Drafts sound closer to the author without changing the evidence |
@@ -110,7 +127,7 @@ gate.
 | Findings an author can understand and act on | Every finding in a pilot report has evidence, a reason it matters, and a suggested action; pilot authors report no unexplained findings (hypothesis) |
 | Author time spent on manual citation checking | A large reduction against the author's prior method (hypothesis; to be measured with pilot authors) |
 | Takeover | A pilot author resolves the references of an existing chapter (hypothesis) |
-| Book build | One command produces the camera-ready PDF from the project files and its source store (hypothesis until a pilot builds a chapter) |
+| Book build | One command produces the camera-ready PDF from the project files (hypothesis until a pilot builds a chapter) |
 | Adoption across personas | Pilots complete a book chapter in each writing persona in the PRD (hypothesis) |
 
 ## Why Now

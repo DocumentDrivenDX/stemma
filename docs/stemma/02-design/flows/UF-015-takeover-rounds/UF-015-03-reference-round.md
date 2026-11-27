@@ -40,7 +40,7 @@ ddx:
 [Depends]      Claims and notes that will be rechecked
 [Proposal]     Advice (not a finding): <optional suggestion and reason>
 [Choices]      Remove / repoint / replace / bind <candidate> / dismiss
-               / add stored copy / skip / check / build / review / pause
+               / add source / skip / check / build / review / pause
 ```
 
 ### Turn: after a choice
@@ -66,7 +66,7 @@ ddx:
 | Choices: replace | control | Author's chosen source | all | UF-015 Replace reference |
 | Choices: bind | control | For an unresolved footnote; no candidate is guessed | all | UF-015 Bind footnote |
 | Choices: dismiss | control | Closes an intake item only | all | UF-015 Dismiss intake item |
-| Choices: add copy | control | Asks rights, which govern what a reviewer package may hold and do not limit model use | all | UF-015 Add a stored copy |
+| Choices: add copy | control | Offers to record rights, which are optional and gate nothing | all | UF-015 Add the source |
 | Choices: skip | control | No record written | all | UF-015 Skip item |
 | Choices: check | control | Leaves to UF-007 | all | UF-015 Check the project |
 | Choices: build | control | Pilot PDF | all | UF-015 Request the pilot PDF |
@@ -130,7 +130,7 @@ stateDiagram-v2
 | NEXT | ideal | skip | loading | Nothing saved |
 | SAVED | applying | write and recheck ran | success | round_choice saved |
 | NOT_SAVED | applying | stale or failed | error | Reported; resume shows actual state |
-| FETCH_FAILED | applying | URL unreachable | offline | No capture added |
+| FETCH_FAILED | applying | URL unreachable | offline | No source added |
 | DENIED | applying | command cannot run | permission-denied | Nothing changed |
 | NEXT | success | author continues | loading | Next item |
 | NEXT | partial | skip | loading | Next item |

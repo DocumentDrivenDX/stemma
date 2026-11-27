@@ -87,7 +87,7 @@ the quote or in the sentence that introduces it.
 **Claim anchor.** `[sentence or passage text]{.claim ids="clm-… clm-…"}` says
 this text asserts those claims. It MUST enclose the citation clusters that
 support them, MUST stay within one block, and MUST NOT overlap another claim
-span; nesting a quotation span inside is allowed. This span is the only stored
+span; nesting a quotation span inside is allowed. This span is the only saved
 link from manuscript text to claims.
 
 **Needs a source.** `[text]{.needs-source}` records the FR-25 mark. It passes
@@ -97,6 +97,19 @@ item with a bound key and a locator.
 **Not a quotation.** `[words]{.not-quote}` excludes quoted words, such as a term
 under discussion, from quotation reading. The report lists the count and
 locations.
+
+### D0. The output reads as scholarship
+
+The manuscript is the work itself: ordinary scholarly prose that states a thesis
+and argues it. Its text and notes MUST NOT carry process or tool commentary:
+nothing about Stemma, records, checks, what cites what, or verification status,
+and no narration of "the source". Evidence appears through normal scholarly
+citation, quotation, and footnotes: full citation, locator, and verbatim
+quotation. Passage addresses, digests, review state, and reports live in the
+records and in separate reports, never in the body or footnotes. Footnote
+quotations and locators are generated from passage records by script (FR-91),
+never typed. The argument is assembled from a thesis, the passages that bear on
+it, contrary evidence included, and a test of whether they support it.
 
 ### D. What checks read
 
@@ -129,6 +142,7 @@ equal ones in that sentence. Edits elsewhere do not change it.
 |---|---|
 | `cite.key`, `locator.extent`, `source.held` | Citation items |
 | `bib.uncited` | All items, against `bibliography_include` |
+| `quote.page` | Quotations with an attributed item and its locator |
 | `quote.present`, `quote.self` | Quotations and their attributed item |
 | `draft.marked` | `.needs-source` spans |
 | `number.present`, `construct.credit` | Sentences with citation items |
@@ -158,7 +172,7 @@ updated. The record's current source is the one the manuscript key resolves to.
 | Endnotes | `[^en-label]` | M2 |
 | Front and back matter | `chapter.matter` | M2 |
 | Alternative interpretations section (FR-26) | `::: alternatives {#alt-id}` … `:::`, holding ordinary blocks and markers | P1 |
-| Figure | `::: figure {#fig-id blob="<sha256>" media="image/svg+xml" alt="…" width="80%"}`, caption, `:::` | M2 |
+| Figure | `::: figure {#fig-id sha256="<sha256>" media="image/svg+xml" alt="…" width="80%"}`, caption, `:::` | M2 |
 | Table with caption | `::: table {#tbl-id}`, a pipe table, caption, `:::` | M2 |
 | Cross-reference | `[](#id){.ref form="number"}` or `form="page"` | M2 |
 | Index entry | `[]{.index term="…" sub="…" sort="…" index="subjects"}` | M2 |

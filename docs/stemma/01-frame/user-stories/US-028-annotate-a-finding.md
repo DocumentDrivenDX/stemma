@@ -44,7 +44,7 @@ Annotations are optional and permit nothing, because nothing is blocked. The rec
 - [ ] **US-028-AC6** — Given current annotations, when reports and the disclosure list them, then all appear with the statement that they are not forgery-proof.
 - [ ] **US-028-AC7** — Given a finding with no sentence, such as an uncited entry, when the author annotates it, then the record is bound to that exact item and its current content.
 - [ ] **US-028-AC8** — Given such an annotation, when the item's content changes, then it ends and the finding is open again.
-- [ ] **US-028-AC9** — Given a missing stored copy, an unreadable record, or uncommitted changes, when the author asks to dismiss the finding, then an explanation may be saved and the finding stays open.
+- [ ] **US-028-AC9** — Given a missing source file, an unreadable record, or uncommitted changes, when the author asks to dismiss the finding, then an explanation may be saved and the finding stays open.
 
 ## Edge Cases
 
@@ -61,12 +61,12 @@ Inputs are synthetic.
 | Annotate | US-028-AC1 | Reason "checked against page image"; 2026-05-10 | Dismiss | All values recorded |
 | Author only | US-028-AC2 | Request to build | Assistant works | No annotation; build completes |
 | Sentence changed | US-028-AC3 | Change one word | Check | Annotation ended; finding open |
-| Source changed | US-028-AC4 | Stored file replaced | Check | Annotation ended |
+| Source changed | US-028-AC4 | Source file replaced | Check | Annotation ended |
 | Date no leniency | US-028-AC5 | New failure dated before an unrelated annotation | Check | New finding open |
 | Listing | US-028-AC6 | 2 current annotations | Report and disclose | Both listed with the limit |
 | Item bound | US-028-AC7 | Uncited entry | Dismiss with reason | Entry and its content recorded |
 | Item changed | US-028-AC8 | Edit that entry | Check | Ended; open |
-| Not dismissible | US-028-AC9 | Cited source with no stored copy | Dismiss | Not dismissed; reason stated |
+| Not dismissible | US-028-AC9 | Cited source with no source file | Dismiss | Not dismissed; reason stated |
 
 ## Dependencies
 

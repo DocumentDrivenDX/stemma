@@ -38,7 +38,7 @@ ddx:
 [Disagreements]  Embedded data against visible text or library; duplicates.
                  Each item: what it is, both values, why it matters, what to do
 [Support level]  For each input and producing tool: supported or untested
-[Next]           No stored copies yet: source.held reports each, as expected
+[Next]           No source files yet: source.held reports each, as expected
 [Choices]        Review items / start rounds / run again / stop, or carry on
 ```
 
@@ -50,7 +50,7 @@ ddx:
 | Counts | content | Report counts. "Bound" means a deterministic rule found one candidate, not that it is right | all | US-101-AC5 |
 | Not read | content | Nothing is dropped silently; long lists are paged with a total. Each kind says why it matters and what the author can do (FR-74) | all | US-099-AC4 |
 | Support level | content | An input with no real-file tests is called untested | all | US-099-AC3 |
-| Next | content | A recovered reference with no stored copy is reported as unchecked, and that finding cannot be dismissed. The turn says why (its quotations and pages cannot be checked) and how to close it (add a stored copy). Unreviewed counts do not change the label | all | US-101-AC7 |
+| Next | content | A recovered reference with no source file is reported as unchecked, and that finding cannot be dismissed. The turn says why (its quotations and pages cannot be checked) and how to close it (add the source). Unreviewed counts do not change the label | all | US-101-AC7 |
 | Choices: review | control | Opens the first review batch; optional | all | UF-015 Review items |
 | Choices: rounds | control | Opens the first open item | all | UF-015 Start rounds |
 | Choices: run again | control | Reruns without overwriting choices (assumption in CONTRACT-003) | all | UF-015 Run takeover again |

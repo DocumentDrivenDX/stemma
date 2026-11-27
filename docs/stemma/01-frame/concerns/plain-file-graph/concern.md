@@ -28,7 +28,7 @@ Owns how the evidence graph is stored. It does not own citation rules
 
 - Records: one canonical JSON file each, in git, with structure defined in UMF
   (the DocumentDrivenDX schema format).
-- Large source files: the project's corpus store, identified by content hash.
+- Source text: Markdown source files in git, one per page or section; originals stay outside, tied by content hash.
 - Indexes and graph databases: SQLite, derived and rebuildable.
 - Restricted values: a store outside the repository.
 

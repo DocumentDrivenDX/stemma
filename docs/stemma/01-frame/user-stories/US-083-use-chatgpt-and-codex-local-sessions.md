@@ -24,7 +24,7 @@ ddx:
 
 ## Context
 
-This is P1 and does not block the first version. Research read vendor documents only for desktop installation, and found no documented graphical way for a personal account to add a repository marketplace. A command-line plugin listing was observed on one macOS machine.
+This is P1 and does not block the first version. Research read vendor documents only for desktop installation, and found no documented graphical way for a personal account to add a marketplace from a repository. A command-line plugin listing was observed on one macOS machine.
 
 ## Walkthrough
 

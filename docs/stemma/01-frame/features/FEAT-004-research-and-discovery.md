@@ -42,7 +42,7 @@ does not, and what was not examined.
   authors. A search result looks like a verified source, and the author cannot
   later show how a work entered the book or what was never searched.
 - **Desired outcome**: A search result is never presented as a checked source
-  without a stored copy, a cited candidate is reported as unreviewed, and each
+  without a source file, a cited candidate is reported as unreviewed, and each
   admission is traceable to a query and a decision.
 
 ## Functional Areas
@@ -59,8 +59,8 @@ does not, and what was not examined.
 | Object | Meaning | In a citation |
 |--------|---------|---------|
 | Candidate | A work that a search returned. It may be wrong or may not exist | Reported as unreviewed |
-| Source | A work with a record and, when held, a stored copy, hash, and provenance (FEAT-002) | Checkable once it has a stored copy |
-| Bibliography record | The official description of a work (FEAT-003) | Checkable only with a stored copy |
+| Source | A work with a record and, when captured, source files tied to its original (FEAT-002) | Checkable once it has a source file |
+| Bibliography record | The official description of a work (FEAT-003) | Checkable only with a source file |
 | Search record | A query, its limits, scope, date, and results | No |
 | Admission decision | The author's dated admission or rejection of a candidate | No |
 
@@ -74,7 +74,7 @@ does not, and what was not examined.
   author sets, and must not search outside them.
 - **SRCH-02** (FR-16). Each result must be presented as a candidate. A cited
   candidate must be reported as unreviewed, and as unchecked while it has no
-  stored copy.
+  source file.
 - **SRCH-03** (FR-16). A candidate must show where it was found and which of its
   details come from that origin.
 
@@ -93,7 +93,7 @@ does not, and what was not examined.
 - **ADM-01** (FR-17). Only an author decision admits a candidate.
 - **ADM-02** (FR-17). Admission must record the author's decision, run source
   acquisition and the corpus checks owned by FEAT-002, and create or link the
-  FEAT-003 record. A missing stored copy or a failed check is reported with the
+  FEAT-003 record. A missing source file or a failed check is reported with the
   reason (FR-9); it never withholds admission, and admission requires no rights
   information.
 - **ADM-03** (FR-17). Admission must record the search query and the author's
@@ -132,7 +132,7 @@ does not, and what was not examined.
   source; no second source is created without an author decision.
 - **Likely duplicate that cannot be settled**: It goes to the author.
 - **Metadata found but no copy obtainable**: The candidate and decision are
-  kept; its citations are reported as unchecked (FR-9). A paper-only work needs a stored scan
+  kept; its citations are reported as unchecked (FR-9). A paper-only work needs a transcription
   with machine-readable text.
 
 - **Source with poor or no extracted text**: It is listed as not reliably
@@ -169,7 +169,7 @@ does not, and what was not examined.
 
 ## Out of Scope
 
-- Extraction, hashing, and change tracking of sources (FEAT-002).
+- Capture, conversion, and change tracking of sources (FEAT-002).
 - Notes and claims made from an admitted source (FEAT-005).
 - Judging whether a source is correct or well chosen.
 - Automatic admission, including bulk admission without an author decision.

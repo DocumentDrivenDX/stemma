@@ -30,6 +30,64 @@ humanities authors and also serves cautious authors, technologists, and
 researchers in other fields. Stemma is for material that may be sent to a
 language model.
 
+## What Stemma Does
+
+Stemma keeps an unbroken chain from each original source to a citation to a
+supported thesis, and lets a person verify every link:
+
+upstream record (address, retrieval time, hashes) → source files (digests,
+converter versions) → passage address and digests → citation record → claim →
+sentence in the output → footnote.
+
+Every link is deterministic and checkable from the repository. The only
+non-deterministic step is writing the thesis, its support, and the discussion.
+Stemma aims for that writing to be built from verified sources and set out so
+that a reader can easily check them, with detailed footnotes that quote the
+sources verbatim. Choosing which passages matter is judgment and is recorded as
+such. The quoted text, locator, citation, and footnote are mechanical: a script
+copies them from the records and source files. No model types or regenerates
+quotation text.
+
+## Core Pipeline
+
+Stemma's product is one pipeline that Claude drives for the author. Each stage
+works from what the one before it saved in the author's repository.
+
+1. **Capture** upstream sources: from a library or archive by the access route it
+   documents for automated use, or as files the author supplies, each with a
+   record of its address, retrieval time, content hashes, and identifiers. A
+   refused fetch is not worked around; the author supplies the file.
+2. **Convert and reverify**: each original becomes Markdown source files with
+   bibliographic metadata, and the checks that apply are set up and run:
+   structure, digests, page maps, comparison with the original when it is
+   present, and metadata against what the copy says and against saved catalogue
+   lookups.
+3. **Research**: identify the research questions and capture the relevant
+   references from the source files, each tied to a stable passage address.
+4. **Assemble** the research outputs, with the context for each output built from
+   fully supported references.
+
+The author asks in plain words; the stages run without the author setting up
+checks.
+
+## Governing Principle: Verification
+
+- Use a deterministic check wherever one is possible.
+- Where none is possible, make the step re-runnable and re-checkable: several
+  independent checks and comparisons, whose results are recorded and run again
+  when inputs or tool versions change.
+- A person can add a verification at any time. It is never a gate. Every review
+  is tracked: who, when, what it covered, against which original and content
+  digest, what it found, and any correction. It goes stale when the reviewed
+  content changes.
+- Prefer processes whose failures are recognizable transcription errors, such as
+  a PDF text layer or a recognition engine, over generative ones. A language
+  model does not produce or silently correct source text; it may flag a
+  suspected error for review.
+- The aim is to confine errors to ones that checks and reviews can find, and to
+  tie research to output by building each output's context from fully supported
+  references.
+
 ## Problem and Goals
 
 ### Problem
@@ -61,7 +119,7 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
 | Known error classes caught by the scripted checks | Every class in FR-29 detected on a seeded test set (hypothesis until measured on real files) | Regression suite of seeded errors |
 | Pilot completion | One existing chapter taken over and checked by a pilot author (hypothesis) | Pilot study |
 | Time on manual citation checking | Reduced against the author's own baseline (hypothesis) | Self-reported before and after |
-| Rebuild from the project files | A second machine with the project, the sources, and the same tool versions gets the same scripted check results (hypothesis) | Release test on each supported system |
+| Rebuild from the project files | A clone of the project with the same tool versions gets the same scripted check results (hypothesis) | Release test on each supported system |
 | Support-check accuracy (FR-52) | False-accept and false-reject rates published; no minimum is set until they are known | A labelled set with seeded errors and a pilot-author sample, run by hand because project automation makes no paid model calls (ADR-007) |
 
 ### Non-Goals
@@ -69,7 +127,7 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
 - Replacing the author's judgment. Interpretation, argument, and the decision to
   scrap a chapter stay with the author.
 - Guaranteeing that a cited source is correct or well chosen. The checks compare
-  a citation with a stored source and passage. A support record states a model's
+  a citation with a source file and passage. A support record states a model's
   judgment about whether the passage supports the claim.
 - Proving that no record was altered. An agent or person who can edit the
   project files can change review marks, annotations, and support verdicts. Scripted checks are
@@ -93,8 +151,11 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
 - Exporting the manuscript to Word, LaTeX, or HTML in the first version.
 - Promising right-to-left main text in the first version.
 - Acting as a general writing assistant for non-scholarly text.
-- Hosting or distributing copyrighted sources. The store is private to the
-  project.
+- Hosting or distributing sources. Source files live in the author's
+  repository, and who can read it is the author's choice.
+- Using a language model to produce or correct source text.
+- Making extraction from scans and images the core of the product. Text-native
+  sources come first; recognized text is supported, labelled, and checked.
 - Training or fine-tuning models.
 
 Deferred items are tracked in `docs/stemma/parking-lot.md`.
@@ -223,8 +284,7 @@ delays the pilot or the first Claude release.
 1. A graph engine compatible with arras, first for the reads its static browser
    needs (subsystem 11).
 2. Full function in ChatGPT and Codex local sessions.
-3. Further governance records, image records, and restoring large files in a
-   clean checkout.
+3. Further governance records and image records.
 
 ### Nice to Have (P2)
 
@@ -250,12 +310,20 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 ### Subsystem: 2. Source corpus
 
-- **FR-6** (P0, M1) — Adding a source to the corpus stores the file, a content hash, and provenance: where it came from, when, which version, and by whom admitted. The file goes into a private store addressed by content hash, apart from the repository; the repository holds the reference, and the author backs up the store.
-- **FR-7** (P0, M1) — Each source record carries rights and permission fields, including unpublished-data flags and community-permission flags. They inform the author and decide what a reviewer package may hold (FR-46); they do not limit what is sent to a hosted model.
-- **FR-8** (P0, M1) — Each stored source has extracted text mapped to its printed page labels, saved with the extraction tool and version. Extraction quality is recorded, including for scanned and non-Latin-script material.
-- **FR-9** (P0, M1) — A cited source with no stored copy that has machine-readable text cannot be checked: every report says so and shows the citation as unchecked, and such a finding cannot be dismissed. A source that exists only on paper becomes checkable through a stored scan with machine-readable text.
+- **FR-6** (P0, M1) — Capturing a source saves its whole text in the project as Markdown source files, in the format of CONTRACT-007, with the bibliographic identity the copy states (such as ISBN, DOI, library identifiers, and edition) and ties to the original: content hash and size of each original file, or a description of a paper or physical original and where it is held, and where and when it was acquired. An upstream record holds the address it came from, the retrieval time, hashes, and identifiers. Binaries and paper originals are not stored in the repository.
+- **FR-7** (P0, M1) — A source record may carry rights and permission fields, including unpublished-data and community-permission flags. They are optional metadata and gate nothing.
+- **FR-8** (P0, M1) — A paged source maps its text to printed page labels page by page, and a source with no pages is located by its structure, such as chapter and paragraph; no page number is invented. Each page or section records its extraction method, tool and version, and quality.
+- **FR-9** (P0, M1) — A cited source with no source file holding text cannot be checked: every report says so and shows the citation as unchecked, and such a finding cannot be dismissed. A source that exists only on paper or as page images becomes checkable through a transcription made by a recognition tool or a person.
 - **FR-10** (P0, M1) — Changing or removing a source flags every note, claim, and citation that depends on it.
-- **FR-61** (P0, M1) — A hosted model receives only the excerpts a task needs. Stemma does not gate individual sources: any source in a project may be sent.
+- **FR-84** (P0, M1) — Stemma converts text-native originals into source files: plain text, Project Gutenberg text, Markdown, HTML, EPUB, DOCX, and PDF with a text layer, from a library or supplied by the author. Conversion keeps the structure the original shows (headings, chapters, paragraphs, notes, quotations, tables, captions, figures, page markers) and a library's own metadata, keeps a library's boilerplate marked so that it never matches as source text, marks structure it cannot determine as undetermined, and gives the same files for the same original, options, and tool versions. Recognized text is labelled as such.
+- **FR-85** (P0, M1) — Checks, excerpts, builds, and the explorer read the source files, so a clone reproduces their results. Verifying a source file against its original, supplied by path and matched by hash, is optional.
+- **FR-86** (P0, M1) — Stemma runs the capture, conversion, and reverification of a project's sources from one command, and sets up and runs every check that applies to what the project holds. A report lists only checks that apply to the project's contents.
+- **FR-87** (P0, M1) — Scripted structure checks verify from the repository alone that each source file is complete and unchanged: parts in sequence with none missing against the original's page count, part digests, printed-label sequence anomalies, and paired note markers and notes. A quotation that spans a page break is matched across the pages, without running heads and notes between them, and a cited page or chapter is checked against where the quoted words are.
+- **FR-88** (P0, M1) — Each comparison of source text, such as a fresh conversion of the original or a second text of the same work, is a recorded run with each page's agreement and the differing readings. It is run again when the text or the tools change.
+- **FR-90** (P0, M1) — Whoever selects evidence gives a passage address or range; a command captures the passage and copies its exact text and its locator from the source file, leaving out running heads, folios, and boilerplate, keeping footnotes apart, and joining lines only by the approved quotation rules. A citation made from a passage takes its quotation and locator from it. Who selected it is recorded. A later change to the pages or sections it lies in, or a quotation or locator that differs from them, is reported.
+- **FR-91** (P0, M2) — A built output's footnotes are generated by script from the records: the full citation, the locator, the verbatim quotation, and the passage address.
+- **FR-89** (P0, M1) — A person can record a review of source text at any time: who, when, what it covered (page, passage, quotations, page number, or source details), against which original and content digest, the outcome, and any corrections. A model's flag is recorded as such and never counts as a person's review. A review goes stale when the reviewed content changes. Stemma reports review coverage; recognized text that no one reviewed is a coverage figure, not a finding.
+- **FR-61** (P0, M1) — What Stemma prepares for a hosted model holds only the excerpts a task needs. Stemma does not gate individual sources: any source in a project may be sent.
 
 ### Subsystem: 3. Citation store
 
@@ -270,11 +338,11 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-16** (P0, M2) — The assistant can search, within limits the author sets, and returns candidates marked as not yet decided by the author. A cited candidate is reported as unreviewed.
 - **FR-17** (P0, M2) — Adding a candidate runs source acquisition and the corpus checks and records the search query. Admission is the author's decision, recorded when they choose to admit or reject it. No check result withholds it, and it does not require rights fields to be filled.
 - **FR-18** (P1) — Searches and decisions are logged so that coverage can be reviewed, including by language, period, and region.
-- **FR-19** (P0, M2) — The assistant can be directed to search the stored corpus first and to report what the corpus does not contain.
+- **FR-19** (P0, M2) — The assistant can be directed to search the project's source files first and to report what the corpus does not contain.
 
 ### Subsystem: 5. Notes, claims, and constructs
 
-- **FR-20** (P0, M1) — A reading note anchors each extract or paraphrase to a source and a locator, and the extract matches the stored text.
+- **FR-20** (P0, M1) — A reading note anchors each extract or paraphrase to a source and a locator, and the extract matches the source text. A passage keeps a stable address and the digests of the pages or sections it lies in, so an output can be tied exactly to it.
 - **FR-21** (P0, M1) — A claim-ledger entry links a claim to one or more notes, with a confidence level and the reason the sources support it.
 - **FR-22** (P0, M2) — A construct register holds each concept the book uses, with its definition and the chapters that use it. A construct taken from a source names that source. The author's own construct is marked as the author's and requires a definition. Author-stated constructs from FR-60 are entries in the same register. Scripts check references to constructs. The agent advises on inconsistent use of a construct or of the methodology; that advice is not a finding.
 - **FR-23** (P0, M1) — Notes, claims, and constructs that the assistant proposes take effect at once, marked unreviewed. The author reviews or corrects them whenever they like, one at a time or in batches, and every report shows what is unreviewed. The author's own edits keep a reviewed item reviewed; a change made by the AI marks it unreviewed again. A review mark records what the author said and is not proof of who wrote it.
@@ -293,10 +361,10 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-29** (P0, M1) — Scripted checks detect each of these error classes, or report that they cannot check it:
   - citation key with no bibliography entry;
   - bibliography entry with no citation;
-  - quotation absent from the stored source text;
+  - quotation absent from the source text, or not on the page or chapter cited;
   - locator outside the cited work's printed page range or other recorded extent;
-  - author, title, year, or venue that disagrees with source metadata or a
-    resolver result;
+  - author, title, year, or venue that disagrees with what the copy says or with a
+    saved catalogue lookup;
   - identifier such as a DOI that does not resolve or resolves to a different
     work;
   - a quotation that duplicates the book's own argument;
@@ -306,7 +374,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 
   The construct-credit check arrives with the construct register (FR-22) in M2;
   the other classes are M1. A quotation or note extract passes only when it
-  matches the stored text apart from these harmless differences: white space and
+  matches the source text apart from these harmless differences: white space and
   line breaks; soft hyphens; Latin presentation ligatures; Unicode canonical
   equivalence; straight and curly quotation marks of the same level; and a word
   split by a hyphen at a line end, which is joined. The list is approved and
@@ -322,9 +390,11 @@ Each requirement carries its priority and, for P0, its delivery step.
   checked clean only when no finding is open. The label reflects checks only:
   unreviewed items do not count as open, and every report counts them
   separately. "Unverified" means only that something has not yet been checked;
-  it is not open by itself. When source details (author, title, year,
-  venue) cannot be verified automatically, the author may record which stored
-  title page or equivalent was checked and confirm the details; the result is
+  it is not open by itself. A report lists a check only when it applies to
+  what the project holds; a check that applies and cannot be run counts as
+  open. When source details (author, title, year, venue) cannot be verified
+  automatically, a person may record a review that names the title page or
+  equivalent checked and the details confirmed (FR-89); the result is
   then shown as confirmed by the author, not verified. A missing confirmation is
   reported, and a mismatch stays reported until fixed or dismissed.
 - **FR-31** (P0, M1) — Checks run inside the agent as the work changes, covering the
@@ -336,12 +406,13 @@ Each requirement carries its priority and, for P0, its delivery step.
   because nothing is blocked. It is a dated record bound to the exact sentence
   and source, or, for a finding with no sentence, to the exact item and its
   current content; it ends when what it is bound to changes. Reports and the
-  disclosure list it. A missing stored copy, an unreadable record, and
+  disclosure list it. A missing source file, an unreadable record, and
   uncommitted changes can be explained but not dismissed (assumption). The
   record states intent and is not forgery-proof.
-- **FR-33** (P0, M1) — Checks run offline against the stored corpus. Checks that need a
-  network resolver are separate, and their results are cached with the query and
-  date.
+- **FR-33** (P0, M1) — Checks run offline against the project's source files.
+  Catalogue and identifier lookups use the network only when run explicitly, and
+  their responses are saved in the repository with the query and date; the checks
+  that read them run offline.
 - **FR-34** (P0, M1) — Scripted checks are deterministic: the same inputs and tool
   versions give the same results, and a seeded-error test set verifies each
   check. A model judgment is never a scripted check result.
@@ -351,7 +422,7 @@ Each requirement carries its priority and, for P0, its delivery step.
   choice when the author makes one, without making the author choose before
   other work continues. It reports a scripted result as the script gave it. An
   unexplained, repetitive, or unactionable finding is a Stemma defect.
-- **FR-52** (P0, M1) — A claim-support check compares each claim with the stored passage
+- **FR-52** (P0, M1) — A claim-support check compares each claim with the source passage
   it cites and reports supported, partly supported, or unsupported, quoting the
   passage. It runs in a context separate from the one that drafted the claim, and
   it reports a claim that goes beyond, overstates, or reverses its source. Its
@@ -385,7 +456,6 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-56** (P0, M2) — Vector images stay vector in the output PDF, with fonts embedded or converted to outlines. A converted EPS image that cannot stay vector is reported.
 - **FR-57** (P0, M2) — The build produces an ordinary print PDF with trim size and bleed area, and a separate archival PDF to the PDF/A standard, the first special PDF standard, for black-and-white or RGB books. The PDF carries the alternative text of FR-35, and the build reports figures that lack it. If the pinned typesetting tool cannot produce the PDF/A, for example from some placed figures or without alternative text (unverified), that is a limit of the tool: the build says so and still produces its other outputs. No output is claimed to conform to PDF/A or to be accessible unless that has been verified. An accessible PDF standard is not promised. The build does not produce PDF/X.
 - **FR-58** (P1) — Each image has a record with its source, credit, rights, permission, caption, alternative text, and the figure identifier used in cross-references. A check reports an image that lacks credit or recorded permission.
-- **FR-59** (P1) — Large binary files, like source files (FR-6), are kept in a separate private store addressed by content hash. The repository holds the references, the author backs up the store, and a clean checkout with access to it can restore the files.
 
 ### Subsystem: 9. Evolution, audit, and review
 
@@ -394,7 +464,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-43** (P0, M2) — A chapter audit runs rival readings first and citation repair second, and marks each finding confirmed or suspected. Each rival reading is recorded as a claim related to the claim it answers (FR-80), in effect and marked unreviewed (FR-23).
 - **FR-44** (P1) — A fresh-eyes review runs in a separate context from the one that drafted the chapter.
 - **FR-45** (P0, M2) — The system generates an AI-use disclosure that states which models and rules were used, what the AI did, what remains unreviewed, how many findings are open, and which annotations explain or dismiss findings. It states that support verdicts were not rerun at build and that review marks and annotations are not forgery-proof. The disclosure is separate from the book's research methodology.
-- **FR-46** (P0, M3) — A reviewer package holds the PDF, an offline explorer file, the check report, and the AI-use disclosure, with restricted and copyrighted source material removed, including source text quoted as evidence in the check report; each result stays visible. Short matching excerpts of copyrighted sources are allowed; how short has not been set. Material from a source flagged unpublished or community-restricted is not covered by that allowance. Structured restricted coordinates are left out of every item, and protected text is redacted from what Stemma generates; both are how the package is built. Protected text that cannot be removed, such as in the PDF, and stray restricted coordinates, such as one typed in prose, are reported with a warning. The package is still produced, so it can disclose protected material or a restricted site's position. A reviewer cannot rerun the checks from the package alone.
+- **FR-46** (P0, M3) — A reviewer package holds the PDF, an offline explorer file, the check report, and the AI-use disclosure. It holds no source files unless the author asks to include them; source text quoted as evidence in the report is kept to short excerpts, and each result stays visible. How short has not been set. Rights fields change nothing in it. Structured restricted coordinates are left out of every item. Longer source text that cannot be removed from what is packaged, such as in the PDF, and stray restricted coordinates, such as one typed in prose, are reported with a warning. The package is still produced, so it can disclose a restricted site's position. Without the source files, a reviewer cannot rerun the checks.
 - **FR-79** (P0, M3) — In the reviewer package's offline explorer, a reviewer attaches comments to claims and saves them to a file that the author imports. Importing changes no claim, check result, or annotation.
 - **FR-47** (P1) — When the thesis, a construct, the methodology, or evidence changes, a check lists the chapters, claims, and registers that need re-review.
 
@@ -402,7 +472,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 - **FR-48** (P0, M1) — Stemma ships as one public skill with modes. The modes cover starting a project, takeover, research, notes, outlining, drafting, voice and style, verification, building, audit, and review.
 - **FR-49** (P0, M1) — The scripted checks and the build run from a command line without an AI. The command line is how the plugin and its tests use Stemma's functionality; it ships inside the plugin and is not installed or set up by hand. Every function of Stemma is available on the command line first, and a user interface supports the same functions for ease of use; no function exists only in an interface. A function arrives on the command line no later than in an interface.
-- **FR-50** (P0, M1) — Stemma is published as a plugin in the project's repository marketplace and installs from it in Claude desktop; an official directory listing comes later. Installing the plugin is the only installation step a person takes. The bundled command line is not committed to the Stemma repository; the marketplace entry installs a versioned release tree from a separate distribution repository. The first version promises full function only in the local Code tab of Claude desktop on macOS and Windows; it makes no desktop-app promise on Linux. Other sessions, including the Claude command-line tool, get no promise of local checks or builds. The command-line tool may serve as a test harness; its results do not verify the desktop app.
+- **FR-50** (P0, M1) — Stemma is published as `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository and installs from it with `claude plugin marketplace add DocumentDrivenDX/plugins` and `claude plugin install stemma@documentdrivendx`; Claude desktop installs it from the same marketplace, and an official directory listing comes later. Installing the plugin is the only installation step a person takes. The bundled command line is not committed to the Stemma repository; a release copies the built, versioned release tree into the marketplace repository. The first version promises full function only in the local Code tab of Claude desktop on macOS and Windows; it makes no desktop-app promise on Linux. Other sessions, including the Claude command-line tool, get no promise of local checks or builds. The command-line tool may serve as a test harness; its results do not verify the desktop app.
 - **FR-77** (P1) — The marketplace plugin installs in ChatGPT desktop and gives full function in ChatGPT and Codex sessions that run on the author's computer.
 - **FR-51** (P1) — Persona defaults control onboarding, explanation level, and number of checkpoints, and every default can be overridden. No default hides a finding or changes when an output is called checked clean.
 - **FR-75** (P0, M1) — Deterministic scripts and tools run natively on macOS, Linux, and Windows, including on Linux without a desktop app; no required feature needs the Windows Subsystem for Linux (WSL) or Docker. The plugin uses one pinned version of the Bun runtime. The plugin and Claude obtain it, and any other tool the product needs, themselves: a pinned download, verified against a digest, kept in the plugin's own data directory, with no change to the system or a shell profile, no step for the author, and the host's permission prompts left in force. Every tool is pinned and recorded.
@@ -410,7 +480,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 ### Subsystem: 11. Evidence graph and graph engine
 
-- **FR-62** (P0, M1) — References and supporting data form one graph: sources, passages, notes, claims, support records, constructs, methodology, places, chapters, searches, annotations, confirmations, admission decisions, takeover findings, the author's round choices, and imported reviewer comments. Each record is one plain JSON file whose structure is defined in UMF (the DocumentDrivenDX schema format). The files are the source of truth, and every index and graph database can be rebuilt from them.
+- **FR-62** (P0, M1) — References and supporting data form one graph: sources, source files, upstream records, saved lookups, text reviews, comparison runs, passages, notes, claims, support records, constructs, methodology, places, chapters, searches, annotations, confirmations, admission decisions, takeover findings, the author's round choices, and imported reviewer comments. Each record is one plain JSON file whose structure is defined in UMF (the DocumentDrivenDX schema format); a source file is Markdown whose front matter is such a record, with one file for each page or section (CONTRACT-007). The files are the source of truth, and every index and graph database can be rebuilt from them.
 - **FR-63** (P1) — A graph engine compatible with arras (the DocumentDrivenDX graph application), written in TypeScript on Bun and SQLite, serves the graph from a rebuildable database. Its first scope is the data reads that arras's static browser needs. Writes and wider server compatibility come later.
 
 ### Subsystem: 12. Explorer and typeset preview
@@ -445,11 +515,19 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-1 | Start a project | Thesis, audience, scope, style | The governing records exist and hold the inputs |
 | FR-60 | Skip constructs, then add one | A project with no constructs | Setup completes; construct checks run only after the construct is added |
 | FR-2 | Start a session | A project with standing rules | The rules are loaded and a report can cite a rule identifier |
-| FR-6 | Add a source | A PDF with its origin | File, hash, and provenance are stored |
-| FR-7 | Record rights | A source with a community-permission flag | The flag is stored, and the reviewer package honors it |
-| FR-8 | Extract a source with roman and arabic page labels | A stored PDF | Text maps to printed labels; tool version and quality are recorded |
-| FR-9, FR-39 | Cite a source with no stored copy | A record for a paper-only book with no scan | The build completes; the report shows the citation unchecked; the finding cannot be dismissed; the output is not checked clean |
-| FR-10 | Replace a stored source | A new file for a cited source | Dependent notes, claims, and citations are flagged |
+| FR-6 | Capture a source | A PDF with its address | Source files hold the whole text, hash and provenance are recorded, and no binary is in the repository |
+| FR-7 | Record rights | A source with a community-permission flag | The flag is stored and changes no check, excerpt, or output |
+| FR-8 | Convert a source with roman and arabic page labels | A PDF | Each page has its own file and label; method, tool version, and quality are recorded |
+| FR-84 | Convert text-native sources | Plain, Gutenberg-style, Markdown, HTML, EPUB, DOCX, and PDF files, twice each | Structure and metadata are kept, boilerplate never matches, no page number is invented, and both runs give the same files |
+| FR-85 | Check a clone | A clone with no originals | The same results as the first machine |
+| FR-86 | Reverify from one command | A project with upstream records and the originals | Every applicable check runs; no check that does not apply is listed |
+| FR-87 | Damage a source file | A deleted, reordered, and edited page; an unpaired note; a quotation across a page break | Each damage is reported with evidence; the quotation passes and its cited pages are checked |
+| FR-88 | Compare text again | A fresh conversion and a second text of one page that differs | Each run records per-page agreement and both readings; a changed page makes the run stale |
+| FR-89 | Review a page | A person reviews a page, which is then edited; a model flags another | The review shows who, when, scope, digest, and outcome, goes stale on the edit, and the flag is not counted as a person's review |
+| FR-90 | Capture and cite a passage | An address range across a page break with a running head and a footnote | The exact text and locator are returned without them; the citation copies both; editing a page or the quotation is reported |
+| FR-91 | Build footnotes | A cited passage | The footnote holds the citation, locator, verbatim quotation, and address, all generated |
+| FR-9, FR-39 | Cite a source with no source file | A record for a paper-only book with no transcription | The build completes; the report shows the citation unchecked; the finding cannot be dismissed; the output is not checked clean |
+| FR-10 | Replace a source file | A new conversion for a cited source | Dependent notes, claims, and citations are flagged |
 | FR-61 | Run a support check | A claim citing one page of a long source | Only the needed excerpt is prepared for the model |
 | FR-11, FR-62 | Build with no reference manager installed | A project with records | The bibliography is read from one JSON file per record |
 | FR-12 | Record varied sources | A book chapter, archive item, dataset, and web page | Each is stored with its type and fields |
@@ -459,7 +537,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-16 | Search outside the corpus | A bounded query | Results are candidates, reported as unreviewed if cited |
 | FR-17 | Admit a candidate | The author records an admission | Source, query, and decision are recorded and checked |
 | FR-19 | Search the corpus first | A question the corpus does not answer | The report states what the corpus does not contain |
-| FR-20 | Record a changed extract | An extract that differs from the stored text | The check fails |
+| FR-20 | Record a changed extract | An extract that differs from the source text | The check fails |
 | FR-21 | Add a claim | A claim with no note | The entry is reported incomplete |
 | FR-22 | Register a borrowed construct | A construct with no definition or source | The register check fails |
 | FR-23, FR-72 | Use takeover claims at once | A batch of extracted claims; the author later edits one and retires one | All are usable at once and reported unreviewed; review state follows the author's later actions |
@@ -468,12 +546,12 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-24 | Derive an outline with a methodology present | Thesis, ledger, methodology | Chapter specifications name them; drafting can use them at once, marked unreviewed |
 | FR-25 | Draft a marked assertion | A marked assertion with no citation | The check reports it |
 | FR-28 | Checkpoints | An unanswered checkpoint, then all checkpoints off | Work continues; the unanswered one is reported; none appears when off |
-| FR-29 | Real title, wrong author | An entry whose author differs from the stored source or resolver result | The check fails and shows both values |
+| FR-29 | Real title, wrong author | An entry whose author differs from the copy or the saved lookup | The check fails and shows both values |
 | FR-29 | Impossible page | Locator "p. 412" on an article printed at pages 31 to 60 | The check fails and names the range |
-| FR-29 | Invented quotation | A quotation absent from the extracted text | The check fails and reports the closest match |
+| FR-29 | Invented quotation | A quotation absent from the source text | The check fails and reports the closest match |
 | FR-29, FR-32 | Near match | A quotation differing by one word | It is reported with both texts until fixed or dismissed |
-| FR-29 | Line-end hyphen | A quoted word that the stored text splits with a hyphen at a line end | The two match |
-| FR-30 | Confirm unverifiable details | A stored scan with no extractable title metadata | It is open until the author confirms the page checked; a seeded wrong year still fails |
+| FR-29 | Line-end hyphen | A quoted word that the source text splits with a hyphen at a line end | The two match |
+| FR-30 | Confirm unverifiable details | A copy whose title page text cannot be compared | It is open until a person's review confirms the details; a seeded wrong year still fails |
 | FR-31 | Skip nothing at build | A record edited outside the agent so that a quotation no longer matches | The build reruns the check and reports it |
 | FR-32 | Change an annotated sentence | A dismissal, then an edit to its sentence | The annotation ends and the finding is open again |
 | FR-32 | Annotate an uncited entry, then edit it | An annotation bound to the entry | It ends when the entry changes |
@@ -503,11 +581,11 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-41 | Build without an entry | A camera-ready build with no changelog entry | It completes and the report shows the missing entry |
 | FR-43 | Audit a chapter | A chapter with one weak citation | Rival readings, then repairs, each finding marked; rival readings become unreviewed claims |
 | FR-45 | Generate disclosure | A project with one dismissal and unreviewed items | The annotation, the unreviewed counts, and both stated limits appear |
-| FR-46 | Package for review | A project with a restricted source, a restricted coordinate typed in prose, and a failing quotation | The package holds the four items, protected text redacted from generated parts, and a coordinate warning |
+| FR-46 | Package for review | A project with source files, a restricted coordinate typed in prose, and a failing quotation | The package holds the four items, no source file, short evidence excerpts, and a coordinate warning |
 | FR-79 | Comment and import | A reviewer comments on a claim and saves the file | The author imports it; the comment is tied to the claim |
 | FR-48 | Use a mode | A takeover request | One skill routes it to takeover |
 | FR-49 | Run without an AI; command line first | A command-line check and build through the plugin's launcher; one interface function and its command | Same scripted results as in the agent; the command does what the interface does, with the same result |
-| FR-50 | Install in Claude desktop | A clean profile and the repository marketplace | Installing the plugin delivers the command line, and it loads in a local Code tab session |
+| FR-50 | Install from the marketplace | A clean profile and the DocumentDrivenDX marketplace | Installing the plugin delivers the command line, and it loads in a local Code tab session |
 | FR-75 | Run the tools on each system | The same fixtures on macOS, Linux, and Windows, from a profile with no Bun | The plugin sets up its pinned Bun itself; same results natively |
 | FR-78 | Tag a release | A release tag with one failing system | The report shows the failure and stops nothing automatically |
 | FR-64 | Explore a large project | A graph beyond the size of the current arras view | The records are searchable and the larger view renders |
@@ -535,11 +613,11 @@ Each requirement carries its priority and, for P0, its delivery step.
   citation formatting. Any other tool is allowed when its version is pinned and
   recorded (ADR-004, ADR-005).
 - **Data/Storage**: One JSON file per record in a git repository, with structure
-  defined in UMF; a manuscript working copy in marked-up Markdown (ADR-009); a
-  generated browser graph that is not committed; source files and other large
-  binaries in a separate private content-hash store that the author backs up;
-  rebuildable SQLite indexes (ADR-002, ADR-006). Restricted coordinates stay
-  outside the repository. A record-format migration runs only when the author
+  defined in UMF; every captured source as page-split or section-split Markdown
+  source files in the repository (ADR-010); a manuscript working copy in
+  marked-up Markdown (ADR-009); a generated browser graph that is not committed;
+  rebuildable SQLite indexes (ADR-002, ADR-006). No binary or paper original is
+  stored in the repository. Restricted coordinates stay outside the repository. A record-format migration runs only when the author
   asks, after listing the changes it will make.
 - **Family tools**: UMF for record definitions, arras (tests used 0.8.1) for the
   explorer, and HELIX for building Stemma. Truss (a graph storage engine), Weft
@@ -557,18 +635,21 @@ Each requirement carries its priority and, for P0, its delivery step.
 ### Constraints
 
 - **Technical**: Scripted checks are deterministic and run offline against the
-  corpus. No build step calls a model to decide a result.
+  source files. No build step calls a model to decide a result.
 - **Business**: Early users are individual scholars, so the system runs on a
   laptop without paid services beyond the AI assistant. The project's own test
   automation must not block progress or depend on paid runs.
-- **Legal/Compliance**: Stored sources are often copyrighted and some data is
-  restricted. The corpus is private to the project. Stemma is built for material
-  that may be sent to a language model.
+- **Legal/Compliance**: The repository captures, under fair use, the whole body
+  of research behind the output, so it holds full source texts, many under
+  copyright, and may hold restricted data. Anyone who can read the repository can
+  read its source files, so publishing the repository publishes them. Stemma is
+  built for material that may be sent to a language model.
 
 ### Assumptions
 
-- Authors can obtain a stored copy or a scan of every source they cite.
-- Text extraction or recognition is good enough on the project's sources to match
+- Authors can obtain a file, or hold the original, for every source they cite.
+- Most sources come as text-native files or PDFs with a text layer.
+- Converted or recognized text is good enough on the project's sources to match
   quotations.
 - FR priorities and delivery steps follow the stated first-version scope and
   delivery order. The product owner has not ranked individual requirements.
@@ -579,17 +660,17 @@ Each requirement carries its priority and, for P0, its delivery step.
   - FR-1's register timing and FR-2's M1 rules file for takeover.
   - The checks for FR-3, FR-4, FR-10, and FR-47 report like any other.
   - A could-not-check result counts as open (FR-30).
-  - A missing stored copy, an unreadable record, and uncommitted changes can be
-    explained but not dismissed (FR-32). "Missing stored copy" also covers a
-    copy that cannot be read or fails its hash.
+  - A missing source file, an unreadable record, and uncommitted changes can be
+    explained but not dismissed (FR-32). "Missing source file" also covers one
+    that cannot be read or fails its structure check.
   - The project can list a source for the built bibliography without citing it
     (FR-15).
   - A takeover claim is one that takeover extracted. "No source passage" means
     its evidence reaches none.
   - "Uncommitted changes" (FR-39) are any modified, staged, or untracked file in
     the project that git does not ignore. A project with no git commit has them.
-  - Until the length of a "short" excerpt is set, packaging keeps no stored
-    source text in the report or explorer data (FR-46).
+  - Until the length of a "short" excerpt is set, packaging keeps no source
+    text in the report or explorer data (FR-46).
   - An exact coordinate found inside a restricted place record is warned about
     like a stray one, and no output includes it.
   - A released version and a release build (FR-41) are camera-ready and reviewer
@@ -633,7 +714,7 @@ Windows, desktop apps, and files saved by real tools are untested.
 | The agent reads exact restricted coordinates and they reach its model or new text | Medium | High | Read only when a task needs them; never write them into tracked files or outputs; the scan only warns |
 | Joining a line-end hyphen lets a wrong quotation match, for example where the source's hyphen belongs to the word | Medium | Medium | Record how each quotation matched; test the approved list on pilot sources |
 | Image problems (low resolution, missing alternative text, credit, or permission) reach a finished book | Medium | High | Report them in every build; the author checks the report before publishing |
-| Claude desktop cannot install the release tree from the distribution repository, or its sandbox blocks the first-use download | Medium | High | Install and first run observed in the desktop app before any support claim |
+| Claude desktop cannot install the plugin from the marketplace, or its sandbox blocks the first-use download | Medium | High | Install and first run observed in the desktop app before any support claim |
 | Claude desktop on Linux is a beta limited to some distributions, so Linux authors may lack a desktop host (unverified) | Medium | Medium | Promise only the scripted tools on Linux; make no desktop-app promise there |
 | Checks and Typst output differ across systems | Medium | High | Run the seeded set on all three systems for each release tag |
 | A publisher bars AI-written text that Stemma helped draft | Medium | High | State that Stemma offers no mode that prevents agent writing; disclosure records AI use |
@@ -641,12 +722,17 @@ Windows, desktop apps, and files saved by real tools are untested.
 | Coordinates leak through prose or misclassified records into a draft, camera-ready book, or reviewer package; the scan only warns | Medium | High | Warn with the file and place, and state that a package or book can disclose a site; the author acts on the warning |
 | A restricted site nobody marked is treated as public, so maps, exports, and packages disclose its position | Medium | High | State the default where places are recorded; the author marks restricted sites |
 | Right-to-left quotations, or experimental right-to-left main text, lay out wrongly | Medium | Medium | Test pilot scripts with the footnote-marker case; promise only quotations in left-to-right books |
-| The author loses the private binary store, and stored copies cannot be restored | Medium | High | Tell the author to back it up; report missing files by hash, which are reported as unverifiable |
+| The author loses an original, so a source file can no longer be verified against it | Medium | Medium | The source file keeps the original's hash, description, and where it was obtained; checks of the text still run |
+| A repository with full source texts is published | Medium | High | Say once that anyone who can read the repository can read its source files |
+| A recognized text layer is wrong and a quotation matches it | High | High | Label recognized text; record comparisons and reviews; report review coverage; quote only after comparing with the page |
+| A conversion assigns wrong structure | Medium | Medium | Assign a role only by a stated rule, record its basis, and mark the rest undetermined |
+| A library refuses automated fetches | Medium | Low | Use only documented automated access; the author supplies the file |
 
 ## Open Questions
 
-- [ ] Which recognition engine produces text from scans on all three systems?
-  Blocks FR-8 and FR-9; design owner.
+- [ ] Should Stemma build in a recognition engine for image-only and paper
+  originals, and which one runs on all three systems? Until then their text is
+  supplied from a tool the author runs or typed; design owner.
 - [x] Which PDF text-extraction library do the checks use? Answered by the
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a

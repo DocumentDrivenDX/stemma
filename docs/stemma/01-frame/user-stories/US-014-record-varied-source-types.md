@@ -42,7 +42,7 @@ Priya's sources include material that changes or disappears. Each type needs its
 ## Edge Cases
 
 - **Type outside the list**: All entered information is kept and the type is reported as unrecognized.
-- **A web page changed after capture**: The stored copy, not the live page, is the cited copy.
+- **A web page changed after capture**: The captured source file, not the live page, is what is cited.
 
 ## Test Scenarios
 

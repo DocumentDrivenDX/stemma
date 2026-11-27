@@ -19,7 +19,7 @@ ddx:
 ## Story
 
 **As a** Margit, the AI-cautious humanist,
-**I want** to ask a question of my own stored corpus first
+**I want** to ask a question of my own captured sources first
 **So that** I learn what my sources hold and what they lack before anything outside is searched.
 
 ## Context
@@ -29,7 +29,7 @@ Margit's collection is the starting point of the book. A report that silently sk
 ## Walkthrough
 
 1. Margit asks a question and directs the assistant to search the corpus first.
-2. The assistant searches stored sources.
+2. The assistant searches the project's source files.
 3. It reports what it found with source and locator.
 4. It states what the corpus does not contain, which sources it searched, and which it could not search and why.
 5. Margit decides whether to allow an outside search.
@@ -43,7 +43,7 @@ Margit's collection is the starting point of the book. A report that silently sk
 ## Edge Cases
 
 - **Source with no extracted text**: It is listed as not searched, with the reason.
-- **Unreadable extraction**: The source is listed as not reliably searched.
+- **Damaged source file**: The source is listed as not reliably searched.
 
 ## Test Scenarios
 

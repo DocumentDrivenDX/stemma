@@ -48,7 +48,7 @@ A failing reference might have a wrong page, point to the wrong work, or rest on
 
 ## Edge Cases
 
-- **Replacement without a stored copy**: It is reported as unchecked.
+- **Replacement without a source file**: It is reported as unchecked.
 - **Repoint that still fails**: The new failure is shown.
 - **One source used by several claims**: Every dependent record is rechecked.
 
