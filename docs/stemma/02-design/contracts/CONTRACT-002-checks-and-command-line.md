@@ -114,7 +114,7 @@ absent (exit 4 if it cannot) and then runs
 | `support list` / `support prepare <claim id> --passage <passage id>` / `support record --input <file>` | List needed verdicts as claim and passage pairs; emit the input bundle for one pair; validate and save a verdict (H) | M1 |
 | `annotate --finding <key> --effect explain\|dismiss --reason <text>` / `annotate list` | Save an annotation (F), or list annotations and whether each applies | M1 |
 | `import <file> --kind <csl-json\|biblatex\|ris> [--again]` / `export --kind <…> --out <file> [--batch <import id>] [--policy report\|strict]` | CONTRACT-003; `--again` imports bytes already imported; `--batch` exports one import batch | M1 |
-| `takeover <docx\|pdf> [--library <file>…] [--again] [--separate]` | CONTRACT-003 intake of one Word file (F) or PDF manuscript (I), told apart by content; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit. A file that repeats text already taken over writes nothing and exits 5 with `repeated_chapter` unless `--separate` states that it is a different text. `pdf_unreadable` and `pdf_no_text` exit 3 | M1 |
+| `takeover <docx\|pdf> [--library <file>…] [--again] [--separate]` | CONTRACT-003 intake of one Word file (F) or PDF manuscript (I), told apart by content; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit. A changed file under an earlier file's name only saves an `original_changed` item, and a file that repeats text already taken over writes nothing and exits 5 with `repeated_chapter`; `--separate`, the statement that it is a different text, adds either (CONTRACT-003 I). `pdf_unreadable` and `pdf_no_text` exit 3 | M1 |
 | `index rebuild` / `index status` / `index dump` | Manage the derived index | M1 |
 | `research list` | List the Markdown files under `research/` by path (code-point order), each with the date its name starts with and its first level-one heading outside fenced code, both when present; a heading is cut at 200 characters, and one matching a coordinate form is not shown. Writes nothing and reports no finding; exit 0. JSON: `content_is` and `notes[]` (`path`, `date?`, `title?`, `problem?`: `cannot_read` or `title_withheld`) | M1 |
 | `research record --input <file>` / `research corpus <query>` / `research admit <id>` / `research reject <id>` / `research coverage` | Save a search and its candidates; search source files offline; record the author's decision, as `source admit` or `reject` does; coverage is P1 | M2 |
@@ -591,6 +591,12 @@ them, and separately in its notes stream. A quotation that spans a page break
 matches and is reported with every page it lies on. The quotation a passage
 yields is its exact text with only the line-end join, soft-hyphen removal, and
 runs of white space made one space.
+
+**Quotations from a PDF chapter (not built).** In a chapter taken over from a
+PDF, a quotation holding a hyphen that was kept at a line end is compared both
+with and without it. Readings that give different outcomes make the result
+`unverifiable` with `uncertain_hyphen` (CONTRACT-003 I, **Quotations in the
+copy**). The profile is unchanged.
 
 `quote-fold/0` as built. The ligatures are U+FB00 to U+FB06 as their own
 letters (U+FB05 is long s and t). Curly marks are U+2018, U+2019, U+201C, and

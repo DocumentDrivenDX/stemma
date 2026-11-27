@@ -65,9 +65,9 @@ tests passing on invented files and `./scripts/dev.sh check` passing.
 |---|---|---|
 | P1 | **Matcher marks.** Add `seams` and `hyphens` to a neutral paragraph and `unreadPages` and `unseparatedLists` to a neutral document; apply CONTRACT-003 I, "What the matcher does with the marks", in the list reader and matcher; add the reasons `uncertain_boundary`, `uncertain_hyphen`, `uncertain_layout`, `list_incomplete` | Hand-made neutral documents show each guard, with the split entry of US-117-AC3 not linked; every existing Word and matcher test passes unchanged; a property test shows that adding any mark to a document never adds a link |
 | P2 | **PDF page facts.** Add the `core` port and implement it in `extract` over `readPdf`: for a manuscript, each page's lines and places, its state (invisible drawing, painted images or shapes), annotations, form values, link addresses, attachment names, layers, and image counts, read in a child process with a time stop. Move the CONTRACT-007 I layout rules the reader reuses into `core`. Extend `tests/pdf.ts` with annotations, invisible text, an image, and an attachment | Tests cover each page state and reported item; `pdf_unreadable` and `input_limit` cases; every source-conversion test gives byte-identical output |
-| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-117-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14 at the reader and matcher level; the library's own piece count equals the account on every invented file |
+| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-117-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14, AC17, AC18 at the reader and matcher level; the library's own piece count equals the account on every invented file |
 | P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-117-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
-| P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the one-file-per-chapter check for both formats | US-117-AC1, AC10, AC11, AC13, AC14 through the command |
+| P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the file comparison of CONTRACT-003 I for both formats; the batch field for kept-hyphen words and, here or in step 5 if that comes later, the quotation rule of BR-1535 | US-117-AC1, AC10, AC11, AC13 to AC16 through the command |
 
 After P4, run the developer report script on PDF manuscripts the author supplies,
 privately; commit only counts and invented reproductions. Every producer stays
@@ -82,6 +82,8 @@ privately; commit only counts and invented reproductions. Every producer stays
 |---|---|---|---|
 | PDF-01 to PDF-09 (FR-95) | Rule-based layout reading over the pinned PDF library, marks the matcher honors, stated limits | PDF reader, Author-date matcher | P0 / M1 pilot |
 | INT-11 (FR-71, FR-95) | One file for each chapter | Import coordinator | P0 / M1 pilot |
+| INT-12 (FR-71, FR-95) | A changed original is reported, not applied or added | Import coordinator | P0 / M1 pilot |
+| PDF-10 (FR-95) | The batch keeps the words with a kept hyphen; quotation checks try both readings | Import coordinator, SD-007 engine | P0 / M1 pilot |
 | INT-01, INT-03, INT-04, INT-07, INT-08 (FR-71) | Bounded read-only Word reader; staged import | Word reader, Import coordinator | P0 / M1 pilot |
 | INT-02 (FR-71) | BibLaTeX, CSL-JSON, RIS intake | SD-003 codecs, Import coordinator | P0 / M1 pilot |
 | INT-05, INT-06 (FR-71) | Support levels and nothing dropped silently | Intake report | P0 / M1 pilot |
@@ -221,7 +223,7 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1516** — Actions: `remove` takes the occurrence out of the text and retires its record. `repoint` binds it to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place, recording both (assumption on the line between the last two). `bind` settles an intake item by binding it to one of its candidates; `close` settles one that needs no citation and changes no finding. `restore_text` returns to plain text an occurrence that was wrongly read as a citation (CONTRACT-002 B).
 - **BR-1517** — The command takes the author's action and target. It records no annotation, edits no result, and captures no source.
 - **BR-1518** — Removal visibility: a claim left without a citation is reported by `takeover.removal` on every later check and build until it is cited again, rewritten, retired, or dismissed.
-- **BR-1519** — Reruns: identical bytes write nothing unless the author passes `--again` (CONTRACT-002 B). A changed original becomes an `original_changed` item and is not applied. No rerun overwrites a choice or an edit in the Stemma copy; a rerun with `--again` follows the same rule (assumption).
+- **BR-1519** — Reruns: identical bytes write nothing unless the author passes `--again` (CONTRACT-002 B). A changed original, told apart as BR-1534 says, becomes an `original_changed` item and is not applied. No rerun overwrites a choice or an edit in the Stemma copy; a rerun with `--again` follows the same rule (assumption).
 - **BR-1520** — Reference list: every entry of a reference list or bibliography section found in the manuscript is bound by the BR-1507 and BR-1508 rules or becomes a provisional source with an intake item, and is added to `bibliography_include` (CONTRACT-003 F). The list is not copied into the chapter files. The report states the count or that no list was found; lists are detected by CONTRACT-003 H, a rule to test on real files.
 
 **PDF manuscripts** (the rules and numbers are CONTRACT-003 I)
@@ -233,7 +235,8 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1531** — Whole lists or nothing: entries are taken from a PDF list only when its layout separates every one of them. Otherwise the lines are examined as text and the list links nothing.
 - **BR-1532** — Unread pages: they are named, never recognized, and block links from any list they could affect.
 - **BR-1533** — Said every time: the limits that no rule can detect are in every PDF report, not only when something looks wrong.
-- **BR-1534** — One file for each chapter: the overlap check of CONTRACT-003 I applies to Word and PDF files in either order, before anything is staged.
+- **BR-1534** — Which file this is: the order of CONTRACT-003 I (same bytes, changed original, repeated text) applies to Word and PDF files in either order, before anything is staged. Only a changed original saves anything, its one item.
+- **BR-1535** — Quotation readings: a PDF chapter's quotations are checked with and without each uncertain hyphen, and a result stands only if the readings agree (BR-1530). It ships with whichever of step 5 or P5 comes later; no version takes over a PDF and reads its copy without it.
 
 BR numbers for this feature start at 1501 so that designs written in parallel cannot collide.
 
@@ -303,8 +306,8 @@ page data is designed.
 
 ### Component: Graph builder and import coordinator (`packages/intake` using `core` ports) — M1
 - **Purpose**: Create records, intake items, the report, and record the originals' digests.
-- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519, BR-1527, BR-1534; the intake report's groups.
-- **Requirements Addressed**: INT-02, INT-03, INT-05, INT-09, INT-10, INT-11, GRF-01 to GRF-03, GRF-07, GRF-08, RPT-01, RPT-03.
+- **Responsibilities**: BR-1501, BR-1512, BR-1513, BR-1519, BR-1527, BR-1534; the words BR-1535 reads; the intake report's groups.
+- **Requirements Addressed**: INT-02, INT-03, INT-05, INT-09, INT-10, INT-11, INT-12, GRF-01 to GRF-03, GRF-07, GRF-08, RPT-01, RPT-03.
 - **Interfaces**: `takeover` and `import` (CONTRACT-002 B); outputs per CONTRACT-003 F.
 
 ### Component: Manuscript writer (`packages/manuscript`) — M1
@@ -373,6 +376,8 @@ graph TD
 | INT-09 | Coordinator | BR-1519 | Second file after a choice; the choice stands |
 | INT-10 | Word reader | BR-1502 | Seeded comments all listed with text and position |
 | INT-11 | Coordinator | BR-1534 | Invented Word and PDF of one text, in both orders, and with `--separate` (US-117-AC13) |
+| INT-12 | Coordinator | BR-1519, BR-1534 | US-117-AC15 on invented Word and PDF files |
+| PDF-10 | Coordinator, check engine | BR-1530, BR-1535 | US-117-AC16; Word quotation tests unchanged |
 | PDF-01, PDF-09 | PDF reader, Coordinator | BR-1527 | US-117-AC1 |
 | PDF-02, PDF-03 | PDF reader | BR-1528 | US-117-AC2, AC7, AC12 on invented files |
 | PDF-04, PDF-05 | PDF reader, matcher, list reader | BR-1529 to BR-1531 | US-117-AC3 to AC6; added marks never add a link; Word tests unchanged |

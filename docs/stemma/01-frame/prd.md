@@ -792,6 +792,20 @@ Windows, desktop apps, and files saved by real tools are untested.
   which support labels can be lifted. Product owner.
 - [ ] May a chapter taken over from PDF later move to its Word file, keeping the
   author's choices? Not designed; product owner.
+- [ ] How is a revised manuscript file recognized and taken further? Until
+  answered, a changed file under an earlier file's name is reported and not
+  applied, so two chapters in files of one name need the author to say they
+  differ; a revision under a new name is refused as repeated text with no saved
+  item; one that repeats too little is added as a further chapter; and no
+  revision is ever applied (FR-71, FR-95). Product owner with the pilot author.
+- [ ] A quotation from a PDF chapter that holds a hyphen kept at a line end is
+  neither passed nor failed when keeping and removing it differ, so a correct
+  compound stays open until a person dismisses it. Should it instead pass and
+  say which reading matched, as the join in source text does, accepting that a
+  wrong quotation can then pass? Product owner.
+- [ ] Do the pilot's PDF files use endnotes? Endnotes are not recognized from a
+  PDF, so citations in them get no note handling (FR-95). Product owner with the
+  pilot author.
 - [x] Which PDF text-extraction library do the checks use? Answered by the
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a

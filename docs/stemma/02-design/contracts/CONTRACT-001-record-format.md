@@ -358,8 +358,9 @@ D); those record fields are never updated.
 
 **PDF manuscripts.** Takeover of a PDF (CONTRACT-003 I) uses these records
 unchanged, with one addition to the record schema that is made with the code that
-writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`. Until then the
-schema does not accept it.
+writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`, and the batch
+gains a field listing the words in which a line-end hyphen was kept (CONTRACT-003
+I). Until then the schema accepts neither.
 
 **Takeover rounds.** `intake_item` and `round_choice` records are never edited.
 There is no round or session record: remaining work is computed from failing
