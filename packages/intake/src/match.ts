@@ -3,7 +3,7 @@
 // unlinked with a reason (CONTRACT-003 H; SD-015 BR-1522 to BR-1524). Only
 // these rules decide. It is a pure function of the documents it is given.
 import type { Document, Location, Position } from "./document.ts";
-import { type Entry, readReferenceLists, type ReferenceList } from "./lists.ts";
+import { type Authors, type Entry, readReferenceLists, type ReferenceList } from "./lists.ts";
 import {
   fold, holdsWords, isCapitalWord, isConnector, isInitials, isName, isParticle, MONTHS, PROFILE, SENTENCE_WORDS,
   words, yearAt, yearForms, type YearForm,
@@ -224,7 +224,10 @@ const isDateRange = (parts: string[]): boolean =>
 /** The names that stand directly before a bracket, with only spaces between. */
 function namesBefore(text: string, known: Known): Cited | undefined {
   // A name phrase is short; this bounds the work in a very long paragraph.
-  const tokens = text.slice(-400).trimEnd().match(/,|[^\s,]+/g) ?? [];
+  const tokens: string[] = text.slice(-400).trimEnd().match(/,|[^\s,]+/g) ?? [];
+  // A possessive, as in `Corso's (2001)`, is no part of the last name.
+  const last = tokens.pop();
+  if (last !== undefined) tokens.push(last.replace(/(?<=.)['’]s$|(?<=s)['’]$/u, ""));
   let at = tokens.length - 1;
   let etAl = false;
   if (/^al\.?$/.test(tokens[at] ?? "") && tokens[at - 1] === "et") {
@@ -289,6 +292,8 @@ const anyKnown = (cited: Cited, known: Known): boolean =>
 
 // ---- Matching ----
 
+const wholeNames = (entry: Authors): string[] => [entry.authors[0]!, ...(entry.alias ? [entry.alias] : [])];
+
 const sameNames = (a: string[], b: string[]): boolean => a.length === b.length && a.every((n, i) => fold(n) === fold(b[i]!));
 
 function matches(entry: Entry, cited: Cited, year: string, suffix: string): boolean {
@@ -300,14 +305,16 @@ function matches(entry: Entry, cited: Cited, year: string, suffix: string): bool
     return !entry.whole && enough && sameNames(entry.authors.slice(0, names.length), names);
   }
   if (entry.cutShort) return false;
-  if (entry.whole && fold(entry.authors[0]!) === fold(cited.whole)) return true;
+  if (entry.whole && wholeNames(entry).some((n) => fold(n) === fold(cited.whole))) return true;
   return names !== undefined && sameNames(entry.authors, names);
 }
 
 /** Whether an entry that does not match could still be the one meant. */
 function couldFit(entry: Entry, cited: Cited, year: string, suffix: string): boolean {
   const first = cited.names?.[0] ?? cited.whole;
-  if (entry.status === "read") return entry.whole && entry.year === year && entry.suffix === suffix && holdsWords(entry.authors[0]!, first);
+  if (entry.status === "read") {
+    return entry.whole && entry.year === year && entry.suffix === suffix && wholeNames(entry).some((n) => holdsWords(n, first));
+  }
   if (!holdsWords(entry.couldBe, first)) return false;
   return /^\d/.test(year)
     ? new RegExp(`(?<![\\p{N}])${year}(?![\\p{N}])`, "u").test(entry.couldBe)
@@ -386,7 +393,12 @@ export function matchAuthorDate(documents: Document[]): AuthorDateResult {
   for (const entry of lists.flatMap((l) => l.entries)) {
     if (entry.status !== "read") continue;
     for (const name of entry.authors) known.families.add(fold(name));
-    if (entry.whole) known.wholes.add(fold(entry.authors[0]!));
+    if (entry.whole) {
+      for (const name of wholeNames(entry)) {
+        known.families.add(fold(name));
+        known.wholes.add(fold(name));
+      }
+    }
   }
 
   const brackets: Bracket[] = [];

@@ -223,10 +223,16 @@ form, a lead-in, or an entry layout makes a new profile version.
      Editor marks such as `(ed.)` and `eds` are not names. `et al.` or `and
      others` marks the authors as cut short. A name with no comma and no
      initials is a corporate author, or a single name, and is one **whole
-     name**. Initials with no comma, and text after `and`, `&`, or `with` that
+     name**. A later `Given Family` with no initials, joined only by commas,
+     is a person only where `and` or `&` comes at or after it, or, in the
+     year-after-authors layout, where `et al.` or `and others` ends the authors. An abbreviation in capitals followed by its
+     full name in round brackets is one whole name, and a citation of either
+     matches it. Initials with no comma, and text after `and`, `&`, or `with` that
      is not a name, leave the entry unread.
    - **Year after the authors.** All the text before the first year form reads
-     as authors, apart from an opening bracket and punctuation.
+     as authors, apart from an opening bracket and punctuation. In this layout
+     only, the first author's initials may be followed by one given name, as in
+     `Family, I. Given`, when that author stands alone or a comma follows.
    - **Year near the end.** The authors are read from the start and must end at
      an opening quotation mark, at a full stop, after initials followed by
      only a space and a title, or at a comma that no name follows. A whole name
@@ -325,7 +331,9 @@ and unresolved, when it uses `et al.` or when a name in it, or the last word of
 one, is a family name in some list of the project. Other words before the
 brackets leave them unlinked. The names are all the names, with their joining
 words and commas, that stand directly before the brackets, with only spaces
-between. A comma joins names only in a series that ends in `and` or `&`.
+between. A possessive ending on the last of them, `'s`, or an apostrophe after
+a final `s`, is not part of the name, also after `et al.` A comma joins names
+only in a series that ends in `and` or `&`.
 Capitalized sentence words that begin the first name are dropped. No other word
 or name is dropped to find a match, so `Brel and Corso (2001)` never matches an
 entry for Corso alone.

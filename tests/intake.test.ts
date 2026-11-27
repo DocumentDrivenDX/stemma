@@ -47,6 +47,12 @@ describe("US-113-AC1: reference entries", () => {
     ["Brel, K., Weirs of the north (Leeds: Invented Press, 2003), pp. 12–19.", "Brel 2003 near_end"],
     ["Brel, K. \"Weirs.\" Invented Weekly, 3 June 2003. https://example.org/2019/weirs [Accessed 4 May 2020].", "Brel 2003 near_end"],
     ["Office of Land and Water. Annual account. Leeds, 2004.", "Office of Land and Water [whole] 2004 near_end"],
+    ["Rowe, Q. Alden. 2001. Fords.", "Rowe 2001 after_authors"],
+    ["Rowe, Q. R. Alden (2001). Fords.", "Rowe 2001 after_authors"],
+    ["Rowe, Q. Alden, and Bea Stone. 2001. Fords.", "Rowe; Stone 2001 after_authors"],
+    ["Rowe, Q. Alden, Bea Stone, and Cy Teal. 2001. Fords.", "Rowe; Stone; Teal 2001 after_authors"],
+    ["Rowe, Alden, Bea Stone, et al. 2001. Fords.", "Rowe; Stone [cut short] 2001 after_authors"],
+    ["XYZ (Example Society). 2001. Fords.", "XYZ [whole] 2001 after_authors"],
   ])("reads %s", (text, expected) => expect(read(text)).toBe(expected));
 
   test.each([
@@ -71,7 +77,15 @@ describe("US-113-AC1: reference entries", () => {
     ["Brel, K. - Corso, L. Weirs. Leeds, 2003.", "unread authors"],
     ["Brel, K., and the Ford Group, Weirs, 2003.", "unread authors"],
     ["Brel, K. und L. Corso. Weirs. Leeds, 2003.", "unread authors"],
+    ["Brel, K. und Corso. 2003. Weirs.", "unread authors"],
     ["Brel, K. et Corso, L. Weirs. Leeds, 2003.", "unread authors"],
+    // What the forms for initials, `et al.`, and abbreviations must not stretch to.
+    ["Brel, K. Lee Corso. 2003. Weirs.", "unread year_place"],
+    ["Brel, K. Corso, L. 2003. Weirs.", "unread authors"],
+    ["Brel, K. Corso and Dunmore. 2003. Weirs.", "unread year_place"],
+    ["Brel, K., Modern Rivers and others, Weirs, Leeds, 2003, a copy by hand.", "unread authors"],
+    ["Brel (Lee Corso). 2003. Weirs.", "unread authors"],
+    ["XYZ (with Lee Corso). 2003. Weirs.", "unread authors"],
     ["Adair, J. 2014–2017. Rivers, in three parts.", "unread year_place"],
     ["Adair, J. Rivers since 1850", "unread year_place"],
     ["Adair, J. Rivers. Leeds, 2003, second printing by hand.", "unread year_place"],
@@ -214,8 +228,31 @@ describe("US-113-AC2: citation forms", () => {
     ]);
   });
 
+  test("a possessive is no part of the last name", () => {
+    expect(one([...LIST, "Jones, A. 1990. Ponds."],
+      "Corso's (2001) view, Corso and Dunmore’s (2008: 4) view, Ewart et al.'s (2010) view, and Jones' (1990) view.",
+    )).toEqual([
+      `(2001) => linked ${CORSO}`, `(2008: 4) => linked ${CORSO2}`, `(2010) => linked ${EWART}`, "(1990) => linked Jones, A. 1990. Ponds.",
+    ]);
+  });
+
+  test("a possessive never drops a name, and an unlisted possessive stays unlinked", () => {
+    expect(one(LIST, "Brel and Corso's (2001) view.", "Brel's and Corso's (2001) view.", "The year's (1999) harvest.", "Corso's study (2001).")).toEqual([
+      "(2001) => unresolved no_entry", "(2001) => unresolved no_entry",
+      "(1999) => unlinked no_author_form", "(2001) => unlinked no_author_form",
+    ]);
+  });
+
+  test("an abbreviation and the full name after it are one author under either name", () => {
+    const entry = "XYZ (Example Society of Rivers and Fords). 2001. Account.";
+    expect(one([entry], "(XYZ 2001) (Example Society of Rivers and Fords 2001) XYZ's (2001) (Rivers 2001)")).toEqual([
+      `(XYZ 2001) => linked ${entry}`, `(Example Society of Rivers and Fords 2001) => linked ${entry}`,
+      `(2001) => linked ${entry}`, "(Rivers 2001) => unresolved unread_entry",
+    ]);
+  });
+
   test("other words before the brackets leave them unlinked, and a possible narrative form is marked", () => {
-    const r = matchAuthorDate([chapter(LIST, "The treaty (1713) held. Zimmer (1999) wrote. Corso. (2001) Then Corso's (2001) view.", "(2017: 4)")]);
+    const r = matchAuthorDate([chapter(LIST, "The treaty (1713) held. Zimmer (1999) wrote. Corso. (2001) Then Zimmer's (2001) view.", "(2017: 4)")]);
     expect(r.brackets.map((b) => [outcome(b), b.state === "unlinked" && b.possibleNarrative])).toEqual([
       ["(1713) => unlinked no_author_form", false],
       ["(1999) => unlinked no_author_form", true],

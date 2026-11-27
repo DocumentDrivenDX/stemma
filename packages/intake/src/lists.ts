@@ -14,6 +14,8 @@ export interface Authors {
   authors: string[];
   /** A corporate author, or a single name with no comma and no initials. */
   whole: boolean;
+  /** For a whole name printed as an abbreviation, the full name in brackets after it. */
+  alias?: string;
   /** The entry says `et al.` or `and others`. */
   cutShort: boolean;
 }
@@ -95,14 +97,30 @@ function wholeName(text: string): boolean {
   return parts.every((w, i) => isCapitalWord(w) || isParticle(w) || (i > 0 && (isConnector(w) || w === "and" || w === "&")));
 }
 
+const ABBREVIATED = /^(\p{Lu}[\p{Lu}&.-]*\p{Lu}\.?)\s+\(([^()]+)\)$/u;
+
+/** One given name after initials, as in `I. Given`. */
+const initialsThenGiven = (given: string): boolean => {
+  const parts = words(given);
+  const last = parts.at(-1) ?? "";
+  return parts.length > 1 && parts.slice(0, -1).every(isInitials) && isCapitalWord(last) && !SENTENCE_WORDS.has(fold(last));
+};
+
 const CUT_SHORT = /,?\s*(?<![\p{L}])(?:et al\.?|and others)$/u;
 
-/** All of `text` read as a list of authors, or nothing. */
-function parseAuthors(text: string): Authors | undefined {
+/**
+ * All of `text` read as a list of authors, or nothing. `beforeYear` says the year
+ * follows this text directly, so no title can be part of it, and allows two more forms.
+ */
+function parseAuthors(text: string, beforeYear = false): Authors | undefined {
   let rest = text.trim();
   const cutShort = CUT_SHORT.test(rest);
   if (cutShort) rest = rest.replace(CUT_SHORT, "");
   if (/(?<![\p{L}])(?:with|et al)(?![\p{L}])/u.test(rest)) return undefined;
+  const [, short, full] = ABBREVIATED.exec(rest) ?? [];
+  if (short && full && words(full).length > 1 && wholeName(full)) {
+    return { authors: [short], whole: true, alias: words(full).join(" "), cutShort };
+  }
   if (!rest.includes(",") && !words(rest).some(isInitials)) {
     return wholeName(rest) ? { authors: [words(rest).join(" ")], whole: true, cutShort } : undefined;
   }
@@ -111,7 +129,8 @@ function parseAuthors(text: string): Authors | undefined {
   const separators = split.filter((_, i) => i % 2 === 1);
   const joins = (separator: string | undefined) => /and|&/.test(separator ?? "");
   const [family, given] = segments;
-  if (!family || !given || joins(separators[0]) || !isFamily(family) || !isGiven(given)) return undefined;
+  const givenReads = (g: string) => isGiven(g) || (beforeYear && initialsThenGiven(g) && (separators[1]?.includes(",") ?? true));
+  if (!family || !given || joins(separators[0]) || !isFamily(family) || !givenReads(given)) return undefined;
   const authors = [family];
   for (let i = 2; i < segments.length; i++) {
     const segment = segments[i]!;
@@ -123,9 +142,9 @@ function parseAuthors(text: string): Authors | undefined {
       continue;
     }
     const natural = naturalOrder(segment);
-    // Two capitalized words after a comma may be a title. Only initials, or
-    // `and` here or later in the series, show that they name a person.
-    if (!natural || !(natural.initials || separators.slice(i - 1).some(joins))) return undefined;
+    // Two capitalized words after a comma may be a title. Only initials, `and`
+    // here or later in the series, or `et al.` before the year show that they name a person.
+    if (!natural || !(natural.initials || (beforeYear && cutShort) || separators.slice(i - 1).some(joins))) return undefined;
     authors.push(natural.family);
   }
   return { authors, whole: false, cutShort };
@@ -136,7 +155,7 @@ function authorsBefore(text: string): Authors | undefined {
   let before = withoutEditorMarks(text).replace(/[\s([,:;]+$/u, "");
   const last = words(before).at(-1) ?? "";
   if (last.endsWith(".") && !isInitials(last) && !/(?:et al|Jr|Sr)\.$/.test(before)) before = before.slice(0, -1);
-  return parseAuthors(before);
+  return parseAuthors(before, true);
 }
 
 const rangeFollows = (text: string, year: YearForm): boolean => /^\s*[-‐‑–—/]\s*(?:\d|present)/.test(text.slice(year.end));
@@ -225,6 +244,8 @@ function yearNearEnd(text: string): EntryReading {
 /** Whether another entry that begins `Family, Given` starts after a line break or a sentence end. */
 function holdsAnotherEntry(text: string): boolean {
   for (const m of text.matchAll(/(?:\n\s*|[.)\d]\s+)(?=\p{Lu}[^,.\n]{1,40},\s)/gu)) {
+    // The full stop of an initial ends no sentence.
+    if (!m[0].includes("\n") && /(?<![\p{L}])\p{Lu}\.$/u.test(text.slice(0, m.index + 1))) continue;
     const rest = text.slice(m.index + m[0].length);
     const reading = yearAfterAuthors(rest);
     if (reading?.status === "read" && !reading.whole && /^[^,]+,\s*(?:\p{Lu}\.|\p{Lu}\p{Ll})/u.test(rest)) return true;
