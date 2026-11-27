@@ -323,7 +323,12 @@ const anyKnown = (cited: Cited, known: Known): boolean =>
 
 const wholeNames = (entry: Authors): string[] => [entry.authors[0]!, ...(entry.alias ? [entry.alias] : [])];
 
-const sameNames = (a: string[], b: string[]): boolean => a.length === b.length && a.every((n, i) => fold(n) === fold(b[i]!));
+/** Every form of the family name of the author at `position`. */
+const forms = (entry: Authors, position: number): string[] => [entry.authors[position]!, ...(entry.longer?.[position] ?? [])];
+
+/** Whether the cited names are, in order, those of the entry's first authors. */
+const namesFirst = (entry: Authors, names: string[]): boolean =>
+  names.every((name, i) => i < entry.authors.length && forms(entry, i).some((form) => fold(form) === fold(name)));
 
 function matches(entry: Entry, cited: Cited, year: string, suffix: string): boolean {
   if (entry.status !== "read" || entry.year !== year || entry.suffix !== suffix) return false;
@@ -331,11 +336,11 @@ function matches(entry: Entry, cited: Cited, year: string, suffix: string): bool
   if (cited.etAl) {
     if (!names) return false;
     const enough = entry.cutShort ? entry.authors.length >= names.length : entry.authors.length > names.length;
-    return !entry.whole && enough && sameNames(entry.authors.slice(0, names.length), names);
+    return !entry.whole && enough && namesFirst(entry, names);
   }
   if (entry.cutShort) return false;
   if (entry.whole && wholeNames(entry).some((n) => fold(n) === fold(cited.whole))) return true;
-  return names !== undefined && sameNames(entry.authors, names);
+  return names !== undefined && entry.authors.length === names.length && namesFirst(entry, names);
 }
 
 /** The same form citing the first author of `entry` by family name alone. */
@@ -435,7 +440,9 @@ export function matchAuthorDate(documents: Document[]): AuthorDateResult {
   const known: Known = { families: new Set(), wholes: new Set(), given: new Set() };
   for (const entry of lists.flatMap((l) => l.entries)) {
     if (entry.status !== "read") continue;
-    for (const name of entry.authors) known.families.add(fold(name));
+    for (const position of entry.authors.keys()) {
+      for (const name of forms(entry, position)) known.families.add(fold(name));
+    }
     for (const name of withGiven(entry)) known.given.add(fold(name));
     if (entry.whole) {
       for (const name of wholeNames(entry)) {

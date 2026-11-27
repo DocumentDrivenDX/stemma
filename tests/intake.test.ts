@@ -97,13 +97,7 @@ describe("US-113-AC1: reference entries", () => {
     ["Brel, K., Modern Rivers and others, Weirs, Leeds, 2003, a copy by hand.", "unread authors"],
     ["Brel (Lee Corso). 2003. Weirs.", "unread authors"],
     ["XYZ (with Lee Corso). 2003. Weirs.", "unread authors"],
-    // Where a later family name begins cannot be known.
-    ["Rowe, Alden, and Najib Abou Field. 2001. Fords.", "unread authors"],
-    ["Rowe, Alden, and Karen Van Brel. 2001. Fords.", "unread authors"],
-    ["Rowe, Alden, Najib Abou Field, and Cy Teal. 2001. Fords.", "unread authors"],
-    ["Rowe, Alden, and Ana Ortega y Gasset. 2001. Fords.", "unread authors"],
     ["Rowe, Alden, and R. Ortega y Gasset. 2001. Fords.", "unread authors"],
-    ["Rowe, Alden, and Najib Abou Field. Fords. Leeds, 2001.", "unread authors"],
     ["Rowe, A., Najib Abou Field, Fords, Leeds, 2001.", "unread authors"],
     // What `I. Given Family` must not stretch to.
     ["Rowe, Alden, and R. Steven T. Stone. 2001. Fords.", "unread authors"],
@@ -178,6 +172,24 @@ describe("US-113-AC1: reference entries", () => {
     }
     expect(short).toEqual([]);
     expect(read).toBeGreaterThan(200);
+  });
+
+  test.each([
+    ["Rowe, Alden, and Najib Abou Field. 2001. Fords.", ["Rowe", "Field"], { 1: ["Abou Field"] }],
+    ["Rowe, Alden, and Bea Lee Stone. 2001. Fords.", ["Rowe", "Stone"], { 1: ["Lee Stone"] }],
+    ["Rowe, Alden, and Karen Van Brel. 2001. Fords.", ["Rowe", "Brel"], { 1: ["Van Brel"] }],
+    ["Rowe, Alden, and Bea Lee van Stone. 2001. Fords.", ["Rowe", "van Stone"], { 1: ["Lee van Stone"] }],
+    ["Rowe, Alden, Bea Mary Lee Stone, and Cy Teal. 2001. Fords.", ["Rowe", "Stone", "Teal"], { 1: ["Lee Stone", "Mary Lee Stone"] }],
+    ["Rowe, Alden, and R. Abou Field. 2001. Fords.", ["Rowe", "Field"], { 1: ["Abou Field"] }],
+    ["Rowe, Alden, and Ana Ortega y Gasset. 2001. Fords.", ["Rowe", "y Gasset"], { 1: ["Ortega y Gasset"] }],
+    ["Rowe, Alden, and Najib Abou Field. Fords. Leeds, 2001.", ["Rowe", "Field"], { 1: ["Abou Field"] }],
+    ["Rowe, Alden, M. Q. Alden Stone, and L. Corso. 2001. Fords.", ["Rowe", "Stone", "Corso"], { 1: ["Alden Stone"] }],
+    // A given name or initial is always left, so these have one form.
+    ["Rowe, Alden, and Karen Stone. 2001. Fords.", ["Rowe", "Stone"], undefined],
+    ["Rowe, Alden, and K. L. Stone. 2001. Fords.", ["Rowe", "Stone"], undefined],
+  ])("keeps each form a later family name may have: %s", (text, authors, longer) => {
+    const r = readEntry(text);
+    expect(r.status === "read" && [r.authors, r.longer]).toEqual([authors, longer]);
   });
 
   test("a second entry in one paragraph is found even when a later family name in it is uncertain", () => {
@@ -510,6 +522,45 @@ describe("US-113-AC3 to AC6: one match, or unresolved", () => {
   test("AC6: an unread entry alone gives its own reason, and an unrelated one blocks nothing", () => {
     expect(one(["Adair J. 2017. R."], "(Adair 2017)")).toEqual(["(Adair 2017) => unresolved unread_entry"]);
     expect(one([solo, "Adairson J. 2017. R.", "Adair J. 2016. R."], "(Adair 2017)")).toEqual([`(Adair 2017) => linked ${solo}`]);
+  });
+});
+
+describe("US-113-AC3 and AC4: a family name with more than one form", () => {
+  const entry = "Rowe, Alden, and Najib Abou Field. 2001. Fords.";
+
+  test("either form matches, bracketed or in running text, and nothing else does", () => {
+    expect(one([entry],
+      "(Rowe and Field 2001) (Rowe and Abou Field 2001) As Rowe and Abou Field (2001) wrote. As Rowe and Field's (2001) map shows.",
+    )).toEqual([`(Rowe and Field 2001) => linked ${entry}`, `(Rowe and Abou Field 2001) => linked ${entry}`, `(2001) => linked ${entry}`, `(2001) => linked ${entry}`]);
+    expect(one([entry], "(Rowe and Abou 2001) (Rowe and Najib Abou Field 2001) (Field and Rowe 2001) (Rowe 2001) (Field 2001) (Rowe and Field 2002)"))
+      .toEqual(["(Rowe and Abou 2001)", "(Rowe and Najib Abou Field 2001)", "(Field and Rowe 2001)", "(Rowe 2001)", "(Field 2001)", "(Rowe and Field 2002)"]
+        .map((text) => `${text} => unresolved no_entry`));
+  });
+
+  test("each form works with et al., and a form never lends itself to another author's place", () => {
+    const three = "Rowe, Alden, Bea Lee Stone, and Cy Teal. 2001. Fords.";
+    expect(one([three], "(Rowe, Lee Stone et al. 2001) (Rowe, Stone et al. 2001) (Rowe et al. 2001) (Rowe, Teal et al. 2001) (Lee Stone, Rowe and Teal 2001)"))
+      .toEqual([
+        `(Rowe, Lee Stone et al. 2001) => linked ${three}`, `(Rowe, Stone et al. 2001) => linked ${three}`, `(Rowe et al. 2001) => linked ${three}`,
+        "(Rowe, Teal et al. 2001) => unresolved no_entry", "(Lee Stone, Rowe and Teal 2001) => unresolved no_entry",
+      ]);
+  });
+
+  test("two entries that either form could mean stay unresolved", () => {
+    expect(one([entry, "Rowe, A., and B. Field. 2001. Weirs."], "(Rowe and Field 2001)")).toEqual(["(Rowe and Field 2001) => unresolved several_entries"]);
+    const longer = "Rowe, A., and Abou Field, N. 2001. Weirs.";
+    expect(one([entry, longer], "(Rowe and Abou Field 2001)")).toEqual(["(Rowe and Abou Field 2001) => unresolved several_entries"]);
+  });
+
+  test("an entry of unclear surname length no longer blocks an unrelated solo citation", () => {
+    const solo = "Rowe, Alden. 2001. Weirs.";
+    expect(one([solo, "Rowe, Alden, Bea Lee Stone, and Cy Teal. 2001. Fords."], "(Rowe 2001)")).toEqual([`(Rowe 2001) => linked ${solo}`]);
+  });
+
+  // CONTRACT-003 H states this risk: the text cannot show which form is right.
+  test("the stated risk: a different, unlisted work by an author named as one of the forms links here", () => {
+    const middle = "Rowe, Alden, and Bea Lee Stone. 2001. Fords.";
+    expect(one([middle], "(Rowe and Lee Stone 2001)")).toEqual([`(Rowe and Lee Stone 2001) => linked ${middle}`]);
   });
 });
 

@@ -314,7 +314,7 @@ done, so a false statement cannot pass it.
 
 ### H. Author-date profile
 
-The profile is `author-date/1`. It is deterministic. Its rules are design
+The profile is `author-date/2`. It is deterministic. Its rules are design
 assumptions drawn from one private set of drafts and are untested. Adding a
 form, a lead-in, or an entry layout makes a new profile version.
 
@@ -358,18 +358,18 @@ form, a lead-in, or an entry layout makes a new profile version.
      joined only by commas, is a person only where `and` or `&` comes at or
      after it, or, in the year-after-authors layout, where `et al.` or `and
      others` ends the authors.
-   - **Where a later family name begins.** Where two or more written-out words
-     stand directly before the last word of a later author in natural order,
-     with no initial between them and it, as in `Given Other Family`, the family
-     name may be one word or more, so the entry is unread. A capitalized
-     particle counts as a written-out word. With one such word, as in
-     `Given Family` or `I. Given Family`, the family name is the last word with
-     any lower-case particles before it; a two-word surname written that way is
-     cut to its last word. `I. Given Family` is not read where the one
-     written-out word is a joining word or `the`, `of`, `for`, or `on`, or where
-     `y` joins the last word to the one before. Initials both before and after a
-     given name, as in `I. Given I. Family`, are not read, because two authors
-     with no separator look the same.
+   - **Where a later family name begins.** In a later author in natural order,
+     the family name is read as the last word with any lower-case particles
+     before it. Each written-out word standing directly before that, a
+     capitalized particle included, may belong to the family name too, as long
+     as a given name or initial is left before it. The entry then keeps each
+     longer form as another form of that author's family name: `Given Other
+     Family` keeps `Family` and `Other Family`, and so does `I. Other Family`.
+     The reading does not say which form is right. `I. Given Family` is not
+     read where the one written-out word is a joining word or `the`, `of`,
+     `for`, or `on`, or where `y` joins the last word to the one before.
+     Initials both before and after a given name, as in `I. Given I. Family`,
+     are not read, because two authors with no separator look the same.
    - **Abbreviations.** An abbreviation in capitals followed by its full name in
      round brackets is one whole name, and a citation of either matches it. Only
      there, the full name may also hold `in`, `at`, or `to` between its words.
@@ -459,6 +459,12 @@ only when:
 - with `et al.`, the entry's first authors are the named ones, in order, and it
   has more authors than are named; and
 - the year and suffix are equal, a missing suffix matching only a missing one.
+
+Where an author has more than one form of family name, a cited name matches
+that author if it equals any of them. This adds no match to the count: two
+entries that match are still `several_entries`. Its risk is a citation of a
+different work, missing from the list, by an author whose name is one of the
+forms and whose co-authors and year are the same.
 
 **Given names in text.** A narrative citation of one name, with or without
 `et al.`, may write the first author's given name, as in `Given Family (2001)`.
@@ -596,7 +602,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
-| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`; the forms and refusals added in `author-date/1` have only invented tests | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
+| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`. A run of `author-date/1` on the same drafts found no wrong link among those it added, but leaving later authors of unknown surname length unread lost correct links, mostly for ordinary names; `author-date/2`, which keeps each form instead, has only invented tests | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis
 
