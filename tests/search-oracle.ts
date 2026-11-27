@@ -22,3 +22,6 @@ export function scan(entries: OracleEntry[], sent: string, types: string[]): { k
   found.sort((a, b) => b.score - a.score || rank.get(a.type)! - rank.get(b.type)! || a.order - b.order);
   return { keys: found.map((f) => f.id), counts };
 }
+
+/** The record browser's search query as arras 0.8.1 sends it, taken from a run of the served page. */
+export const BROWSER_QUERY = "query($text: String!, $types: [String!], $limit: Int) { _search(text: $text, types: $types, limit: $limit) { text hits { type key score label excerpt { text mark } matched entity { key type  } } counts { type count atLeast } notSearched { type reason backend } truncated freshness { backend asOf at consistency } } }";

@@ -299,8 +299,11 @@ What to tell them, once:
   project.
 - Pass on the warnings the command prints. Exit code 3 means the project could
   not be read and nothing was served.
-- It searches within the same limits as the offline page (below), and opens no
-  original.
+- Its **Search** view finds every record that matches, of every type, says how
+  many there are, and pages through all of them. The record browser's own search
+  box lists only the best 200 and says when there are more. Neither searches
+  source page text beyond what passages quote, the manuscript or research notes.
+- It opens no original.
 
 ### As an offline page (`graph export`)
 
@@ -335,8 +338,8 @@ same one.
   verification.
 - There is no reviewer export yet. Never offer the author's page as one: it is
   not filtered for another reader.
-- A search lists at most 50 matches. Other records are reached through their
-  type lists and links.
+- A search lists at most 50 matches, with no next page. Other records are reached
+  through their type lists and links. `browse` has no such limit.
 
 ## Showing a citation in its source
 

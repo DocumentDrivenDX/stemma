@@ -2,7 +2,7 @@
 // secret nor the one-time code is sent, each signs what it is the key of; no
 // answer is used before it has proved that it holds the same key; every answer
 // that holds data names the data it came from; and the arras client forwards
-// each read to arras's static client in the server, unchanged.
+// each read to the server unchanged, but for the limit of arras's search.
 import { TAGS, type TagPair } from "../../core/src/browse-proof.ts";
 import type { ArrasClient, SchemaApi } from "./arras-types.ts";
 import { type Proved, provedPost } from "./proof.ts";
@@ -153,7 +153,16 @@ export function readsOf(server: Server, identity: string, lost: (error: CallFail
 const READ_ONLY = "This explorer only reads: change the record files, and it reads them again.";
 const refuse = () => Promise.reject(Object.assign(new Error(READ_ONLY), { status: 501 }));
 
-/** What the arras browser reads through. `moduleQuery` goes as arras made it, and its answer comes back as arras gave it. */
+/** arras asks for 50 matches and has no next page. The server's search gives more, with true counts. */
+const ARRAS_ASKS = 50;
+export const ARRAS_SHOWS = 200;
+
+export const isSearch = (query: string): boolean => /\b_search\(/.test(query);
+
+/**
+ * What the arras browser reads through. `moduleQuery` goes as arras made it, but
+ * for its search's limit, and its answer comes back as the server gave it.
+ */
 export function remoteClient(read: Read): ArrasClient {
   const arras = <T>(call: string, request?: unknown) => read<T>("/api/arras", request === undefined ? { call } : { call, request });
   return {
@@ -164,7 +173,10 @@ export function remoteClient(read: Read): ArrasClient {
     status: () => arras("status"),
     schemaCatalog: () => arras("schemaCatalog"),
     export: (request) => arras("export", request),
-    moduleQuery: (module, query, variables) => read("/api/query", { module, query, ...(variables === undefined ? {} : { variables }) }),
+    moduleQuery: (module, query, variables) => {
+      const asked = isSearch(query) && (variables as { limit?: unknown } | undefined)?.limit === ARRAS_ASKS ? { ...variables, limit: ARRAS_SHOWS } : variables;
+      return read("/api/query", { module, query, ...(asked === undefined ? {} : { variables: asked }) });
+    },
     validate: refuse, invoke: refuse, batch: refuse, changes: refuse, loads: refuse, query: refuse,
   };
 }

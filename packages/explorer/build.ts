@@ -92,6 +92,14 @@ function pageStyles(): string {
     // A record's repeated values are whole lines of text. arras draws each as a badge that does not wrap.
     ".gb-tags{max-width:100%}.gb-tags .gb-badge{height:auto;white-space:normal;overflow-wrap:anywhere}",
     "dd{min-width:0;overflow-wrap:anywhere}",
+    // The served page's Search view.
+    ".stemma-search{flex:1 0 auto;background:#fff;color:#0f172a;padding:1rem;box-sizing:border-box;width:100%;max-width:60rem;margin:0 auto;overflow-wrap:anywhere}",
+    ".stemma-search-form{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}.stemma-search-form label{font-weight:600}.stemma-search-form input{flex:1 1 14rem;min-width:0}",
+    ".stemma-search input,.stemma-search button{font:inherit;color:inherit;background:#fff;border:1px solid #64748b;border-radius:4px;padding:.35rem .6rem}",
+    ".stemma-search a{color:#1d4ed8}",
+    ".stemma-types{display:flex;flex-wrap:wrap;gap:.25rem;max-height:7.5rem;overflow:auto;font-size:.875rem}.stemma-types a{border:1px solid #64748b;border-radius:4px;padding:.15rem .5rem;text-decoration:none}.stemma-types a[aria-current]{background:#0f172a;color:#fff}",
+    ".stemma-hits{padding-left:4rem}.stemma-hits li{margin:.6rem 0}.stemma-hit-type{font-size:.8rem;color:#475569}.stemma-hit-excerpt{display:block;font-size:.875rem}.stemma-hits mark{background:#fde68a;color:#0f172a}",
+    ".stemma-pager{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin:1rem 0}.stemma-pager span[aria-disabled]{color:#64748b}.stemma-pager input{width:6rem;margin:0 .35rem}",
     // After the rules above, which it overrides.
     "@media (max-width:60rem){.stemma-manuscript{display:block}.stemma-open .stemma-reading{padding-bottom:75vh}.stemma-pane{position:fixed;left:0;right:0;bottom:0;top:auto;height:70vh;z-index:20;border-left:0;border-top:3px solid #0f172a;box-shadow:0 -4px 16px rgba(15,23,42,.25)}.stemma-pane .stemma-source{max-height:none;border:0}}",
   ].join("");

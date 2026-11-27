@@ -11,8 +11,9 @@ import { Explorer } from "./app.tsx";
 import { Banner } from "./Banner.tsx";
 import { foldingClient } from "./client.ts";
 import { Manuscript } from "./Manuscript.tsx";
-import { CallFailed, noSchemaApi, type Read, readsOf, type Redemption, remoteClient, Server, takeCode } from "./remote.ts";
-import type { ManuscriptRoute } from "./route.ts";
+import { SearchView } from "./Search.tsx";
+import { CallFailed, isSearch, noSchemaApi, type Read, readsOf, type Redemption, remoteClient, Server, takeCode } from "./remote.ts";
+import type { ManuscriptRoute, SearchRoute } from "./route.ts";
 import { type GetSourceView, Served, Text, useLoaded } from "./SourcePanel.tsx";
 
 /** How often the page asks whether its data is still current, shown or hidden. */
@@ -99,12 +100,23 @@ function Ready({ server, loaded, lost }: { server: Server; loaded: Loaded; lost(
   const made = useMemo(() => {
     const read = readsOf(server, loaded.identity, (error) => lostNow.current(error));
     const getView: GetSourceView = async (id) => (await read<SourceView | null>("/api/source-view", { id })) ?? undefined;
-    return { read, getView, client: foldingClient(remoteClient(read)) };
+    const folding = foldingClient(remoteClient(read));
+    // What was last typed in the record browser's search box, for the Search view to start with.
+    let typed = "";
+    const client: typeof folding = {
+      ...folding,
+      moduleQuery: (module, query, variables) => {
+        const text = (variables as { text?: unknown } | undefined)?.text;
+        if (isSearch(query) && typeof text === "string") typed = text;
+        return folding.moduleQuery(module, query, variables);
+      },
+    };
+    return { read, getView, client, search: { view: (route: SearchRoute) => <SearchView read={read} route={route} />, last: () => typed } };
   }, []);
   return (
     <div className="stemma-page">
       <Banner data={loaded.banner} served />
-      <Explorer client={made.client} schemaApi={noSchemaApi} getView={made.getView}
+      <Explorer client={made.client} schemaApi={noSchemaApi} getView={made.getView} search={made.search}
         manuscript={loaded.manuscript ? (route) => <ServedManuscript read={made.read} route={route} getView={made.getView} /> : undefined} />
     </div>
   );

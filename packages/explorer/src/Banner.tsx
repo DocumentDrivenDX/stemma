@@ -46,10 +46,19 @@ export function Banner({ data, served = false }: { data: BannerData; served?: bo
             checks: {data.states.checks.join(", ")}. Not from: {data.states.checks_left_out.map((c) => `${c.check} (${c.why})`).join("; ")}.
             Run a check for the findings themselves.
           </p>
-          <p>
-            Search lists at most 50 results, and at most 50 of one type, from the first 20 types. Other records are reached by their
-            type lists and links.
-          </p>
+          {served ? (
+            <p>
+              Search covers every record shown here, of every type. The Search view lists every match, page by page, with the true total.
+              The record browser’s own search box lists the best 200 matches and says when there are more; its type counts are true totals;
+              it takes 2 to 200 characters and at most 6 words. A record’s links are all reached with “Show more”. Source page text beyond
+              what passages quote, the manuscript and research notes are not searched.
+            </p>
+          ) : (
+            <p>
+              Search lists at most 50 results, and at most 50 of one type, from the first 20 types, and takes 2 to 200 characters and at
+              most 6 words. It has no next page. Other records are reached by their type lists and links.
+            </p>
+          )}
           <p>Left out of {served ? "what is shown" : "this export"}:</p>
           <ul className="st:list-disc st:pl-5">
             {data.omissions.map((o) => <li key={`${o.type} ${o.reason}`}>{o.type}: {plain(o.reason)}, {o.count}</li>)}

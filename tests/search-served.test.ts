@@ -7,10 +7,7 @@ import { type Served, servedData } from "@stemma/graph";
 import { loadCorpus, searchFold } from "@stemma/records";
 import { answersOf, ARRAS_SEARCH_QUERY, createSearch, excerptOf, MOST_ANSWER_BYTES, queryOf, SEARCH_LIMITS } from "@stemma/server";
 import { syntheticProject } from "../scripts/synthetic-project.ts";
-import { scan } from "./search-oracle.ts";
-
-/** The record browser's search query as arras 0.8.1 sends it, taken from a run of the served page. */
-export const BROWSER_QUERY = "query($text: String!, $types: [String!], $limit: Int) { _search(text: $text, types: $types, limit: $limit) { text hits { type key score label excerpt { text mark } matched entity { key type  } } counts { type count atLeast } notSearched { type reason backend } truncated freshness { backend asOf at consistency } } }";
+import { BROWSER_QUERY, scan } from "./search-oracle.ts";
 
 let made: { served: Served } | undefined;
 function synthetic(): Served {

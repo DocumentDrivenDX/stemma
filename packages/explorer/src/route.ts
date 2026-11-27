@@ -63,6 +63,35 @@ export function manuscriptRouteOf(hash: string): ManuscriptRoute | undefined {
   }
 }
 
+// The served page's Search view. Its text is in the fragment, which no request
+// carries, so that Back returns to the same page of results.
+export interface SearchRoute {
+  type: string | undefined;
+  /** From 1. */
+  page: number;
+  text: string;
+}
+
+export function searchHref({ type, page, text }: SearchRoute): string {
+  return text === "" ? "#/search" : `#/search/${type === undefined ? "all" : encodeURIComponent(type)}/${page}/${encodeURIComponent(text.toWellFormed())}`;
+}
+
+/** The search a fragment names, or nothing when it is another view's. */
+export function searchRouteOf(hash: string): SearchRoute | undefined {
+  const [first, type, page, text, ...more] = hash.replace(/^#\/?/, "").split("/");
+  if (first !== "search") return undefined;
+  const none: SearchRoute = { type: undefined, page: 1, text: "" };
+  if (more.length > 0 || !type || !/^[1-9]\d{0,8}$/.test(page ?? "") || !text) return none;
+  try {
+    return { type: type === "all" ? undefined : decodeURIComponent(type), page: Number(page), text: decodeURIComponent(text) };
+  } catch {
+    return none;
+  }
+}
+
+/** A record's page in the record browser. */
+export const recordHref = (type: string, key: string): string => `#/explore/stemma/${encodeURIComponent(type)}/${encodeURIComponent(key)}`;
+
 export function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash);
   useEffect(() => {
