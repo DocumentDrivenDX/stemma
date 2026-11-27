@@ -263,6 +263,8 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
     limit: "It reads recorded citations, not your manuscript, and does not show that the source supports your sentence." },
   { id: "bib.uncited", question: "Is every listed work cited?", looks: "A work you have listed for the bibliography should be cited somewhere.",
     limit: "It cannot tell when your project has manuscript files, because it does not read them. It says so." },
+  { id: "claim.complete", question: "Does each recorded claim say what it rests on?", looks: "A claim you have recorded needs a note behind it, a level of confidence, and your reason why the sources support it.",
+    limit: "It only sees that the three are there. It does not show that the note supports the claim, or that the reason is a good one. It reads recorded claims, not your manuscript." },
   { id: "source.changed", question: "Did something you relied on change?", looks: "Lists passages, citations and other work that rest on a source you have replaced or set aside, or on text that has changed.",
     limit: "It cannot record that you have looked again, so an item stays listed." },
   { id: "record.valid", question: "Are the project files in order?", looks: "Reads the settings, every record, every source file and the headings of your standing rules.",
