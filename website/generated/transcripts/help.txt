@@ -12,6 +12,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   source tag <id|key>... --actor <kind>:<name> [--add <tag>]... [--remove <tag>]... [--from <text>]
   source list [--tag <tag|namespace:>]... [--stage record|captured|text] [--has identifiers|lookup|tags]...
   source history <id|key>
+  source locate <upstream id|source id|key> --actor <kind>:<name> [--note <text>]
+             (--url <address> --kind publisher|web_archive|archive [--fetch] | --private <label> [--original <file>])
+             adds another place an original can be had from, or compares one; only the upstream record changes
   source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
              [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...
@@ -56,6 +59,6 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
              the plugin declares it, and the host starts it
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
-Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
+Only ingest --fetch, ingest --refresh-lookups, source locate --fetch and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
 Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemented;
 3 project unreadable; 4 wrong runtime; 5 request not valid; 70 internal error.
