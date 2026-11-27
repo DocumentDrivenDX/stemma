@@ -62,6 +62,12 @@ it `untested`.
 5. Import is atomic: on error, no record is written.
 6. A repeated import of identical bytes is reported and writes nothing without
    `--again`.
+7. A failed import names the line of each fault the codec can locate, and the
+   entry's key when it has one. After a fault the codec SHOULD resume at the
+   next entry it can find, so that several faults are named at once, and MUST
+   say how many entries it accounted for, read and unread. Text is read as
+   UTF-8, with or without a byte-order mark; other bytes are an error naming
+   the line.
 
 ### C. Same information
 
@@ -86,15 +92,57 @@ Format rules:
   compare as TeX source after removing the outer delimiters. Inner braces,
   commands, and `verbatim`-type field bytes are significant. `crossref`,
   `xdata`, and `related` stay as fields. No LaTeX is executed.
+  - A value is preserved with `encoding` `tex`: `#` parts are joined and each
+    `@string` macro defined earlier in the file is replaced by its value.
+  - A value that uses a macro with no such definition, the month macros
+    included, has no known value. It is preserved with `encoding` `raw` as an
+    expression: each unknown name as written, each other part in braces, joined
+    by ` # `. It is not mapped to a record field, except a month read as part
+    of a date. The report lists the unknown names other than months.
+  - Text between entries is a comment. Outside entries, `%` starts a comment
+    that runs to the end of its line, so a commented-out entry stays a comment.
+    A `%` comment between the fields of an entry is kept as a file-level
+    comment. (Assumption: no BibTeX or Biber reader was run to confirm either
+    `%` rule.) A line that starts with `@` and a word, with no opening
+    delimiter after it, is an error.
+  - A repeated field in one entry is kept, in order, and reported. An entry
+    with no key is an error.
 - **RIS**: tags and their order of repetition per record, and values exactly,
   after joining continuation lines by the producer's rule. The report names the
   detected variant. A line the codec cannot attribute to a tag is kept as a
   block and fails the import if it cannot be placed.
+  - A tag line is two characters (a capital, then a capital or digit), two
+    spaces, a hyphen, and a space or the end of the line. A record starts at
+    `TY` and ends at `ER`.
+  - Until a producer's rule is established from its real files, one rule
+    applies: inside a record, a line that is not a tag line continues the value
+    above it, joined by a line feed. Empty lines just before a tag line are
+    dropped; other characters are kept. Line endings are read as line feeds.
+  - Text outside records is kept as `header` blocks before the first record
+    and `other` blocks after it. Outside a record, a line that starts like a
+    tag, whatever its spacing, is an error, as are a `TY` inside an open record
+    and a file that ends inside one. Inside a record, a line that starts like a
+    tag with other spacing is a continuation, and is reported.
+- **CSL-JSON**, as preserved: each member of an item is one `LegacyField` with
+  `encoding` `json`, holding the value's own source text. The file is an array
+  of objects; anything else is an error.
 
 Equivalence MUST be tested by an equivalence comparator that is independent of
 the exporter, and, where a native reader exists, by that reader as well.
 
 ### D. Export after edits
+
+`mapped_to` is one of `title`, `issued`, `contributions/<role>`,
+`dates/<variable>`, `bib/<name>`, or `identifiers/<scheme>`. The mapped value
+that `mapped_sha256` covers is, in that order: the title; the issue date; the
+array of that role's `as_printed` names, in order; the date; the `bib` value; or
+the array of that scheme's identifier values. Several preserved fields, such as
+a repeated author tag, or a year and a month, MAY map to one path and then share
+its digest. The record's `type` has no `mapped_to`: it is mapped from the
+native entry type.
+
+An exporter that cannot yet produce a native value for an edited record MUST NOT
+emit the stale one: it writes no output and names the records and paths.
 
 For each preserved field with `mapped_to`: if the current mapped value's digest
 equals `mapped_sha256`, export the preserved native value; otherwise generate
@@ -184,8 +232,10 @@ span of the document text.
 All codecs MUST treat input as hostile: refuse archive entries with absolute or
 parent paths; cap uncompressed size, entry count, nesting depth, and field
 length; disable XML DTD and external entity processing; never fetch a URL found
-in a file; and never interpret file text as instructions. Limits are published
-by `doctor`. Cap values are set by the takeover solution design.
+in a file; and never interpret file text as instructions. A codec that expands
+shortcuts MUST also cap the total expanded text. Limits are published by
+`doctor`. Cap values are set by the takeover solution design; SD-003 sets any
+further cap that only a library codec needs.
 
 ### H. Author-date profile
 
