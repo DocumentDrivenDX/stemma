@@ -32,7 +32,8 @@ Then go round again with a new source, a better scan, or a corrected sentence.
 Installing the plugin is the only installation there is. The plugin and Claude
 set up everything else themselves.
 
-Install it from the DocumentDrivenDX marketplace with Claude Code:
+Install it from the DocumentDrivenDX marketplace with Claude Code. On Windows,
+setup needs Git Bash.
 
 ```sh
 claude plugin marketplace add DocumentDrivenDX/plugins
@@ -88,14 +89,6 @@ Stemma compares no text with page images and recognizes no characters in a scan.
 While it reads a PDF, the PDF library warns that no native drawing module is
 there; the plugin ships none, and reading text draws nothing. Manuscript files
 are not read yet: quotations and pages are checked from citation records.
-
-## Where it has been tried
-
-On one Mac with Apple silicon: the checks, reading PDFs (synthetic ones and one
-old scan with a text layer), and installation from the DocumentDrivenDX
-marketplace on GitHub with the Claude command-line tool (version 0.0.1). The
-Claude desktop app, a live Claude session using the skill, Windows, and Linux are
-untested. Setup on Windows needs Git Bash.
 
 ## Layout
 

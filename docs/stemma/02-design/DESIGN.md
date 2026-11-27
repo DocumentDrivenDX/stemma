@@ -308,7 +308,9 @@ The microsite presents the plugin. Its home page leads with what the author is
 after, creating academically rigorous research reports and books, and presents
 the checks as how Stemma serves that: the problem, how the author works, what
 each recorded citation rests on, what is checked, and what stays the author's
-judgment. It claims for Stemma only what works.
+judgment. It claims for Stemma only what works. It carries no testing history:
+nothing about which machines, versions, or sessions have or have not been tried.
+Requirements a reader must meet, and the limits of what a check shows, stay.
 
 Its voice is approachable and nontechnical, for an author rather than a
 programmer: everyday words, "you" for the reader, a term explained where it is
@@ -350,7 +352,7 @@ the test fixtures. The local test run fails when they are stale or when a websit
 file holds a local path. The worked example's runs that need its private copy are
 under `website/recorded/` (`./scripts/dev.sh record-example <store>`). A test
 compares them with a fresh run only where the store is present, and is skipped
-elsewhere; the site says they cannot be rebuilt without the copy. A screenshot counts as current when the page it was
+elsewhere. A screenshot counts as current when the page it was
 captured from is unchanged; its pixels are not compared between machines.
 Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,
 off-site requests, links, light and dark, 320 and 375 pixel widths, keyboard

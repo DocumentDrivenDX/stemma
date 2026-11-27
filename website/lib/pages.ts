@@ -51,7 +51,7 @@ export function findingCard(r: Result): string {
 
 /** Detail that is there for whoever wants it. `body` is trusted HTML. */
 const more = (summary: string, body: string) => `<details class="more"><summary>${summary}</summary>\n${body}\n</details>`;
-const transcript = (text: string, caption = "<strong>Transcript</strong> of a real run, with folder names from the test machine replaced.") => excerpt(caption, text);
+const transcript = (text: string, caption = "<strong>Transcript</strong> of a real run, with folder names replaced.") => excerpt(caption, text);
 
 function shot(file: string): string {
   const shots: Omit<ReturnType<typeof screenshotPlan>[number], "html">[] = JSON.parse(generated("screenshots/manifest.json"));
@@ -212,14 +212,12 @@ const ASKS: [string, string][] = [
 
 function install(): string {
   return `${opening("Get started", "Install one plugin, then ask Claude in plain words. There is nothing else for you to set up.")}
-${band("What you need", `<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs.</p>
-<p class="note">Stemma is pre-release. It has been tried on one Mac with Apple silicon, including installation with the Claude command-line tool (Stemma 0.0.1). The Claude desktop app, a live Claude session using the plugin, Windows and Linux are untested. On Windows, setup needs Git Bash.</p>`)}
+${band("What you need", `<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs. On Windows, setup also needs Git Bash.</p>`)}
 ${band("Install the plugin", `<p>Type these two commands in a terminal. They add the DocumentDrivenDX catalog of plugins and install Stemma from it.</p>
 ${excerpt("Commands to type in a terminal.", "claude plugin marketplace add DocumentDrivenDX/plugins\nclaude plugin install stemma@documentdrivendx")}`)}
 ${band("The first time you use it", `<p>Stemma needs a small program called Bun to run. Claude downloads one fixed version, confirms it is the expected file, and keeps it inside the plugin's own folder. Your system settings stay as they are, and Claude asks permission as it usually does.</p>
 <p>If setup fails, or you say no, Claude tells you that nothing was checked. You can keep writing either way.</p>`)}
-${band("What to ask Claude", `<dl class="asks">${ASKS.map(([ask, does]) => `<div><dt>&ldquo;${escape(ask)}&rdquo;</dt><dd>${escape(does)}</dd></div>`).join("")}</dl>
-<p class="note">The tools behind these requests are tested. A live Claude session following the plugin's instructions has not been tested.</p>`)}
+${band("What to ask Claude", `<dl class="asks">${ASKS.map(([ask, does]) => `<div><dt>&ldquo;${escape(ask)}&rdquo;</dt><dd>${escape(does)}</dd></div>`).join("")}</dl>`)}
 ${band("Before you add material", `<p><strong>Anything in a project may be sent to the AI model.</strong> Stemma holds back no individual source. If you may not send something to a hosted model, do not put it in the project.</p>
 <p><strong>Back up your private store.</strong> Your copies and their text live outside the project, and Stemma makes no other copy of them.</p>
 <p><a href="how.html#places">Where your material lives</a></p>`)}`;
@@ -301,7 +299,7 @@ const FIXTURE_NAMES: Record<string, string> = {
 
 function examples(): string {
   const fixtures = Object.entries(FIXTURES);
-  return `${opening("Examples", "Watch Stemma at work on a made-up book. Everything here comes from real runs of the tool.", `<p class="note">All names and sources on this page are invented. For a real book, see the <a href="darwin.html">worked example</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folders on the test machine.</p>
+  return `${opening("Examples", "Watch Stemma at work on a made-up book. Everything here comes from real runs of the tool.", `<p class="note">All names and sources on this page are invented. For a real book, see the <a href="darwin.html">worked example</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folder names.</p>
 ${contents("Parts of this page", [["demo", "The demo, step by step"], ["fixtures", "More test projects"], ["screenshots", "Pictures of the output"]])}`)}
 ${band("The demo, step by step", `<p>Eleven short steps, from an empty folder to checked quotations. IDs in the demo are fixed so that every run looks the same.</p>
 ${demoSteps()}`, { id: "demo" })}
@@ -364,7 +362,7 @@ ${file(`records/citations/${citations[0]!.id}.json`)}`, { id: "citations" })}
 ${band("6. The check", `<p>With the private copy in place, the check compared all four citations with it. For each one: the copy and text are there and unchanged, the quotation is in the text, the page is within the numbered pages, and nothing it relies on has been replaced. Nothing was left open among the checks that ran.</p>
 <p>One quotation matched only after rejoining the word <em>denying</em>, split at the end of a line. The report points that out so you can look.</p>
 <p>The project is still <em>not</em> called checked clean, and the first line of the report says why: three kinds of check do not run. It also notes that nobody has admitted the source.</p>
-${transcript(withCopy, "<strong>Transcript</strong> of a real run on the maintainer's machine, which holds the private copy. Folder names are replaced. It cannot be rebuilt on a machine without the copy.")}`, { id: "check" })}
+${transcript(withCopy, "<strong>Transcript</strong> of a real run with the private copy. Folder names are replaced.")}`, { id: "check" })}
 ${band("7. Planted mistakes", `<p>To see whether the checks would notice, two mistakes were made in a throwaway copy of the project: <q>greater</q> was changed to <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
 <p>Both were caught. The changed quotation is shown beside the wording in the copy (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words were found: page 88.</p>
 ${more("What the tool printed for the planted mistakes", transcript(trial, "<strong>Transcript</strong> of a real run on a throwaway copy with two planted mistakes, on the machine that holds the private copy."))}
@@ -397,13 +395,13 @@ ${table("Voice", ["Write", "Not"], [
   ])}`)}
 ${band("Color", `<p>Surfaces, text and the accent are the default role tokens of <a href="https://github.com/DocumentDrivenDX/arras">arras</a>; Stemma sets no brand color. It adds a strong line and three status colors. Light and dark follow the system setting, or <code>data-appearance</code> on the page. Status colors only repeat a word.</p>
 ${table("Color tokens", ["Token", "Light", "Dark", "Current"], tokens.map((t) => [code(t.name), code(t.light), code(t.dark), `<span class="swatch" style="background: var(${t.name})">&#8195;&#8195;</span>`]))}`)}
-${band("Contrast", `<p>Computed with the WCAG 2.2 formula from the stylesheet's values. A browser test then reads the rendered colors of the samples below in light and dark and compares them with these numbers.</p>
+${band("Contrast", `<p>Computed with the WCAG 2.2 formula from the stylesheet's values.</p>
 ${table("Contrast ratios", ["Foreground on background", "Needs", "Light", "Dark", "Sample"], light.map((p, i) => [`${short(p.fg)} on ${short(p.bg)}`, `${p.floor}:1`, `${p.ratio.toFixed(2)}:1`, `${dark[i]!.ratio.toFixed(2)}:1`,
     p.floor === 3
       ? `<span class="swatch" data-pair="${i}" style="color: var(${p.fg}); border: 2px solid var(${p.fg}); background: var(${p.bg})">&#8195;&#8195;</span>`
       : `<span class="swatch" data-pair="${i}" style="color: var(${p.fg}); background: var(${p.bg})">Aa 123</span>`]))}
 <p>The arras border color is under 3:1 on all ${BACKGROUNDS.length} backgrounds, so it is for decorative dividers only. It never marks a control or carries meaning.</p>`, { id: "contrast" })}
-${band("Type", `<p>Three families under the SIL Open Font License, served from this site: Source Serif 4 for headings, Inter for text, JetBrains Mono for command output and identifiers. Source Serif 4 also sets quoted words, at its optical sizes and with its own italic. Their licence texts are published beside the font files: <a href="fonts/LICENSE-source-serif-4.txt">Source Serif 4</a>, <a href="fonts/LICENSE-inter.txt">Inter</a>, <a href="fonts/LICENSE-jetbrains-mono.txt">JetBrains Mono</a>. Only Latin and extended Latin are bundled; other scripts fall back to system fonts and are untested.</p>
+${band("Type", `<p>Three families under the SIL Open Font License, served from this site: Source Serif 4 for headings, Inter for text, JetBrains Mono for command output and identifiers. Source Serif 4 also sets quoted words, at its optical sizes and with its own italic. Their licence texts are published beside the font files: <a href="fonts/LICENSE-source-serif-4.txt">Source Serif 4</a>, <a href="fonts/LICENSE-inter.txt">Inter</a>, <a href="fonts/LICENSE-jetbrains-mono.txt">JetBrains Mono</a>. Only Latin and extended Latin are bundled; other scripts fall back to system fonts.</p>
 <p class="specimen-display">A line of descent to a stored source</p>
 <p class="specimen-quote">Some fields were abandoned by their holders.</p>
 <p>A citation rests on a source record and a stored copy.</p>
@@ -427,8 +425,7 @@ ${findingCard(unverifiable)}
 <h3>Figure</h3>
 <p>A screenshot or drawing has alternative text, a caption that says how it was made, and the same content available as text. A rendered page is never presented as a terminal window or as a Stemma screen.</p>
 ${shot("check-clean.png")}`)}
-${band("Navigation and accessibility", `<p>The target is WCAG 2.2 level AA. A skip link comes first, each page has one first-level heading, the current page is marked with <code>aria-current</code> by weight and an underline, focus shows a 2-pixel ring, and wide tables and long excerpts can be reached by keyboard. On narrow screens the navigation wraps; the site needs no JavaScript.</p>
-<p>Automated checks run axe-core on every page in light and dark. A clean run does not show conformance. Screen readers, zoom at 200% by hand, Safari and Firefox are untested.</p>`)}`;
+${band("Navigation and accessibility", `<p>The target is WCAG 2.2 level AA. A skip link comes first, each page has one first-level heading, the current page is marked with <code>aria-current</code> by weight and an underline, focus shows a 2-pixel ring, and wide tables and long excerpts can be reached by keyboard. On narrow screens the navigation wraps; the site needs no JavaScript.</p>`)}`;
 }
 
 const BODIES: Record<(typeof NAV)[number]["file"], () => string> = {
