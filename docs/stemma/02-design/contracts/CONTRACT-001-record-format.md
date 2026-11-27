@@ -355,6 +355,11 @@ found. The manuscript, which links to it by the record ID, is authoritative for
 the current key, locator, quotation, sentence, and claim links (CONTRACT-006
 D); those record fields are never updated.
 
+**PDF manuscripts.** Takeover of a PDF (CONTRACT-003 I) uses these records
+unchanged, with one addition to the record schema that is made with the code that
+writes it (SD-015, step P5): `ImportBatch.format` gains `pdf`. Until then the
+schema does not accept it.
+
 **Takeover rounds.** `intake_item` and `round_choice` records are never edited.
 There is no round or session record: remaining work is computed from failing
 results and intake items that have no applicable choice, so stopping and

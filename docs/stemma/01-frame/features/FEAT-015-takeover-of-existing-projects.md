@@ -17,13 +17,14 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 15. Takeover of existing projects
-**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82, FR-92, FR-93
+**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82, FR-92, FR-93, FR-95
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 Takeover brings an existing manuscript and its reference libraries into Stemma
-without changing the originals (FR-71). It builds what it finds into the
+without changing the originals (FR-71). A manuscript is a Word file or, for a
+chapter with none, a born-digital PDF (FR-95). It builds what it finds into the
 evidence graph as unverified (FR-72), links author-date citations to the
 manuscript's reference lists by fixed rules (FR-92), keeps its first report
 usable (FR-93), and lets the author resolve failing
@@ -33,7 +34,8 @@ constructs and methodology (FR-82).
 
 ## Ideal Future State
 
-An author gives Stemma a half-referenced Word manuscript and their libraries.
+An author gives Stemma a half-referenced Word or PDF manuscript and their
+libraries.
 The originals stay as they were. The author sees what was found, what was not
 read, and what is uncertain, all unverified. As they add sources, checks
 run, and the author decides for each failing reference whether to remove,
@@ -58,6 +60,7 @@ losing a decision.
 | Area | User question or job | Feature responsibility |
 |------|----------------------|------------------------|
 | Intake | What did Stemma read from my files? | Non-destructive reading with a stated support level per input |
+| PDF intake | What could Stemma not tell from my PDF? | Structure only by stated rules, no link across a doubtful join, and a list of what a PDF cannot show |
 | Unverified graph | What does my manuscript rest on? | References, quotations, and claims as unverified records |
 | Author-date citations | Which entry does each citation mean? | Reference lists, citation recognition, rule-based linking, and an account of every parenthesis with a year |
 | Stemma copy | Do checks see what I cite? | Markers that keep each citation as typed, and checks that read them |
@@ -76,11 +79,13 @@ These objects differ:
 | Full or partial reference | A recovered reference with all, or only some, identifying data |
 | Round | One working pass through failing references |
 | Choice | The author's decision to remove, repoint, or replace one reference |
-| Reference list | A list of works under a references or bibliography heading in a Word file |
+| Reference list | A list of works under a references or bibliography heading in a manuscript file |
 | Linked citation | An author-date citation that a fixed rule matched to exactly one list entry; not a verified one |
 | Unresolved citation | Text read as a citation that no entry, or more than one, matches; it stays open |
 | Left unlinked | A parenthesis with a year that takeover did not read as a citation, listed with its reason |
 | Exact repeat | Reference entries whose text as found is identical |
+| Seam | A place where a PDF reading joined or ended text without being able to vouch that it belongs together as shown |
+| Unread page | A PDF page whose content is not converted: no text layer, or text drawn invisibly, as in a recognition layer |
 
 ## Task Model
 
@@ -109,10 +114,44 @@ N/A — the user stories name the tasks.
   as data and never as instructions.
 - INT-08. A damaged or unreadable input must produce a named failure and must not
   leave a partial import presented as complete.
-- INT-09. A manuscript may be several Word files, such as one for each chapter
+- INT-09. A manuscript may be several files, such as one for each chapter
   or appendix. Taking over a further file into the same project must add to it
   and must keep earlier records and choices.
 - INT-10. Takeover must report every Word comment with its text and location.
+- INT-11. A chapter must be taken over from one file. A file that repeats text
+  already taken over must add nothing, and must name the earlier file, unless
+  the author says it is a different text.
+
+#### PDF intake (FR-95)
+
+INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
+
+- PDF-01. Takeover must read a born-digital PDF manuscript with a text layer and
+  must produce from it what it produces from a Word file: the same kinds of
+  records, intake items, report, author-date account, and Stemma copy.
+- PDF-02. Paragraphs, headings, footnotes and their markers, running heads, page
+  numbers, and reading order must be set only by stated deterministic rules.
+  No model may set them. What the rules cannot establish must be reported, and
+  every removed line must be listed.
+- PDF-03. Every piece of text read from a converted page must end as manuscript
+  text, a note marker, or a listed removal.
+- PDF-04. Takeover must not link a citation or read a reference entry across a
+  place it cannot vouch for, such as a page break or a line-end hyphen that
+  changes a name. Each such citation and entry must be listed with the reason.
+- PDF-05. A reference list whose entries cannot be told apart, or that an unread
+  page could affect, must link no citation it serves, and the report must say
+  so.
+- PDF-06. Takeover must report every comment annotation with its text and page,
+  and must report form values, link addresses, and attachments without fetching
+  or opening anything.
+- PDF-07. Every report must state what a PDF cannot show, including whether it
+  was made with tracked changes showing, comments printed on the page, hidden or
+  struck text, tables, block quotations, and reference-manager data.
+- PDF-08. A page with no text layer or with invisibly drawn text must not be
+  converted and must be named. A file with no page that can be converted must
+  fail by name and write nothing. Takeover must not run recognition.
+- PDF-09. Each converted paragraph must keep the page and place of its lines in
+  the original.
 
 #### Unverified graph (FR-72)
 
@@ -145,7 +184,7 @@ N/A — the user stories name the tasks.
 #### Reference lists and author-date citations (FR-92)
 
 - ADC-01. Takeover must find each reference list or bibliography section by its
-  heading.
+  heading. (In a PDF, PDF-05 also applies.)
 - ADC-02. For each entry it must read the authors, the year, and any year
   suffix, whether the year follows the authors or stands near the end of the
   entry, and must keep the entry as found. An entry it cannot read must be
@@ -221,6 +260,7 @@ N/A — the user stories name the tasks.
 - **Recovery accuracy**: On each supported input's seeded real-file test set,
   takeover reports 0 uncertain footnotes as resolved to a wrong source. On a
   hand-checked answer list, it links 0 author-date citations to a wrong entry.
+  Both targets apply to PDF as to Word.
 - **Accounting**: 100% of the parentheses that hold a year in a seeded
   manuscript are linked, unresolved, or listed with a reason.
 - **Security**: A seeded hostile input causes 0 executed code, 0 writes outside
@@ -240,6 +280,7 @@ N/A — the user stories name the tasks.
 - [US-106 — Review suggested constructs and methodology](../user-stories/US-106-review-suggested-constructs.md)
 - [US-113 — Link author-date citations to the chapter's reference list](../user-stories/US-113-link-author-date-citations.md)
 - [US-114 — Work through a usable first report](../user-stories/US-114-use-the-first-report.md)
+- [US-116 — Take over a PDF chapter](../user-stories/US-116-take-over-a-pdf-chapter.md)
 
 ## Edge Cases and Error Handling
 
@@ -262,7 +303,14 @@ N/A — the user stories name the tasks.
 - **An unread entry that could be the one cited**: The citation stays
   unresolved even when another entry matches.
 - **Citation inside a table**: Until the open question is answered, it is listed
-  as left unlinked with that reason.
+  as left unlinked with that reason. A PDF does not show which text is a table,
+  so there this reason cannot be given (PDF-07).
+- **PDF made with tracked changes showing**: Deleted text cannot be told from
+  current text. Every PDF report says so; the Word file is the remedy.
+- **Reference entry split across PDF pages**: The part after the break could
+  read as a work by fewer authors, so the entry is unread.
+- **Word and PDF of one chapter**: The second file adds nothing unless the author
+  says it is a different text.
 
 ## Success Metrics
 
@@ -277,7 +325,14 @@ N/A — the user stories name the tasks.
   without a source in a finished book; the report is the only warning.
 - The pilot build order is: Word reader; reference-list reader; author-date
   recognition and linking; Stemma copy and its reader; checks that read the
-  copy; usable first report. Later steps depend on earlier ones.
+  copy; usable first report. Later steps depend on earlier ones. The PDF reader
+  steps run beside these and no Word step waits for them (SD-015).
+- Product owner's decisions on PDF (2026-11-27): a PDF gets a full takeover; the
+  first reader is designed for single-column drafts; scanned pages and invisible
+  recognition layers are not converted; each chapter is taken over from one
+  file.
+- **Risk**: a PDF reading can lose or reorder text in ways its rules do not
+  detect, and a clean-looking report does not prove the reading is right.
 - Reading is not verifying: linking a citation says which entry it names.
   Checking its quotation or page still needs a copy of the cited work.
 - The repository is public. Tests copy the patterns found in real manuscripts
@@ -318,12 +373,17 @@ N/A — the user stories name the tasks.
   FEAT-010 provides the takeover mode; FEAT-011 stores the records.
 - **External services**: The tools that save the authors' manuscripts and
   libraries. Record, report, and command surfaces belong in Contracts.
-- **PRD requirements**: FR-71, FR-72, FR-73, FR-92, FR-93 (P0, M1); FR-82
+- **PRD requirements**: FR-71, FR-72, FR-73, FR-92, FR-93, FR-95 (P0, M1); FR-82
   (P0, M2).
 
 ## Out of Scope
 
-- PDF-only or LaTeX manuscript intake.
+- LaTeX manuscript intake.
+- Recognition of scanned pages, and converting a recognition layer.
+- Two-column pages, typeset proofs, and published pages as designed inputs. They
+  are read by the same rules, with more reported.
+- Using a PDF only to show where a Word chapter's sentences sit on pages, and
+  replacing a chapter taken over from one file with another file.
 - Capturing and converting sources (FEAT-002).
 - Check definitions, support checks, and annotations (FEAT-007).
 - Legacy library export (FEAT-003).
@@ -337,6 +397,8 @@ N/A — the user stories name the tasks.
 - [ ] Are the pilot author's current files structured like the earlier copies the
   author-date rules were drawn from? Product owner with the pilot author.
 - [ ] The PRD's open questions on tables, the second reference-entry layout,
-  repeated entries, working markers, left-unlinked parentheses, and the pilot
-  PDF's citation style apply to this feature.
+  repeated entries, working markers, left-unlinked parentheses, the pilot
+  PDF's citation style, and the five questions on PDF intake (figure pages,
+  list layout, pilot timing, producing programs, moving to Word) apply to this
+  feature.
 
