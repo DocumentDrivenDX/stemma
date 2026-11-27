@@ -90,7 +90,10 @@ if (skills.length !== 1 || skills[0] !== "stemma") fail(`expected one skill, fou
 const bundle = join(installed, "dist/stemma.js");
 if (!existsSync(bundle)) fail("the installed copy has no command line");
 const sha = (path: string) => new Bun.CryptoHasher("sha256").update(readFileSync(path)).digest("hex");
-if (sha(bundle) !== sha(join(release, "dist/stemma.js"))) fail("the installed command line differs from the built one");
+for (const part of new Bun.Glob("*.js").scanSync(join(release, "dist"))) {
+  const copy = join(installed, "dist", part);
+  if (!existsSync(copy) || sha(copy) !== sha(join(release, "dist", part))) fail(`the installed command line differs from the built one: ${part}`);
+}
 console.log(`\nInstalled command line matches the build: sha256 ${sha(bundle)}`);
 
 // What the skill tells Claude to run. The data directory stands in for the one

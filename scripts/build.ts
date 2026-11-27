@@ -1,8 +1,9 @@
-// Bundles the command line to dist/stemma.js and assembles the release tree
+// Bundles the command line to dist/stemma.js, with parts it loads only when needed
+// in files beside it, and assembles the release tree
 // dist/release/ that the organization marketplace publishes. dist/ is not committed.
 import { cpSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { isBuiltin } from "node:module";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 const root = join(import.meta.dir, "..");
 
@@ -32,11 +33,14 @@ export function copyCiteLicenses(outdir: string): void {
 export async function bundle(outdir: string): Promise<string> {
   const built = await Bun.build({
     entrypoints: [join(root, "packages/cli/src/main.ts")],
-    outdir, naming: "stemma.js", target: "bun", minify: false,
+    // Splitting keeps the PDF reader out of what every command loads at start.
+    outdir, naming: { entry: "stemma.js", chunk: "[name]-[hash].js" }, splitting: true, target: "bun", minify: false,
   });
   if (!built.success) throw new Error(built.logs.join("\n"));
   const path = join(outdir, "stemma.js");
-  const left = unresolvedImports(readFileSync(path, "utf8"));
+  const parts = built.outputs.filter((o) => o.path.endsWith(".js")).map((o) => basename(o.path));
+  const left = parts.flatMap((part) => unresolvedImports(readFileSync(join(outdir, part), "utf8")))
+    .filter((i) => !(i.startsWith("./") && parts.includes(i.slice(2))));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
   copyPdfData(outdir);
   copyCiteLicenses(outdir);
@@ -50,7 +54,7 @@ if (import.meta.main) {
   const built = await bundle(dist);
   mkdirSync(join(release, ".claude-plugin"), { recursive: true });
   mkdirSync(join(release, "dist"));
-  cpSync(built, join(release, "dist/stemma.js"));
+  for (const part of new Bun.Glob("*.js").scanSync(dist)) cpSync(join(dist, part), join(release, "dist", part));
   cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
   cpSync(join(dist, "licenses"), join(release, "dist/licenses"), { recursive: true });
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });

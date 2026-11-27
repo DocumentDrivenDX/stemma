@@ -39,9 +39,9 @@ bun="$root/.tools/bun"
 # working directory's .env and bunfig.toml (SEC-014).
 run() { "$bun" --no-install --no-env-file --config=/dev/null "$@"; }
 
-if [ ! -d node_modules/typescript ] || [ ! -d node_modules/@playwright/test ]; then
-  "$bun" install --frozen-lockfile --ignore-scripts --registry=https://registry.npmjs.org
-fi
+# Every time, so that a dependency added since the last run is there; with
+# nothing to do it takes milliseconds.
+"$bun" install --frozen-lockfile --ignore-scripts --registry=https://registry.npmjs.org >/dev/null
 
 case "${1:-check}" in
   check)
@@ -52,7 +52,7 @@ case "${1:-check}" in
     run scripts/build.ts >/dev/null
     # Many tests run several commands in turn, so they get longer than the
     # 5-second default when workers share the machine.
-    run test ./tests --parallel=4 --timeout=30000
+    run test ./tests --preload ./tests/cleanup.ts --parallel=4 --timeout=30000
     ;;
   build) run scripts/build.ts ;;
   example)

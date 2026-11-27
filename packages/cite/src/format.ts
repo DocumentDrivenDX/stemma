@@ -78,15 +78,35 @@ const formatOne = (engine: ReturnType<typeof engineFor>, id: string, note: numbe
  * (which the style forms only for a letter it treats as published, so the
  * publisher is kept for that one).
  */
-function letterDescriptions(corpus: Corpus, record: JsonObject): { full: string; short: string } {
-  const own = cslItem(corpus, record);
-  const bare = { ...own };
-  for (const v of ["container-title", "container-title-short", "editor", "volume", "publisher", "publisher-place", "issued", "container-author", "page", "collection-title", "edition"]) delete bare[v];
-  const full = formatOne(engineFor({ [own.id]: bare }), own.id, 1, []);
-  const shortItem = { ...bare, ...(own.publisher !== undefined ? { publisher: own.publisher } : {}) };
-  const engine = engineFor({ [own.id]: shortItem });
-  formatOne(engine, own.id, 1, []);
-  return { full, short: formatOne(engine, own.id, 2, [["x1", 1]]) };
+function letterDescriber(corpus: Corpus): (record: JsonObject) => { full: string; short: string } {
+  // Compiling the style is the costly step, so one engine for each form serves
+  // every letter, emptied before each so that no letter affects another.
+  const maker = () => {
+    const items: Record<string, CslItem> = {};
+    let engine: ReturnType<typeof engineFor> | undefined;
+    return (item: CslItem) => {
+      items[item.id] = item;
+      engine ??= engineFor(items);
+      engine.updateItems([]);
+      return engine;
+    };
+  };
+  const fullEngine = maker();
+  const shortEngine = maker();
+  const described = new Map<string, { full: string; short: string }>();
+  return (record) => {
+    const own = cslItem(corpus, record);
+    const known = described.get(own.id);
+    if (known) return known;
+    const bare = { ...own };
+    for (const v of ["container-title", "container-title-short", "editor", "volume", "publisher", "publisher-place", "issued", "container-author", "page", "collection-title", "edition"]) delete bare[v];
+    const full = formatOne(fullEngine(bare), own.id, 1, []);
+    const engine = shortEngine({ ...bare, ...(own.publisher !== undefined ? { publisher: own.publisher } : {}) });
+    formatOne(engine, own.id, 1, []);
+    const made = { full, short: formatOne(engine, own.id, 2, [["x1", 1]]) };
+    described.set(own.id, made);
+    return made;
+  };
 }
 
 /**
@@ -113,6 +133,7 @@ export function formatCitations(corpus: Corpus, clusters: Cluster[], include: st
     return id;
   };
   const engine = engineFor(items);
+  const describeLetter = letterDescriber(corpus);
   const lettersSeen = new Set<string>();
   const citations: string[] = [];
   const pre: [string, number][] = [];
@@ -132,7 +153,7 @@ export function formatCitations(corpus: Corpus, clusters: Cluster[], include: st
       let target = id;
       let prefix = item.before ? hold(item.before) : "";
       if (container) {
-        const described = letterDescriptions(corpus, record);
+        const described = describeLetter(record);
         prefix += hold(`${lettersSeen.has(id) ? described.short : described.full}, in `);
         lettersSeen.add(id);
         target = String(container.id);

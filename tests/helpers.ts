@@ -2,14 +2,14 @@ import { cpSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { deflateRawSync } from "node:zlib";
-import { afterAll } from "bun:test";
 
 export const ROOT = join(import.meta.dir, "..");
 
 const made: string[] = [];
-afterAll(() => {
+/** Removes every temporary directory made so far; tests/cleanup.ts calls it. */
+export function removeTemporaries(): void {
   for (const dir of made.splice(0)) rmSync(dir, { recursive: true, force: true });
-});
+}
 
 export function temporary(): string {
   const dir = mkdtempSync(join(tmpdir(), "stemma-test-"));
