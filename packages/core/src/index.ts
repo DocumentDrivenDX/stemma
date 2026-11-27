@@ -15,7 +15,7 @@ export { changedResults, dependants, sourceBinding } from "./checks/changed.ts";
 export { describeLabels, judgeLocator, locatorResults } from "./checks/locators.ts";
 export { quotePageResults, quoteResults } from "./checks/quotes.ts";
 export { figuresIn } from "./checks/numbers.ts";
-export { titlesMatch, describedSources } from "./checks/metadata.ts";
+export { titlesMatch, foldName, describedSources } from "./checks/metadata.ts";
 export * from "./excerpt.ts";
 export { normalizeText } from "./normalize.ts";
 export * from "./matching/quote-fold.ts";

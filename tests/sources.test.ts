@@ -4,7 +4,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { cpSync, existsSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type CheckReport, figuresIn, planResolution, readLookup, type Result, titlesMatch } from "@stemma/core";
+import { type CheckReport, figuresIn, foldName, planResolution, readLookup, type Result, titlesMatch } from "@stemma/core";
 import { canonical, sha256 } from "@stemma/records";
 import { fetchBytes, FetchRefused } from "@stemma/workspace";
 import { bundle } from "../scripts/build.ts";
@@ -341,6 +341,13 @@ describe("comparisons and reviews (FR-85, FR-88, FR-89)", () => {
 });
 
 describe("metadata and identifiers (FR-86)", () => {
+  test("a note mark set against a name does not hide the name, and another name still differs", () => {
+    expect(foldName("Smith1, Reyes\u00b2")).toBe("smith 1 reyes 2");
+    expect(` ${foldName("A. Smith1, B. Reyes2")} `).toContain(" smith ");
+    expect(` ${foldName("A. Smithson1")} `).not.toContain(" smith ");
+    expect(foldName("The 3rd edition")).toBe("the 3rd edition");
+  });
+
   test("meta.source agrees with the title page, fails on a wrong year, and a person's review confirms what the text cannot show", () => {
     const good = reef();
     expect(verdicts(good.book.check(), "meta.source")).toEqual(["pass"]);

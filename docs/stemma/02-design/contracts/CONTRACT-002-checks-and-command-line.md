@@ -226,7 +226,8 @@ both readings.
 **Metadata checks** (assumptions beyond SD-007 BR-716). `meta.source` emits a
 result for every source that has a source file, and `meta.resolver` for every
 source that has one or is cited or listed. Values compare after case, diacritics, punctuation, line-end
-hyphens, and white space are folded. A title matches when it equals the other,
+hyphens, and white space are folded, and a letter followed by a digit is read
+as two words, so that a note mark set against a name does not hide it. A title matches when it equals the other,
 or equals the other's main title before a colon or full stop; `meta.source`
 also accepts the record title found as consecutive words on a title page. Each
 author's family name must appear among the stated contributors or on a title

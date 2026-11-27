@@ -14,10 +14,15 @@ import { itemOf, subjectOf } from "./records.ts";
 const list = (value: unknown): JsonObject[] => (Array.isArray(value) ? value.filter(isObject) : []);
 const text = (value: unknown): string | undefined => (typeof value === "string" && value !== "" ? value : undefined);
 
-/** Case, diacritics, punctuation, line-end hyphens and white space are folded. */
+/**
+ * Case, diacritics, punctuation, line-end hyphens and white space are folded. A
+ * letter followed by a digit is read as two words: in extracted text a note mark
+ * often stands against a name, as in "Smith1".
+ */
 export const foldName = (value: string): string => value
   .replace(/(\p{L})[-‐]\s*\n\s*(?=\p{Ll})/gu, "$1")
-  .normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  .normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase()
+  .replace(/(?<=\p{L})(?=\p{N})/gu, " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
 const holds = (within: string, words: string): boolean => words !== "" && ` ${within} `.includes(` ${words} `);
 const mainTitle = (title: string): string => title.split(/(?<=\S)\s*[:.;]\s+/)[0]!;
