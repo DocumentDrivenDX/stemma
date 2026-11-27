@@ -89,7 +89,10 @@ Each item states its acceptance criterion.
   no annotation that may be seen there; any doubt places none. A PDF is read for
   this in a separate process with no secret, bounded in time, number, and memory:
   it is killed once its resident memory passes 1.5 GiB (CONTRACT-005 M,
-  "Bounds"), and then none is placed.
+  "Bounds"), and then none is placed. An estimate on a scan (CONTRACT-005 M,
+  "Estimates on scans") is made in that process under the same bounds, from the
+  same checked bytes and from words the source view already shows. It is a
+  separate answer, labelled as unchecked, and loosens nothing above.
 - **SEC-040**: The MCP server downloads, writes, listens, reads no project
   file, and starts no lasting process until a tool is called; its launcher never
   fetches the runtime for it; and only protocol messages reach its standard
