@@ -169,16 +169,39 @@ export function blockText(block: Block, asConverted = false): string {
   return decodeText(block.role === "table" ? tableText(plain) : plain);
 }
 
+/**
+ * The streams and digest of the blocks of a part file a project was read with,
+ * which nothing changes once read. Each is made once: a check or an export asks
+ * for the same part's several times over.
+ */
+const made = new WeakMap<Block[], Map<string, unknown>>();
+export function readBlocks(blocks: Block[]): Block[] {
+  made.set(blocks, new Map());
+  return blocks;
+}
+
+/** What `make` gives for these blocks: once for each `name` if they are blocks a project was read with. */
+export function madeOnce<T>(blocks: Block[], name: string, make: () => T): T {
+  const kept = made.get(blocks);
+  if (!kept) return make();
+  if (!kept.has(name)) kept.set(name, make());
+  return kept.get(name) as T;
+}
+
 export function streamsOf(blocks: Block[], asConverted = false): Streams {
-  const of = (roles: string[]) => blocks.filter((b) => roles.includes(b.role)).map((b) => blockText(b, asConverted)).filter((t) => t !== "").join("\n");
-  return { main: of(MAIN_ROLES), notes: of(NOTE_ROLES), furniture: of(FURNITURE_ROLES) };
+  const make = (): Streams => {
+    const of = (roles: string[]) => blocks.filter((b) => roles.includes(b.role)).map((b) => blockText(b, asConverted)).filter((t) => t !== "").join("\n");
+    return { main: of(MAIN_ROLES), notes: of(NOTE_ROLES), furniture: of(FURNITURE_ROLES) };
+  };
+  // A copy, so that a caller that changes what it is given changes nothing kept.
+  return { ...madeOnce(blocks, asConverted ? "streams as converted" : "streams", make) };
 }
 
 /** What a review or a comparison binds to: the words and what counts as source text. */
-export const textDigest = (blocks: Block[]): string => {
+export const textDigest = (blocks: Block[]): string => madeOnce(blocks, "text digest", () => {
   const { main, notes, furniture } = streamsOf(blocks);
   return digest({ furniture, main, notes });
-};
+});
 
 /** A part entry's digest: the file's bytes with CRLF turned into LF. */
 export const fileDigest = (text: string): string => sha256(text.replace(/\r\n/g, "\n"));

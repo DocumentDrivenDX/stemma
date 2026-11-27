@@ -2,7 +2,7 @@
 import { canonical, compareCodePoints, decodeUtf8, digest, type Json, type JsonObject, JsonUnreadable, parseJson, sha256 } from "./json.ts";
 import { PROJECT_FORMAT, PROJECT_SCHEMA, RECORD_SCHEMA } from "./kinds.ts";
 import {
-  type Block, fileDigest, parseBlocks, partFile, serializeManifest, serializePart, SOURCE_DIRECTORY_NAME, splitFrontMatter,
+  type Block, fileDigest, parseBlocks, partFile, readBlocks, serializeManifest, serializePart, SOURCE_DIRECTORY_NAME, splitFrontMatter,
 } from "./sourcefile.ts";
 import { isObject, type Problem, type Reference, validatePart, validateProject, validateRecord } from "./validate.ts";
 
@@ -232,7 +232,7 @@ function loadPart(file: SourceFile, paged: boolean): { loaded: LoadedFile; part?
     ...base, state: "ok", formattable: grammar.length === 0, problems,
     canonical: grammar.length > 0 || text.replace(/\r\n/g, "\n") === serializePart(split.front, blocks),
   };
-  return { loaded, part: { index: Number(split.front.index), path: file.path, front: split.front, blocks } };
+  return { loaded, part: { index: Number(split.front.index), path: file.path, front: split.front, blocks: readBlocks(blocks) } };
 }
 
 function loadText(directory: string, files: Map<string, SourceFile>, manifest: LoadedFile): { text: LoadedText; partFiles: LoadedFile[]; strays: SourceFile[] } {

@@ -86,6 +86,22 @@ xml.getNodesByName = function (node, name, nameValue, found) {
   return [...(byName.get(nameValue) ?? [])];
 };
 
+// Each node of the style is given its formatting attributes in a fixed order,
+// which the processor found by enumerating the keys of the array that lists the
+// order, a third of the time taken to compile the style. The same attributes are
+// taken in the same order by walking the array itself.
+const processor = CSL as unknown as { FORMAT_KEY_SEQUENCE: string[]; setDecorations: (state: unknown, attributes: Record<string, unknown>) => [string, unknown][] };
+processor.setDecorations = (_state, attributes) => {
+  const ret: [string, unknown][] = [];
+  for (const key of processor.FORMAT_KEY_SEQUENCE) {
+    if (attributes[key]) {
+      ret.push([key, attributes[key]]);
+      delete attributes[key];
+    }
+  }
+  return ret;
+};
+
 const engineFor = (items: Record<string, CslItem>) => {
   const engine = new CSL.Engine({ retrieveLocale: () => locale, retrieveItem: (id: string) => items[id] }, style, "en-US", true);
   engine.setOutputFormat("stemma");
