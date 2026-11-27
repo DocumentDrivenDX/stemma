@@ -112,6 +112,14 @@ if (!added.includes("method text_layer")) fail("the installed copy did not read 
 if (added.includes("cMapUrl") || added.includes("standardFontDataUrl")) fail("the packaged font or character-map data was not found");
 if (!readFileSync(join(reading, directory, "pages/p0000.md"), "utf8").includes("\u6e2f\u306e\u901a\u884c\u7a0e")) fail("the text did not come out of the PDF");
 
+// The explorer page from the installed copy: filled from the shipped template,
+// with no node_modules and no bundling on this machine.
+const browsed = run([...launcher, "graph", "export", "--audience", "author", "--page", "--project", reading]);
+const identity = /Data identity ([0-9a-f]{12})/.exec(browsed)?.[1] ?? fail("the export printed no data identity");
+const explorer = readFileSync(join(reading, "build/graph/author/explorer.html"), "utf8");
+if (!explorer.includes("connect-src 'none'") || !explorer.includes(identity)) fail("the installed copy made no explorer page for this data");
+run([...launcher, "graph", "status", "--project", reading]);
+
 if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.test(name))) fail("something was written to the home directory");
 
 console.log(`
@@ -120,6 +128,7 @@ plugin installs from a local stand-in for the DocumentDrivenDX marketplace
 into an empty profile with one skill, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
-no native module. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
+no native module, and makes the explorer page from the shipped template. The page is not
+opened in a browser here. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);

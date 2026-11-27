@@ -40,6 +40,8 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
+  graph export --audience author [--page] [--out <dir>]
+  graph status [--out <dir>]
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network.

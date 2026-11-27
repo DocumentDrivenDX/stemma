@@ -28,6 +28,7 @@
       "dependencies": {
         "@stemma/core": "workspace:*",
         "@stemma/extract": "workspace:*",
+        "@stemma/graph": "workspace:*",
         "@stemma/records": "workspace:*",
         "@stemma/workspace": "workspace:*",
       },

@@ -7,6 +7,7 @@
     "@stemma/records": "workspace:*",
     "@stemma/core": "workspace:*",
     "@stemma/workspace": "workspace:*",
-    "@stemma/extract": "workspace:*"
+    "@stemma/extract": "workspace:*",
+    "@stemma/graph": "workspace:*"
   }
 }

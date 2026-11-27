@@ -11,6 +11,7 @@ import { canonical, PROJECT_FORMAT, PROJECT_SCHEMA, type ProjectContent, type So
 
 export * from "./fetch.ts";
 export * from "./originals.ts";
+export * from "./outputs.ts";
 
 export function findProject(start: string): string | undefined {
   for (let dir = resolve(start); ; dir = dirname(dir)) {

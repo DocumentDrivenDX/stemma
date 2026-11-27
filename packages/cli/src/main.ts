@@ -16,6 +16,7 @@ import {
   actorOf, CommandError, emit, openCorpus, type Options, reportRecords, requireActor, requireProject, tools, usageError, VERSION,
 } from "./context.ts";
 import { sourceCapture, sourceEnrich, sourceHistoryCommand, sourceList, sourceTag } from "./enrich.ts";
+import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
@@ -68,6 +69,8 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
+  graph export --audience author [--page] [--out <dir>]
+  graph status [--out <dir>]
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network.
@@ -79,7 +82,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 const NOT_YET = new Set([
   "migrate", "key", "unreviewed", "reviewed", "rounds",
   "support", "import", "export", "takeover", "index", "setup", "log", "activity",
-  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "graph", "map",
+  "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "map",
 ]);
 
 const STRING = { type: "string" } as const;
@@ -95,7 +98,7 @@ const OPTIONS = {
   outcome: STRING, flag: LIST, "original-sha256": STRING, address: STRING, via: STRING, identifier: STRING, plan: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
   finding: STRING, effect: STRING, "add-identifier": LIST, set: LIST, author: LIST, lookup: STRING, replace: FLAG, from: STRING,
-  add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST,
+  add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST, audience: STRING, page: FLAG, chapter: STRING,
 };
 
 /** The options each command takes beyond --project and --format. A command not listed takes none. */
@@ -114,7 +117,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages"], retire: ["actor", "reason", "replaced-by"],
   annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
-  check: ["changed", "all"], "research list": [], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
+  check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
 function version(options: Options): number {
@@ -363,11 +366,13 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "record add": only(1); return recordAdd(options, rest[0]);
     case "rules check": only(0); return rulesCheck(options);
     case "research list": only(0); return researchList(options);
+    case "graph export": only(0); return graphExport(options);
+    case "graph status": only(0); return graphStatus(options);
     default: throw usageError(`Unknown command: ${command}`);
   }
 }
 
-const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research"]);
+const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "graph"]);
 const NOT_YET_SUB = new Set(["source admit", "source reject", "record show", "record search", "record trace", "review import", "review comment", "review baseline", "review needed", "research record", "research corpus", "research admit", "research reject", "research coverage"]);
 
 export async function main(argv: string[]): Promise<number> {

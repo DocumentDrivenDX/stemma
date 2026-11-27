@@ -10,8 +10,8 @@ description: |
   capture quotations with their pages; record the citations in a manuscript;
   check citations, quotations, pages, metadata, identifiers, records, or the
   project and explain what is open; compare or review source text; show what a
-  source says on a page; or find out which sources are missing, damaged, or
-  changed.
+  source says on a page; browse and search the records in an offline page; or
+  find out which sources are missing, damaged, or changed.
 argument-hint: "[intent or scope]"
 ---
 
@@ -215,6 +215,7 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `check [--format json]` | Check the whole project and explain what is open |
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `research list` | List research notes under `research/` by path, with date and first heading |
+| `graph export --audience author --page` / `graph status` | Make one offline page for browsing and searching the records; say whether an export is current |
 | `annotate --finding <finding key> --effect explain\|dismiss --reason <text> --actor <kind>:<name>` | Save a note on one finding; an explanation leaves it open, and only a person dismisses. The key is in `.stemma/reports/check.json` |
 | `retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Retire a record or source file; the files stay, and what rested on it is listed |
 | `fmt [paths]`, `validate [paths]`, `rules check` | Canonical layout; check record and source files |
@@ -224,6 +225,28 @@ After writing or editing records, run `fmt` on them and then `check` before
 saying the work is done. Use `--actor model:<your model name>` for what you
 write; use `person:` only when entering the author's own words or review as
 given. Write temporary input files outside the project.
+
+## Browsing the records
+
+When the author asks to see, browse or search their evidence, run `graph export
+--audience author --page`, then tell them to open the `explorer.html` it names,
+with the data identity it prints. The page shows the same one.
+
+- The page works offline and never changes by itself. After records, sources or
+  manuscript files change, export again and tell the author to reload;
+  `graph status` says whether an export is current.
+- It holds passage text and other record contents. Say so once: anyone given the
+  file can read all of it. Do not send or publish it unasked, and do not commit
+  it; the default under `build/` is ignored by git.
+- It does not hold source pages, manuscript files or research notes. Pass on the
+  command's warnings and what it says was left out.
+- A record with no state has not been shown to be clear. Run `check` for
+  findings. Support results shown there are recorded model judgments, not
+  verification.
+- There is no reviewer export yet. Never offer the author's page as one: it is
+  not filtered for another reader.
+- A search lists at most 50 matches. Other records are reached through their
+  type lists and links.
 
 ## Capturing sources
 
