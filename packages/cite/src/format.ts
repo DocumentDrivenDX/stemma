@@ -63,6 +63,29 @@ export interface Formatted {
 
 const markdown = (s: string): string => s.replaceAll(ITALIC_OPEN, "*").replaceAll(ITALIC_CLOSE, "*");
 const hasPrivate = (v: unknown): boolean => /[]/.test(JSON.stringify(v));
+// While compiling a style, the processor looks up each macro it expands by
+// walking the whole parsed style, which made that walk most of the time taken
+// to format anything. The macros it holds do not change while it compiles, so
+// they are listed once for each parsed style and looked up by name.
+type StyleNode = { name?: string; attrs?: Record<string, string>; children?: unknown[] };
+type NodeSearch = (this: unknown, node: StyleNode, name: string, nameValue?: string, found?: StyleNode[]) => StyleNode[];
+const xml = (CSL as unknown as { XmlJSON: { prototype: { getNodesByName: NodeSearch; dataObj?: StyleNode } } }).XmlJSON.prototype;
+const walk = xml.getNodesByName;
+const macros = new WeakMap<StyleNode, Map<string, StyleNode[]>>();
+xml.getNodesByName = function (node, name, nameValue, found) {
+  if (name !== "macro" || !nameValue || found || node !== (this as { dataObj?: StyleNode }).dataObj) return walk.call(this, node, name, nameValue, found);
+  let byName = macros.get(node);
+  if (!byName) {
+    byName = new Map();
+    for (const macro of walk.call(this, node, name)) {
+      const own = macro.attrs?.name ?? "";
+      byName.set(own, [...(byName.get(own) ?? []), macro]);
+    }
+    macros.set(node, byName);
+  }
+  return [...(byName.get(nameValue) ?? [])];
+};
+
 const engineFor = (items: Record<string, CslItem>) => {
   const engine = new CSL.Engine({ retrieveLocale: () => locale, retrieveItem: (id: string) => items[id] }, style, "en-US", true);
   engine.setOutputFormat("stemma");
