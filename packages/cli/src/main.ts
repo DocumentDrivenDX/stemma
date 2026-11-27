@@ -21,6 +21,7 @@ import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
 import { buildReportCommand, citeFormat } from "./publish.ts";
 import { browse } from "./browse.ts";
+import { reviewed, unreviewedList } from "./reviewed.ts";
 import { mcp } from "./mcp.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
@@ -73,6 +74,10 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   excerpt --source <id> --pages <printed pages> | --passage <id> | --citation <id> | --quotation <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
+  unreviewed list
+             records whose review mark does not apply, with their passages; writes nothing
+  reviewed <id@sha256>... --actor person:<name>
+             record that the author said they reviewed these, as listed; a mark is not proof
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
   graph export --audience author [--page] [--out <dir>]
@@ -92,7 +97,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 
 /** Commands CONTRACT-002 B names that this version does not have yet. */
 const NOT_YET = new Set([
-  "migrate", "key", "unreviewed", "reviewed", "rounds",
+  "migrate", "key", "rounds",
   "support", "import", "export", "takeover", "index", "setup", "log", "activity",
   "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "disclosure", "scan", "map",
 ]);
@@ -130,7 +135,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"], "cite format": ["input"], "build report": ["check", "pdf"],
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages", "citation", "quotation"], retire: ["actor", "reason", "replaced-by"],
-  annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
+  annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"], "unreviewed list": [], reviewed: ["actor"],
   check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes", "originals"], mcp: ["idle-minutes", "opener"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
@@ -332,6 +337,8 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "ingest": only(0); return ingest(options, check);
     case "excerpt": only(0); return excerpt(options);
     case "retire": return retire(options, rest);
+    case "unreviewed list": only(0); return unreviewedList(options);
+    case "reviewed": return reviewed(options, rest);
     case "annotate": only(0); return annotateCommand(options);
     case "resolve": return resolveCommand(options, rest);
     case "coverage": only(1); return coverage(options, rest[0]);
@@ -363,7 +370,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
   }
 }
 
-const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "cite", "build", "graph"]);
+const TWO_WORDS = new Set(["source", "review", "passage", "record", "rules", "research", "cite", "build", "graph", "unreviewed"]);
 const NOT_YET_SUB = new Set(["source admit", "source reject", "record show", "record search", "record trace", "review import", "review comment", "review baseline", "review needed", "research record", "research corpus", "research admit", "research reject", "research coverage", "build draft", "build camera-ready", "build reviewer"]);
 
 export async function main(argv: string[]): Promise<number> {
