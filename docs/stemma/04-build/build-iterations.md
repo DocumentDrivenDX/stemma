@@ -154,6 +154,36 @@ With source views, at 500 / 2,000 / 5,000 sources (about 5 passages, 2 notes and
   200 characters. A replacement client can lift the 20-type, 50-per-type and
   100-link limits; the list of searched types is Stemma's own.
 
+### Measured after the export was made to scale
+
+Same machine. `scripts/synthetic-project.ts <directory> <sources> --plain`, and
+with `--unmatched 20` (a fifth of extracts and citations quote what their source
+does not hold). Memory is maximum resident size, as above, then peak footprint.
+Before and after were both run on these projects.
+
+| Export | 500 | 2,000 | 5,000 |
+|---|---|---|---|
+| Time before | 6 s | 34 s | 169 s |
+| Time after | 3 s | 12 s | 42 s |
+| Time before, unmatched | 12 s | 59 s | 239 s |
+| Time after, unmatched | 4 s | 14 s | 48 s |
+| Memory before | 3.3 / 2.9 GB | 11.3 / 9.5 GB | 19.6 / 20.7 GB |
+| Memory after | 1.5 / 1.2 GB | 5.3 / 4.1 GB | 11.2 / 7.9 GB |
+
+- `check` at 5,000 sources takes 57 s after (315 s before), 63 s unmatched.
+- The target of 60 s is met for export. The target of 4 GB is not.
+- The cause was not only `coverageOf`: many places rescanned every record for
+  each item. The closest-text search and the maps from folded to stored text
+  were the other large costs.
+- What remains is that a run holds the whole project at once: each record's
+  bytes and parsed form, each source file's text in several readings, and the
+  export's files as strings. About a third of the time is reading and parsing
+  the files. Getting under 4 GB needs source text read and released as it is
+  used, and export files written as they are made.
+- `tests/scale.test.ts` fails if the records read by `check` or export grow
+  faster than the project. Within one source file some work still grows with its
+  length times the number of citations of it.
+
 ### Order of work
 
 1. Make the export's time and memory grow in proportion to the project.
