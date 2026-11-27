@@ -239,7 +239,11 @@ export function sourceSeal(options: Options, text: string | undefined): number {
 }
 
 /** Converts an original again with a source file's recorded settings and compares each part. */
-export async function reconvert(root: string, corpus: Corpus, id: string, original: Original, actor: ConvertRequest["actor"]) {
+export async function reconvert(
+  root: string, corpus: Corpus, id: string, original: Original, actor: ConvertRequest["actor"],
+  /** A current comparison, when one exists: a result that repeats it is not recorded again. */
+  standing?: JsonObject,
+) {
   const text = corpus.texts.get(id);
   if (!text) throw new InvalidInput(`No readable source file has the ID ${id}.`);
   const data = text.manifest.data!;
@@ -264,8 +268,12 @@ export async function reconvert(root: string, corpus: Corpus, id: string, origin
     tools: [{ name: "stemma-convert", version: CONVERTER_VERSION }, ...(original.media_type === "application/pdf" ? [{ name: "pdfjs-dist", version: PDFJS_VERSION }] : [])],
     actor, now: new Date(), token: randomToken,
   });
-  writeProjectFile(root, plan.record.path, plan.record.text);
-  return { reconvertible: true as const, run: plan.record.id, parts: plan.parts, differing: plan.differing };
+  const repeats = standing !== undefined && canonical((parseJson(plan.record.text).value as JsonObject).pages!) === canonical(standing.pages!);
+  if (!repeats) writeProjectFile(root, plan.record.path, plan.record.text);
+  return {
+    reconvertible: true as const, run: repeats ? String(standing.id) : plan.record.id, recorded: !repeats,
+    parts: plan.parts, differing: plan.differing,
+  };
 }
 
 export async function sourceVerify(options: Options, id: string | undefined): Promise<number> {

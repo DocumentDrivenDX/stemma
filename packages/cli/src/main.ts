@@ -31,7 +31,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   version
   doctor
   init --project <dir>
-  ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--refresh-lookups]
+  ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups]
   source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
              [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...
@@ -83,7 +83,7 @@ const OPTIONS = {
   "auto-pages": FLAG, "page-numbers": STRING, identity: STRING, "coverage-note": STRING, note: STRING, name: STRING, out: STRING,
   original: STRING, with: STRING, against: STRING, independent: FLAG, scope: STRING, pages: STRING, passage: STRING, fields: STRING,
   outcome: STRING, flag: LIST, "original-sha256": STRING, address: STRING, via: STRING, identifier: STRING, plan: STRING,
-  originals: LIST, fetch: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
+  originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
 };
 
 /** The options each command takes beyond --project and --format. A command not listed takes none. */
@@ -96,7 +96,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "source compare": ["actor", "with", "against", "independent"],
   "review add": ["actor", "scope", "pages", "passage", "fields", "against", "outcome", "flag", "original-sha256", "note"],
   "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"],
-  ingest: ["actor", "plan", "originals", "fetch", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
+  ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages"], retire: ["actor", "reason", "replaced-by"], "record add": ["actor", "input"],
   check: ["changed", "all"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };

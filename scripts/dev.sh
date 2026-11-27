@@ -2,6 +2,10 @@
 # One entry point for local work. Everything it fetches or caches stays in the
 # git-ignored .tools/ and node_modules/ directories.
 #   ./scripts/dev.sh check         type check and all tests
+#   ./scripts/dev.sh example [--originals <dir> | --fetch]
+#                                  convert the worked example's originals again,
+#                                  compare, and check it; --fetch downloads them
+#                                  from the recorded addresses
 #   ./scripts/dev.sh demo          build, then run the demo in a fresh temporary directory
 #   ./scripts/dev.sh plugin-check  build, then install into an isolated Claude profile
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
@@ -43,6 +47,10 @@ case "${1:-check}" in
     run test ./tests
     ;;
   build) run scripts/build.ts ;;
+  example)
+    shift
+    run scripts/build.ts >/dev/null
+    run dist/stemma.js ingest --project "$root/examples/coral-reefs" --reconvert --actor software:dev-example "$@" ;;
   demo) run scripts/build.ts >/dev/null && run scripts/demo.ts ;;
   plugin-check) run scripts/build.ts >/dev/null && run scripts/plugin-check.ts ;;
   publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;
@@ -53,5 +61,5 @@ case "${1:-check}" in
   preview) run website/build.ts && run website/preview.ts ;;
   browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;
   e2e) run website/build.ts && run --bun node_modules/.bin/playwright test --config website/playwright.config.ts ;;
-  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|record-example|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
+  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|example|record-example|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
 esac

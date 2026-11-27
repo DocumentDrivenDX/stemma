@@ -25,7 +25,7 @@ export interface Options {
   "coverage-note"?: string; note?: string; name?: string; out?: string; original?: string; with?: string; against?: string;
   independent?: boolean; scope?: string; pages?: string; passage?: string; fields?: string; outcome?: string; flag?: string[];
   "original-sha256"?: string; address?: string; via?: string; identifier?: string; plan?: string; originals?: string[];
-  fetch?: boolean; "refresh-lookups"?: boolean; reason?: string; "replaced-by"?: string;
+  fetch?: boolean; reconvert?: boolean; "refresh-lookups"?: boolean; reason?: string; "replaced-by"?: string;
 }
 
 export const sqliteVersion = (): string => {

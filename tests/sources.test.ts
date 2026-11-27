@@ -447,6 +447,11 @@ describe("ingest (FR-86)", () => {
     const second = book.run("ingest", "--plan", planFile, ...AUTHOR);
     expect(second.out).toContain("0 source file(s) converted again, 1 already had a current comparison");
     expect(book.files()).toEqual(files);
+    // --reconvert converts again all the same, and records nothing that repeats what is recorded.
+    const third = book.run("ingest", "--reconvert", ...AUTHOR);
+    expect(third.out).toContain("converted again; 5 of 5 parts agree, as already recorded");
+    expect(third.out).toContain("1 source file(s) converted again, 0 already had a current comparison");
+    expect(book.files()).toEqual(files);
     const report = book.check();
     expect(verdicts(report, "source.original")).toEqual(["pass"]);
 

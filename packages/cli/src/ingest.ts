@@ -136,8 +136,10 @@ export async function ingest(options: Options, check: (options: Options) => numb
     const label = String(corpus.byId.get(String(data.source))?.data?.citation_key ?? data.source);
     const mine = [...corpus.texts].filter(([, t]) => t.manifest.data!.source === data.source && !isRetired(t.manifest.data!)
       && list((t.manifest.data!.original as JsonObject).files).some((f) => f.sha256 === data.sha256));
-    const stale = mine.filter(([id, t]) => !reconversions(corpus, id).some((r) => currentRun(r.data!, t, tools())));
-    current += mine.length - stale.length;
+    // A current comparison need not be made again; --reconvert makes it all the same.
+    const todo = mine.map(([id, t]) => ({ id, loaded: t, standing: reconversions(corpus, id).find((r) => currentRun(r.data!, t, tools()))?.data }))
+      .filter((m) => options.reconvert || !m.standing);
+    current += mine.length - todo.length;
     const wanted = { sha256: String(data.sha256), size: Number(data.size) };
     let path = findOriginal(root, wanted, places);
     if (!path && options.fetch && text(data.url)) {
@@ -157,16 +159,16 @@ export async function ingest(options: Options, check: (options: Options) => numb
     }
     // The digest was matched when the file was found; it is read as that kind of original.
     const original = { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type) };
-    for (const [id, loaded] of stale) {
+    for (const { id, loaded, standing } of todo) {
       if (!loaded.usable) {
         say(`  ${label}: ${loaded.directory} is damaged, so it was not compared.`);
         continue;
       }
-      const done = await reconvert(root, openCorpus(root), id, original, actor);
+      const done = await reconvert(root, openCorpus(root), id, original, actor, standing);
       if (!done.reconvertible) say(`  ${label}: its text was supplied, so it cannot be made again from the original.`);
       else {
         compared++;
-        say(`  ${label}: converted again; ${done.parts - done.differing.length} of ${done.parts} parts agree`);
+        say(`  ${label}: converted again; ${done.parts - done.differing.length} of ${done.parts} parts agree${done.recorded ? "" : ", as already recorded"}`);
       }
     }
   }
