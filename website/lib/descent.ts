@@ -13,7 +13,7 @@ export function descent(onExample = false): string {
   if (manifest.conversion.method !== "ocr" || manifest.conversion.level !== "unassessed") throw new Error("the example's text is no longer unassessed character recognition; reword the drawing");
   const author = source.contributions[0].as_printed;
   const title = String(source.title.value).split(". ")[0]!;
-  return `<figure class="descent">
+  return `<figure class="descent plate">
 <div class="descent-head"><p class="descent-title"><cite>${escape(title)}</cite></p>
 <p>${escape(`${author.given} ${author.family}, ${source.issued.edtf}`)}. The source record.</p>${id(source.id)}</div>
 <ul class="descent-tree" aria-label="What descends from the source record">

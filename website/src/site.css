@@ -57,11 +57,30 @@
   .colophon .shell { padding-block: 1.5rem 2rem; }
   .colophon p + p { margin-top: var(--stm-space-2); }
 
-  /* Page opening */
-  .opening { padding-bottom: 2.5rem; }
-  .opening > * + * { margin-top: var(--stm-space-4); }
+  /* Page opening: a tinted plate with the title, and the mark large beside it. */
+  .opening { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 2.5rem; align-items: start; margin-bottom: 3rem; padding: 1.5rem 1rem 1.75rem; background: var(--arras-color-surface-sunken); border: 1px solid var(--arras-color-border); border-radius: var(--arras-radius-card); }
+  @media (min-width: 40rem) { .opening { padding: 2.5rem 2.25rem; } }
+  .opening-text { min-width: 0; }
+  .opening-text > * + * { margin-top: var(--stm-space-4); }
   .opening h1 { max-width: 22ch; }
-  .opening-home h1 { font-size: clamp(2.25rem, 6.5vw, 4rem); font-weight: 450; max-width: 25ch; }
+  .opening-mark { display: none; }
+  @media (min-width: 56rem) {
+    .opening { grid-template-columns: minmax(0, 1fr) 7rem; }
+    .opening-mark { display: block; width: 7rem; height: 7rem; }
+  }
+  .opening .numbers { padding-top: var(--stm-space-2); }
+
+  /* The first page: the title, and beside it from 66rem the drawing of the chain. */
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: center; padding-bottom: 2rem; }
+  .hero-text { min-width: 0; }
+  .hero-text > * + * { margin-top: 1.25rem; }
+  .hero h1 { font-size: clamp(2.25rem, 5.4vw, 3.5rem); font-weight: 450; max-width: 20ch; }
+  .eyebrow { display: flex; align-items: center; gap: var(--stm-space-3); font: italic 400 1.125rem/1.4 var(--stm-font-serif); color: var(--arras-color-text-muted); }
+  .eyebrow img { flex: none; width: 3rem; height: 3rem; }
+  @media (min-width: 66rem) {
+    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); column-gap: 2.5rem; padding-block: 0.5rem 3rem; }
+    .hero h1 { font-size: 3.125rem; }
+  }
   .statement { font: 400 clamp(1.375rem, 3vw, 1.75rem)/1.4 var(--stm-font-serif); text-wrap: pretty; }
   .band-body > p.statement { max-width: 36rem; }
   /* A numbered sequence: the three steps happen in this order. */
@@ -76,12 +95,94 @@
   .steps .more, .steps .excerpt { margin-top: var(--stm-space-3); }
   .steps .more p.record { overflow-wrap: anywhere; }
   /* A section that needs the whole width, for the drawing. */
-  .spread { border-top: 1px solid var(--stm-color-line-strong); padding-block: 1.75rem 1rem; }
-  .spread > h2 + p { max-width: 40rem; margin-top: var(--stm-space-3); }
-  .spread > figure { margin-top: 1.5rem; }
-  .spread > h2 + .descent { margin-top: 2rem; }
+  .spread { border-top: 1px solid var(--stm-color-line-strong); padding-block: 1.75rem 2.75rem; }
+  .spread > * + * { margin-top: var(--stm-space-4); }
+  .spread > p { max-width: 40rem; }
+  .spread > figure, .spread > h2 + p + figure { margin-top: 1.5rem; }
+  /* Section marks: on wide screens each section's number stands over its heading. */
+  .page { counter-reset: section plate; }
+  @media (min-width: 56rem) {
+    .band-head > h2::before, .spread > h2::before { counter-increment: section; content: counter(section) / ""; display: block; margin-bottom: var(--stm-space-2); font: 400 2.5rem/1 var(--stm-font-serif); color: var(--arras-color-text-muted); }
+    /* The list of links has numbers of its own; the worked example numbers its steps. */
+    .spread.unnumbered > h2::before { content: none; counter-increment: none; }
+    .page-darwin :is(.band-head, .spread) > h2::before { content: none; }
+  }
+  .numeral { display: block; font: 400 2.5rem/1 var(--stm-font-serif); color: var(--arras-color-text-muted); margin-bottom: var(--stm-space-2); }
+
+  /* Plates: the tinted panel a full-width figure sits in. Numbered on each page. */
+  .plate { padding: var(--stm-space-3); background: var(--arras-color-surface-sunken); border: 1px solid var(--arras-color-border); border-radius: var(--arras-radius-card); }
+  @media (min-width: 40rem) { .plate { padding: var(--stm-space-4) 1.25rem; } }
+  .plate > figcaption { max-width: 44rem; margin-top: var(--stm-space-4); font-size: 0.8125rem; line-height: 1.55; color: var(--arras-color-text-muted); text-align: left; }
+  .plate > figcaption::before { counter-increment: plate; content: "Figure " counter(plate) ". "; font: 600 0.875rem/1.5 var(--stm-font-serif); color: var(--arras-color-text); }
+
+  /* Generated diagrams: the renderer's classes, drawn in the page's tokens. */
+  .drawing svg.lini { display: block; width: 100%; height: auto; margin-inline: auto; font-family: var(--stm-font-sans); font-size: 15px; font-weight: 500; }
+  .drawing-narrow { display: none; }
+  @media (max-width: 35.99rem) {
+    .drawing-wide { display: none; }
+    .drawing-narrow { display: block; }
+  }
+  .drawing-scroll { overflow-x: auto; }
+  /* Said only where a drawing is wider than its plate. */
+  .scroll-hint { display: none; margin-bottom: var(--stm-space-2); font: italic 400 0.9375rem/1.4 var(--stm-font-serif); color: var(--arras-color-text-muted); }
+  @media (max-width: 35.99rem) { .scrolls .scroll-hint { display: block; } }
+  @media (max-width: 49.99rem) { .scrolls-flow .scroll-hint { display: block; } }
+  /* The renderer's outermost group is dashed, and children would inherit it. */
+  .lini :is(g, rect, path, line, polygon) { stroke-dasharray: none; }
+  .lini .lini-block { fill: none; stroke: none; }
+  .lini .lini-box, .lini .lini-path { fill: var(--arras-color-surface); stroke: var(--stm-color-line-strong); stroke-width: 1.5; }
+  .lini .lini-group { fill: none; stroke: none; }
+  .lini .lini-text { fill: var(--arras-color-text); stroke: none; text-anchor: middle; }
+  .lini .stm-focus > :is(rect, path) { stroke: var(--arras-color-text); stroke-width: 2.5; }
+  .lini .stm-inner { fill: none; stroke: var(--arras-color-text); stroke-width: 1; }
+  .lini .lini-link { fill: none; stroke: var(--stm-color-line-strong); stroke-width: 2; }
+  .lini .lini-marker { fill: var(--stm-color-line-strong); stroke: none; }
+  .lini .stm-opposing { stroke: var(--arras-color-text); }
+  .lini .lini-link.stm-opposing path { stroke-dasharray: 7 5; }
+  .lini .stm-bar { stroke: var(--arras-color-text); stroke-width: 3.5; }
+  .legend { display: flex; flex-wrap: wrap; gap: var(--stm-space-2) 1.5rem; margin-top: var(--stm-space-3); font-size: 0.8125rem; }
+  .legend span { display: inline-flex; align-items: center; gap: var(--stm-space-2); }
+  .legend i { flex: none; width: 2.25rem; border-top: 2px solid var(--stm-color-line-strong); }
+  .legend .line-opposing { border-top: 2px dashed var(--arras-color-text); position: relative; }
+  .legend .line-opposing::after { content: ""; position: absolute; right: 0; top: -7px; height: 12px; border-right: 3px solid var(--arras-color-text); }
+
+  /* The text equivalent of a diagram: numbered or ruled entries, always in view. */
+  .equivalent > :is(ol, ul) { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--stm-space-4) 1.5rem; counter-reset: entry; }
+  .equivalent li { border-top: 2px solid var(--arras-color-text); padding-top: var(--stm-space-2); font-size: 0.9375rem; line-height: 1.55; min-width: 0; overflow-wrap: break-word; }
+  .equivalent ol > li { counter-increment: entry; }
+  .equivalent ol > li::before { content: counter(entry); display: block; font: 400 2rem/1.1 var(--stm-font-serif); color: var(--arras-color-text-muted); }
+  .equivalent-term { font: 600 1.0625rem/1.4 var(--stm-font-serif); margin-bottom: var(--stm-space-1); }
+  .equivalent-checks { display: flex; flex-direction: column; gap: var(--stm-space-1); margin-top: var(--stm-space-2); font-size: 0.8125rem; }
+  .equivalent-checks a { display: inline-block; padding-block: 2px; }
+  .equivalent-checks code { color: var(--arras-color-text-muted); }
+  .equivalent-evidence > ul { grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); }
+  .equivalent-evidence li:first-child { grid-column: 1 / -1; }
+  .equivalent-evidence li:first-child p:last-child { max-width: 44rem; font: 400 1.125rem/1.55 var(--stm-font-serif); }
+
+  /* Kinds of technical source */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--stm-space-4); }
+  .tiles li { background: var(--arras-color-surface); border: 1px solid var(--arras-color-border); border-top: 3px solid var(--arras-color-text); border-radius: var(--arras-radius-control); padding: var(--stm-space-4); font-size: 0.9375rem; line-height: 1.55; }
+  .tiles h3 { font-size: 1.125rem; margin-bottom: var(--stm-space-2); }
+
+  /* A short row of large figures, each read from records or a run. */
+  .numbers { display: flex; flex-wrap: wrap; gap: var(--stm-space-4) 1.5rem; }
+  .numbers > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; flex: 0 1 8rem; min-width: 4.5rem; }
+  .numbers dt { font-size: 0.8125rem; line-height: 1.4; color: var(--arras-color-text-muted); }
+  .numbers dd { font: 400 2.75rem/1.1 var(--stm-font-serif); font-optical-sizing: auto; }
+
+  /* Worked examples */
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+  .spread > .cards { margin-top: 1.5rem; }
+  .card { display: flex; flex-direction: column; gap: var(--stm-space-3); background: var(--arras-color-surface); border: 1px solid var(--stm-color-line-strong); border-radius: var(--arras-radius-card); padding: 1.5rem 1.25rem; }
+  .card-subject { font: italic 400 1rem/1.4 var(--stm-font-serif); color: var(--arras-color-text-muted); }
+  .card h3 { font-size: 1.5rem; }
+  .card .numbers { border-block: 1px solid var(--arras-color-border); padding-block: var(--stm-space-3); }
+  .card > p:last-child { margin-top: auto; }
+  .card-link { display: inline-block; padding-block: var(--stm-space-1); font-weight: 650; }
+  @media (min-width: 48rem) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
   .lead { max-width: 40rem; font: 400 1.25rem/1.55 var(--stm-font-serif); color: var(--arras-color-text-muted); }
-  .opening > .note { max-width: 44rem; }
+  .opening .note { max-width: 44rem; }
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--stm-space-3); padding-top: var(--stm-space-2); }
   .stage { margin-left: var(--stm-space-2); font: italic 400 1.0625rem/1.4 var(--stm-font-serif); color: var(--arras-color-text-muted); }
   .button { display: inline-block; border-radius: var(--arras-radius-control); padding: var(--stm-space-2) var(--stm-space-4); font-weight: 650; text-decoration: none; border: 1px solid var(--stm-color-line-strong); background: var(--arras-color-surface); }
@@ -167,12 +268,14 @@
 
   /* Line of descent. Narrow: an indented tree. Wide: branches side by side.
      --node is a node's size; lines run through the node centers. */
-  .descent { --node: 15px; --stem: 7px; padding-bottom: 2.75rem; }
+  .descent { --node: 15px; --stem: 7px; --node-fill: var(--arras-color-surface-sunken); }
+  .plate.descent { padding-block: 1.5rem; padding-inline: 1rem; }
+  @media (min-width: 40rem) { .plate.descent { padding-inline: 1.5rem; } }
   .descent p { line-height: 1.45; }
   .descent .record { margin-top: var(--stm-space-1); font-size: 0.75rem; }
   .descent-head, .descent-tree li { position: relative; font-size: 0.875rem; }
   .descent-head { padding-left: 2rem; padding-bottom: 1.5rem; }
-  .descent-head::before, .descent-tree li > .descent-kind::before { content: ""; position: absolute; width: var(--node); height: var(--node); border: 2px solid var(--arras-color-text); border-radius: 50%; background: var(--arras-color-ground); z-index: 1; }
+  .descent-head::before, .descent-tree li > .descent-kind::before { content: ""; position: absolute; width: var(--node); height: var(--node); border: 2px solid var(--arras-color-text); border-radius: 50%; background: var(--node-fill); z-index: 1; }
   .descent-head::before { left: 0; top: 0.45rem; background: var(--arras-color-text); }
   .descent-head::after { content: ""; position: absolute; left: var(--stem); top: 1rem; bottom: 0; border-left: 2px solid var(--stm-color-line-strong); }
   .descent-title { font: 500 1.375rem/1.3 var(--stm-font-serif); }
@@ -181,7 +284,7 @@
   .held { position: relative; }
   /* Joins the original's node to its source files. Side by side, the words are in the way. */
   .held::after { content: ""; position: absolute; left: -1.25rem; top: 1.1rem; bottom: -1rem; border-left: 2px solid var(--stm-color-line-strong); }
-  .descent-tree li .descent-kind::before { content: ""; position: absolute; width: var(--node); height: var(--node); border: 2px solid var(--arras-color-text); border-radius: 50%; background: var(--arras-color-ground); z-index: 1; }
+  .descent-tree li .descent-kind::before { content: ""; position: absolute; width: var(--node); height: var(--node); border: 2px solid var(--arras-color-text); border-radius: 50%; background: var(--node-fill); z-index: 1; }
   .descent-tree > li > .held > .descent-kind::before { left: -1.75rem; top: 0.2rem; }
   .descent-tree li > .descent-kind::before { left: 1.5rem; top: 0.2rem; }
   .descent-tree > li { padding: 0 0 1.5rem 3.25rem; }
@@ -196,7 +299,7 @@
   .descent-tree ul li { padding-left: 2rem; }
   .descent-tree ul li > .descent-kind::before { left: 0; }
   .descent-tree ul li::before { content: ""; position: absolute; left: -1.25rem; top: -1rem; width: 1.25rem; height: 1.65rem; border-left: 2px solid var(--stm-color-line-strong); border-bottom: 2px solid var(--stm-color-line-strong); }
-  .descent figcaption { max-width: 44rem; margin-top: 1.75rem; font-size: 0.8125rem; color: var(--arras-color-text-muted); }
+  .descent > figcaption { margin-top: 1.75rem; }
   @media (min-width: 62rem) {
     .descent-tree { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .descent-tree > li, .descent-tree > li:last-child { padding: 3.25rem 1.25rem 0 0; }
@@ -268,8 +371,7 @@
   .pagemap ol { display: flex; flex-direction: column; border: 1px solid var(--stm-color-line-strong); border-radius: var(--arras-radius-control); overflow: hidden; }
   .pagemap li { flex-basis: 0; min-width: 0; padding: var(--stm-space-2) var(--stm-space-3); font-size: 0.8125rem; line-height: 1.45; }
   .pagemap li + li { border-top: 1px solid var(--stm-color-line-strong); }
-  .pagemap li.mapped { background: var(--arras-color-surface-sunken); }
-  .pagemap figcaption, .rounds figcaption { margin-top: var(--stm-space-3); font-size: 0.8125rem; color: var(--arras-color-text-muted); }
+  .pagemap li.mapped { background: var(--arras-color-surface); }
   @media (min-width: 48rem) {
     .places > ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .pagemap ol { flex-direction: row; }

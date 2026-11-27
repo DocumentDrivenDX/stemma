@@ -122,6 +122,56 @@ for (const scheme of SCHEMES) {
   });
 }
 
+const DRAWN = ["index.html", "how.html", "checks.html"];
+
+for (const file of DRAWN) {
+  for (const width of [320, 375, 1280]) {
+    test(`${file}: diagram text stays legible, with its text equivalent in view, at ${width} pixels`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(file);
+      await settle(page);
+      const drawings = await page.locator(".drawing svg").evaluateAll((all) => (all as SVGSVGElement[]).filter((s) => s.getBoundingClientRect().width > 0).map((s) => {
+        const scale = s.getBoundingClientRect().width / s.viewBox.baseVal.width;
+        return {
+          name: s.querySelector("title")!.textContent!,
+          smallest: Math.min(...[...s.querySelectorAll("text")].map((t) => parseFloat(getComputedStyle(t).fontSize) * scale)),
+          labels: [...s.querySelectorAll("text")].map((t) => t.textContent!),
+          // Wider than the room it has: it must be in a region the keyboard can reach and scroll.
+          clipped: s.getBoundingClientRect().width > s.parentElement!.clientWidth + 1,
+          reachable: s.parentElement!.getAttribute("tabindex") === "0" && !!s.parentElement!.getAttribute("aria-label"),
+        };
+      }));
+      expect(drawings.length).toBeGreaterThan(0);
+      const words = (await page.locator(".equivalent").allInnerTexts()).join("\n").toLowerCase();
+      for (const d of drawings) {
+        expect(d.smallest, d.name).toBeGreaterThanOrEqual(11.5);
+        if (d.clipped) expect(d.reachable, d.name).toBe(true);
+        for (const label of d.labels) expect(words, `${d.name}: ${label}`).toContain(label.toLowerCase());
+      }
+      for (const list of await page.locator(".equivalent").all()) await expect(list).toBeVisible();
+    });
+  }
+}
+
+for (const scheme of SCHEMES) {
+  test(`diagrams are drawn in the page's tokens, ${scheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto("how.html");
+    const value = new Map(colorTokens().map((t) => [t.name, t[scheme]]));
+    const style = (selector: string, property: "fill" | "stroke" | "strokeDasharray") =>
+      page.locator(selector).first().evaluate((e, p) => getComputedStyle(e)[p], property);
+    const box = ".diagram-evidence .lini-box:not(.stm-focus) > rect";
+    expect(hex(await style(box, "fill"))).toBe(value.get("--arras-color-surface")!);
+    expect(hex(await style(box, "stroke"))).toBe(value.get("--stm-color-line-strong")!);
+    expect(await style(box, "strokeDasharray")).toBe("none");
+    expect(hex(await style(".diagram-evidence .lini-text", "fill"))).toBe(value.get("--arras-color-text")!);
+    await expect(page.locator(".diagram-evidence .stm-opposing")).toHaveCount(1);
+    expect(await style(".diagram-evidence .stm-opposing path", "strokeDasharray")).not.toBe("none");
+    expect(await style(".diagram-evidence .lini-link:not(.stm-opposing) path", "strokeDasharray")).toBe("none");
+    await expect(page.locator(".diagram-evidence .stm-inner")).toHaveCount(1);
+  });
+}
+
 test("data-appearance overrides the system setting", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("index.html");

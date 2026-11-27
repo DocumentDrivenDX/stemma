@@ -6,6 +6,9 @@ import type { CheckReport, Result } from "@stemma/core";
 import { BACKGROUNDS, colorTokens, measured } from "./contrast.ts";
 import { descent } from "./descent.ts";
 import { darwinBook, records } from "./example.ts";
+import { exampleCards, numbers } from "./examples.ts";
+import { diagram, equivalent, figure } from "./figures.ts";
+import { chain, compare, evidence, locators, reportBuild } from "./graphs.ts";
 import { cycle, pageMap, places, rounds } from "./diagrams.ts";
 import { escape, excerpt } from "./html.ts";
 import { FIXTURES } from "./fixtures.ts";
@@ -26,8 +29,14 @@ const table = (label: string, head: string[], rows: string[][]) =>
 /** A section whose heading sits in the margin on wide screens. `body` and `aside` are trusted HTML. */
 const band = (title: string, body: string, { id = "", aside = "" } = {}) =>
   `<section class="band"><div class="band-head"><h2${id ? ` id="${id}"` : ""}>${title}</h2>${aside}</div><div class="band-body">\n${body}\n</div></section>`;
-/** The title block that opens a page. */
-const opening = (title: string, lead: string, rest = "") => `<div class="opening"><h1>${title}</h1>\n<p class="lead">${lead}</p>\n${rest}</div>`;
+/** The title block that opens a page, in a plate with the mark beside it. */
+const opening = (title: string, lead: string, rest = "") =>
+  `<div class="opening"><div class="opening-text"><h1>${title}</h1>\n<p class="lead">${lead}</p>\n${rest}</div><img class="opening-mark" src="mark.svg" alt="" width="112" height="112"></div>`;
+/** A full-width section under its own heading, for drawings. */
+const spread = (id: string, title: string, body: string, classes = "") =>
+  `<section class="spread${classes ? ` ${classes}` : ""}" aria-labelledby="${id}">\n<h2 id="${id}">${title}</h2>\n${body}\n</section>`;
+/** A step's number, as part of its section's heading. */
+const numeral = (n: number) => `<span class="numeral">${n}</span> `;
 /** Links to places on the same page. */
 const contents = (label: string, links: [string, string][]) =>
   `<nav class="contents" aria-label="${escape(label)}"><ul>${links.map(([href, text]) => `<li><a href="#${href}">${text}</a></li>`).join("")}</ul></nav>`;
@@ -85,23 +94,37 @@ const CHECKED: [string, string][] = [
 const entries = (list: [string, string][]) =>
   `<dl class="entries">${list.map(([term, text]) => `<div><dt>${term}</dt><dd>${text}</dd></div>`).join("")}</dl>`;
 
+/** The kinds of technical source the home page names, and how each is cited. What each says is checked against lib/graphs.ts in the drawing on How it works. */
+const TECHNICAL: [string, string][] = [
+  ["Documentation, for the version you name", "Capture the pages for the version you are writing about, and note the version on the record. Your project keeps their text as you captured it, even if the page online changes."],
+  ["Release notes", "Quote what changed from the notes themselves, with the release they belong to."],
+  ["Papers", "A PDF is read page by page, and cited by its printed page numbers where those on the pages support them."],
+  ["Engineering write-ups", "A saved article usually has no pages, so a passage in it is cited by paragraph number."],
+];
+
 function home(): string {
-  return `<div class="opening opening-home"><h1>Create academically rigorous research reports and books</h1>
-<p class="lead">Research and write with Claude. The Stemma plugin keeps your sources in your project, checks your citations and quotations against them, and explains what it finds in plain language.</p>
-<p class="actions"><a class="button button-primary" href="install.html">Get started</a> <a class="button" href="how.html">See how it works</a> <span class="stage">Pre-release</span></p></div>
+  const links = chain();
+  return `<div class="hero">
+<div class="hero-text">
+<p class="eyebrow"><img src="mark.svg" alt="" width="48" height="48"> <span>A Claude plugin for research you can trace</span></p>
+<h1>Create academically rigorous research reports and books</h1>
+<p class="lead">Research technical subjects with Claude: documentation for the version you name, release notes, papers and engineering write-ups. The Stemma plugin keeps their text in your project, checks your citations and quotations against it, and explains what it finds in plain language.</p>
+<p class="actions"><a class="button button-primary" href="install.html">Get started</a> <a class="button" href="how.html">See how it works</a> <span class="stage">Pre-release</span></p>
+</div>
+${figure(links, "This site’s drawing of the links Stemma keeps, from an original source to a footnote. Each is explained below.", "hero-figure")}
+</div>
+${spread("links", "From an original source to a footnote", equivalent(links), "unnumbered")}
 ${band("Why rigor takes more", `<p class="statement">An AI assistant can produce a reference that does not exist, give a real title the wrong author, cite a page the work does not have, or invent a quotation.</p>
 <p>Checking all of that by hand can cost the time the assistant saved. With Stemma, the comparing that a computer can do reliably is done for you, against your own sources. The report also tells you what it could not check, so you know where to look yourself.</p>`)}
-<section class="spread" aria-labelledby="cycle">
-<h2 id="cycle">Research in rounds</h2>
-<p>Research is rarely finished in one pass. You find another source, get a better scan, or rewrite a sentence. Stemma fits that loop.</p>
+${spread("technical", "Made for researching technical subjects", `<ul class="tiles" aria-label="Kinds of technical source">${TECHNICAL.map(([kind, says]) => `<li><h3>${kind}</h3><p>${says}</p></li>`).join("")}</ul>
+<p><a href="how.html#sources">What Stemma reads, and how each source is cited</a></p>`)}
+${spread("cycle", "Research in rounds", `<p>Research is rarely finished in one pass. You find another source, get a better copy, or rewrite a sentence. Stemma fits that loop.</p>
 ${cycle()}
-<p><a href="how.html">How a round works, step by step</a></p>
-</section>
-<section class="spread" aria-labelledby="descent">
-<h2 id="descent">Every citation has a family tree</h2>
-<p>Scholars draw a <em>stemma codicum</em> to show which copy of a manuscript comes from which. Stemma does something similar for your work: each citation leads back to the words and page it came from, to the text of the source in your project, and to the original that text was made from.</p>
-${descent()}
-</section>
+<p><a href="how.html">How a round works, step by step</a></p>`)}
+${spread("worked", "Two worked examples", `<p>Each is a real project, with its records in plain files that you can read. One researches a technical subject; the other a question in the history of science.</p>
+${exampleCards()}`)}
+${spread("descent", "Every citation has a family tree", `<p>Scholars draw a <em>stemma codicum</em> to show which copy of a manuscript comes from which. Stemma does something similar for your work: each citation leads back to the words and page it came from, to the text of the source in your project, and to the original that text was made from.</p>
+${descent()}`)}
 ${band("What gets checked", `${entries(CHECKED)}
 <p><a href="checks.html">Each check, and what passing it does not tell you</a></p>`)}
 ${band("When a quotation differs", `<p>In our made-up demo book, one typed citation quotes <q>All fields were abandoned by their holders.</q> The source's text begins with a different word. Stemma shows you both, so you can look at the page and decide.</p>
@@ -109,7 +132,7 @@ ${transcript(demoFinding("3. PROBLEM: A quotation"), "<strong>Transcript</strong
 <p><a href="examples.html#demo">The whole demo, step by step</a></p>`)}
 ${band("What stays yours", `<p>Judgment stays with you. A pass only means that your record agrees with the text made from your source, and that text can be wrong, especially when a computer read it from a scan. No check tells you that a source supports your argument.</p>
 <p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It checks the citations in manuscript files written in Stemma's marked-up Markdown, or else the citations that have been recorded; it does not check a Word file. Nothing ever stops you from writing.</p>`)}
-${band("Part of a family", `<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it.</p>`)}`;
+${band("Part of a family", `<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it. The drawings of boxes and lines on this site are made from data with <a href="https://github.com/DocumentDrivenDX/umf-visual">umf-visual</a>.</p>`)}`;
 }
 
 /** One round of research in detail, and the words the site uses. */
@@ -121,8 +144,9 @@ const ROUND: { title: string; you: string; happens: string[] }[] = [
     "Claude writes a record of the work and tells you where each detail came from. It is instructed never to invent one."] },
   { title: "Capture your sources", you: "Capture this PDF as my copy of that source. I downloaded it from the library today.", happens: [
     "Stemma turns it into text files in your project, one for each page, with where and when you got it. A digital fingerprint ties them to the exact original, which is not added to the project.",
+    "You can record more than one place the original can be had, such as its web address and a copy in a web archive. Only a file with the same fingerprint counts as that original.",
     "It reads the text a PDF already contains, and reads EPUB, web pages, Word documents, Markdown, Project Gutenberg and plain text files. It cannot read words from a picture of a page: you supply that text, made by a recognition tool or typed.",
-    "Anyone who can read your project can read these files, so publishing it publishes them. You can note that material is unpublished, restricted by a community, or under a particular license. These notes inform you; they stop nothing."] },
+    "Anyone who can read your project can read these files, so publishing it publishes them. You can note that material is unpublished or restricted by a community. These notes inform you; they stop nothing."] },
   { title: "Check the text and page numbers", you: "Compare the text with the original and look at the page numbers.", happens: [
     "Stemma proposes page numbers only where the numbers printed on the pages support them. A book with no pages is cited by chapter or paragraph.",
     "It can convert the original again to show that the text still matches. For text a computer recognized, you can compare it with another reading and note what you looked at. None of that is required."] },
@@ -154,6 +178,8 @@ const WORDS: [string, string][] = [
   ["Source files", "The text of a work, kept in your project: one file for each page, or for each section where there are no pages."],
   ["Passage", "A piece of a source chosen by its place. A script copies its words and page."],
   ["Page label", "The number printed on a page, where it could be established."],
+  ["Note", "A short extract or paraphrase that names the passages it rests on, or a comment of your own."],
+  ["Claim", "Something your report asserts, recorded with how sure you are and why. Notes can support it, support it in part, qualify it, contradict it or give its context."],
   ["Finding", "One thing a check reports, with its evidence and a suggestion."],
   ["Could not check", "Something needed was missing, so there is no answer yet."],
   ["Coverage", "What a report covered by other means, or did not cover, and what it saw in an original. It is not a list of things to do."],
@@ -161,23 +187,23 @@ const WORDS: [string, string][] = [
   ["Unreviewed, not admitted", "A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding."],
 ];
 
+const EXAMPLE_ON_GITHUB = `${REPOSITORY}/tree/main/examples/postgres-web-apps`;
+
 function how(): string {
-  return `${opening("How it works", "You ask in plain words. Claude does the clerical work, scripts do the comparing, and you make the decisions.")}
-<section class="spread" aria-labelledby="loop">
-<h2 id="loop">The research cycle</h2>
-${cycle()}
-</section>
+  return `${opening("How it works", "You ask in plain words. Claude does the clerical work, scripts do the comparing, and you make the decisions.",
+    contents("Parts of this page", [["loop", "The research cycle"], ["sources", "What Stemma reads"], ["evidence", "Claims and evidence"], ["report", "The report"], ["places", "Where material lives"]]))}
+${spread("loop", "The research cycle", cycle())}
 ${band("One round, step by step", `<ol class="steps">${ROUND.map((r) => `<li><h3>${r.title}</h3><div><p class="ask"><span>You might say</span> &ldquo;${escape(r.you)}&rdquo;</p>${r.happens.map((h) => `<p>${h}</p>`).join("")}</div></li>`).join("")}</ol>`)}
-<section class="spread" aria-labelledby="rounds">
-<h2 id="rounds">What going round looks like</h2>
-<p>In the demo, one project is checked four times. The numbers fall as things are fixed, added and looked at.</p>
-${rounds()}
-</section>
+${spread("sources", "What Stemma reads, and how each is cited", `<p>Much of what you read on a technical subject has no page numbers. A paragraph number is counted through Stemma’s copy of a page: it is not printed on the page itself, and another copy of the same address may count differently. That is one reason the text you cite is kept in your project.</p>
+${diagram(locators(), "This site’s drawing of the kinds of source Stemma reads, and how a place in each is cited.")}`)}
+${spread("evidence", "Claims, and what bears on them", `<p>A thesis and the claims under it can be recorded with how sure you are and why, and linked to notes on passages. Each link says whether the note supports the claim, supports it in part, qualifies it, contradicts it or only gives context, so evidence against you is kept beside evidence for you. A check lists a recorded claim that lacks a note, a level of confidence or a reason. It does not judge whether a note supports a claim.</p>
+${diagram(evidence(), `This site’s drawing of part of the records of the <a href="${EXAMPLE_ON_GITHUB}">PostgreSQL worked example</a>: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.`)}`)}
+${spread("report", "The report", `<p>Ask Claude to build the report. Each quotation is copied from your source’s text through the passage you chose, so nobody retypes it, and citations are written in Chicago notes-and-bibliography style from your source records.</p>
+${diagram(reportBuild(), "This site’s drawing of what the report build reads and writes.")}`)}
+${spread("rounds", "What going round looks like", `<p>In the demo, one project is checked four times. The numbers fall as things are fixed, added and looked at.</p>
+${rounds()}`)}
 ${band("Where a finding sends you", table("Where a finding sends you", ["When a check reports", "Go back to"], BACK.map(([a, b]) => [a, b])))}
-<section class="spread" aria-labelledby="places">
-<h2 id="places">Where your material lives</h2>
-${places()}
-</section>
+${spread("places", "Where your material lives", places())}
 ${band("Words used here", entries(WORDS))}`;
 }
 
@@ -215,6 +241,8 @@ const ASKS: [string, string][] = [
   ["Find where that book discusses atolls, and capture the passage I choose.", "Searches the source's text. A script copies the words and page of the passage you choose."],
   ["Record the citations in this chapter.", "Writes one record for each citation, with its sentence, page and quotation."],
   ["Check the project and explain what is open.", "Runs the checks and explains each finding. When a quotation differs, you see it beside the closest wording in your source."],
+  ["Build the report.", "Writes the report with its footnotes, a verification table, and a record of what lies behind each sentence."],
+  ["Let me browse my evidence.", "Opens a page in your browser, served only from your own computer, where you can browse and search your records."],
   ["What does that book say on page 89?", "Shows only the pages you ask for, up to five, marked as quoted from the source."],
   ["I have a better scan of this book. Replace the old one.", "Captures the new one, sets the old one aside, and lists what relied on it."],
   ["Are any of my source files missing or changed?", "Names every source file that is missing, added or edited."],
@@ -222,7 +250,7 @@ const ASKS: [string, string][] = [
 
 function install(): string {
   return `${opening("Get started", "Install one plugin, then ask Claude in plain words. There is nothing else for you to set up.")}
-${band("What you need", `<p>Claude Code. A folder for your project. Your own copies of the works you cite, for example PDFs or EPUB books. On Windows, setup also needs Git Bash.</p>`)}
+${band("What you need", `<p>Claude Code. A folder for your project. What you will cite, such as saved documentation pages, papers as PDFs, or EPUB books. On Windows, setup also needs Git Bash.</p>`)}
 ${band("Install the plugin", `<p>Type these two commands in a terminal. They add the DocumentDrivenDX catalog of plugins and install Stemma from it.</p>
 ${excerpt("Commands to type in a terminal.", "claude plugin marketplace add DocumentDrivenDX/plugins\nclaude plugin install stemma@documentdrivendx")}`)}
 ${band("The first time you use it", `<p>Stemma needs a small program called Bun to run. Claude downloads one fixed version, confirms it is the expected file, and keeps it inside the plugin's own folder. Your system settings stay as they are, and Claude asks permission as it usually does.</p>
@@ -290,7 +318,16 @@ ${example ? more("See an example finding", `<p>From a <a href="examples.html#fix
 ${more(`Exact wording: the full description and every message (${c.findings.length})`, `<p>${escape(c.summary)}</p><p class="limits"><strong>Limits:</strong> ${escape(c.limits)}</p>
 <ul class="reasons" aria-label="${escape(`Findings of ${c.id}`)}">${c.findings.map((f) => `<li>${code(f.reason)}<div><p class="message">${escape(f.message)}</p><dl><div><dt>Why it matters</dt><dd>${escape(f.why)}</dd></div><div><dt>What to do</dt><dd>${f.suggestions.map(escape).join(" ")}</dd></div></dl></div></li>`).join("")}</ul>`)}`;
   });
+  const compared = compare();
+  const named = (id: string): string => {
+    const plain = PLAIN_CHECKS.find((c) => c.id === id);
+    if (!plain) throw new Error(`the drawing of what is compared names no check: ${id}`);
+    return `<a href="#${anchor(id)}">${plain.question} <code>${id}</code></a>`;
+  };
   return `${opening("What gets checked", `${all.length} checks, what each looks at, and what passing it does not tell you.`, `<p class="note">Each check answers <em>pass</em>, <em>fail</em> or <em>could not check</em> (the tool writes <code>unverifiable</code>). Nothing is ever blocked. A pass covers only what that check reads. You do not need the names in <code>small type</code>; they are how a report refers to a check.</p>`)}
+${spread("compare", "What is compared with what", `<p>A check compares something you wrote, or something in your project, with something else. These are some of those comparisons.</p>
+${figure(compared, "This site’s drawing of some of the comparisons the checks make.")}
+${equivalent(compared, named)}`)}
 ${band("The checks", built.join("\n"), { id: "checks", aside: contents("Checks on this page", [...PLAIN_CHECKS.map((c): [string, string] => [anchor(c.id), c.question]), ["not-checked", "What is not checked"]]) })}
 ${band("What is not checked", `<p>A report runs the checks that apply to what is in your project. These are left to you:</p>
 <ul class="plain-list"><li>Whether the text made from a source matches the pictures of its pages, unless a person compares them.</li>
@@ -331,7 +368,7 @@ const FIXTURE_NAMES: Record<string, string> = {
 
 function examples(): string {
   const fixtures = Object.entries(FIXTURES);
-  return `${opening("Examples", "Watch Stemma at work on a made-up book. Everything here comes from real runs of the tool.", `<p class="note">All names and sources on this page are invented. For a real book, see the <a href="darwin.html">worked example</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folder names.</p>
+  return `${opening("Examples", "Watch Stemma at work on a made-up book. Everything here comes from real runs of the tool.", `<p class="note">All names and sources on this page are invented. For real material, see the <a href="index.html#worked">two worked examples</a>. When you use Stemma you talk to Claude; what is shown here is what the tool prints behind the scenes. In it, <code>$DEMO</code>, <code>$PROJECTS</code> and <code>&lt;plugin root&gt;</code> stand for folder names.</p>
 ${contents("Parts of this page", [["demo", "The demo, step by step"], ["fixtures", "More test projects"], ["screenshots", "Pictures of the output"]])}`)}
 ${band("The demo, step by step", `<p>Eleven short steps, from an empty folder to checked quotations. IDs in the demo are fixed so that every run looks the same.</p>
 ${demoSteps()}`, { id: "demo" })}
@@ -382,39 +419,36 @@ function darwin(): string {
   if (!checked.includes("CHECKED CLEAN")) throw new Error("the worked example is no longer checked clean; reword the page");
   const page = `sources/${source.citation_key}/pages/p0105.md`;
   const parts: [string, string][] = [["works", "1. The works"], ["original", "2. One original"], ["text", "3. Its source files"], ["pages", "4. Its page numbers"], ["citations", "5. Four citations"], ["check", "6. The check"], ["mistakes", "7. Planted mistakes"], ["again", "8. Checking it again"], ["facts", "Where the facts come from"], ["limits", "What this does not show"]];
-  return `${opening("Worked example: Darwin and coral reefs", "A real book from 1842, followed from its title page to four checked quotations.", `<p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The example holds the text of ${works.length} works on coral reefs. No PDF or page picture is published with it.</p>
+  return `${opening("Worked example: Darwin and coral reefs", "A real book from 1842, followed from its title page to four checked quotations.", `${numbers([[works.length, "works held"], [pages.length, "pages of the cited book’s text"], [citations.length, "citations of it"]])}<p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The example holds the text of ${works.length} works on coral reefs. No PDF or page picture is published with it.</p>
 ${contents("Steps of the worked example", parts)}`)}
-<section class="spread" aria-labelledby="whole">
-<h2 id="whole">The whole example at a glance</h2>
-${descent(true)}
-</section>
-${band("1. The works", `<p>The example gathers these works in the old argument over how coral reefs form. Its four citations are of Darwin's 1842 book.</p>
+${spread("whole", "The whole example at a glance", descent(true))}
+${band(`${numeral(1)}The works`, `<p>The example gathers these works in the old argument over how coral reefs form. Its four citations are of Darwin's 1842 book.</p>
 <ul class="plain-list">${works.map((w) => `<li>${reference(w)}</li>`).join("")}</ul>
 <p>The short label <code>${escape(source.citation_key)}</code> is how citations refer to Darwin's book. It is marked as a <em>candidate</em>: nobody has formally accepted it into the project.</p>
 ${file(`records/sources/${source.id}.json`)}`, { id: "works" })}
-${band("2. One original", `<p>The original of Darwin's book is a ${megabytes} MB scan from the Internet Archive (${escape(upstream.version)}). Its record notes the address it came from, when it was obtained, and a fingerprint of the exact file. If the file changed by even one character, the fingerprint would no longer match. The PDF itself is not in the project.</p>
+${band(`${numeral(2)}One original`, `<p>The original of Darwin's book is a ${megabytes} MB scan from the Internet Archive (${escape(upstream.version)}). Its record notes the address it came from, when it was obtained, and a fingerprint of the exact file. If the file changed by even one character, the fingerprint would no longer match. The PDF itself is not in the project.</p>
 <p class="record">Address: ${escape(upstream.url)}</p>
 ${file(`records/upstreams/${upstream.id}.json`)}`, { id: "original" })}
-${band("3. Its source files", `<p>The PDF already contains text, made by a computer reading the page pictures. Stemma wrote it into the project as ${pages.length} files, one for each page, blank pages included. Nobody has proofread it, and its quality is marked as not assessed. Where the layout of a page, such as its paragraphs or footnotes, could not be told, the file says so.</p>
+${band(`${numeral(3)}Its source files`, `<p>The PDF already contains text, made by a computer reading the page pictures. Stemma wrote it into the project as ${pages.length} files, one for each page, blank pages included. Nobody has proofread it, and its quality is marked as not assessed. Where the layout of a page, such as its paragraphs or footnotes, could not be told, the file says so.</p>
 <p>The PDF was then converted a second time, and every page agreed.</p>
 ${more("The start of the file for printed page 88", excerpt("The first lines of a source file, as it is in the repository. The words are the recognized text, errors included.", read(`examples/coral-reefs/${page}`).split("\n").slice(0, 28).join("\n")))}
 <p class="record">Source files: ${code(manifest.id)}</p>`, { id: "text" })}
-${band("4. Its page numbers", `<p>The third page of a PDF is rarely page 3 of the book. Stemma took page numbers from the numbers printed on the pages, and left ${without} pages without one.</p>
+${band(`${numeral(4)}Its page numbers`, `<p>The third page of a PDF is rarely page 3 of the book. Stemma took page numbers from the numbers printed on the pages, and left ${without} pages without one.</p>
 <p>Among them is a publisher's list of other books, bound in at the back with numbering of its own. Its numbers repeat the book's, so they were not used. A number printed on a page does not always number the work.</p>
 ${pageMap()}`, { id: "pages" })}
-${band("5. Four citations", `<p>Each sentence below is this example's own wording around a short quotation, which is underlined. The words and page of each quotation were copied by script from a passage in the source files.</p>
+${band(`${numeral(5)}Four citations`, `<p>Each sentence below is this example's own wording around a short quotation, which is underlined. The words and page of each quotation were copied by script from a passage in the source files.</p>
 <ol class="citations">${cited}</ol>
 ${file(`records/passages/${citations[0]!.passage}.json`)}
 ${file(`records/citations/${citations[0]!.id}.json`)}`, { id: "citations" })}
-${band("6. The check", `<p>All four citations pass: each quotation is in the source's text, on the page cited. One matched after rejoining the word <em>denying</em>, split at the end of a line; the report points that out so you can look.</p>
+${band(`${numeral(6)}The check`, `<p>All four citations pass: each quotation is in the source's text, on the page cited. One matched after rejoining the word <em>denying</em>, split at the end of a line; the report points that out so you can look.</p>
 <p>The project as a whole is checked clean: nothing across the works is open. No person had to approve anything. The report also says how it got there. The computer-read text of Darwin's title page leaves out the year, and a saved library record of the same copy bears it out. In another volume the printed page numbers jump from 232 to 333; every page of the original is there and the text runs on, so the report records the jump as something seen in the original. <em>Checked clean</em> does not mean the work is correct, only that these checks found nothing wrong.</p>
 ${more("What the tool printed", transcript(checked, "<strong>Transcript</strong> of a real run on the example as published. Folder names are replaced."))}`, { id: "check" })}
-${band("7. Planted mistakes", `<p>To see whether the checks would notice, two citations in a throwaway copy of the project were changed as if an author had typed them wrongly: <q>greater</q> became <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
+${band(`${numeral(7)}Planted mistakes`, `<p>To see whether the checks would notice, two citations in a throwaway copy of the project were changed as if an author had typed them wrongly: <q>greater</q> became <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
 <p>Both were caught. The changed quotation is shown beside the wording in the source (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words are: page 88.</p>
 ${more("What the tool printed for the planted mistakes", transcript(trial, "<strong>Transcript</strong> of a real run on a throwaway copy with two planted mistakes."))}
 <h3>A correct quotation that would be flagged</h3>
 <p>On page 2, the computer-read text has a stray space after a quotation mark. A quotation typed correctly from the page across that mark would be reported as only a near match. A finding means <em>look at the page</em>, not <em>you are wrong</em>.</p>`, { id: "mistakes" })}
-${band("8. Checking it again", `<p>The text of every source is in the project, so anyone who downloads the example gets the same check results without the PDFs. Someone who obtains the originals can also have them converted again and compared with the published text.</p>
+${band(`${numeral(8)}Checking it again`, `<p>The text of every source is in the project, so anyone who downloads the example gets the same check results without the PDFs. Someone who obtains the originals can also have them converted again and compared with the published text.</p>
 <p><a href="${REPOSITORY}/tree/main/examples/coral-reefs">How to do that, with all the example's files and notes, on GitHub</a></p>`, { id: "again" })}
 ${band("Where the facts come from", `<p>Below, a <em>picture of a page</em> means an image drawn from an original PDF and read by an AI model (claude-sonnet-5-5). No person has read these pages for the example.</p>
 ${entries(PROVENANCE)}`, { id: "facts" })}
@@ -451,13 +485,26 @@ ${band("Type", `<p>Three families under the SIL Open Font License, served from t
 <p class="specimen-quote">Some fields were abandoned by their holders.</p>
 <p>A citation rests on a source record and the text of the source.</p>
 <p class="specimen-mono">src-demo0harbour01 &nbsp; cite.key &nbsp; 0O 1lI</p>`)}
-${band("Spacing and shape", `<p>Spacing steps of 4, 8, 12 and 16 pixels; 6-pixel control corners and 10-pixel card corners. Borders that carry meaning use the strong line. No shadows and no animation.</p>`)}
+${band("Spacing and shape", `<p>Spacing steps of 4, 8, 12 and 16 pixels; 6-pixel control corners and 10-pixel card corners. Borders that carry meaning use the strong line. Tinted plates and cards use the surface tokens. No shadows, gradients or animation.</p>`)}
 ${band("Components", `<h3>Page layout</h3>
-<p>A page opens with its title. On wide screens each section's heading sits in the margin and stays in view while the section is read; on narrow screens it sits above the text. Running text keeps a short line; transcripts and entries may use the whole column.</p>
-<h3>Drawings</h3>
+<p>A page opens in a plate with its title, and the mark large beside it on wide screens; the first page opens with the drawing from an original source to a footnote beside its title. On wide screens each section's heading sits in the margin, under its number, and stays in view while the section is read; on narrow screens it sits above the text. Running text keeps a short line; drawings, transcripts and entries may use the whole width. The section numbers are ornament; where sections are steps, as in a worked example, the step's number is part of the heading.</p>
+<h3>Plates</h3>
+<p>A full-width drawing sits in a plate: the sunken surface, a hairline and the card radius, with no shadow. Its caption begins with its number on the page and says that the drawing is this site's own.</p>
+<h3 id="generated">Generated diagrams</h3>
+<p>A <a href="how.html#sources">drawing of boxes and lines</a> is made from data in the repository when the site's generated files are written: names and counts are read from records, <a href="https://github.com/DocumentDrivenDX/umf-visual">umf-visual</a> and the Lini renderer it carries lay it out, and the committed SVG is written into the page, where these pages' color tokens draw it in light and dark. Nothing runs in your browser. Each has a name and a description for a screen reader, and a visible list that holds the same boxes, lines and relation words.</p>
+<ul class="plain-list"><li>Lines carry no labels. A line's relation is written first in the box it starts from, and repeated in the list.</li>
+<li>A solid line ends in an arrowhead. A line that opposes, such as a note that contradicts a thesis, is dashed and ends in a bar. No relation has a color of its own.</li>
+<li>The thesis has a double border. The ends of a chain have a heavier one. Sources and what a thing is compared with have a folded corner.</li>
+<li>On narrow screens a drawing takes a one-column layout, or keeps its size in a region that scrolls and can be reached by keyboard. Its smallest text stays at least 11.5 pixels at 320 pixels wide.</li></ul>
+<h3>Other drawings</h3>
 <p>The <a href="how.html#loop">research cycle</a>, the <a href="how.html#rounds">demo's rounds of checking</a>, <a href="how.html#places">where material lives</a> and the <a href="darwin.html#pages">example's page numbers</a> are drawn with HTML and lines, so the words in each drawing are its text.</p>
+<h3>Figures in numbers</h3>
+<p>A short row of large numerals, each with a label, for counts read from record files or a run. Never a score or a share.</p>
+${numbers([[checks().length, "checks"], [records("citations").length, "citations in the Darwin example"]])}
+<h3>Example card</h3>
+<p>One for each <a href="index.html#worked">worked example</a>: its subject, its question, figures from its records, and one link, to its page or to its folder on GitHub.</p>
 <h3>Line of descent</h3>
-<p>The drawing on the <a href="index.html#descent">first page</a> is a nested list of records with lines drawn between them, so its text is the drawing. As in the mark, the filled node is the one the rest descend from. Its caption says where it came from.</p>
+<p>The family tree on the <a href="index.html#descent">first page</a> is a nested list of records with lines drawn between them, so its text is the drawing. As in the mark, the filled node is the one the rest descend from. Its caption says where it came from.</p>
 <h3>Status label</h3>
 <p>The script's own word in a bordered label. Never a check mark.</p>
 <p><span class="status status-pass">pass</span> <span class="status status-fail">fail</span> <span class="status status-unverifiable">unverifiable</span></p>
@@ -497,11 +544,11 @@ export function render(page: Page): string {
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
 <div class="shell">
-<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
 <nav aria-label="Main"><ul class="nav">${nav}</ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="shell page">
+<main id="main" tabindex="-1" class="shell page page-${page.file.replace(".html", "")}">
 ${page.body()}
 </main>
 <footer class="colophon">
