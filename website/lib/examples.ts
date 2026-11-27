@@ -18,6 +18,7 @@ export interface WorkedExample {
 export const WORKED_EXAMPLES: WorkedExample[] = [
   {
     folder: "postgres-web-apps",
+    page: "postgres.html",
     subject: "A technical subject",
     title: "PostgreSQL for web applications",
     question: "When is PostgreSQL a sound default for a web application’s main database, and where does that default end? It cites documentation, release notes, engineering articles and papers. An AI model made it, and no person has reviewed it.",

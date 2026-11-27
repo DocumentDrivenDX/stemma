@@ -5,10 +5,11 @@ import { join } from "node:path";
 import type { CheckReport, Result } from "@stemma/core";
 import { BACKGROUNDS, colorTokens, measured } from "./contrast.ts";
 import { descent } from "./descent.ts";
-import { darwinBook, records } from "./example.ts";
+import { darwinBook, exampleCounts, exampleDir, records } from "./example.ts";
 import { exampleCards, numbers } from "./examples.ts";
 import { diagram, equivalent, figure } from "./figures.ts";
-import { chain, compare, evidence, locators, reportBuild } from "./graphs.ts";
+import { chain, compare, evidence, locators, page as followedPage, reportBuild } from "./graphs.ts";
+import { archived, argument, followed, gaps, outline, rejected, runs, works } from "./postgres.ts";
 import { cycle, pageMap, places, rounds } from "./diagrams.ts";
 import { escape, excerpt } from "./html.ts";
 import { FIXTURES } from "./fixtures.ts";
@@ -187,8 +188,6 @@ const WORDS: [string, string][] = [
   ["Unreviewed, not admitted", "A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding."],
 ];
 
-const EXAMPLE_ON_GITHUB = `${REPOSITORY}/tree/main/examples/postgres-web-apps`;
-
 function how(): string {
   return `${opening("How it works", "You ask in plain words. Claude does the clerical work, scripts do the comparing, and you make the decisions.",
     contents("Parts of this page", [["loop", "The research cycle"], ["sources", "What Stemma reads"], ["evidence", "Claims and evidence"], ["report", "The report"], ["places", "Where material lives"]]))}
@@ -197,7 +196,7 @@ ${band("One round, step by step", `<ol class="steps">${ROUND.map((r) => `<li><h3
 ${spread("sources", "What Stemma reads, and how each is cited", `<p>Much of what you read on a technical subject has no page numbers. A paragraph number is counted through Stemma’s copy of a page: it is not printed on the page itself, and another copy of the same address may count differently. That is one reason the text you cite is kept in your project.</p>
 ${diagram(locators(), "This site’s drawing of the kinds of source Stemma reads, and how a place in each is cited.")}`)}
 ${spread("evidence", "Claims, and what bears on them", `<p>A thesis and the claims under it can be recorded with how sure you are and why, and linked to notes on passages. Each link says whether the note supports the claim, supports it in part, qualifies it, contradicts it or only gives context, so evidence against you is kept beside evidence for you. A check lists a recorded claim that lacks a note, a level of confidence or a reason. It does not judge whether a note supports a claim.</p>
-${diagram(evidence(), `This site’s drawing of part of the records of the <a href="${EXAMPLE_ON_GITHUB}">PostgreSQL worked example</a>: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.`)}`)}
+${diagram(evidence(), `This site’s drawing of part of the records of the <a href="postgres.html">PostgreSQL worked example</a>: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.`)}`)}
 ${spread("report", "The report", `<p>Ask Claude to build the report. Each quotation is copied from your source’s text through the passage you chose, so nobody retypes it, and citations are written in Chicago notes-and-bibliography style from your source records.</p>
 ${diagram(reportBuild(), "This site’s drawing of what the report build reads and writes.")}`)}
 ${spread("rounds", "What going round looks like", `<p>In the demo, one project is checked four times. The numbers fall as things are fixed, added and looked at.</p>
@@ -455,6 +454,121 @@ ${entries(PROVENANCE)}`, { id: "facts" })}
 ${band("What this does not show", `<p>The checks show that four quotations agree with computer-read text of one copy, on the pages cited. They do not show that Darwin is quoted fairly, that the sentences around the quotations are right, or that this is the best edition to cite. The other works are held but not yet cited, and no argument has been built from them here.</p>`, { id: "limits" })}`;
 }
 
+const POSTGRES_ON_GITHUB = `${REPOSITORY}/tree/main/examples/postgres-web-apps`;
+const POSTGRES_FILE = `${REPOSITORY}/blob/main/examples/postgres-web-apps`;
+
+/** One line of Markdown as the report writes a footnote: italics become titles, and addresses stay text. */
+const footnoteLine = (line: string) => escape(line).replace(/\*([^*]+)\*/g, "<cite>$1</cite>");
+const quotation = (text: string) => `<blockquote class="quote"><p>${escape(text)}</p></blockquote>`;
+/** Lines cut from a transcript. `[…]` marks where lines are left out. */
+const cut = (...parts: string[]) => parts.join("\n\n[…]\n\n");
+
+function postgres(): string {
+  const listed = works();
+  const away = listed.filter((w) => !w.held);
+  const f = followed();
+  const a = argument();
+  const r = runs();
+  const dropped = rejected();
+  const report = outline();
+  const counts = exampleCounts(exampleDir("postgres-web-apps"));
+  if (counts.cited !== listed.length) throw new Error("the PostgreSQL example no longer cites every work it records; reword its page");
+  const captures = archived();
+  const compared = f.upstream.locations ?? [];
+  const place = `${f.passage.locator.label} ${f.passage.locator.value}`;
+  const [before, after] = String(f.citation.sentence.text).split(f.citation.quotation) as [string, string?];
+  if (after === undefined) throw new Error("the followed sentence no longer holds its quotation");
+  const record = (path: string) => more(`The record file: ${code(path.split("/").pop()!)}`, excerpt("A record file, as it is in the repository.", read(`examples/postgres-web-apps/${path}`)));
+  const same = (sha: string) => (sha === f.upstream.sha256 ? "The same bytes as the recorded original" : "Other bytes, so it is not the recorded original");
+  const places = [
+    [`The page’s own address, ${code(f.upstream.url)}`, `The recorded original: the file fetched on ${escape(f.upstream.retrieved_at.slice(0, 10))}`],
+    ...compared.map((l: any) => [`${l.kind === "web_archive" ? "A copy at a web archive" : "Another address"}, ${code(l.url)}`, `${same(l.compared.sha256)} (compared ${escape(l.compared.at.slice(0, 10))})`]),
+  ];
+  const source = sourceFile(f.citation.key, f.anchored.file);
+  const parts: [string, string][] = [["question", "1. The question"], ["works", "2. The works"], ["followed", "3. One page, followed"], ["against", "4. Evidence against"], ["report", "5. The report"], ["check", "6. The check"], ["mistakes", "7. Planted mistakes"], ["text", "8. Text not held here"], ["limits", "What no check shows"]];
+  return `${opening("Worked example: PostgreSQL for web applications", "A research report on a technical question, followed from its thesis to the documentation page behind one footnote, and to what its checks leave open.", `${numbers([[counts.cited, "works cited"], [counts.citations, "citations"], [counts.claims, "claims recorded"]])}<p class="note">An AI model (claude-sonnet-5-5) chose the sources, made every record and wrote the report. <strong>No person has reviewed any of it.</strong> The checks leave findings open, so the example is not checked clean.</p>
+${contents("Steps of the worked example", parts)}`)}
+${band(`${numeral(1)}The question, and a thesis revised twice`, `<p>The report, <cite>${escape(report.title)}</cite>, opens with its question:</p>
+${quotation(a.question)}
+<p>A <em>thesis</em> is the answer a report argues for. The research log, kept beside the report, records two that were dropped. These are its words.</p>
+<ol class="revisions">${dropped.map((d) => `<li><p class="revision-name">${escape(d.name)}</p><p class="sentence"><q>${escape(d.thesis)}</q></p><p><strong>${escape(d.verdict)}</strong> ${escape(d.why)}</p></li>`).join("")}
+<li><p class="revision-name">The thesis kept</p><p class="sentence">${escape(a.thesis.text)}</p><p><strong>Confidence recorded: ${escape(a.thesis.confidence)}.</strong> ${escape(a.thesis.reason)}</p></li></ol>
+<p class="note">The confidence and the reason are the model’s own judgement, recorded so that you can weigh them. No check judges them.</p>
+<p><a href="${POSTGRES_FILE}/report/research-log.md">The whole research log, on GitHub</a></p>`, { id: "question" })}
+${band(`${numeral(2)}The works`, `<p>The report cites ${listed.length} works. In a project of your own you would usually hold the text of every source you cite. This published copy holds the text of ${listed.length - away.length}. For the other ${away.length} it holds their records, the fingerprints of their originals and the quoted passages, and their text can be <a href="#text">fetched again</a>.</p>
+<ul class="works" aria-label="The works the report cites">${listed.map((w) => `<li><div><p class="work-title">${escape(w.title)} ${code(w.key)}</p><p class="work-about">${escape(`${w.kind}. ${w.when}.`)}</p></div><p class="work-held${w.held ? "" : " work-away"}">${w.held ? "Text held" : "Text not held in this copy"}</p></li>`).join("")}</ul>
+<p>The short name beside each title, such as <code>${escape(f.citation.key)}</code>, is how a citation refers to it. Every source is marked as a <em>candidate</em>: nobody has formally accepted it into the project.</p>`, { id: "works" })}
+${spread("followed", `${numeral(3)}One page, followed to a footnote`, `<p>Here is one page of the PostgreSQL documentation, and one footnote of the report that quotes it.</p>
+${diagram(followedPage(), "This site’s drawing of one citation in the PostgreSQL example, made from its records and its report. An AI model made them, and no person has reviewed them.")}`)}
+${band("Where the page can be had", `<p>The documentation is cited at an address that names its version, ${escape(String(f.upstream.version))}. Such a page can still change, so the <em>upstream record</em> keeps the fingerprint of the exact file fetched. It can also list other places the file might be had. Each is a place to look: only a file with the same fingerprint counts as the original.</p>
+<dl class="places-tried">${places.map(([where, gave]) => `<div><dt>${where}</dt><dd>${gave}</dd></div>`).join("")}</dl>
+<p>Across the whole example, ${captures.captures} copies at the Internet Archive were compared in this way: ${captures.same} gave the recorded original byte for byte, and ${captures.captures - captures.same} gave other bytes.</p>
+${record(`records/upstreams/${f.upstream.id}.json`)}`)}
+${band("Its text, and the passage", `<p>The page’s text is in the project as ${f.sections.length} files, one for each section. Web pages have no page numbers, so a place is a paragraph number. Stemma counts it through its copy of the whole page, menus and all: it is not printed on the page, and you cannot count to it in a browser. To find the place, look for the quoted words.</p>
+${more(`The start of the file for the section “${escape(f.anchored.heading)}”`, excerpt("The first lines of a source file, as it is in the repository.", source))}
+<p>A <em>passage</em> is chosen by its place, and a script copies its words, so nobody retypes them. This one is ${escape(place)}:</p>
+${quotation(f.passage.quote.exact)}
+${record(`records/passages/${f.passage.id}.json`)}
+${record(`records/citations/${f.citation.id}.json`)}`)}
+${band("The claim it bears on", `<p>A <em>claim</em> is something the report asserts, recorded with how sure its author is and why. A <em>note</em> says what a passage shows, and a link says how the note bears on a claim. A note on this passage says:</p>
+${quotation(f.note.body)}
+<p>It is recorded as supporting this claim, and the thesis:</p>
+<p class="sentence">${escape(f.claim.text)}</p>
+<p><strong>Confidence recorded: ${escape(f.claim.confidence)}.</strong> ${escape(f.claim.reason)}</p>
+<p class="note">The link from this claim to the report runs through the passage. The report’s manuscript does not mark which sentence states which claim, and no check judges whether the note supports the claim.</p>`)}
+${band("The sentence and its footnote", `<p>In the report, the sentence reads, with the quotation underlined:</p>
+<p class="sentence">${escape(before)}<span class="quoted">${escape(f.citation.quotation)}</span>${escape(after)}<sup>${f.footnote.number}</sup></p>
+<div class="footnote"><p class="locator">Footnote ${f.footnote.number}</p><div>${f.footnote.paragraphs.map((p) => `<p>${footnoteLine(p)}</p>`).join("")}</div></div>
+<p>The build copied the quotation from the passage and wrote the reference from the source record, in its short form because the page is cited earlier in the report. <q>para.</q> says the number is a paragraph, not a page.</p>`)}
+${spread("against", `${numeral(4)}Evidence against`, `<p>Evidence against a thesis is recorded in the same way as evidence for it, as a note whose link says <em>contradicts</em>. A drawing of part of what is linked to this thesis:</p>
+${diagram(evidence(exampleDir("postgres-web-apps")), "This site’s drawing of part of the example’s records: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.")}`)}
+${band("The case against, and what was done with it", `<p>The note that contradicts the thesis rests on these words of <cite>${escape(a.source.title.value)}</cite>:</p>
+${quotation(a.passage.quote.exact)}
+<p>Its sharper form is recorded as a <em>rival reading</em>, another way to read the same evidence:</p>
+<p class="sentence">${escape(a.rival.text)}</p>
+<p><strong>Confidence recorded: ${escape(a.rival.confidence)}.</strong> ${escape(a.rival.reason)}</p>
+<p>An <em>objection</em> to the report’s own evidence is recorded too:</p>
+<p class="sentence">${escape(a.objection.text)}</p>
+<p><strong>Confidence recorded: ${escape(a.objection.confidence)}.</strong> ${escape(a.objection.reason)}</p>
+<p>The research log says of one paper sought on this question: <q>${escape(a.bothWays)}</q> The report’s answer begins <q>${escape(a.reportAnswers)}</q> It goes on to say: <q>${escape(a.reportSays)}</q></p>`)}
+${band(`${numeral(5)}The report`, `<p><cite>${escape(report.title)}</cite> has these sections and ${report.notes} footnotes:</p>
+<ul class="outline">${report.sections.map((s) => `<li>${escape(s)}</li>`).join("")}</ul>
+<p>Read it, and what the build wrote beside it, on GitHub. A PDF is not published with the example.</p>
+<ul class="plain-list"><li><a href="${POSTGRES_FILE}/report/report.md">The report, with its footnotes and bibliography</a></li>
+<li><a href="${POSTGRES_FILE}/report/verification.md">The verification table: where each quotation was copied from and how it was compared, as recorded</a></li>
+<li><a href="${POSTGRES_FILE}/report/evidence.json">The evidence ledger: what is recorded behind each sentence</a></li>
+<li><a href="${POSTGRES_FILE}/report/research-log.md">The research log</a></li></ul>`, { id: "report" })}
+${band(`${numeral(6)}The check`, `<p>With the text of all ${listed.length} works present, the check ends with two problems open and nothing it could not check. This version also does not run ${r.complete.notRun} kinds of check that apply here. So the project is <strong>not checked clean</strong>.</p>
+${excerpt("<strong>Transcript</strong>, first lines, of a real run on a copy that also held the text of the works the published copy leaves out. Each part of that text matched the fingerprint recorded for it.", r.complete.head)}
+<h3>The first problem: a reference and its page disagree</h3>
+<p>The page of the 9.6 release notes calls itself by a general title, and its first parts are menus. Stemma compares the record with those, and finds neither the record’s title nor its authors or year there. The page does give the release number and its date further down. The record was not changed to match the general title, which would make the reference worse.</p>
+${more("What the tool printed", transcript(r.details, "<strong>Transcript</strong>: one finding of a real run on the copy with all the text, with its number left off. The last line is a note a model recorded; it is not a person’s review."))}
+<h3>The second: a footnote lost its marker</h3>
+<p>In converting the page on JSON types, Stemma kept the words of one of the page’s footnotes but did not read its marker as a marker. No quotation in the report comes from that footnote.</p>
+${more("What the tool printed", transcript(r.footnotes, "<strong>Transcript</strong>: one finding of a real run on the copy with all the text, with its number left off. The last line is a note a model recorded; it is not a person’s review."))}
+<h3>What was not run</h3>
+${more("What the tool printed about what it did not check", transcript(r.complete.text.slice(r.complete.text.indexOf("\nNOT CHECKED: ") + 1, r.complete.text.indexOf("\n\nFor information, not a finding: ", r.complete.text.indexOf("\nNOT CHECKED: "))), "<strong>Transcript</strong>: part of the same run."))}
+<p><a href="recorded/postgres-check-full.txt">The whole transcript of this run</a></p>`, { id: "check" })}
+${band(`${numeral(7)}Planted mistakes`, `<p>To see what the checks would notice, two citations of the documentation were changed in a throwaway copy, as if an author had typed them wrongly. In one quotation, <q>does not immediately remove</q> lost its <q>not</q>, which turns the sentence around. Another citation was moved from paragraph ${escape(f.passage.locator.value)} to paragraph 32.</p>
+<p>Both were caught. The changed quotation is shown beside the wording in the source. For the moved one, the report says the words are in the source but not where the citation says.</p>
+${more("What the tool printed for the planted mistakes", transcript(cut(r.trial.head, ...r.added), "<strong>Transcript</strong> of a real run on a throwaway copy of the published example with two planted mistakes: its first lines and the two findings that the run without them does not have, their numbers left off. [&#8230;] marks lines left out here."))}
+<p><a href="recorded/postgres-trial.txt">The whole transcript of this run</a></p>`, { id: "mistakes" })}
+${band(`${numeral(8)}Text not held here`, `<p>The published copy does not hold the text of ${away.length} works. Run on that copy, the same check has the same two problems, and ${r.published.unchecked} items it <em>could not check</em>. A could-not-check never counts as a pass.</p>
+${excerpt(`<strong>Transcript</strong>, first lines, of a real run on a copy of this example that holds only what is published, which does not hold the text of ${away.length} works.`, r.published.head)}
+<p>For each of those works the report says once that its text is <em>not held here</em>, which is not the same as damaged, and lists what rests on it. What cannot be checked includes the quotations from it, their places, and whether anything they rest on has changed.</p>
+${more("What the tool printed about the text that is not held", transcript(r.notHeld, "<strong>Transcript</strong>: one finding of the same run, with its number left off."))}
+<p><a href="recorded/postgres-check.txt">The whole transcript of this run</a></p>
+<h3>Getting the text back</h3>
+<p>Ask Claude to fetch the text again, or give it your own copies of the originals. Stemma tries the places recorded for each work, or looks at your files, for one with the recorded fingerprint. It writes the missing text only if every part matches what the project recorded. Where a page now differs, it says that the copy fetched is not the recorded original, and writes the text only on the same condition. A web page can change at any time, so this may stop working for any of them. Until the text is back, the report cannot be rebuilt, and whether it is current cannot be told.</p>
+<p><a href="${POSTGRES_ON_GITHUB}">The example, with all its files and how to fetch the text, on GitHub</a></p>`, { id: "text" })}
+${band("What no check shows", `<p>No check tells you that a source supports the sentence that cites it, that the argument holds, or that these are the right sources. Documentation says how software is meant to behave, not how it behaves under load. The research also has gaps:</p>
+<ul class="plain-list">${gaps().map((g) => `<li>${escape(g)}</li>`).join("")}</ul>
+<p><a href="${POSTGRES_FILE}/research">The note on how sources were chosen, and what is missing</a></p>`, { id: "limits" })}`;
+}
+
+/** The first lines of one source file of the PostgreSQL example. */
+const sourceFile = (key: string, file: string) => read(`examples/postgres-web-apps/sources/${key}/${file}`).split("\n").slice(0, 30).join("\n");
+
 function design(): string {
   const tokens = colorTokens();
   const light = measured("light");
@@ -522,7 +636,7 @@ ${band("Navigation and accessibility", `<p>The target is WCAG 2.2 level AA. A sk
 
 const BODIES: Record<(typeof NAV)[number]["file"], () => string> = {
   "index.html": home, "how.html": how, "principles.html": principles, "install.html": install,
-  "checks.html": checksPage, "examples.html": examples, "darwin.html": darwin, "design.html": design,
+  "checks.html": checksPage, "examples.html": examples, "postgres.html": postgres, "darwin.html": darwin, "design.html": design,
 };
 
 export const PAGES: Page[] = NAV.map((p) => ({ ...p, body: BODIES[p.file] }));

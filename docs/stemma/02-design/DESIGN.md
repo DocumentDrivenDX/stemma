@@ -350,13 +350,24 @@ citations, to the check with its open findings and deliberate mistakes. Pages
 about a worked example may explain the tool; sentences shown as the author's
 scholarship hold only the scholarship.
 
-The site has two worked examples: Darwin and coral reefs
-(`examples/coral-reefs/`), which has its own page, and PostgreSQL for web
-applications (`examples/postgres-web-apps/`), which has a card on the home page
-linking to its folder on GitHub until it has a page. The list of examples is
-data (`website/lib/examples.ts`): the home page's cards are made from it, and a
-second example page adds its entry there and in the page list
-(`website/lib/nav.ts`). Drawings and helpers that read an example take its
+The site has two worked examples, each with a page: PostgreSQL for web
+applications (`examples/postgres-web-apps/`, `postgres.html`), the technical
+research example, listed first, and Darwin and coral reefs
+(`examples/coral-reefs/`, `darwin.html`). The PostgreSQL page follows the
+research: the question and the theses considered, from the research log; every
+work, with whether the published copy holds its text; one documentation page
+followed through its records to a footnote; the evidence against the thesis; the
+report; the check; planted mistakes; and what no check shows. A published copy
+that does not hold some works' text says only that those texts are not held
+there and can be fetched again; the normal case it describes is a project that
+holds all its sources' text. Which works are held is worked out from the
+example's `.gitignore` and files, and counts and quoted words are read from
+records, the report, the research log and recorded runs. The build fails when
+they stop saying what a page says.
+
+The list of examples is data (`website/lib/examples.ts`): the home page's cards
+are made from it, and another example page adds its entry there and in the page
+list (`website/lib/nav.ts`). Drawings and helpers that read an example take its
 folder as a value rather than naming Darwin.
 
 The one installation it may describe is
@@ -387,9 +398,16 @@ short comparable values. Dark follows the system setting or
 Command transcripts, JSON reports, the check list, and screenshots under
 `website/generated/` come from real runs (`./scripts/dev.sh docs`) of the demo and
 the test fixtures. The local test run fails when they are stale or when a website
-file holds a local path. The worked example's runs that the site shows are under
-`website/recorded/` (`./scripts/dev.sh record-example`). The example holds its
-source files, so a test compares them with a fresh run on any machine. A
+file holds a local path. The worked examples' runs that the site shows are under
+`website/recorded/` (`./scripts/dev.sh record-example`), and the build publishes
+them whole beside the pages that show parts of them. A page says what each run
+was made on. The Darwin example holds its source files, and the PostgreSQL runs
+on its published copy are made on a copy that leaves out the text it does not
+commit, even where the tree holds it, so a test compares those runs with fresh
+ones on any machine. The PostgreSQL run with all the text can be made, and is
+compared, only where the tree holds that text; elsewhere the test run says that
+it was not. A part of a transcript is cut only between its lines, and the caption
+says that it is a part. A
 screenshot counts as current when the page it was
 captured from is unchanged; its pixels are not compared between machines.
 Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,

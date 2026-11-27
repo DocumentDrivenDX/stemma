@@ -4,6 +4,7 @@
 // docs (lib/render-diagrams.ts); the site build writes the text beside it. This
 // module reads record files and loads nothing heavy.
 import { exampleDir, readRecords } from "./example.ts";
+import { followed } from "./postgres.ts";
 
 /** The longest label a box may have: the renderer does not wrap them. */
 export const LONGEST_LABEL = 26;
@@ -218,7 +219,31 @@ export function evidence(example = exampleDir("postgres-web-apps")): Diagram {
   };
 }
 
-export const DIAGRAMS: (() => Diagram)[] = [chain, compare, locators, reportBuild, () => evidence()];
+/** One documentation page of the PostgreSQL example, from the page to a footnote: the chain, filled from its records. */
+export function page(): Diagram {
+  const { source, upstream, sections, anchored, passage, footnote } = followed();
+  const place = `${passage.locator.label} ${passage.locator.value}`;
+  const links: [string, string, string, DiagramNode["shape"]?][] = [
+    ["original", "A documentation page", `“${source.title.value}”, from the ${upstream.version}, as it was fetched. The saved page itself is not added to the project.`, "document"],
+    ["upstream", "Upstream record", `Where the page came from, when, and the fingerprint (SHA-256) of the exact file fetched, which begins ${String(upstream.sha256).slice(0, 12)}.`],
+    ["files", `${sections.length} files, one per section`, `The page’s text, kept in the project: ${sections.map((s) => (s.heading ? `“${s.heading}”` : "one without a heading")).join(", ")}.`, "document"],
+    ["passage", `Passage: ${place}`, `Words chosen by their place in the section “${anchored.heading}”. A script copied them, with the paragraph number.`],
+    ["citation", `Citation: ${place}`, `A record that ties the report’s sentence to the source, with the quotation and ${place}.`],
+    ["footnote", `Footnote ${footnote.number} in the report`, "The sentence, and a footnote that gives the quotation and then the reference."],
+  ];
+  const ids = links.map(([id]) => id);
+  return {
+    name: "followed",
+    title: "One documentation page, followed to a footnote",
+    desc: `${links.length} links, each leading to the next: ${links.map(([, label]) => label.toLowerCase()).join(", ")}.`,
+    layout: { kind: "grid", columns: 2, order: ["original", "upstream", "passage", "files", "citation", "footnote"], narrow: ids },
+    nodes: links.map(([id, label, , shape]) => ({ id, label, ...(shape ? { shape } : {}), ...(id === "original" || id === "footnote" ? { focus: true } : {}) })),
+    edges: path(ids),
+    text: { label: `The ${links.length} links, each leading to the next`, ordered: true, entries: links.map(([, term, says]) => ({ term, says })) },
+  };
+}
+
+export const DIAGRAMS: (() => Diagram)[] = [chain, compare, locators, reportBuild, () => evidence(), page];
 
 /** The files each diagram is drawn into, under website/generated/diagrams/. */
 export const files = (d: Diagram): string[] =>

@@ -105,7 +105,7 @@
     .band-head > h2::before, .spread > h2::before { counter-increment: section; content: counter(section) / ""; display: block; margin-bottom: var(--stm-space-2); font: 400 2.5rem/1 var(--stm-font-serif); color: var(--arras-color-text-muted); }
     /* The list of links has numbers of its own; the worked example numbers its steps. */
     .spread.unnumbered > h2::before { content: none; counter-increment: none; }
-    .page-darwin :is(.band-head, .spread) > h2::before { content: none; }
+    :is(.page-darwin, .page-postgres) :is(.band-head, .spread) > h2::before { content: none; }
   }
   .numeral { display: block; font: 400 2.5rem/1 var(--stm-font-serif); color: var(--arras-color-text-muted); margin-bottom: var(--stm-space-2); }
 
@@ -235,6 +235,37 @@
   }
 
   .work { font-size: 1.125rem; }
+  /* Words quoted from a report, a record or a source. */
+  .quote { max-width: 38rem; border-left: 3px solid var(--stm-color-line-strong); padding-left: var(--stm-space-4); font: 400 1.1875rem/1.6 var(--stm-font-serif); }
+  /* Theses considered, in the order they were taken up. */
+  .revisions { counter-reset: revision; }
+  .revisions li { padding-block: var(--stm-space-4); border-top: 1px solid var(--arras-color-border); }
+  .revisions li > * + * { margin-top: var(--stm-space-2); }
+  .revisions li > p:not(.sentence) { max-width: 40rem; }
+  .revision-name { counter-increment: revision; font: 600 1.0625rem/1.4 var(--stm-font-serif); }
+  .revision-name::before { content: counter(revision) ". "; color: var(--arras-color-text-muted); font-weight: 400; }
+  /* A report's works, and the places recorded for one original: entries, so that
+     nothing is out of sight on a narrow screen. */
+  .works li { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 1.5rem; padding-block: var(--stm-space-2); border-top: 1px solid var(--arras-color-border); }
+  .work-title { font-weight: 600; overflow-wrap: anywhere; }
+  .work-title code { font-weight: 400; color: var(--arras-color-text-muted); }
+  .work-about { font-size: 0.875rem; color: var(--arras-color-text-muted); }
+  .work-held { font: italic 400 1rem/1.5 var(--stm-font-serif); }
+  .work-away { color: var(--arras-color-text-muted); }
+  @media (min-width: 40rem) { .works li { grid-template-columns: minmax(0, 1fr) 9.5rem; } }
+  .places-tried > div { padding-block: var(--stm-space-3); border-top: 1px solid var(--arras-color-border); font-size: 0.9375rem; }
+  .places-tried dt { overflow-wrap: anywhere; }
+  .places-tried dd { margin-top: var(--stm-space-1); font-weight: 600; }
+
+  /* The report's sections, which carry their own numbers. */
+  .outline { columns: 15rem 2; column-gap: 2rem; max-width: 40rem; }
+  .outline li { break-inside: avoid; padding-block: 2px; }
+  .revisions .sentence q { font-size: inherit; }
+  /* A footnote as the report gives it. */
+  .footnote { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 1.5rem; padding-block: var(--stm-space-4); border-block: 1px solid var(--arras-color-border); font-size: 0.9375rem; overflow-wrap: anywhere; }
+  .footnote > div { max-width: 38rem; }
+  .footnote > div > p + p { margin-top: var(--stm-space-2); }
+  @media (min-width: 40rem) { .footnote { grid-template-columns: 6rem minmax(0, 1fr); } }
   .citations > li { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 1.5rem; padding-block: var(--stm-space-4); border-top: 1px solid var(--arras-color-border); }
   .locator { font: italic 400 1.0625rem/1.7 var(--stm-font-serif); color: var(--arras-color-text-muted); }
   .sentence { max-width: 38rem; font: 400 1.1875rem/1.6 var(--stm-font-serif); }

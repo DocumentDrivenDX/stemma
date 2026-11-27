@@ -122,7 +122,7 @@ for (const scheme of SCHEMES) {
   });
 }
 
-const DRAWN = ["index.html", "how.html", "checks.html"];
+const DRAWN = ["index.html", "how.html", "checks.html", "postgres.html"];
 
 for (const file of DRAWN) {
   for (const width of [320, 375, 1280]) {

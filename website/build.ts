@@ -29,4 +29,6 @@ for (const pkg of new Set(fonts.files.map((f) => f.pkg))) cpSync(join(ROOT, "nod
 cpSync(join(import.meta.dir, "src/mark.svg"), join(OUT, "mark.svg"));
 cpSync(join(import.meta.dir, "generated/screenshots"), join(OUT, "screenshots"), { recursive: true, filter: (path) => !path.endsWith(".json") });
 cpSync(join(import.meta.dir, "generated/reports"), join(OUT, "reports"), { recursive: true });
+// The whole transcripts that a page shows only in part.
+cpSync(join(import.meta.dir, "recorded"), join(OUT, "recorded"), { recursive: true });
 console.log(`built ${PAGES.length} pages in website/dist/\nopen it with ./scripts/dev.sh preview`);
