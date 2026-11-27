@@ -39,6 +39,7 @@
         "@stemma/graph": "workspace:*",
         "@stemma/publish": "workspace:*",
         "@stemma/records": "workspace:*",
+        "@stemma/server": "workspace:*",
         "@stemma/workspace": "workspace:*",
       },
     },
@@ -83,6 +84,9 @@
     },
     "packages/records": {
       "name": "@stemma/records",
+    },
+    "packages/server": {
+      "name": "@stemma/server",
     },
     "packages/workspace": {
       "name": "@stemma/workspace",
@@ -186,6 +190,8 @@
     "@stemma/publish": ["@stemma/publish@workspace:packages/publish"],
 
     "@stemma/records": ["@stemma/records@workspace:packages/records"],
+
+    "@stemma/server": ["@stemma/server@workspace:packages/server"],
 
     "@stemma/workspace": ["@stemma/workspace@workspace:packages/workspace"],
 

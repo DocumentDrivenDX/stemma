@@ -4,7 +4,7 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { isBuiltin } from "node:module";
 import { basename, join } from "node:path";
-import { buildTemplate, explorerLicenses } from "../packages/explorer/build.ts";
+import { buildServed, buildTemplate, explorerLicenses } from "../packages/explorer/build.ts";
 
 const root = join(import.meta.dir, "..");
 
@@ -26,9 +26,14 @@ export function unresolvedImports(bundle: string): string[] {
   return imports.map((i) => i.path).filter((path) => !isBuiltin(path) && !path.startsWith("bun:"));
 }
 
-/** The explorer page template, which the command line finds beside itself, with the licenses of the code in it. */
+/** The explorer page template and the served page, which the command line finds beside itself, with the licenses of the code in them. */
 export async function writeExplorer(outdir: string): Promise<void> {
   writeFileSync(join(outdir, "explorer.template.html"), await buildTemplate());
+  const served = await buildServed();
+  mkdirSync(join(outdir, "explorer-served"), { recursive: true });
+  for (const [name, text] of [["index.html", served.html], ["app.js", served.js], ["app.css", served.css]] as const) {
+    writeFileSync(join(outdir, "explorer-served", name), text);
+  }
   const licenses = join(outdir, "explorer-licenses");
   mkdirSync(licenses, { recursive: true });
   for (const [name, text] of Object.entries(explorerLicenses())) writeFileSync(join(licenses, name), text);
@@ -47,7 +52,13 @@ export async function bundle(outdir: string): Promise<string> {
   });
   if (!built.success) throw new Error(built.logs.join("\n"));
   const path = join(outdir, "stemma.js");
-  const parts = built.outputs.filter((o) => o.path.endsWith(".js")).map((o) => basename(o.path));
+  // The process `browse` starts to hold its data: a file of its own, whole, so that it loads no command.
+  const worker = await Bun.build({
+    entrypoints: [join(root, "packages/cli/src/browse-worker.ts")],
+    outdir, naming: { entry: "browse-worker.js" }, target: "bun", minify: false,
+  });
+  if (!worker.success) throw new Error(worker.logs.join("\n"));
+  const parts = [...built.outputs, ...worker.outputs].filter((o) => o.path.endsWith(".js")).map((o) => basename(o.path));
   const left = parts.flatMap((part) => unresolvedImports(readFileSync(join(outdir, part), "utf8")))
     .filter((i) => !(i.startsWith("./") && parts.includes(i.slice(2))));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
@@ -67,6 +78,7 @@ if (import.meta.main) {
   for (const part of new Bun.Glob("*.js").scanSync(dist)) cpSync(join(dist, part), join(release, "dist", part));
   cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
   cpSync(join(dist, "explorer.template.html"), join(release, "dist/explorer.template.html"));
+  cpSync(join(dist, "explorer-served"), join(release, "dist/explorer-served"), { recursive: true });
   cpSync(join(dist, "explorer-licenses"), join(release, "dist/explorer-licenses"), { recursive: true });
   cpSync(join(dist, "licenses"), join(release, "dist/licenses"), { recursive: true });
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });

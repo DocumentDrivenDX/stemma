@@ -56,7 +56,7 @@ export function sourceViewsFile(corpus: Corpus, projection: Projection, cap = SO
   let cut = 0;
   for (const view of [...passages.filter((v) => cited.has(v.id)), ...passages.filter((v) => !cited.has(v.id))]) {
     // Only a view that holds source text counts against the cap.
-    const size = view.segments.length > 0 ? bytesOf(view) : 0;
+    const size = view.segments.length > 0 && cap !== Number.POSITIVE_INFINITY ? bytesOf(view) : 0;
     if (used + size > cap) {
       cut++;
       views[view.id] = {
@@ -97,5 +97,7 @@ export function sourceViewsFile(corpus: Corpus, projection: Projection, cap = SO
       records: located.map((v) => v.id).sort(compareCodePoints),
     });
   }
-  return { text: jsonText({ schema: SOURCE_VIEWS_SCHEMA, views }), views, omissions, warnings };
+  // Written only when asked for: with no cap, as the local server makes them, the text can be very large.
+  let text: string | undefined;
+  return { get text() { return (text ??= jsonText({ schema: SOURCE_VIEWS_SCHEMA, views })); }, views, omissions, warnings };
 }

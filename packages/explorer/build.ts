@@ -32,9 +32,9 @@ export function explorerLicenses(): Record<string, string> {
 /** What goes inside a script element: nothing in it may end the element or start another. */
 const scriptText = (text: string): string => text.replace(/<(?=\/script|script|!--)/gi, "\\x3C");
 
-export async function bundleHost() {
+export async function bundleHost(entry: "host.tsx" | "served.tsx" = "host.tsx") {
   const built = await Bun.build({
-    entrypoints: [join(import.meta.dir, "src/host.tsx")], target: "browser", format: "esm", minify: true,
+    entrypoints: [join(import.meta.dir, "src", entry)], target: "browser", format: "esm", minify: true,
     define: { "process.env.NODE_ENV": '"production"' }, metafile: true,
   });
   if (!built.success || built.outputs.length !== 1) throw new Error(built.logs.join("\n"));
@@ -56,10 +56,8 @@ function stemmaStyles(): string {
   }
 }
 
-export async function buildTemplate(): Promise<string> {
-  const script = scriptText((await bundleHost()).script);
-  // The browser reads CR LF as LF and a NUL as another character; either would change the script and break its hash.
-  if (/[\r\0]/.test(script)) throw new Error("The explorer script holds a character the page would change.");
+/** The styles of both pages: arras's, Stemma's, and the layout. */
+function pageStyles(): string {
   const arras = readFileSync(join(packageDir("@documentdrivendx/arras-ui", root), "dist/styles.css"), "utf8");
   const layout = [
     'body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}',
@@ -97,7 +95,44 @@ export async function buildTemplate(): Promise<string> {
     // After the rules above, which it overrides.
     "@media (max-width:60rem){.stemma-manuscript{display:block}.stemma-open .stemma-reading{padding-bottom:75vh}.stemma-pane{position:fixed;left:0;right:0;bottom:0;top:auto;height:70vh;z-index:20;border-left:0;border-top:3px solid #0f172a;box-shadow:0 -4px 16px rgba(15,23,42,.25)}.stemma-pane .stemma-source{max-height:none;border:0}}",
   ].join("");
-  const styles = `${arras}\n${stemmaStyles()}\n${layout}`.replace(/\r\n?/g, "\n");
+  return `${arras}\n${stemmaStyles()}\n${layout}`.replace(/\r\n?/g, "\n");
+}
+
+/**
+ * The page the local server serves (CONTRACT-005 M): its own template, with the
+ * script and styles as files of their own, none inline, and no data. The server
+ * sends its content security policy as a header.
+ */
+export async function buildServed(): Promise<{ html: string; js: string; css: string }> {
+  const js = (await bundleHost("served.tsx")).script;
+  const html = [
+    "<!doctype html>",
+    '<html lang="en">',
+    "<head>",
+    '<meta charset="utf-8">',
+    '<meta name="referrer" content="no-referrer">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    "<title>Stemma explorer</title>",
+    // No icon is asked for.
+    '<link rel="icon" href="data:,">',
+    '<link rel="stylesheet" href="/app.css">',
+    "</head>",
+    "<body>",
+    '<div id="root"></div>',
+    "<noscript>This page needs JavaScript.</noscript>",
+    '<script type="module" src="/app.js"></script>',
+    "</body>",
+    "</html>",
+    "",
+  ].join("\n");
+  return { html, js, css: pageStyles() };
+}
+
+export async function buildTemplate(): Promise<string> {
+  const script = scriptText((await bundleHost()).script);
+  // The browser reads CR LF as LF and a NUL as another character; either would change the script and break its hash.
+  if (/[\r\0]/.test(script)) throw new Error("The explorer script holds a character the page would change.");
+  const styles = pageStyles();
   if (/<\/style/i.test(styles)) throw new Error("The explorer styles would end their element.");
   const hash = new Bun.CryptoHasher("sha256").update(script).digest("base64");
   // Nothing may be loaded and nothing may connect. Only the one script, known by its hash, runs.

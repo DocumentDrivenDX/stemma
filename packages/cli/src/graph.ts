@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
-  dataIdentity, type Export, exportBlockers, exportGraph, ExportMappingError, exportOwnFiles, exportStaleness, FILES, MANIFEST, PAGE,
+  type Blocker, dataIdentity, type Export, exportBlockers, exportGraph, ExportMappingError, exportOwnFiles, exportStaleness, FILES, MANIFEST, PAGE,
 } from "@stemma/graph";
 import { manuscriptView } from "@stemma/publish";
 import { checkOutputDirectory, outputExists, readOutputFile, RefusedOutput, removeOutputFile, writeOutputFiles } from "@stemma/workspace";
@@ -44,16 +44,19 @@ function manuscriptLines({ manuscript }: Export): string[] {
   return [`Manuscript: ${manuscript.inputs!.template} and report/report.json, as read now: ${manuscript.notes.length} notes; ${shown} of ${quotations.length} quotations open highlighted in their source.`];
 }
 
+/** What to say when the project cannot be read well enough to show it. */
+export function blockedMessage(blockers: Blocker[]): string {
+  const listed = blockers.slice(0, 20).map((b) => `  ${b.path}: ${b.problems.slice(0, 3).join(", ")}`).join("\n");
+  return `The project cannot be read, so a graph of it would be wrong. Nothing was written. Run \`check\` for what is wrong and how to fix it.\n${listed}`;
+}
+
 export async function graphExport(options: Options): Promise<number> {
   if (options.chapter !== undefined) throw new CommandError(2, "not_implemented", "`graph export --chapter` is not implemented in this version. Nothing was done.");
   audienceOf(options);
   const root = requireProject(options);
   const corpus = openCorpus(root);
   const blockers = exportBlockers(corpus);
-  if (blockers.length > 0) {
-    const listed = blockers.slice(0, 20).map((b) => `  ${b.path}: ${b.problems.slice(0, 3).join(", ")}`).join("\n");
-    throw new CommandError(3, "project_unreadable", `The project cannot be read, so a graph of it would be wrong. Nothing was written. Run \`check\` for what is wrong and how to fix it.\n${listed}`, blockers.map((b) => b.path));
-  }
+  if (blockers.length > 0) throw new CommandError(3, "project_unreadable", blockedMessage(blockers), blockers.map((b) => b.path));
   const template = options.page ? await pageTemplate() : undefined;
   let made: Export;
   try {

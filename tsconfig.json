@@ -25,6 +25,7 @@
       "@stemma/cite": ["./packages/cite/src/index.ts"],
       "@stemma/publish": ["./packages/publish/src/index.ts"],
       "@stemma/graph": ["./packages/graph/src/index.ts"],
+      "@stemma/server": ["./packages/server/src/index.ts"],
       "@stemma/manuscript": ["./packages/manuscript/src/index.ts"]
     },
     "skipLibCheck": true,

@@ -36,7 +36,7 @@ const plural = (label: string) => /(s|x|ch|sh)$/.test(label) ? `${label}es` : /[
 /** Text safe to put in a script element: `<` only occurs inside JSON strings, where this is the same character. */
 export const jsonText = (value: unknown): string => canonical(value).replaceAll("<", "\\u003c");
 
-export function moduleDocument(projection: Projection): object {
+export function moduleDocument(projection: Projection, served = false): object {
   const names = new Set<string>();
   const unique = (name: string) => {
     if (names.has(name.toLowerCase())) throw new ExportMappingError(`Two relationship fields are named ${name}.`);
@@ -116,7 +116,7 @@ export function moduleDocument(projection: Projection): object {
       id: MODULE_NAME, namespace: MODULE_NAME,
       extensions: {
         "umf.ddd": { kind: "bounded-context", terms: [] },
-        "arras.view": { title: "Evidence graph", description: "Records of one Stemma project, as they were when exported. Support results are recorded model judgments, not verification." },
+        "arras.view": { title: "Evidence graph", description: `Records of one Stemma project, ${served ? "as Stemma last read them from its files" : "as they were when exported"}. Support results are recorded model judgments, not verification.` },
       },
       elements, relationships,
     }],

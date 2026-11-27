@@ -44,6 +44,8 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   research list
   graph export --audience author [--page] [--out <dir>]
   graph status [--out <dir>]
+  browse [--no-open] [--idle-minutes <n>]
+             serves the explorer to a browser on this computer until stopped
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.

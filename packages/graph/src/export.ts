@@ -100,7 +100,8 @@ export interface ExportRequest {
   manuscriptCap?: number;
 }
 
-export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
+/** What an export is made of, before its files are written. */
+function assemble(corpus: Corpus, request: ExportRequest, served = false) {
   const blockers = exportBlockers(corpus);
   if (blockers.length > 0) throw new UnreadableProject(blockers);
   const states = recordStates(corpus);
@@ -109,20 +110,8 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
   const sources = sourceViewsFile(corpus, projection, request.sourceViewsCap, quotedPassages(made));
   const manuscript = manuscriptFile(made, sources.views, request.manuscriptCap);
   const omissions = [...projection.omissions, ...sources.omissions].sort((a, b) => compareCodePoints(`${a.type}\0${a.reason}`, `${b.type}\0${b.reason}`));
-  const moduleText = jsonText(moduleDocument(projection));
+  const moduleText = jsonText(moduleDocument(projection, served));
   const graphText = jsonText(graphDocument(projection));
-  const exportedKeys = new Set(projection.entities.map((e) => e.key));
-  const files: { name: string; text: string }[] = [
-    { name: FILES.module, text: moduleText },
-    { name: FILES.graph, text: graphText },
-    { name: FILES.config, text: jsonText({ module: FILES.module, graph: FILES.graph }) },
-    {
-      name: FILES.states,
-      text: jsonText({ schema: "stemma.states/0", records: Object.fromEntries([...states.records].filter(([id]) => exportedKeys.has(id))) }),
-    },
-    { name: FILES.sourceviews, text: sources.text },
-    { name: FILES.manuscript, text: manuscript.text },
-  ];
   const bytes = Buffer.byteLength(moduleText) + Buffer.byteLength(graphText);
   const warnings = [...projection.warnings, ...sources.warnings, ...manuscript.warnings];
   if (projection.entities.length > MEASURED.entities || bytes > MEASURED.bytes) {
@@ -145,17 +134,76 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
     states: { computed: states.computed, not_computed: states.not_computed, checks: states.checks, checks_left_out: states.checks_left_out },
     warnings,
   };
-  if (request.template !== undefined) {
+  const banner = (): BannerData => {
     const named = corpus.settings.data?.project_id;
     const project_id = typeof named === "string" ? named : "";
-    const banner: BannerData = { ...shared, project_id, module_sha256: sha256(moduleText), graph_sha256: sha256(graphText) };
-    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText, sourceviews: sources.text, manuscript: manuscript.text }) });
+    return { ...shared, project_id, module_sha256: sha256(moduleText), graph_sha256: sha256(graphText) };
+  };
+  return { states, projection, sources, manuscript, moduleText, graphText, shared, banner };
+}
+
+export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
+  const { states, projection, sources, manuscript, moduleText, graphText, shared, banner } = assemble(corpus, request);
+  const exportedKeys = new Set(projection.entities.map((e) => e.key));
+  const files: { name: string; text: string }[] = [
+    { name: FILES.module, text: moduleText },
+    { name: FILES.graph, text: graphText },
+    { name: FILES.config, text: jsonText({ module: FILES.module, graph: FILES.graph }) },
+    {
+      name: FILES.states,
+      text: jsonText({ schema: "stemma.states/0", records: Object.fromEntries([...states.records].filter(([id]) => exportedKeys.has(id))) }),
+    },
+    { name: FILES.sourceviews, text: sources.text },
+    { name: FILES.manuscript, text: manuscript.text },
+  ];
+  if (request.template !== undefined) {
+    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner()), [MODULE_NAME]: moduleText, graph: graphText, sourceviews: sources.text, manuscript: manuscript.text }) });
   }
   const manifest: Manifest = {
     schema: EXPORT_SCHEMA, scope: "all", ...shared,
     files: Object.fromEntries(files.map((f) => [f.name, sha256(f.text)])),
   };
   return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states, sourceViews: sources.views, manuscript: manuscript.view };
+}
+
+/** Warnings that tell the reader of an export what to do with its files, said of a served page instead. */
+const SERVED_WORDS: [Warning["code"], string, string][] = [
+  ["records_left_out", ", then export again.", "; the page reads the files again when they change."],
+  ["broken_references", ", then export again.", "; the page reads the files again when they change."],
+  ["manuscript_unavailable", "The report is not in this export:", "The report cannot be shown:"],
+  ["manuscript_unavailable", "Fix it, then export again.", "Fix it; the page reads it again."],
+  ["coordinates_in_views", "The export was written with it, so anyone given the export can read it. If it locates a restricted site, do not pass the export on.", "The served page shows it. If it locates a restricted site, do not pass on what you copy from the page."],
+  ["coordinates_in_manuscript", "The export was written with it, so anyone given the export can read it. If it locates a restricted site, do not pass the export on.", "The served page shows it. If it locates a restricted site, do not pass on what you copy from the page."],
+];
+
+const servedWarning = (warning: Warning): Warning => ({
+  ...warning,
+  message: SERVED_WORDS.reduce((message, [code, from, to]) => (code === warning.code ? message.replace(from, to) : message), warning.message),
+});
+
+export interface Served {
+  data_identity: string;
+  banner: BannerData;
+  moduleText: string;
+  graphText: string;
+  views: SourceViewsFile["views"];
+  manuscript: ManuscriptView;
+}
+
+/**
+ * The author export as the local server holds it (CONTRACT-005 M): the same
+ * data, made by the same function, with no size cap on the source views or the
+ * manuscript view, and no files. The served page does not load the graph, so
+ * the warning about its size is left out.
+ */
+export function servedData(corpus: Corpus, request: Pick<ExportRequest, "version" | "manuscript">): Served {
+  const made = assemble(corpus, { ...request, sourceViewsCap: Number.POSITIVE_INFINITY, manuscriptCap: Number.POSITIVE_INFINITY }, true);
+  const banner = made.banner();
+  return {
+    data_identity: made.shared.data_identity,
+    banner: { ...banner, warnings: banner.warnings.filter((w) => w.code !== "large_graph").map(servedWarning) },
+    moduleText: made.moduleText, graphText: made.graphText, views: made.sources.views, manuscript: made.manuscript.view,
+  };
 }
 
 /**

@@ -605,7 +605,8 @@ from the record files by the same functions, with no size cap on source views or
 the manuscript view, so no view is `not_exported` and no
 `source_views_cut` warning is given. The `large_graph` warning is left out: the
 served page does not load the graph. All other omissions and warnings are the
-export's. arras's pinned static loader loads the module and graph in the server,
+export's. Where the module's description or a warning tells the reader of an
+export what to do with it, the served one says the same of a served page. arras's pinned static loader loads the module and graph in the server,
 and its static client answers the reads. The page's `ArrasClient` forwards each
 read; for `moduleQuery` it sends the module name, query text, and variables
 unchanged, and gives arras the answer unchanged. The page folds search text
@@ -618,10 +619,10 @@ holds one built snapshot and answers from it, so that the command can answer
 while a rebuild runs. The child gets no secret and opens no listener. It ends
 when the command ends.
 
-**Surface.** Every request line outside this table is refused. The path is
-compared as the HTTP library gives it, whole; no query string is accepted; no
-part of a request names or reaches a file, since the three assets are held in
-memory.
+**Surface.** Every request outside this table is refused. The target on the
+request line is compared whole, as sent: nothing is decoded or resolved, and no
+query string is accepted. No part of a request names or reaches a file, since
+the three assets are held in memory.
 
 | Method and path | Body | Answer |
 |---|---|---|
@@ -635,13 +636,16 @@ memory.
 | `POST /api/manuscript` | `{}` | The manuscript view |
 
 Each answer made from the snapshot is `{"data_identity", "result"}`. A refusal
-is `{"error": {"code", "message"}}` with an HTTP status, and holds no value taken
-from the request. No call writes anything; arras's write, journal, and SQL calls
+is `{"error": {"code", "message"}}` with an HTTP status; a refusal under the
+rules below holds no value taken from the request, and arras's own refusal
+(`arras_refusal`) holds the message arras gives. No call writes anything; arras's write, journal, and SQL calls
 are refused in the page as the static profile refuses them.
 
 **Rules.** Each is tested.
 
-1. The listener is bound to `127.0.0.1` only, on a port the system picks.
+1. The listener is bound to `127.0.0.1` only, on a port the system picks. A
+   header that a rule reads and that comes more than once is refused, and so is a
+   request that sends `Expect`.
 2. Every request must carry `Host` exactly `127.0.0.1:<port>`; `localhost`, any
    other name, address, or port, or no `Host`, is refused. This stops DNS
    rebinding.
@@ -668,7 +672,8 @@ are refused in the page as the static profile refuses them.
    and when the command ends. The secret is written to no file by Stemma.
 9. The page removes the code from its address at once, keeps the secret in
    `sessionStorage` only, and sends it only as the header. When it cannot reach
-   the server it drops the secret and shows nothing it loaded.
+   the server, other than because the page itself is being left, it drops the
+   secret, shows nothing it loaded, and asks no more.
 10. A request's headers may take at most 16 KiB and its body at most 64 KiB; a
     request must arrive whole within 10 seconds of its connection; at most 64
     connections are open at once, and each carries one request.
@@ -703,10 +708,12 @@ are refused in the page as the static profile refuses them.
 - A build that fails leaves state `failed` with what is wrong; nothing is served
   from the earlier snapshot, and the next change to the inputs starts another
   build. A start whose first build fails ends the command.
-- The page asks for `status` every 2 seconds. When the state is not `current`,
-  or the data identity differs from what it loaded, it takes down what it shows
-  and says that the records changed and are being read again; when current again
-  it loads afresh at the same route.
+- The page asks for `status` every 2 seconds, every 30 while it is hidden, and
+  when it is shown again. When the state is not `current`, a data answer is
+  refused or names another data identity, it takes down what it shows and says
+  that the records changed and are being read again; when current again it loads
+  afresh at the same route. A page that has had no confirmation for 8 seconds
+  while visible, as after being hidden, covers what it shows until it has one.
 
 **Lifetime.** The command runs until it is interrupted or terminated, or 60
 minutes (`--idle-minutes`) pass with no accepted call. An open page keeps it
@@ -716,9 +723,9 @@ running. It then removes the launch file and ends its child.
 the launch file, the browser's storage, and either process's memory, as it can
 already read the project. A browser extension allowed on the page reads what the
 page shows. Another user of the computer can connect to the port and use up
-connections; without the secret it reads nothing. The page notices a stopped
-server at its next call, so for up to its polling interval an open page can show
-what it last loaded; if another program took the same port within that
+connections; without the secret it reads nothing. The page notices a change or a stopped server at its next call, so an open page
+can show what it last loaded for up to its polling interval, or 8 seconds after
+it comes back into view; if another program took the same port within that
 interval, the page would send it the ended run's secret and believe its answers.
 Two writes to one input within the file system's time resolution that keep its
 size can pass the scan unseen. On Windows the file modes of rule 8 are not

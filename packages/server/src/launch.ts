@@ -1,0 +1,61 @@
+// How the one-time code reaches the browser without passing through a process
+// argument, standard output or a log (CONTRACT-005 M, rule 8): a file only its
+// owner can read sends the browser to the server, and the browser is opened on
+// that file.
+import { spawn } from "node:child_process";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+export const LAUNCH_NAME = "open-stemma.html";
+
+export interface LaunchFile {
+  path: string;
+  remove(): void;
+}
+
+/** The code goes in the fragment, which a browser sends in no request and no referrer. */
+export function writeLaunchFile(address: string, code: string, parent = tmpdir()): LaunchFile {
+  // mkdtemp makes the directory for its owner only; the modes are set again in case a system does not.
+  const directory = mkdtempSync(join(parent, "stemma-browse-"));
+  chmodSync(directory, 0o700);
+  const path = join(directory, LAUNCH_NAME);
+  const target = `${address}#code=${code}`;
+  writeFileSync(path, [
+    "<!doctype html>",
+    '<meta charset="utf-8">',
+    '<meta name="referrer" content="no-referrer">',
+    `<meta http-equiv="refresh" content="0;url=${target}">`,
+    "<title>Opening Stemma</title>",
+    `<p><a href="${target}">Open Stemma</a></p>`,
+    "",
+  ].join("\n"), { mode: 0o600, flag: "wx" });
+  chmodSync(path, 0o600);
+  return { path, remove: () => rmSync(directory, { recursive: true, force: true }) };
+}
+
+/** The system's way to open a file. It is given the file's path and nothing else. */
+export function openerCommand(platform: NodeJS.Platform, path: string): [string, ...string[]] {
+  if (platform === "darwin") return ["/usr/bin/open", path];
+  if (platform === "win32") return ["rundll32.exe", "url.dll,FileProtocolHandler", path];
+  return ["xdg-open", path];
+}
+
+/**
+ * Asks the system to open the file. True when the opener ended well, or was
+ * still running after a moment, as some are while the browser runs.
+ */
+export function openInBrowser(path: string, platform: NodeJS.Platform = process.platform, waitMs = 3000): Promise<boolean> {
+  const [command, ...args] = openerCommand(platform, path);
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { stdio: "ignore", detached: true });
+    const finish = (opened: boolean) => {
+      clearTimeout(timer);
+      child.unref();
+      resolve(opened);
+    };
+    const timer = setTimeout(() => finish(true), waitMs);
+    child.on("error", () => finish(false));
+    child.on("exit", (code) => finish(code === 0));
+  });
+}

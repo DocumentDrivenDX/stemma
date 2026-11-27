@@ -3,11 +3,11 @@
 // source. The page finds no link: it follows the IDs the view holds. Everything
 // shown is a text node, each piece isolated and hidden characters shown, and
 // the source is shown with the record panel's own parts and rules.
-import { Fragment, type ReactNode, useEffect, useRef } from "react";
+import { Fragment, type ReactNode, useContext, useEffect, useRef } from "react";
 import {
   inlineRuns, type ManuscriptCitation, type ManuscriptEntry, type ManuscriptPart, type ManuscriptView, quotationRuns, type Run,
 } from "../../core/src/manuscript-view.ts";
-import { Address, type GetSourceView, load, type Loaded, STATES, Text, useLoaded, ViewBody, ViewsFailed } from "./SourcePanel.tsx";
+import { Address, type GetSourceView, load, type Loaded, Served, STATES, Text, useLoaded, ViewBody, ViewsFailed } from "./SourcePanel.tsx";
 import { manuscriptHref, type ManuscriptRoute } from "./route.ts";
 
 /** Formatted runs. Inside something that is itself a link, an address stays text. */
@@ -68,6 +68,18 @@ function Entry({ entry, open }: { entry: ManuscriptEntry; open: string }) {
   if (entry.source === undefined) return <span className="stemma-broken">{words}</span>;
   const href = manuscriptHref({ kind: "source", id: entry.source });
   return <a href={href} className="stemma-entry" data-entry={entry.source} aria-current={open === href ? "true" : undefined}>{words}</a>;
+}
+
+/** What the reader is reading: the report as read, never the printed PDF. */
+function Statement({ view }: { view: ManuscriptView }) {
+  const served = useContext(Served);
+  return (
+    <p role="note" className="stemma-statement">
+      <strong>This is the manuscript as {served ? "Stemma read it from your files" : "the export read it"}, not the printed PDF.</strong>{" "}
+      {view.inputs ? <>It is <code><Text value={view.inputs.template} /></code> and <code>{view.inputs.directory}/report.json</code>, assembled again with the project’s records and citation style; <code>report.md</code>, <code>report.pdf</code> and other report directories are not read. </> : null}
+      Originals are not opened yet. Choose a quotation, a note’s citation, or a bibliography entry to see its source.
+    </p>
+  );
 }
 
 function Reading({ view, open }: { view: ManuscriptView; open: string }) {
@@ -271,11 +283,7 @@ export function Manuscript({ view, route, getView }: { view: ManuscriptView; rou
   return (
     <div className={route.kind === "text" ? "stemma-manuscript" : "stemma-manuscript stemma-open"}>
       <main className="stemma-reading" onClickCapture={(event) => { from.current = (event.target as Element).closest("a"); }}>
-        <p role="note" className="stemma-statement">
-          <strong>This is the manuscript as the export read it, not the printed PDF.</strong>{" "}
-          {view.inputs ? <>It is <code><Text value={view.inputs.template} /></code> and <code>{view.inputs.directory}/report.json</code>, assembled again with the project’s records and citation style; <code>report.md</code>, <code>report.pdf</code> and other report directories are not read. </> : null}
-          Originals are not opened yet. Choose a quotation, a note’s citation, or a bibliography entry to see its source.
-        </p>
+        <Statement view={view} />
         {view.state === "unavailable" ? <p role="alert">The report is not in this export. <Text value={view.why ?? ""} /> Fix it, then export again.</p> : null}
         {view.problems.length === 0 ? null : <ul role="note" className="stemma-broken">{view.problems.map((p, i) => <li key={i}><Text value={p} /></li>)}</ul>}
         <Reading view={view} open={open} />

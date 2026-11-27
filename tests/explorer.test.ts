@@ -26,7 +26,7 @@ afterAll(async () => browser?.close());
 test("US-094-AC1, US-090-AC6 the explorer Stemma wrote is TypeScript, bundled with the arras graph browser", async () => {
   const written = [...new Bun.Glob("**/*").scanSync(join(ROOT, "packages/explorer/src"))].sort();
   expect(written.filter((file) => !/\.(tsx?|css)$/.test(file))).toEqual([]);
-  expect(readFileSync(join(ROOT, "packages/explorer/src/host.tsx"), "utf8")).toContain('import { GraphBrowser } from "@documentdrivendx/arras-ui/browser";');
+  expect(readFileSync(join(ROOT, "packages/explorer/src/app.tsx"), "utf8")).toContain('import { GraphBrowser } from "@documentdrivendx/arras-ui/browser";');
   const { inputs } = await bundleHost();
   expect(inputs.some((path) => /arras-ui\/dist\/browser\.js$/.test(path))).toBe(true);
   // Of arras, only the browser and the static client and what they load.

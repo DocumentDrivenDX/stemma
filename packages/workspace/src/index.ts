@@ -10,6 +10,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { canonical, PROJECT_FORMAT, PROJECT_SCHEMA, type ProjectContent, type SourceFile } from "@stemma/records";
 
 export * from "./fetch.ts";
+export * from "./inputs.ts";
 export * from "./originals.ts";
 export * from "./outputs.ts";
 

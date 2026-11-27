@@ -9,6 +9,7 @@
     "@stemma/workspace": "workspace:*",
     "@stemma/extract": "workspace:*",
     "@stemma/graph": "workspace:*",
+    "@stemma/server": "workspace:*",
     "@stemma/cite": "workspace:*",
     "@stemma/publish": "workspace:*"
   }

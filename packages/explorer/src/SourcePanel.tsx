@@ -5,7 +5,7 @@
 // highlighted: it marks only the `quoted` text of a view that says
 // `highlighted`, and only when every view involved says so and is the one asked
 // for.
-import { Fragment, type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
+import { createContext, Fragment, type ReactNode, type RefObject, useContext, useEffect, useRef, useState } from "react";
 import type { PageSegment, SourceView, SourceViewState, ViewOriginal, WorkName } from "../../core/src/source-view.ts";
 import { splitControls } from "../../records/src/visible.ts";
 
@@ -25,6 +25,9 @@ export const STATES: Record<SourceViewState, string> = {
   retired: "Retired",
   not_exported: "Text left out of this export",
 };
+
+/** True in the served page, whose data comes from the project's files as they are, not from an export. */
+export const Served = createContext(false);
 
 /** One piece of untrusted text, kept from reordering what is around it. */
 export function Text({ value }: { value: string }) {
@@ -229,6 +232,7 @@ export const ViewsFailed = ({ error }: { error: string }) => <p role="alert">The
 
 /** Give it a key of the record's ID, so that nothing loaded for one record is ever shown for another. */
 export function SourcePanel({ route, getView }: { route: SourceRoute; getView: GetSourceView }) {
+  const served = useContext(Served);
   const box = useRef<HTMLElement>(null);
   const found = useLoaded<Loaded>(
     `${route.type}/${route.id}`,
@@ -242,7 +246,7 @@ export function SourcePanel({ route, getView }: { route: SourceRoute; getView: G
       <h2 className="st:text-base st:font-semibold">In the source</h2>
       {!found ? <p>Loading.</p> : found.failed !== undefined ? <ViewsFailed error={found.failed} /> : !view ? (
         <p role="note">
-          This export holds no source view of this record, so nothing is highlighted. It, or something it rests on, may be retired. <code>excerpt</code> with its ID says why.
+          {served ? "There is" : "This export holds"} no source view of this record, so nothing is highlighted. It, or something it rests on, may be retired. <code>excerpt</code> with its ID says why.
         </p>
       ) : <ViewBody found={{ ...found, view }} />}
     </section>
