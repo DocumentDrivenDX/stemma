@@ -81,6 +81,7 @@
       "dependencies": {
         "@stemma/cite": "workspace:*",
         "@stemma/core": "workspace:*",
+        "@stemma/manuscript": "workspace:*",
         "@stemma/records": "workspace:*",
       },
     },

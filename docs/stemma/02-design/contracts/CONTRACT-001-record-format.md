@@ -334,8 +334,14 @@ person said and is not verification or proof.
 **Other feature records.** `plan` and `voice_profile` carry `review` as above.
 `checkpoint_input` records an author's answer at a checkpoint; an unanswered
 checkpoint stops nothing. `given.by.kind` MUST be `person`. An
-`authorship_mark` applies to the exact `text` it holds; changed or unmarked text
-is unmarked, never assumed human-written. An `ai_activity` is written for AI
+`authorship_mark` applies to the exact `text` it holds, in the `version` it
+names; changed or unmarked text is unmarked, never assumed human-written. Its
+`chapter` is optional, since an assembled report has no chapter records.
+`text_sha256` MUST be the SHA-256 of `text` normalized as E defines; otherwise
+`record.valid` reports it and the mark applies to nothing. `marked` says who
+declared the mark and when. A mark is a declaration, not proof of authorship.
+How a report's
+evidence ledger reads marks is CONTRACT-006 J. An `ai_activity` is written for AI
 work that record stamps cannot show, such as drafting prose; the disclosure
 reads it and is only as complete as these records. Examples of the author's
 writing behind a profile change are saved as `voice_example` records, so they

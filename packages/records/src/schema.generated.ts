@@ -2985,8 +2985,7 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    ]
   },
   "chapter": {
-   "type": "string",
-   "required": true
+   "type": "string"
   },
   "text": {
    "type": "string",

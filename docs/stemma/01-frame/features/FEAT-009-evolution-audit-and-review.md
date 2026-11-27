@@ -17,15 +17,15 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 9. Evolution, audit, and review
-**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79
+**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79, FR-97 (P1)
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 Evolution, audit, and review keeps the history of a book, reviews its chapters,
-and tells others how it was made. It covers PRD FR-41 to FR-47 and FR-79. FR-43
-and FR-45 are P0 in delivery step M2; FR-46 and FR-79 are P0 in M3; the rest are
-P1.
+and tells others how it was made. It covers PRD FR-41 to FR-47, FR-79, and FR-97.
+FR-43 and FR-45 are P0 in delivery step M2; FR-46 and FR-79 are P0 in M3; the
+rest are P1. FR-97, the evidence ledger of a report, is P1 in M1.
 
 ## Ideal Future State
 
@@ -52,6 +52,7 @@ no source files unless the author includes them, and states what it cannot show.
 |------|----------------------|------------------------|
 | History | What changed, what was wrong, what needs another look? | Changelog, errata, and re-review lists |
 | Chapter review | Where is this chapter weak? | Audit and fresh-eyes review |
+| Sentence evidence | What stands behind each sentence of my report? | The evidence ledger of a report |
 | Release evidence | What can I tell and give a reviewer, and what comes back? | Disclosure, reviewer package, and reviewer comments |
 
 ## Domain Objects
@@ -66,6 +67,7 @@ no source files unless the author includes them, and states what it cannot show.
 | Audit finding | An issue marked confirmed or suspected. It is not a scripted check result |
 | AI-use disclosure | A statement about the tool's AI use. It is not the book's research methodology |
 | Check report | The build's record of check results |
+| Evidence ledger | For each sentence of a report, what is recorded about its writer and its source evidence. It is not a measure of truth |
 | Reviewer package | PDF, offline explorer file, check report, and disclosure, with source files left out unless asked |
 | Comment file | A reviewer's comments, each tied to a claim, saved from the offline explorer for the author to import |
 
@@ -128,6 +130,24 @@ no source files unless the author includes them, and states what it cannot show.
   report must be shortened to the allowed excerpt, with each result still
   visible. This covers the report's sentence fields.
 
+#### Evidence ledger
+
+- **LED-01** (FR-97, P1). A report build must write, beside the report, a ledger
+  of every sentence of the body and of note comments, with the labels of
+  CONTRACT-006 J and totals computed from those sentences.
+- **LED-02** (FR-97, P1). Who wrote a sentence's words must come only from an
+  authorship record made for the report's version that holds that exact
+  sentence, with who recorded it. With no such record, records of that version
+  that disagree, or a report that names no version, it is `unrecorded`.
+- **LED-03** (FR-97, P1). A quotation copied by script, words typed between
+  quotation marks, a citation with no quotation in the sentence, and a sentence
+  with neither must stay distinct. Support must show as `not_judged` while no
+  support record can be read.
+- **LED-04** (FR-97, P1). The ledger must name every open and unimplemented
+  check and every dismissed result, count the unreviewed records and confirmed
+  results beside its label, say what it does not cover, and hold no source or
+  sentence text.
+
 #### Reviewer comments
 
 - **COM-01** (FR-79). In the package's offline explorer, a reviewer must be able
@@ -161,6 +181,7 @@ no source files unless the author includes them, and states what it cannot show.
 - [US-068 — List what needs re-review after a change](../user-stories/US-068-list-what-needs-re-review.md)
 - [US-069 — Assess a manuscript from its reviewer package](../user-stories/US-069-assess-a-reviewer-package.md)
 - [US-104 — Return comments tied to claims](../user-stories/US-104-return-comments-on-claims.md)
+- [US-124 — Show what supports each sentence](../user-stories/US-124-show-what-supports-each-sentence.md)
 
 ## Edge Cases and Error Handling
 
@@ -211,11 +232,13 @@ no source files unless the author includes them, and states what it cannot show.
 
 - **Other features**: FEAT-007 (results, support records, annotations), FEAT-008
   (builds and build record), FEAT-012 (offline explorer). It reads FEAT-001
-  registers and rules, FEAT-006 authorship marks when they exist, and
+  registers and rules, FEAT-006 authorship marks when they exist (for the
+  disclosure and the evidence ledger, which also reads FEAT-002 text reviews and
+  FEAT-008 report assembly), and
     FEAT-013 FR-68 restricted-coordinate rules. Records, including imported
   comments, are held by FEAT-011. M2 work does not wait on FEAT-012.
 - **External services**: the hosted model for audits and reviews.
-- **PRD requirements**: FR-41 to FR-47, FR-79; related FR-1, FR-10, FR-39.
+- **PRD requirements**: FR-41 to FR-47, FR-79, FR-97; related FR-1, FR-10, FR-39.
 
 ## Out of Scope
 

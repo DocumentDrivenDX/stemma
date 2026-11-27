@@ -211,6 +211,19 @@ with `passage capture`, name the passages in the report's `report.json`, and
 run `build report`. Each note gives the quotation, then its citation; text in
 the manuscript is never changed by the build.
 
+The build also writes `evidence.json`, a ledger of what is recorded behind each
+sentence. Report its counts with their total, never as a share of the text that
+is true, false, or hallucinated. Never give its check label without the open,
+dismissed and unreviewed counts. A sentence with no recorded writer is not the
+author's, and no sentence's support is judged. Record who wrote a sentence only
+when the author says so: `record add authorship_mark` with the exact `text`,
+`authorship` (`human_written`, `edited`, or `ai_drafted`), and `version`. Name
+the actor who is saying it, so that your own record names you as a model.
+Authorship marks count only for the `version` that `report.json` names, spelled
+exactly, so ask the author what to call a version before marking. When they
+rename it, earlier marks stop applying, even to unchanged sentences; say so,
+and mark again only what they confirm for the new version.
+
 ## Run Stemma
 
 Run every command through the plugin's launcher, with absolute paths:
@@ -253,7 +266,7 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `passage find --source <id> <words>` / `passage capture --address <address>` | Find words; copy a passage and its locator |
 | `resolve <source id> [--via crossref\|internet_archive --identifier <value>]` | Make and save a catalogue lookup (uses the network) |
 | `cite format --input <absolute file>` | Format notes and a bibliography in Chicago notes-and-bibliography style (18th edition, citeproc-js) from source records: `{"notes": [[{"key": "…", "locator": "…"}], …]}` |
-| `build report [<dir>] [--check] [--pdf]` | Build a report from `<dir>/report.json` (its manuscript file and quotation list) and the passage and source records: Markdown, Typst, a verification table, and with `--pdf` a PDF typeset by the pinned Typst, fetched once into the data directory and checked against its digest. `--check` writes nothing and exits 1 if the files are stale |
+| `build report [<dir>] [--check] [--pdf]` | Build a report from `<dir>/report.json` (its manuscript file and quotation list) and the passage and source records: Markdown, Typst, a verification table, the evidence ledger, and with `--pdf` a PDF typeset by the pinned Typst, fetched once into the data directory and checked against its digest. `--check` writes nothing and exits 1 if the files are stale |
 | `check [--format json]` | Check the whole project and explain what is open |
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `excerpt --citation <id>`, `excerpt --quotation <id>` | Show a citation, or a quotation of `report/report.json`, marked in its source page's text, within the same limits |
