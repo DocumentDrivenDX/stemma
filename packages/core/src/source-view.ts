@@ -120,12 +120,11 @@ export interface SourceViewOptions {
 
 export interface SourceViewRequest { kind: "citation" | "passage" | "quotation"; id: string }
 
-const WHY: Record<Exclude<SourceViewState, "citation_differs" | "invalid_anchor" | "no_passage" | "retired">, string> = {
+const WHY: Record<Exclude<SourceViewState, "citation_differs" | "invalid_anchor" | "no_passage" | "retired" | "not_exported">, string> = {
   highlighted: "The passage's address still gives exactly the words the passage copied from this source file.",
   changed: "The source text at the passage's address is no longer what the passage copied: the page changed after it was captured, or the record does. Nothing is highlighted. Run `check`, look at the change, and capture the passage again if the words still stand.",
   no_source_file: "The passage names no source file that this project holds in readable form, so there is no text to show. Nothing is highlighted. Run `check`.",
   damaged_file: "The source file is damaged or breaks a record rule, so none of its text is used. Nothing is highlighted. Run `check` for what is wrong with it.",
-  not_exported: "This export left the text out to stay within its size limit. Use `excerpt` to see it.",
 };
 
 const list = (value: unknown): JsonObject[] => (Array.isArray(value) ? value.filter(isObject) : []);
@@ -136,6 +135,8 @@ const words = (value: unknown): value is string => typeof value === "string" && 
 function releasable(value: unknown, location = false): string | undefined {
   return words(value) && !isLocalPath(value, location) ? value : undefined;
 }
+/** A record's string as `why` may repeat it. */
+const said = (value: string): string => releasable(value) ?? "a withheld value";
 const optional = <K extends string>(name: K, value: unknown): { [k in K]?: string } =>
   (value === undefined ? {} : { [name]: value }) as { [k in K]?: string };
 
@@ -366,9 +367,9 @@ export class SourceViews {
   /** The state of a view of passages: the first passage that cannot be highlighted decides. */
   private passagesState(pointers: PassagePointer[]): Failure | undefined {
     for (const { passage } of pointers) {
-      if (!this.record(passage, "passage")) return { state: "no_passage", why: `No readable passage record has the ID ${passage}, so nothing is highlighted.` };
+      if (!this.record(passage, "passage")) return { state: "no_passage", why: `No readable passage record has the ID ${said(passage)}, so nothing is highlighted.` };
       const made = this.passage(passage);
-      if (made.state !== "highlighted") return { state: made.state as Failure["state"], why: pointers.length > 1 ? `Passage ${passage}: ${made.why}` : made.why };
+      if (made.state !== "highlighted") return { state: made.state as Failure["state"], why: pointers.length > 1 ? `Passage ${said(passage)}: ${made.why}` : made.why };
     }
     return undefined;
   }
@@ -382,7 +383,7 @@ export class SourceViews {
     const cites = [data.key, data.source].filter(words).map((name) => ({ name, found: this.named(name) }));
     const cited = cites.length > 0 && cites.every((c) => "id" in c.found && c.found.id === (cites[0]!.found as { id: string }).id)
       ? (cites[0]!.found as { id: string }).id : undefined;
-    const pointer = words(data.passage) ? data.passage : undefined;
+    const pointer = releasable(data.passage);
     const base = {
       schema: SOURCE_VIEW_SCHEMA as typeof SOURCE_VIEW_SCHEMA, kind: "citation" as const, id, segments: [],
       ...(cited ? { work: this.work(cited) } : {}), ...(locator ? { locator } : {}),
@@ -408,8 +409,8 @@ export class SourceViews {
     if (data.locator === undefined || canonical(data.locator as Json) !== canonical(passage.locator as Json)) found.push("its cited place is not the passage's");
     if (cites.length === 0) found.push("it names no source");
     for (const c of cites) {
-      if ("problem" in c.found) found.push(`${c.name} ${c.found.problem}`);
-      else if (!this.supports(c.found.id, String(passage.source))) found.push(`${c.name} names neither the passage's source nor a part of it`);
+      if ("problem" in c.found) found.push(`${said(c.name)} ${c.found.problem}`);
+      else if (!this.supports(c.found.id, String(passage.source))) found.push(`${said(c.name)} names neither the passage's source nor a part of it`);
     }
     if (found.length === 0 && !cited) found.push("its key and its source name different works");
     if (found.length > 0) return give(differs(`The citation disagrees with its passage: ${found.join("; ")}. Nothing is highlighted. Make the citation agree, or point it at the right passage.`));

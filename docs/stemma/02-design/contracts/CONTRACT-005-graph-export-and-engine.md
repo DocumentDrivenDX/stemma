@@ -479,7 +479,8 @@ is chapter sized, so it is cut to 1,500 code points on each side. A cut is marke
 citation and passage, except a `retired` one, counted as `SourceView`
 `retired`. Report quotations are not records and are not in it. It is a derived
 file under J: listed with its digest in the manifest and byte-identical for the
-same data. Its passage views are capped at 8,000,000 bytes in all, as written.
+same data. The passage views that hold source text are capped at 8,000,000 bytes
+in all, as written; citation views and views without text are not counted.
 Those that a highlighted citation points to are kept first, then the rest, each
 in ID order. A view that does not fit is written as `not_exported` with no
 source text, counted as `SourceView` `size_cap`, and warned
@@ -563,6 +564,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Offline page | In headless Chromium on one macOS system (Apple silicon), from a local file with the network off: search, diacritic search, links in both directions, Back, reload, 150 links on one record, hostile record text shown as text, no request, no console error. axe-core reported no violation on the arras home, list, and record views it was run on, or on the Stemma banner | Other browsers, systems, and desktop hosts; keyboard and screen-reader use by hand |
 | Scale | The stock static browser loaded 10,000 synthetic nodes in about 0.28 s and 100,000 in 2.5 to 2.9 s in an earlier feasibility test | This projection at that size, real note text; arras claims support for 1,024 nodes and 7.9 MB, past which an export warns |
 | arras limits | Search types, 100 keys, 50 fields, 128 KiB of views, and no folding are tested against the pinned package (`tests/arras.test.ts` and the build spike) | Later arras releases |
+| Source views (K) | Tests over invented sources for every state, and the worked example: 4 citations and 125 passages highlighted, 748,172 bytes of source views in a 2.7 MB page, of which about 212 KB is page text repeated for passages that share a page. A synthetic page at the cap (8.0 MB of source views, 9.2 MB in all, 450 passages) opened in about 0.13 s and showed its first citation in about 0.04 s, in headless Chromium from a local file on one macOS system (Apple silicon) | A real large project; slower machines and other browsers; right-to-left and complex-script page text; keyboard and screen-reader use by hand |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 

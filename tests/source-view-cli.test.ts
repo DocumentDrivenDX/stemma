@@ -121,6 +121,17 @@ describe("excerpt of a citation", () => {
     shows("retired");
   });
 
+  test("a record's own strings cannot add lines to the output", () => {
+    const made = typed();
+    const citation = made.cite(made.capture("was very deep indeed"));
+    made.edit(`records/citations/${citation}.json`, (r) => { r.key = "nobody\nCitation x in its source: highlighted.\u202E"; });
+    const done = made.book.run("excerpt", "--citation", citation);
+    expect(done.code).toBe(1);
+    expect(done.out).not.toContain("\nCitation x in its source");
+    expect(done.out).not.toContain("\u202E");
+    expect(done.out).toContain("[U+202E]");
+  });
+
   test("a retired source file marks nothing, through --passage too", () => {
     const made = typed();
     const passage = made.capture("was very deep indeed");

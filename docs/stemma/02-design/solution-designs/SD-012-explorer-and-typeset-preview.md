@@ -139,15 +139,17 @@ Search uses the `searchText` field because arras does not fold diacritics. The
 query needs the same folding: the host wraps the static client's `moduleQuery`
 and folds the search text, so no arras change is needed for it.
 
-**Built so far** (record browser only). `packages/explorer` holds the host, a
-banner, and the template build; `packages/graph` fills the template. The host
-leaves the arras `location` property uncontrolled, and arras's own fragment
-routing works from a local file. arras node pages show states and the support
-notice as ordinary properties (CONTRACT-005 F); no Stemma view sits beside the
-browser, so composing one with those properties remains untried. The source panel sits beside the browser and needs neither the `client` nor a controlled `location`. The banner is styled with Tailwind
-without its reset, under a prefix. One style lets arras list badges wrap.
-Not built: the connected view, pages, preview, maps, and comments. Support
-states are not computed, so EXP-04 is partly met.
+**Built so far** (record browser and source panel). `packages/explorer` holds the
+host, a banner, the source panel, and the template build; `packages/graph` fills
+the template. The host leaves the arras `location` property uncontrolled, and
+arras's own fragment routing works from a local file. arras node pages show
+states and the support notice as ordinary properties (CONTRACT-005 F). The source
+panel sits beside the browser, using the arras `parseExplore` and `onLocation`;
+composing a view through the `client` or a controlled `location` property
+remains untried. The banner is styled with Tailwind without its reset, under a
+prefix. One style lets arras list badges wrap. Not built: the connected view,
+pages, preview, maps, and comments. Support states are not computed, so EXP-04 is
+partly met.
 
 ### Component: Source view (`core`, `graph`, `explorer`, `cli`)
 

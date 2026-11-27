@@ -167,6 +167,13 @@ describe("a citation", () => {
     expect(view.why).toContain(why);
   });
 
+  test("a reason repeats no local path from a record", () => {
+    for (const more of [{ key: "/Users/author/keys" }, { passage: "/Users/author/passage" }]) {
+      expect(JSON.stringify(cite(more))).not.toContain("/Users/author");
+      expect(cite(more).state).not.toBe("highlighted");
+    }
+  });
+
   test("a key that two sources hold names neither", () => {
     const sources = [...project().sources, { ...project().sources[2]!, id: "src-second000001", citation_key: "volume1850" }];
     const view = get({ sources }, "citation", "cit-onepage00001");

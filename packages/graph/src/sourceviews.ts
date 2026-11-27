@@ -26,7 +26,7 @@ function proseOf(view: SourceView): string[] {
     view.citation?.sentence, view.citation?.quotation,
     ...view.segments.flatMap((s) => [
       // Run together, so that a coordinate cut by the highlight is still found.
-      s.before + s.quoted + s.after, s.quality.note,
+      s.before + s.quoted + s.after, s.place, s.quality.note,
       ...s.reviews.flatMap((r) => r.flags.flatMap((f) => [f.reading, f.suggested, f.note])),
     ]),
     view.source_text?.note,
