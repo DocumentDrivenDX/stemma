@@ -126,7 +126,7 @@ run([...launcher, "record", "add", "source", "--input", invented, "--actor", "so
 const clusters = join(base, "clusters.json");
 writeFileSync(clusters, JSON.stringify({ notes: [[{ key: "example1987", locator: "41" }], [{ key: "example1987", locator: "42" }]] }));
 const cited = run([...launcher, "cite", "format", "--input", clusters, "--project", reading]);
-for (const expected of ["1. Ann Example, An Invented Harbour Survey (Invented Press, 1987), 41.", "2. Example, Invented Harbour Survey, 42.", "Example, Ann. An Invented Harbour Survey. Invented Press, 1987."]) {
+for (const expected of ["1. Ann Example, An Invented Harbour Survey (Invented Press, 1987), 41.", "2. Example, An Invented Harbour Survey, 42.", "Example, Ann. An Invented Harbour Survey. Invented Press, 1987."]) {
   if (!cited.replaceAll("*", "").includes(expected)) fail(`the installed command line did not format the citation: expected ${expected}`);
 }
 

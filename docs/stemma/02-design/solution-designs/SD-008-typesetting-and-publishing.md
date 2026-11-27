@@ -194,7 +194,7 @@ graph TD
 | Layer | Choice | Why | Alternatives Rejected |
 |---|---|---|---|
 | Layout and citations | Typst 0.15.1 (release digests pinned in `packages/publish/src/typst.ts`), citeproc-js 2.4.63 | ADR-005 | See ADR-005 |
-| Citation style and locale | `chicago-notes-bibliography.csl` (Chicago Manual of Style 18th edition, notes and bibliography) at styles commit 1aaf551f864d, `locales-en-US.xml` at locales commit 938c09c164a6; digests and licenses in `packages/cite/vendor/` | The official CSL repositories; no `ibid.` (the style gives shortened notes) | A hand-written style |
+| Citation style and locale | `chicago-notes-bibliography.csl` (Chicago Manual of Style 18th edition, notes and bibliography) and `locales-en-US.xml`, each pinned by its upstream revision and SHA-256 in `packages/cite/vendor/pins.json`, with their licenses | The official CSL repositories; no `ibid.` (the style gives shortened notes) | A hand-written style |
 | Indexes and endnotes (M2) | Vendored Typst packages `in-dexter` 0.7.2 and `deixis` 0.2.0, candidates | Worked in feasibility tests | Writing both now; fetching packages at build time |
 | Sort order for index | Stemma-computed keys | Native sorting misplaced diacritic initials in a test | Typst native sort |
 
