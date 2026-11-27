@@ -250,6 +250,7 @@ describe("text that is not held (FR-98)", () => {
     expect(found.message).toContain("Nothing shows that anything is damaged.");
     expect(found.suggestions.join(" ")).toContain("ingest --fetch");
     expect(evidence(found, "parts")).toEqual(["none of the 2 listed section files is here"]);
+    expect(evidence(found, "rests_on_it")).toEqual(["1 passage(s) and 1 citation record(s) taken from this text cannot be checked"]);
     expect(verdicts(report, "source.held")).toEqual(["unverifiable text_not_held"]);
     expect(verdicts(report, "quote.present").every((v) => v.startsWith("unverifiable"))).toBe(true);
     expect(verdicts(report, "source.original")).toEqual(["unverifiable text_not_held"]);
@@ -292,13 +293,32 @@ describe("text that is not held (FR-98)", () => {
     expect(book.check().body.results).toEqual(clean.body.results);
   });
 
-  test("when no address gives the original, nothing is written", async () => {
+  test("a page that differs on each request restores the text only if every part matches, and is not called the original", async () => {
+    const { book, record } = cited();
+    const text = dropText(book);
+    forget(book);
+    // The same words and structure; only a script's value differs.
+    const served = PAGE.replace("</head>", '<script>var request = "8f2c";</script></head>');
+    fakeFetch({ [LIVE]: { body: served } });
+    const before = book.read(record);
+    const done = await runIngest(book, { fetch: true });
+    expect(done.out).toContain("what the address gives now differs from the recorded original");
+    expect(done.out).toContain(`restored 2 section file(s) of sources/reefpage/ from what ${LIVE} gave. Each has the digest the manifest records. The text is restored, and the fetched copy is not the recorded original (its sha256 is ${sha(served)})`);
+    for (const [name, content] of Object.entries(text)) expect(book.read(`sources/reefpage/sections/${name}`)).toBe(content);
+    expect(() => readFileSync(cached(book))).toThrow();
+    expect(book.read(record)).toBe(before);
+    expect(book.check().body.label).toBe("checked_clean");
+  });
+
+  test("when no address gives the original or its text, nothing is written", async () => {
     const { book } = cited();
     dropText(book);
     forget(book);
     const before = book.files();
     fakeFetch({ [LIVE]: { body: PAGE.replace("37", "73") } });
     const done = await runIngest(book, { fetch: true });
+    expect(done.out).toContain("Its bytes are not the recorded original, and converting them does not give the recorded text:");
+    expect(done.out).toContain("1 of 2 listed parts differ (index 1)");
     expect(done.out).toContain("its original was not available, so it was not restored.");
     expect(book.files().filter((f) => !f.startsWith(".stemma/"))).toEqual(before.filter((f) => !f.startsWith(".stemma/")));
   });

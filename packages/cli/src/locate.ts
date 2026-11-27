@@ -18,11 +18,16 @@ async function ask(url: string): Promise<{ bytes: Uint8Array; sha256: string }> 
   return { bytes: response.bytes, sha256: digestOf(response.bytes) };
 }
 
+/** What an address gave when it was not the recorded original. */
+export interface Other { url: string; bytes: Uint8Array; sha256: string }
+
 /**
  * Asks an upstream's addresses in order until one gives the recorded original,
  * which is kept in the ignored cache. Each address is asked once, in one way.
+ * Other bytes are never kept; they go to `others` for the one use they have,
+ * which is to see whether they still convert to text a manifest records.
  */
-export async function fetchOriginal(root: string, upstream: JsonObject, label: string, say: (line: string) => void): Promise<string | undefined> {
+export async function fetchOriginal(root: string, upstream: JsonObject, label: string, say: (line: string) => void, others?: Other[]): Promise<string | undefined> {
   const wanted = String(upstream.sha256);
   const addresses = addressesOf(upstream);
   const listed = Array.isArray(upstream.locations) && upstream.locations.length > 0;
@@ -31,6 +36,7 @@ export async function fetchOriginal(root: string, upstream: JsonObject, label: s
     try {
       const gave = await ask(url);
       if (gave.sha256 !== wanted) {
+        others?.push({ url, ...gave });
         say(listed ? `  ${label}: ${where}it gives different bytes from the recorded original (sha256 ${gave.sha256}). They were not used.`
           : `  ${label}: what the address gives now differs from the recorded original (sha256 ${gave.sha256}). It was not used.`);
         continue;

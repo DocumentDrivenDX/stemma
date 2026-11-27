@@ -12,7 +12,7 @@ import {
 } from "@stemma/workspace";
 import { createHash } from "node:crypto";
 import { CommandError, namedFile, openCorpus, type Options, requireActor, requireProject, tools, usageError, USER_AGENT } from "./context.ts";
-import { fetchOriginal, privateLabels } from "./locate.ts";
+import { fetchOriginal, type Other, privateLabels } from "./locate.ts";
 import { restoreText } from "./restore.ts";
 import { convertAndWrite, lookUp, reconvert } from "./sources.ts";
 
@@ -147,17 +147,28 @@ export async function ingest(options: Options, check: (options: Options) => numb
     // A current comparison need not be made again; --reconvert makes it all the same.
     const wanted = { sha256: String(data.sha256), size: Number(data.size) };
     let path = findOriginal(root, wanted, places);
-    if (!path && options.fetch) path = await fetchOriginal(root, data, label, say);
+    const others: Other[] = [];
+    const absent = mine.filter(([, t]) => t.notHeld);
+    if (!path && options.fetch) path = await fetchOriginal(root, data, label, say, absent.length > 0 ? others : undefined);
+    else if (path && Array.isArray(data.locations)) say(`  ${label}: the recorded original is in .stemma/originals/ or a place given with --originals, so no address was asked.`);
     // The digest was matched when the file was found; it is read as that kind of original.
     const original = path ? { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type), name: path } : undefined;
     // Text that is not here is written again first, so that it can then be compared like any other.
-    for (const [, loaded] of mine.filter(([, t]) => t.notHeld)) {
-      if (!original) {
-        say(`  ${label}: the text of ${loaded.directory}/ is not held here, and its original was not available, so it was not restored.`);
+    for (const [, loaded] of absent) {
+      const entry = entries.find((e) => e.source === data.source && text(e.url) === text(data.url));
+      if (original) {
+        say(`  ${label}: ${(await restoreText(root, loaded, original, entry, base)).said}`);
         continue;
       }
-      const entry = entries.find((e) => e.source === data.source && text(e.url) === text(data.url));
-      say(`  ${label}: ${await restoreText(root, loaded, original, entry, base)}`);
+      // Bytes that are not the original may still hold the same text. Only the manifest's digests can say so.
+      let restored = false;
+      for (const other of others) {
+        if (mediaType(other.bytes, new URL(other.url).pathname) !== data.media_type) continue;
+        const done = await restoreText(root, loaded, { ...other, size: other.bytes.length, media_type: String(data.media_type), name: other.url }, entry, base, other.url);
+        say(`  ${label}: ${done.said}`);
+        if ((restored = done.restored)) break;
+      }
+      if (!restored) say(`  ${label}: the text of ${loaded.directory}/ is not held here, and its original was not available, so it was not restored.`);
     }
     const now = openCorpus(root);
     const todo = mine.map(([id]) => {
@@ -187,7 +198,7 @@ export async function ingest(options: Options, check: (options: Options) => numb
   }
   say(`  ${compared} source file(s) converted again, ${current} already had a current comparison.`);
   if (unavailable.length > 0) {
-    say(`  No original was available for: ${unavailable.join(", ")}. Their text was not compared with it, and text that is not held here stays so. Give --originals <dir>, or --fetch to fetch from the recorded addresses.`);
+    say(`  No original was available for: ${unavailable.join(", ")}. Their text was not compared with it. Give --originals <dir>, or --fetch to fetch from the recorded addresses.`);
   }
 
   say("== 3. Catalogue lookups");

@@ -280,6 +280,11 @@ relabelled by hand, and text made by other converter versions may not be
 reproducible this way; it then has to come from wherever the author keeps it.
 No step uses a part's expected digest to shape a conversion.
 
+The same conversion and the same condition apply to bytes a recorded address
+gave that are not the original, as when a page differs on each request. Parts
+that all match are the recorded text; the bytes are still not the original and
+are treated as nothing else.
+
 ### I. Conversion rules by format
 
 | Original | Parts | Structure taken from | Identity taken from |

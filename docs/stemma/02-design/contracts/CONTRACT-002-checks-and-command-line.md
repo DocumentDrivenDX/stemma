@@ -205,7 +205,9 @@ is printed for a command's first reading only.
 ### B2. Locations and text that is not held (FR-98)
 
 **Where `ingest` looks.** First by hash in `.stemma/originals/` and in the files
-and folders named with `--originals`; this is how a private copy is used. Then,
+and folders named with `--originals`, which needs no request; this is how a
+private copy is used, and for an upstream with `locations` it says that no
+address was asked. Then,
 with `--fetch`, at the addresses: the upstream's `url`, then each entry of
 `locations` that has an address, in order, an address listed twice once. It
 stops at the first that gives bytes with the recorded digest, and keeps them in
@@ -224,13 +226,21 @@ locate --fetch` records what a location gave. For an upstream with no
 **Restoring text.** For an upstream whose original is at hand and a source file
 of its source, made from that original, whose text is not held (CONTRACT-007 H),
 `ingest` converts the original again and writes the parts only if all of them
-have the digests the manifest records, whether or not `--fetch` was given. It
-says which it did. When it cannot, it writes nothing and reports why: what
+have the digests the manifest records, whether or not `--fetch` was given. When
+the original is not at hand and `--fetch` was given, it converts what each
+address gave instead of the original, in the same order, and writes the parts
+under the same condition; bytes that are not of the recorded media type are not
+converted. When that restores the text, it says exactly that: the text is
+restored, and the fetched copy is not the recorded original. Those bytes are not
+kept, the upstream is not changed, and nothing is compared with them as the
+original. It says which it did. When it cannot, it writes nothing and reports why: what
 differed (which parts, and the tool versions recorded and current), or that the
 text was supplied and cannot be made from the original. A plan given with
 `--plan` also serves here, for the page map or page-number data of its entry for
 the same source and address. A source file with some parts missing or changed is
-damaged: `ingest` does not write to it.
+damaged: `ingest` does not write to it. `build report --check` that stops for
+text it cannot read also says that whether the report's files are current cannot
+be told.
 
 ### B1. Unreviewed records and review marks
 
@@ -365,7 +375,7 @@ A source file that does not pass `source.pages` is not used by other checks.
 **Text that is not held** (FR-98; CONTRACT-007 H). When every listed part of a
 source file is absent and its manifest is sound, `source.pages` gives one result
 for the source file, `unverifiable` with `not_held`, not one failure for each
-part. It is never a pass and is not called damage. It names the command that
+part. It says how many passages and citation records were taken from that text. It is never a pass and is not called damage. It names the command that
 fetches the text again. It is open, and no annotation dismisses it, so a project
 with text that is not held is never labelled `checked_clean`; an annotation can
 explain it. What rests on that text stays could-not-be-checked as for a damaged
