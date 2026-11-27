@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 366,
+      "index": 71,
+      "page_sha256": "214cabc58bdddfc6303ac7e6d51485985111eb61c5a685423ce1a2cb75cb2eff",
+      "start": 213,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:02Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-409mkkq37yne4whwkraz",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "224"
+  },
+  "quote": {
+    "exact": "the more\nunavoidable is the hypothesis that most of the world's drowned valleys\nwere submerged because of a Recent, general rising of the ocean's\nsurface"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "source_record_sha256": "78f1f40f660a283f41f3c97adb2a0205cbbb4b26771b5b300bcc6a78fe924d61",
+  "text": "txt-8q5sdvm520cwygpgjvn8"
+}

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2106,
+      "index": 467,
+      "page_sha256": "d26fa561effead4865854ade0dfed9227858793836b62f5c48e745183f11df76",
+      "start": 1942,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:23Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-ck9689wqzg4058841wnc",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "552"
+  },
+  "quote": {
+    "exact": "In\nthis case it is impossible, on account of the nature of the central\nmass, to consider the reef as based on an external crater, or on any\naccumulation of sediment"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-ymdxbsxjmc5fbmq0t4a0",
+  "source_record_sha256": "c21e8d8a22c42adfd1b38fc35b87266f045a9c738a2a6e5dbefe3c4f04ef7c21",
+  "text": "txt-hcn5vw3frm4256b32xhe"
+}

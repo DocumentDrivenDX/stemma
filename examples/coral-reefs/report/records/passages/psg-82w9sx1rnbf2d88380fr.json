@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1633,
+      "index": 316,
+      "page_sha256": "c899a5c10efd7f6c301b0823f017e4a6de5a454e66872f7bc351c25d489d22c3",
+      "start": 1493,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:58Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-82w9sx1rnbf2d88380fr",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "291"
+  },
+  "quote": {
+    "exact": "In regard to this objec-\ntion we may refer to what we have said in a former volume\nrespecting the size of the so-called craters of elevation"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-rd44yd9ctbs143rpe1be",
+  "source_record_sha256": "1254be8bee750e06f781ffa21c87a6efe975cd2635d442037bf3cb60b5713327",
+  "text": "txt-g5myzs9ef0b53mhq2pe1"
+}

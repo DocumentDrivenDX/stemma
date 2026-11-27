@@ -11,6 +11,7 @@ each with a short quotation copied from its pages.
 | `sources/` | One folder per work: `source.md`, the manifest, and one file for each page of the PDF it came from, blank pages included. About 13.6 MB of text in some 5,000 files |
 | `records/` | A record of each work; where its original came from (address, retrieval time, SHA-256); each comparison with the original; saved catalogue lookups; two flags a model recorded, on a page number and a collective title, and one retired flag; a note explaining one finding; four passages; four citations |
 | `plan.json` | What was captured, from where, and how it was converted |
+| `report/` | A research report written from these works, *Foundations Out of Sight*. Its quotations are copied from `sources/` by passage records in `report/records/`; `./scripts/dev.sh report` rebuilds it and `report-check` fails if it is stale. Its pages in `sources/agassiz1903` (file indexes 22–41) and `sources/funafuti1904` (19–20) carry roman page numbers added with `source label` from page images read by a model (claude-opus-5-5) |
 | `tools/render-pages.swift` | Draws page images on macOS, for comparing text with the page. The images are not committed |
 
 Where the copy a repository serves carries a download stamp, naming a network

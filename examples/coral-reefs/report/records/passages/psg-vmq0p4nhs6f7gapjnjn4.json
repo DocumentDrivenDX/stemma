@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 765,
+      "index": 5,
+      "page_sha256": "8fe8fcd24c53d3a5400b20d30951ec245673fd7fd06a830961364aac1b014d8f",
+      "start": 631,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:05Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-vmq0p4nhs6f7gapjnjn4",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "863"
+  },
+  "quote": {
+    "exact": "Deep drilling revealed the presence of olivine basalt beneath\nshallow water limestone of Eocene age at a depth of more than\n4,000 feet"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "f1307b24e0e70db84490689b7aee51249db7d4e9687510d9e1f6fbe654b885bb",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

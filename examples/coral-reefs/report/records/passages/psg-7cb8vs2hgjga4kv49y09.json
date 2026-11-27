@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2972,
+      "index": 2,
+      "page_sha256": "87ef6c4870d8d9983ded03a23db5bb486f9a41b23210f4785fdab2315759c8d6",
+      "start": 2807,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:14Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-7cb8vs2hgjga4kv49y09",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "303"
+  },
+  "quote": {
+    "exact": "Darwin’s subsidence model overlooks that the appearance of atolls today in their rim-island\nconfiguration is merely a transient stage of longer geo-ecological cycles"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-9y5zh0m86v7n3fkawade",
+  "source_record_sha256": "2bb97eb547bf3c03781ec72986f41a07b5b001d0d07be0008610e63a9e12b8cc",
+  "text": "txt-r8t6cvfg4wwj6jbwqqg1"
+}

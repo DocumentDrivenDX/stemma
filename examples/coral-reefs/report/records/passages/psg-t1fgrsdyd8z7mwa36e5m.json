@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1219,
+      "index": 77,
+      "page_sha256": "ce047054d06ee994ea72e5c80fe5f1dbfdcdae0edabde6407d1936f837807f66",
+      "start": 1136,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:56Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-t1fgrsdyd8z7mwa36e5m",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "54"
+  },
+  "quote": {
+    "exact": "It was\nevident then, that the base of the coral-reef rock had not yet been attaimed"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "191539882229b1ac3d89178f16eeb8d6f9b637c91d30c6e305b08dd79c5a9b83",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}
