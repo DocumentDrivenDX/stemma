@@ -63,7 +63,16 @@ export async function buildTemplate(): Promise<string> {
   const arras = readFileSync(join(packageDir("@documentdrivendx/arras-ui", root), "dist/styles.css"), "utf8");
   const layout = [
     'body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}',
-    ".stemma-page{display:flex;flex-direction:column;min-height:100vh}.stemma-browser{flex:1 0 auto}",
+    ".stemma-page{display:flex;flex-direction:column;min-height:100vh}.stemma-browser{flex:1 0 auto;display:flex;align-items:flex-start}",
+    ".stemma-records{flex:1 1 0;min-width:0;align-self:stretch}",
+    // The source panel scrolls by itself, so that bringing the highlight into view leaves the record where it is.
+    ".stemma-source{flex:0 0 clamp(20rem,38vw,38rem);box-sizing:border-box;position:sticky;top:0;max-height:100vh;overflow:auto;background:#fff;color:#0f172a;border-left:1px solid #94a3b8;overflow-wrap:anywhere}",
+    "@media (max-width:60rem){.stemma-browser{flex-direction:column;align-items:stretch}.stemma-records{flex:0 0 auto}.stemma-source{flex:0 0 auto;position:static;max-height:80vh;border-left:0;border-top:2px solid #94a3b8}}",
+    ".stemma-source-text{white-space:pre-wrap;border:1px solid #cbd5e1;background:#f8fafc;padding:.5rem;margin:.25rem 0}",
+    // The printed page stays in sight while its text is scrolled to the highlight.
+    ".stemma-page-heading{position:sticky;top:-.75rem;background:#fff;padding:.25rem 0}",
+    ".stemma-source-text mark{background:#fde68a;color:#0f172a;outline:1px solid #b45309}",
+    ".stemma-control{unicode-bidi:isolate;font:600 .75em ui-monospace,monospace;border:1px solid #b91c1c;color:#991b1b;background:#fef2f2;border-radius:3px;padding:0 2px;margin:0 1px}",
     // A record's repeated values are whole lines of text. arras draws each as a badge that does not wrap.
     ".gb-tags{max-width:100%}.gb-tags .gb-badge{height:auto;white-space:normal;overflow-wrap:anywhere}",
     "dd{min-width:0;overflow-wrap:anywhere}",

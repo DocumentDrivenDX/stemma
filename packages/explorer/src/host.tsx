@@ -4,9 +4,12 @@
 import { createRoot } from "react-dom/client";
 import { GraphBrowser } from "@documentdrivendx/arras-ui/browser";
 import { createStaticClient, GraphLoadError, InvalidDocument, loadStore, staticSchemaApi } from "@documentdrivendx/arras-ui/static";
+import type { SourceView } from "../../core/src/source-view.ts";
 import type { BannerData } from "../../graph/src/export.ts";
 import { Banner } from "./Banner.tsx";
 import { foldingClient } from "./client.ts";
+import { sourceRouteOf, useLocationOfBrowser } from "./route.ts";
+import { type GetSourceView, SourcePanel } from "./SourcePanel.tsx";
 
 const dataText = (id: string): string => document.getElementById(id)!.textContent!;
 
@@ -24,6 +27,29 @@ function Failure({ error }: { error: unknown }) {
   );
 }
 
+/** The views the export holds, answered by ID. A server would answer the same objects. */
+function inlinedViews(): GetSourceView {
+  let views: Record<string, SourceView> | undefined;
+  return async (id) => {
+    views ??= (JSON.parse(dataText("stemma-sourceviews")) as { views: Record<string, SourceView> }).views;
+    return Object.hasOwn(views, id) ? views[id] : undefined;
+  };
+}
+
+/** The record browser, with the open citation's or passage's source beside it, or below it on a narrow screen. */
+function Explorer({ client, getView }: { client: ReturnType<typeof createStaticClient>; getView: GetSourceView }) {
+  const [at, onLocation] = useLocationOfBrowser();
+  const route = sourceRouteOf(at, "stemma");
+  return (
+    <div className="stemma-browser">
+      <div className="stemma-records">
+        <GraphBrowser client={client} schemaApi={staticSchemaApi()} onLocation={onLocation} />
+      </div>
+      {route ? <SourcePanel key={`${route.type}/${route.id}`} route={route} getView={getView} /> : null}
+    </div>
+  );
+}
+
 async function start(): Promise<void> {
   const root = createRoot(document.getElementById("root")!);
   try {
@@ -34,9 +60,7 @@ async function start(): Promise<void> {
     root.render(
       <div className="stemma-page">
         <Banner data={banner} />
-        <div className="stemma-browser">
-          <GraphBrowser client={client} schemaApi={staticSchemaApi()} />
-        </div>
+        <Explorer client={client} getView={inlinedViews()} />
       </div>,
     );
   } catch (error) {

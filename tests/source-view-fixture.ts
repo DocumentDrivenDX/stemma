@@ -92,8 +92,12 @@ export function standard(pages: Page[] = PAGES) {
 
 export function project(change: Partial<Project> = {}): Project {
   const pages = change.pages ?? structuredClone(PAGES);
-  const { one, two, note } = standard(pages);
-  return { sources: sources(), records: [one, two, note, citation("cit-onepage00001", one)], pages, manifest: {}, ...change };
+  // The standard passages are made only for a project that does not bring its own records.
+  const records = change.records ?? (() => {
+    const { one, two, note } = standard(pages);
+    return [one, two, note, citation("cit-onepage00001", one)];
+  })();
+  return { sources: sources(), pages, manifest: {}, ...change, records };
 }
 
 export function content(made: Project, paged = true): ProjectContent {

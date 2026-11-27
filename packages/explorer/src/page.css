@@ -4,3 +4,4 @@
 @import "tailwindcss/utilities.css" layer(utilities) prefix(st) source(none);
 @source "./Banner.tsx";
 @source "./host.tsx";
+@source "./SourcePanel.tsx";
