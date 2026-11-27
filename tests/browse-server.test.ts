@@ -196,7 +196,7 @@ describe("rule 6: signed with the secret, which is never sent", () => {
   test("US-119-AC5 every call but session needs this run's signature; no cookie, address or header with the secret stands in for it", async () => {
     const other = createSession();
     const otherSecret = secretOf(other)!;
-    for (const path of ["/api/status", "/api/boot", "/api/arras", "/api/query", "/api/source-view", "/api/manuscript"]) {
+    for (const path of ["/api/status", "/api/boot", "/api/arras", "/api/query", "/api/source-view", "/api/manuscript", "/api/search"]) {
       for (const wrong of ["x", secret.slice(0, -1), `${secret}x`, secret.toUpperCase(), otherSecret, session.code]) {
         await refused(raw(server.port, [request("POST", path, headers({}, { key: wrong, path }), "{}")]), 401, "unauthorized");
       }

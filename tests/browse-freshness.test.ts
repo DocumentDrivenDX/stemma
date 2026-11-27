@@ -8,10 +8,10 @@ import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static
 import { exportGraph, FILES, type ManuscriptPort, servedData } from "@stemma/graph";
 import { manuscriptView } from "@stemma/publish";
 import { loadCorpus } from "@stemma/records";
-import { type Built, ProcessGone, type SnapshotProcess, Snapshots } from "@stemma/server";
+import { type Built, createSearch, ProcessGone, queryOf, type SnapshotProcess, Snapshots } from "@stemma/server";
 import { inputsChanged, mayShowTheSame, readProject, researchFiles, scanInputs } from "@stemma/workspace";
 import { VERSION } from "../packages/cli/src/context.ts";
-import { Browsing, childrenOf, endRuns } from "./browse-run.ts";
+import { Browsing, childrenOf, endRuns, post } from "./browse-run.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 afterAll(endRuns);
@@ -64,8 +64,6 @@ describe("US-119-AC2 the served data is the export's, with no cap", () => {
   }, 60_000);
 });
 
-const SEARCH = "query($text: String!, $types: [String!], $limit: Int) { _search(text: $text, types: $types, limit: $limit) { text hits { type key score label excerpt { text mark } matched } counts { type count atLeast } notSearched { type reason } truncated freshness { asOf at } } }";
-
 describe("US-119-AC3 the server answers as arras's static client does", () => {
   test("the same queries give the same answers through the server as in process", async () => {
     const dir = project();
@@ -75,8 +73,7 @@ describe("US-119-AC3 the server answers as arras's static client does", () => {
     const local = createStaticClient(await loadStore(served.moduleText, served.graphText), served.moduleText);
     const source = (JSON.parse(served.graphText) as { records: { type?: string; key?: string }[] }).records.find((r) => r.type === "Source")!.key!;
     const queries: [string, Record<string, unknown> | undefined][] = [
-      [SEARCH, { text: "subsidence", limit: 50 }], [SEARCH, { text: "darwin atoll", types: ["Passage"], limit: 50 }], [SEARCH, { text: "x", limit: 50 }],
-      [SEARCH, { text: "a b c d e f g", limit: 50 }], [`query($key: ID!) { source(key: $key) { key title citationKey passageSourceSource { key heading } } }`, { key: source }],
+      [`query($key: ID!) { source(key: $key) { key title citationKey passageSourceSource { key heading } } }`, { key: source }],
       [`query { source(key: "no-such-key") { key } }`, undefined], ["query { nothing }", undefined], ["not graphql", undefined], ["mutation { x }", undefined],
     ];
     for (const [query, variables] of queries) {
@@ -390,4 +387,35 @@ describe("US-119-AC4 which snapshot may answer", () => {
     writeFileSync(join(dir, "report/.template.md"), "x");
     expect(await inputsChanged(dir, scan)).toBe(true);
   }, 60_000);
+});
+
+describe("US-120 search through the built command", () => {
+  const ask = { text: "reef", offset: 0, limit: 200 };
+
+  test("AC1, AC6: it is signed and proved like every call, bounded, and never older than the files", async () => {
+    const dir = project();
+    const one = await Browsing.start(dir);
+    // `Browsing.call` fails unless the answer carries its right proof.
+    const first = await one.call("/api/search", ask);
+    expect([first.status, first.proved, first.json.data_identity]).toEqual([200, true, one.info.data_identity]);
+    const served = (() => {
+      const { corpus, request } = read(dir);
+      return servedData(corpus, request);
+    })();
+    expect(first.json.result).toEqual(createSearch(served.search).page(queryOf("reef")!, undefined, 0, 200));
+    expect(first.json.result.total).toBeGreaterThan(50);
+    const unsigned = await post(one.info, "/api/search", ask);
+    expect([unsigned.status, unsigned.json.error.code]).toEqual([401, "unauthorized"]);
+    expect((await one.call("/api/search", { ...ask, limit: 100_000 })).status).toBe(400);
+    expect((await one.call("/api/search", { ...ask, text: "x".repeat(100_000) }).catch((e: Error) => ({ status: e.message.includes("413") ? 413 : 0 }))).status).toBe(413);
+    const sourceFile = recordOf(dir, "src-");
+    const record = JSON.parse(readFileSync(sourceFile, "utf8")) as { id: string; title: { value: string } };
+    record.title.value = "Zebra retitled work";
+    writeFileSync(sourceFile, `${JSON.stringify(record, null, 2)}\n`);
+    expect((await one.call("/api/search", { ...ask, text: "zebra retitled" })).json.error.code).toBe("index_stale");
+    await one.current();
+    const after = await one.call("/api/search", { ...ask, text: "zebra retitled" });
+    expect(after.json.result.hits.map((h: { key: string }) => h.key)).toContain(record.id);
+    await one.stop();
+  }, 90_000);
 });

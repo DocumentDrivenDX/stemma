@@ -1,8 +1,10 @@
 // What a built snapshot answers (CONTRACT-005 M): arras's own static loader and
 // static client over the export's module and graph, held in memory, with the
-// source views and the manuscript view beside them. Nothing here writes, opens a
-// file, or connects anywhere: a record ID is only looked up.
+// source views and the manuscript view beside them, and Stemma's own search,
+// which also answers arras's search query. Nothing here writes, opens a file, or
+// connects anywhere: a record ID is only looked up.
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
+import { ARRAS_SEARCH_QUERY, arrasAccepts, createSearch, queryOf, SEARCH_LIMITS, type SearchData } from "./search.ts";
 import type { Answer } from "./snapshots.ts";
 
 export interface ServedData {
@@ -12,6 +14,7 @@ export interface ServedData {
   graphText: string;
   views: Record<string, unknown>;
   manuscript: { state: string };
+  search: SearchData;
 }
 
 export const ARRAS_CALLS = ["version", "viewer", "meta", "status", "schemaCatalog", "export"] as const;
@@ -23,9 +26,21 @@ export function refusal(status: number, code: string, message: string): Answer {
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const BAD = refusal(400, "bad_request", "The request body is not what this call takes.");
 
-export async function answersOf(data: ServedData): Promise<(route: string, body: unknown) => Promise<Answer>> {
+/** The most an answer to a query or a search may take (rule 13). */
+export const MOST_ANSWER_BYTES = 8 * 1024 * 1024;
+const BOUNDED = new Set(["query", "arras", "search"]);
+const TOO_LARGE = refusal(422, "answer_too_large", "The answer would be larger than the server sends. Ask for less at once; the Search view lists matches a page at a time.");
+const SEARCH_KEYS = new Set(["text", "type", "offset", "limit"]);
+const wholeFrom = (value: unknown, least: number, most: number): value is number => Number.isSafeInteger(value) && (value as number) >= least && (value as number) <= most;
+
+export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWER_BYTES): Promise<(route: string, body: unknown) => Promise<Answer>> {
   const client = createStaticClient(await loadStore(data.moduleText, data.graphText), data.moduleText);
   const { banner, views, manuscript, data_identity } = data;
+  const search = createSearch(data.search);
+  const moduleName = (JSON.parse(data.moduleText) as { id: string }).id;
+  // What arras says of its answers' freshness and revision, taken from one answer of its own.
+  const probe = await client.moduleQuery(moduleName, 'query { _search(text: "zz", limit: 1) { freshness { backend asOf at consistency } } }');
+  const freshness = (probe.data as { _search?: { freshness?: unknown[] } } | null)?._search?.freshness ?? [];
   const ok = (result: unknown): Answer => ({ status: 200, body: JSON.stringify({ data_identity, result: result ?? null }) });
   /** arras's refusal, passed to the page as arras made it. */
   const arras = async (call: () => Promise<unknown>): Promise<Answer> => {
@@ -37,7 +52,19 @@ export async function answersOf(data: ServedData): Promise<(route: string, body:
       return { status: 422, body: JSON.stringify({ error: { code: "arras_refusal", message: String(message), arras: { status, code: typeof code === "string" ? code : undefined } } }) };
     }
   };
-  return async (route, body) => {
+  /** arras's search query, answered by Stemma's search. A search arras would not accept gets arras's own refusal. */
+  const arrasSearch = (module: string, query: string, variables: Record<string, unknown>) => {
+    const { text, types, limit = 20, ...more } = variables;
+    const names = types === null || types === undefined ? undefined : types;
+    if (Object.keys(more).length > 0 || typeof text !== "string" || (limit !== null && !wholeFrom(limit, 1, SEARCH_LIMITS.arrasPage))
+      || (names !== undefined && !(Array.isArray(names) && names.every((name) => typeof name === "string" && search.hasType(name))))) return Promise.resolve(BAD);
+    const asked = module === moduleName && arrasAccepts(text) ? queryOf(text) : undefined;
+    // Its limit is put within arras's own, so that what arras refuses is the text or the module.
+    if (!asked) return arras(() => client.moduleQuery(module, query, { ...variables, limit: 1 }));
+    const answered = search.arrasPage(asked, names as string[] | undefined, (limit as number | null) ?? 20, freshness);
+    return Promise.resolve(ok({ data: { _search: answered }, errors: [], revision: probe.revision }));
+  };
+  const answer = async (route: string, body: unknown): Promise<Answer> => {
     if (!isObject(body)) return BAD;
     if (route === "boot") return ok({ banner, manuscript_state: manuscript.state });
     if (route === "manuscript") return ok(manuscript);
@@ -45,9 +72,20 @@ export async function answersOf(data: ServedData): Promise<(route: string, body:
       if (typeof body.id !== "string") return BAD;
       return ok(Object.hasOwn(views, body.id) ? views[body.id] : null);
     }
+    if (route === "search") {
+      const { text, type, offset, limit } = body;
+      if (Object.keys(body).some((key) => !SEARCH_KEYS.has(key)) || typeof text !== "string" || !(type === undefined || (typeof type === "string" && search.hasType(type)))
+        || !wholeFrom(offset, 0, Number.MAX_SAFE_INTEGER) || !wholeFrom(limit, 1, SEARCH_LIMITS.page)) return BAD;
+      const asked = queryOf(text);
+      if (!asked) return refusal(400, "bad_request", `A search is 1 to ${SEARCH_LIMITS.chars} characters and at most ${SEARCH_LIMITS.words} words.`);
+      return ok(search.page(asked, type, offset, limit));
+    }
     if (route === "query") {
       const { module, query, variables } = body;
       if (typeof module !== "string" || typeof query !== "string" || (variables !== undefined && !isObject(variables))) return BAD;
+      if (ARRAS_SEARCH_QUERY.test(query)) return arrasSearch(module, query, variables ?? {});
+      // arras's own search lists few of the matches and says little of it, so no other query reaches it.
+      if (/\b_search\b/.test(query)) return refusal(422, "unsupported_search", "This server answers only the record browser's search query. Use the search call for other searches.");
       return arras(() => client.moduleQuery(module, query, variables));
     }
     if (route === "arras") {
@@ -58,5 +96,9 @@ export async function answersOf(data: ServedData): Promise<(route: string, body:
       return arras(() => client.export(body.request as Parameters<typeof client.export>[0]));
     }
     return refusal(404, "not_found", "No such call.");
+  };
+  return async (route, body) => {
+    const made = await answer(route, body);
+    return BOUNDED.has(route) && Buffer.byteLength(made.body) > mostBytes ? TOO_LARGE : made;
   };
 }

@@ -41,7 +41,7 @@ const ASSETS: Record<string, [keyof Assets, string]> = {
 
 /** The calls a snapshot answers, by path. */
 const SNAPSHOT_CALLS: Record<string, string> = {
-  "/api/boot": "boot", "/api/arras": "arras", "/api/query": "query", "/api/source-view": "source-view", "/api/manuscript": "manuscript",
+  "/api/boot": "boot", "/api/arras": "arras", "/api/query": "query", "/api/source-view": "source-view", "/api/manuscript": "manuscript", "/api/search": "search",
 };
 const CALLS = new Set(["/api/session", "/api/status", ...Object.keys(SNAPSHOT_CALLS)]);
 

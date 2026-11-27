@@ -130,6 +130,11 @@ export interface Projection {
   omissions: Count[];
   dropped: DroppedLink[];
   warnings: Warning[];
+  /**
+   * When asked for: each entity's folded search text, in the order of
+   * `entities`, for every type, searched by arras or not. No export file holds it.
+   */
+  search?: string[];
 }
 
 /** `allowed` is the record kinds the reference field may name; a link to an owned entry has none. */
@@ -148,7 +153,8 @@ class Tally {
 
 class Walker {
   readonly omitted = new Tally();
-  readonly entries: { entity: Entity; searched: string[] }[] = [];
+  /** `words` are all its own; `searched` are those its `searchText` property is made of. */
+  readonly entries: { entity: Entity; searched: string[]; words: string[] }[] = [];
   readonly links: PendingLink[] = [];
   readonly properties = new Map<string, Map<string, Property>>();
 
@@ -278,7 +284,8 @@ class Walker {
     this.walk(entity, valueType, value, { path: [], refPath, order: [], searched: searched ? words : undefined, top: false });
     searched?.push(...words);
     this.links.push({ sourceType: owner.type, source: owner.key, path, targetId: `${valueType}\0${key}` });
-    this.entries.push({ entity, searched: words });
+    // An entry under a type that is not searched has no words of its own in its property.
+    this.entries.push({ entity, searched: SEARCHED_TYPES.includes(owner.type) ? words : [], words });
   }
 }
 
@@ -367,7 +374,7 @@ function headingOf(entity: Entity, data: JsonObject): string {
 
 export const SUPPORT_NOTICE = "A recorded model judgment, not verification. It says what a model answered, not that the source supports the claim.";
 
-export function project(corpus: Corpus, states: RecordStates): Projection {
+export function project(corpus: Corpus, states: RecordStates, options: { search?: boolean } = {}): Projection {
   const walker = new Walker();
   const droppedTally = new Tally();
   const readable = corpus.records.filter((f): f is LoadedFile & { data: JsonObject } => f.state === "ok" && f.data !== undefined && idOf(f) !== undefined);
@@ -388,7 +395,8 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
     leftOut.push(file.path);
   }
   const typeOf = new Map<string, string>();
-  const exported: { entity: Entity; data: JsonObject; searched: string[] | undefined }[] = [];
+  /** `searched` makes the `searchText` property; `words` the search text of every type, when asked for. */
+  const exported: { entity: Entity; data: JsonObject; searched: string[] | undefined; words: string[] | undefined }[] = [];
 
   for (const file of valid) {
     const data = file.data;
@@ -405,14 +413,17 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
     if (!KEY.test(key)) throw new ExportMappingError(`arras does not accept the key of ${file.path}.`);
     typeOf.set(key, type);
     const entity: Entity = { type, key, properties: {} };
-    const searched = SEARCHED_TYPES.includes(type) ? [] as string[] : undefined;
+    const listed = SEARCHED_TYPES.includes(type);
+    const words = listed || options.search ? [] as string[] : undefined;
     walker.walk(entity, type, releasable(data, excess, checked, (reason) => walker.omitted.add(type, reason)), {
-      path: [], refPath: String(data.kind), order: [], searched, top: true,
+      path: [], refPath: String(data.kind), order: [], searched: words, top: true,
     });
-    if (searched && type === "Source") searched.push(...citationKeys(data), ...agentWords(corpus, data));
-    exported.push({ entity, data, searched });
+    if (words && type === "Source") words.push(...citationKeys(data), ...agentWords(corpus, data));
+    exported.push({ entity, data, searched: listed ? words : undefined, words });
   }
-  for (const { entity, searched } of walker.entries) exported.push({ entity, data: {}, searched });
+  for (const { entity, searched, words } of walker.entries) exported.push({ entity, data: {}, searched, words });
+  const searchTexts = new Map<Entity, string>();
+  const foldedWords = (heading: string, words: string[]) => searchFold([...new Set([heading, ...words])].join(" "));
   const entryData = new Map<string, JsonObject>();
   for (const file of valid.filter((f) => !isRetired(f.data))) {
     for (const [field, spec] of Object.entries(TYPES[KIND_TYPES[String(file.data.kind)]!]!)) {
@@ -434,9 +445,12 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
     if (entity.type === "SupportRecord") add("stemmaNotice", SUPPORT_NOTICE, 2);
     const own = states.records.get(entity.key);
     if (own && own.length > 0) add("stemmaStates", own, 3, true);
-    if (item.searched) {
-      const words = [...new Set([heading, ...item.searched])].join(" ");
-      walker.set(entity, "searchText", searchFold(words), { type: "string", many: false }, [Number.MAX_SAFE_INTEGER]);
+    const property = item.searched ? foldedWords(heading, item.searched) : undefined;
+    if (property !== undefined) walker.set(entity, "searchText", property, { type: "string", many: false }, [Number.MAX_SAFE_INTEGER]);
+    if (options.search) {
+      // The same string where both are made of the same words, so that it is held once.
+      const same = property !== undefined && item.searched!.length === (item.words?.length ?? 0);
+      searchTexts.set(entity, same ? property : foldedWords(heading, item.words ?? []));
     }
   }
 
@@ -501,6 +515,7 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
   }
   return {
     entities, links, types, relationships: declared, properties: walker.properties,
+    ...(options.search ? { search: entities.map((e) => searchTexts.get(e)!) } : {}),
     omissions: walker.omitted.list().map(([type, reason, count]) => ({ type, reason, count })),
     dropped: droppedTally.list().map(([relationship, reason, count]) => ({ relationship, reason, count })),
     warnings,

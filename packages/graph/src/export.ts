@@ -3,7 +3,7 @@
 // same bytes: no export holds a time, a user, a machine path or a git revision.
 import { type ManuscriptView, type RecordStates, recordStates } from "@stemma/core";
 import { compareCodePoints, type Corpus, corpusDigest, isObject, type LoadedFile, SEARCH_FOLD_VERSION, sha256 } from "@stemma/records";
-import { graphDocument, jsonText, MODULE_NAME, moduleDocument, VIEW_VERSION } from "./module.ts";
+import { graphDocument, jsonText, MODULE_NAME, moduleDocument, typeLabel, VIEW_VERSION } from "./module.ts";
 import { type ManuscriptPort, manuscriptFile, manuscriptOf, quotedPassages } from "./manuscript.ts";
 import { fillPage } from "./page.ts";
 import { project, type Projection, type Warning } from "./project.ts";
@@ -105,7 +105,7 @@ function assemble(corpus: Corpus, request: ExportRequest, served = false) {
   const blockers = exportBlockers(corpus);
   if (blockers.length > 0) throw new UnreadableProject(blockers);
   const states = recordStates(corpus);
-  const projection = project(corpus, states);
+  const projection = project(corpus, states, { search: served });
   const made = manuscriptOf(corpus, projection, request.manuscript);
   const sources = sourceViewsFile(corpus, projection, request.sourceViewsCap, quotedPassages(made));
   const manuscript = manuscriptFile(made, sources.views, request.manuscriptCap);
@@ -188,6 +188,8 @@ export interface Served {
   graphText: string;
   views: SourceViewsFile["views"];
   manuscript: ManuscriptView;
+  /** What the server's search reads (CONTRACT-005 M, "Search"): the types in declaration order, and each entry in theirs, then by key. */
+  search: { types: { type: string; label: string }[]; entries: { type: string; key: string; label: string; text: string }[] };
 }
 
 /**
@@ -203,6 +205,10 @@ export function servedData(corpus: Corpus, request: Pick<ExportRequest, "version
     data_identity: made.shared.data_identity,
     banner: { ...banner, warnings: banner.warnings.filter((w) => w.code !== "large_graph").map(servedWarning) },
     moduleText: made.moduleText, graphText: made.graphText, views: made.sources.views, manuscript: made.manuscript.view,
+    search: {
+      types: made.projection.types.map((type) => ({ type, label: typeLabel(type) })),
+      entries: made.projection.entities.map((e, i) => ({ type: e.type, key: e.key, label: String(e.properties.heading), text: made.projection.search![i]! })),
+    },
   };
 }
 

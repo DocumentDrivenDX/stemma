@@ -36,6 +36,9 @@ const plural = (label: string) => /(s|x|ch|sh)$/.test(label) ? `${label}es` : /[
 /** Text safe to put in a script element: `<` only occurs inside JSON strings, where this is the same character. */
 export const jsonText = (value: unknown): string => canonical(value).replaceAll("<", "\\u003c");
 
+/** What a type is called in the module, and in the served search. */
+export const typeLabel = (type: string): string => (TYPE_LABELS[type] ?? [typeWords(type)])[0]!;
+
 export function moduleDocument(projection: Projection, served = false): object {
   const names = new Set<string>();
   const unique = (name: string) => {
