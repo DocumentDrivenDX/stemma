@@ -213,7 +213,9 @@ restricted values.
    these and the extracted claims, singly or in batches with their original
    passages, whenever they choose.
 10. When run again, keep existing author choices, and report a changed original
-    as an intake item without applying it (assumption).
+    as an intake item without applying it (assumption). How a file is told to
+    be the same, changed, or another one is **Which file this is** in I, for
+    Word and PDF files alike.
 11. Carry the whole original reference list forward. For each entry of a
     reference list or bibliography section found in the manuscript, bind it to
     one source by the same deterministic rules, or create a provisional source
@@ -581,7 +583,9 @@ the support level (`untested` for every producer until A is met); the producer
 and creator the file states; and the coverage statements below. It writes
 nothing, fetches nothing, and runs nothing found in the file. Text is read from
 the text layer with the pinned PDF library (SD-002), with characters kept as the
-file maps them.
+file maps them, ligature characters (U+FB00 to U+FB06) included. No fold is
+added for them: the name comparison of H and `quote-fold/0` already read them as
+their letters.
 
 **Pages.** Each page has exactly one state:
 
@@ -631,8 +635,16 @@ leaves the body text, and its place is kept as a note reference.
   with a seam at each end, and is reported `unpaired_foot_text`.
 - A raised marker that nothing pairs stays in the text as typed, with a seam on
   each side, and is reported `unpaired_marker`.
-- Endnotes are read as the body text they appear as, and are not tied to their
-  markers.
+- **Endnotes are not recognized.** Their text is read as the body text it
+  appears as, so no paragraph has location `endnote`. Their markers are not
+  tied to it: each marker the pairing rule sees is an `unpaired_marker`, and
+  its seams withhold any link that would cross it, including a narrative
+  citation whose names it follows or precedes closely. Nothing typed in an
+  endnote is read as a note: F6 does not bind its full references, short forms,
+  or "ibid.", it is not listed as unclassified, and the report's counts of
+  notes cover footnotes only. A bracketed year in that text is examined as in
+  any body text. A manuscript that cites in endnotes therefore gets no
+  note-style citations from its PDF.
 
 **Paragraphs and headings.** Lines in reading order form one paragraph until
 one of these: the next line is indented from the left margin and the line before
@@ -688,6 +700,28 @@ the rule, says that no entry was carried forward for the bibliography (F11),
 and says that exporting each chapter as its own file, or taking over its Word
 file, can help.
 
+**Quotations in the copy.** The copy keeps line-end hyphens, and the line-end
+join of `quote-fold/0` (CONTRACT-002 D) applies only to source text. A quotation
+read from a PDF could then fail only because the draft's line broke inside a
+word. So the batch keeps, for its chapter, each word in which a hyphen was kept
+at a join: the text between the white space on either side, without surrounding
+punctuation, folded as `quote-fold/0` folds. The record schema gains that field
+with the `format` value (CONTRACT-001). In `quote.present` and `quote.page` over
+that chapter, a hyphen in a quotation is **uncertain** when the word holding it
+is one of those kept. The check compares the quotation as printed and with each
+combination of its uncertain hyphens removed. If every reading gives the same
+outcome, that outcome stands, with the evidence of the printed reading.
+Otherwise the outcome is `unverifiable`, reason `uncertain_hyphen`, and the
+evidence shows each reading, what it matched, and where. The author compares the
+words with the original page and removes a hyphen from the copy if it is not
+part of the word; the quotation is then checked as it stands. If the hyphen does
+belong, the result stays open until a person dismisses it (CONTRACT-001,
+Annotations). So no quotation passes or fails on a reading Stemma chose. The
+same word typed within a line elsewhere in the chapter is treated the same way.
+`quote-fold/0` itself is unchanged, and a chapter from Word has no such words.
+Whether such a quotation should instead pass and say which reading matched, as
+the source-side join does, is a PRD open question.
+
 **What the matcher does with the marks.** H applies unchanged to a document that
 has no seams, hyphen marks, unread pages, or unseparated lists, which is every
 Word document. For a document that has them, these rules also apply. Each only
@@ -740,6 +774,8 @@ file holds:
   as current text and can produce citations; export with changes accepted, or
   take over the Word file. F4's rule for deleted text cannot be met.
 - Comments printed onto the page are read as page text.
+- Endnotes are not recognized. Their text is read as body text, their markers
+  are unpaired, and no citation in them is handled as a note.
 - Hidden, white, struck-through, covered, and switched-off-layer text is read
   like other text. Text placed wholly off the page may not be returned at all.
 - Tables, captions, block quotations, emphasis, and each passage's language and
@@ -758,16 +794,40 @@ removal (stamps by count only).
 Form-field values and comment texts are reported apart. A difference stops the
 reading as an internal error. Unread pages are outside this count and are named.
 
-**One file for each chapter** (Word and PDF alike). Before writing, `takeover`
-compares the new file with each file already taken over. It takes every run of
-12 consecutive words in the new file's body text outside reference lists, folded
-as in H, with bracketed text and line-end hyphens removed. When 20% or more of
-the runs occur in the chapters that came from one earlier file, it writes
-nothing, fails with `repeated_chapter`, and names that file and the share. With
-`--separate`, the author's statement that it is a different text, it proceeds
-and the batch records the statement. A file with fewer than 12 such words is not
-compared. The threshold is an assumption. Identical bytes follow F10.
-Replacing a chapter taken over from one file with another file is not defined.
+**Which file this is** (Word and PDF alike). Before writing, `takeover`
+compares the new file with the manuscript files already taken over. The first of
+these that applies decides:
+
+1. **The same file.** Its bytes are those of an earlier takeover's original. B6
+   and F10 apply: without `--again` it is reported and nothing is written; with
+   `--again` takeover reruns, keeping every author choice and edit.
+2. **A changed original** (assumption). Its bytes differ, and its base name is
+   the `original_name` of an earlier takeover's batch. F10 applies: takeover
+   saves one `intake_item` of category `original_changed`, which names that
+   batch and states the new file's SHA-256 and size, and writes nothing else.
+   No chapter or other record is added, the Stemma copy is unchanged, and the
+   change is not applied, with or without `--again`. The report says so, and
+   that `--separate` adds the file as a different text. Where an item that is
+   not retired already states those bytes, nothing is written and that item is
+   reported. If earlier files with different bytes share the name, the item
+   names the one whose chapters hold the most of the new file's runs (3), and
+   of equals the latest.
+3. **Repeated text.** One file for each chapter: takeover takes every run of 12
+   consecutive words in the new file's body text outside reference lists, folded
+   as in H, with bracketed text and line-end hyphens removed. When 20% or more
+   of the runs occur in the chapters that came from one earlier file, it writes
+   nothing, fails with `repeated_chapter`, and names that file and the share.
+   The message also says that if the new file is a revision of that one under
+   another name, Stemma does not apply revisions, and that `--separate` would
+   add it as a second chapter. A file with fewer than 12 such words is not
+   compared. The threshold is an assumption.
+
+`--separate` is the author's statement that the file is a different text from
+those already taken over. It skips 2 and 3, never 1, and the batch records the
+statement. A revision saved under another name is not recognized as a changed
+original: no `original_changed` item is saved for it (PRD open question).
+Applying a revision, and replacing a chapter taken over from one file with
+another file, are not defined.
 
 **Limits and damage.** `pdf_unreadable` is given for a file that is not a PDF,
 is encrypted, is damaged, or has a page that cannot be read; `input_limit` for a
@@ -796,6 +856,7 @@ page data itself, and no cap on expanded size or memory is designed.
 | Corrupt or encrypted `.docx` | `docx_unreadable` | no | Save an unencrypted copy |
 | Corrupt or encrypted PDF | `pdf_unreadable`; nothing written | no | Export an unencrypted copy |
 | PDF with no page that can be converted | `pdf_no_text`; nothing written | no | Supply the Word file or a born-digital PDF; recognition is not offered |
+| Changed original under an earlier file's name | One `original_changed` item; nothing else written; the change is not applied | yes | Keep working in the Stemma copy, or pass `--separate` for a different text that has the same name |
 | File repeats text already taken over | `repeated_chapter`; nothing written | yes | Take one file per chapter, or pass `--separate` for a different text |
 | Embedded field present but undecodable | Intake continues; listed with raw location | no | Author resolves manually |
 | Strict export would lose data | Exit 5, report only | yes | Use `report` policy |
@@ -836,7 +897,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
-| PDF manuscript intake (I) | A probe of the pinned PDF library on one invented file showed that invisible, white, struck-through, and switched-off-layer text arrives unmarked; off-page text did not arrive; rendering modes, comment and form annotations, and attachment names are available apart from the text. The source converter's rules that I reuses have their own synthetic tests | Every rule, number, and guard of I: no reader is built. Any PDF from a real producer: PDF manuscript support is untested |
+| PDF manuscript intake (I) | A probe of the pinned PDF library on one invented file showed that invisible, white, struck-through, and switched-off-layer text arrives unmarked; off-page text did not arrive; rendering modes, comment and form annotations, and attachment names are available apart from the text. The source converter's rules that I reuses have their own synthetic tests | Every rule, number, and guard of I: no reader is built, and neither the file comparison nor the quotation rule exists. A run of the matcher on invented text, not on a PDF, linked a name holding U+FB03 whether the ligature was in the entry or in the citation. Any PDF from a real producer: PDF manuscript support is untested |
 | Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`. A run of `author-date/1` on the same drafts found no wrong link among those it added, but leaving later authors of unknown surname length unread lost correct links, mostly for ordinary names; `author-date/2`, which keeps each form instead, restored those links on the same drafts, and a check of the changed links found none wrong; most longer forms it kept were a middle name before the surname, and two authors with a separator missing between them can read as one, which that run did not find in the entries holding longer forms | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis
