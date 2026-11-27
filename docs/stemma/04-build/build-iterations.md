@@ -30,6 +30,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Next after 11 |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs the manuscript reader and citation formatter on main |
 
 ## Iteration 24: see a citation inline with its source
 
@@ -48,6 +49,30 @@ quality, and the way to the original where one is recorded.
   arras limits, restricted sources). Source text stays inert text. A link to an
   original is a link the author follows; viewing still sends no request.
 - Page images need originals the project may not hold; say when there is none.
+## Iteration 25: manuscript browser
+
+Requested by the product owner. The author reads the completed manuscript and
+clicks citation text or a bibliography entry to open the source material itself
+with the cited text highlighted. It opens the original PDF or page images where
+possible and falls back to the text snapshots in the repository.
+
+- An in-text citation opens the cited place. A bibliography entry opens the
+  source and lists every place the manuscript cites it.
+- Order of preference: the original PDF or page images, then the repository's
+  text snapshot. Say which one is shown, and why an original is not.
+- Use an original only when its digest matches the recorded one. Originals may
+  be absent from the repository and from a fresh clone.
+- Highlighting on an original needs text positions. A PDF text layer can give
+  them; a scan with no word positions cannot. Then show the page unhighlighted
+  beside the highlighted snapshot text, and never guess a region.
+- Never highlight text whose anchor no longer matches. A citation with no
+  recorded quotation or page opens the source and highlights nothing.
+- To design first: how a page opened from a local file reaches large originals
+  (embedded, files beside the page, or a local server) without breaking the
+  no-network rule (BRW-03) or the no-backend rule (BRW-02, ADR-008). A change
+  to either rule is the product owner's decision. Fetching a remote original
+  stays a separate action the author asks for.
+- Originals stay out of reviewer exports unless the rights rules allow them.
 
 ## Not completable by an agent alone
 
