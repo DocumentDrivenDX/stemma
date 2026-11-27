@@ -29,7 +29,8 @@ and search records (FR-64). It links typeset sentences to claims and evidence
 
 ## Ideal Future State
 
-An author opens the explorer from their own computer with no server to run. They
+An author opens the explorer from their own computer, as one file with no server,
+or from a server that Stemma runs on that computer for them (ADR-012). They
 find any record, read it, and see how it connects to others, including in a
 connected-graph view that handles more than arras shows today. From a sentence
 on a typeset page they reach its claim, note, passage, and source, and they
@@ -44,7 +45,8 @@ what is unverified, and says when a preview page differs from print.
 - **Pain points**: An author cannot see a book-scale evidence graph, or get from
   a sentence on a page to what supports it.
 - **Desired outcome**: Every linked sentence leads to its evidence and back, in
-  an explorer that needs no backend.
+  an explorer that works from one file with no backend, and can also be served on
+  the author's own computer so that a large project's sources all open.
 
 ## Functional Areas
 
@@ -57,6 +59,7 @@ what is unverified, and says when a preview page differs from print.
 | Typeset pages | What supports this sentence? | Typeset pages with links in both directions |
 | Live preview | How will my edit look? | Typst compiled in the browser |
 | Browser delivery | Can I open it anywhere? | A TypeScript bundle that needs no backend |
+| Local server | Can I open every source of a large project, and see my latest records? | Serve the explorer on the author's own computer, safely and never stale |
 
 These page outputs differ:
 
@@ -177,15 +180,42 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 - BRW-01. All exploration and rendering code the project writes must be
   TypeScript bundled to run in a browser.
 - BRW-02. The explorer must ship as a bundle that needs no backend, with
-  navigation that works from a local file (ADR-008).
+  navigation that works from a local file (ADR-008). The same explorer may also
+  be served by Stemma on the author's computer (ADR-012, SRV-01 to SRV-07);
+  that does not change the offline file.
 - BRW-06. The explorer's browser graph must be generated from the record files,
   must not be committed to the repository, and must be rebuilt when needed, including before a fresh clone is browsed.
-- BRW-03. Viewing the explorer must send no network request.
+- BRW-03. Viewing the offline explorer must send no network request. Viewing the
+  served explorer must send requests only to its own server on the same
+  computer, and that server must send none.
 - BRW-04. The explorer must display record and source text as data and must not
   execute markup or scripts found in it.
 - BRW-05. The explorer must supply the offline explorer file for the reviewer
   package from whatever data FEAT-009 passes after removing restricted and
   copyrighted material.
+
+#### Local server (FR-64; ADR-012)
+
+- SRV-01. One command must serve the explorer to a browser on the same computer,
+  from the record files, writing nothing in the project, and must open the
+  browser. The agent must be able to run it for the author without the secret
+  that guards it reaching the agent's transcript or any process argument.
+- SRV-02. Every source view and the manuscript view must be given on request,
+  with no size cap that leaves out text.
+- SRV-03. Browsing and search must answer as the offline explorer does, through
+  arras's own static client, with the same stated search limits.
+- SRV-04. Data older than the record files must never be presented as current.
+  While the server rebuilds after a change, the page must say so and show no
+  earlier data.
+- SRV-05. Only the page the command opened must be able to read the project:
+  CONTRACT-005 M's rules against other web pages, other local ports, other users
+  of the computer, and malformed, oversize, or slow requests must hold, and what
+  they do not defend against must be stated.
+- SRV-06. The server must listen on the loopback address only, make no outbound
+  request, let no request name a file, and stop when interrupted or after an
+  hour without use.
+- SRV-07. The installed plugin must run it with no further package or download
+  beyond the pinned runtime.
 
 ### Non-Functional Requirements
 
@@ -194,8 +224,9 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   report 0 violations; keyboard and screen-reader behavior is checked by hand.
 - **Accessibility alternatives**: 100% of page images have a text alternative.
   Every node and link in the graph view is also reachable as text.
-- **Security**: 0 network requests while viewing; 0 executed scripts from a
-  seeded hostile record.
+- **Security**: 0 network requests while viewing the offline file, and 0 to any
+  other host while viewing the served page; 0 executed scripts from a seeded
+  hostile record.
 - **Verification**: At least one core flow runs in a real browser against the
   built bundle opened from a local file.
 - **Scale** (assumption, pending the product owner): On a synthetic graph of
@@ -212,6 +243,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 - [US-094 — Open the explorer as a local browser bundle](../user-stories/US-094-open-explorer-from-local-file.md)
 - [US-116 — See a citation in its source](../user-stories/US-116-see-a-citation-in-its-source.md)
 - [US-118 — Read the report and open its sources](../user-stories/US-118-read-the-report-and-open-its-sources.md)
+- [US-119 — Browse through the local server](../user-stories/US-119-browse-through-the-local-server.md)
 
 ## Edge Cases and Error Handling
 
@@ -223,7 +255,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   isolated from its neighbours and such characters are shown visibly.
 - **Stale explorer data**: When records changed after the explorer data was
   generated and the explorer can tell, it says so; otherwise it shows when the
-  data was generated.
+  data was generated. The served explorer can tell (SRV-04).
 - **One sentence with several claims, or one claim in several sentences**: Every
   link is reachable.
 - **Sentence split across lines, pages, or a footnote**: Each part leads to the
@@ -237,16 +269,17 @@ N/A — requirement verification covers this feature.
 ## Constraints and Assumptions
 
 - Delivery step M3. M1 and M2 do not depend on the explorer.
-- ADR-008 governs the arras contribution and the bundle; its override of the
-  `react-vite` concern removes backend routes and server routing. Explorer
+- ADR-008 governs the arras contribution and the bundle; ADR-012 adds the local
+  server. ADR-008's override of the `react-vite` concern removes backend routes
+  and server routing. Explorer
   styling uses Tailwind alongside arras styles, per the HELIX React guideline.
 - The `typesetting-fidelity` concern pins Typst, citeproc-js, fonts, and
   packages for print and preview.
 - **Risk**: arras may not accept the larger view, or may take longer than
   planned; the explorer's schedule depends on it.
 - The preview reads the manuscript Markdown of CONTRACT-006 (ADR-009).
-- Edits reach the explorer only through a rebuild and reload (ADR-008). Until
-  then an open page shows earlier text, so it shows when its data was built.
+- Edits reach the offline explorer only through a rebuild and reload (ADR-008);
+  the served explorer rebuilds itself (SRV-04). Until then an open page shows earlier text, so it shows when its data was built.
 - **Risk, not spiked**: Browser Typst compilation was not tried. Research read
   that the compiler is large, that its packaged release lagged the native Typst
   version, and that host or arras security policies may block it. The PRD asks
@@ -273,7 +306,8 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
-- Opening or highlighting an original or page image, and a localhost server.
+- Opening or highlighting an original or page image, search beyond the arras
+  limits, and an MCP surface: later stages of ADR-012, not yet specified.
 - Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).
 - Reviewer package contents and removal rules (FEAT-009).

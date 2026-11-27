@@ -12,6 +12,7 @@ ddx:
     - stemma.threat-model
     - stemma.adr-003
     - stemma.adr-007
+    - stemma.adr-012
 ---
 
 # Security Architecture
@@ -71,6 +72,7 @@ Boundary IDs match the [threat model](../01-frame/threat-model.md).
 | B6 To reviewer or host | Source text, positions | Recipient gets everything in the files | Audience filtering before writing, redaction, scan |
 | B7 Tools and releases | Machine | Third-party code runs with author's rights | Pins, digests, lockfile, no runtime download, release audit |
 | B8 Collaborator input | Records, rules, agent behavior | Others' text becomes project content | Validation; comment import writes only comment records. `rules.md` is followed by the agent, so the author reviews changes to it |
+| B9 Requests to the local server | Everything an author export holds | Any web page, local program, or local user can send a request to a loopback port | CONTRACT-005 M: loopback only, exact Host and Origin, a per-run secret got by a one-time code, no cookie and no cross-origin permission, bounded requests, fixed routes |
 
 ## Control Mapping
 
@@ -95,12 +97,16 @@ Verification names the SEC criterion that tests the control.
 | TM-T-005, TM-T-004, TM-D-003 | Derived data is never authoritative; validate on read; digest verification | `core`, `graph`, `records` | SEC-004, SEC-008 |
 | TM-T-007, TM-E-007, TM-S-004, TM-R-004 | Pinned and recorded tools, lockfile, digests, controlled install scripts, identified release package, release audit and secret scan | Release and bundle scripts | SEC-025 to SEC-028 |
 | TM-I-013 | Synthetic or open fixtures; secret scan | Repository | SEC-029, SEC-026 |
+| TM-I-016, TM-I-017, TM-S-008 | CONTRACT-005 M rules 2 to 7, 9, 11 | `server`, `explorer` | SEC-034 |
+| TM-I-018 | Launch file in a private directory; nothing in arguments or output | `server`, `cli` | SEC-035 |
+| TM-D-010, TM-E-008 | CONTRACT-005 M rules 1, 10, 12; fixed routes | `server` | SEC-036 |
 
 TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
 
 ## Identity and Access
 
-- Authentication: none. Stemma has no accounts. An actor in a record is a
+- Authentication: none for people. Stemma has no accounts. The local server
+  accepts a request only with the secret of its own run (CONTRACT-005 M). An actor in a record is a
   self-asserted label. Host, model, git, and hosting sign-ins belong to those
   services.
 - Authorization: the operating system and the agent host decide access. Role
@@ -108,8 +114,11 @@ TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
   review marks, annotations, confirmations, and verdict handling by instruction.
   `annotate`
   cannot tell who ran it, and a host permission prompt adds no assurance.
-- Session or token handling: not applicable. No design stores a token or API
-  key. A resolver that needs one requires a new design decision.
+- Session or token handling: the local server makes a new secret at each start
+  and gives it once, for a one-time code, to the page, which keeps it in
+  `sessionStorage`. Stemma writes it to no file; the code is only in the private
+  launch file. No design stores an API key. A resolver that needs one requires a
+  new design decision.
 
 ## Data Protection
 
@@ -124,6 +133,10 @@ TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
 | Index, reports, builds, exports | `.stemma/`, `build/` | Ignored by git; may copy source text |
 
 - Data in transit:
+  - Local server: plain HTTP over the loopback interface, which does not leave
+    the computer. Reading loopback traffic needs administrator rights, which this
+    design does not defend against. The served data is everything an author
+    export holds, with no size cap.
   - Hosted model: the host's transport. The data is what the threat model lists
     for B3; `excerpt` and `support prepare` bound only their own output.
   - Resolvers: HTTPS (architecture, Level 1). Requests disclose identifiers and
@@ -187,6 +200,10 @@ Accepted by owner decision:
 
 Remaining by design limits:
 
+- The local server does not defend against a process running as the author, a
+  browser extension with access to the page, or an administrator. Another local
+  user can use up its connections. The other limits are in CONTRACT-005 M.
+
 - Prompt injection is not contained. A steered agent has whatever the host
   allows, including the restricted store and files unrelated to Stemma.
 - Package scans find verbatim text only. Paraphrase, altered copies, text inside
@@ -215,4 +232,5 @@ the system they ran on; none is required to continue.
 | Typst escape, outside-file read, unvendored package, hostile EPS | SEC-010, SEC-012 | M1 basic build; EPS M2 |
 | Browser: hostile strings and SVG, network denied | SEC-011, SEC-023 | M3 |
 | Seeded long source text in every package part | SEC-017, SEC-018 | M3 |
+| Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files | SEC-034 to SEC-036 | With the server |
 | Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

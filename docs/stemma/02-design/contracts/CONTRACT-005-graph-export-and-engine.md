@@ -10,6 +10,7 @@ ddx:
     - stemma.adr-002
     - stemma.adr-006
     - stemma.adr-008
+    - stemma.adr-012
     - CONTRACT-001
 ---
 
@@ -18,20 +19,20 @@ ddx:
 **Contract ID**: CONTRACT-005
 **Type**: library and file formats
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-002, ADR-006, ADR-008, FR-46, FR-62 to FR-68, FR-76
+**Related**: ADR-002, ADR-006, ADR-008, ADR-012, FR-46, FR-62 to FR-68, FR-76
 
 ## Purpose
 
 Defines the graph files generated from record files, how arras (the
-DocumentDrivenDX graph application) reads them in a browser with no server
-application, and the query interface shared by the disposable index and the
-later graph engine.
+DocumentDrivenDX graph application) reads them in a browser, from an offline
+file or from Stemma's server on the author's computer (ADR-012), and the query
+interface shared by the disposable index and the later graph engine.
 
 ## Scope and Boundaries
 
 - In scope: export files, audiences, mapping, freshness, rebuilding,
-  the reviewer comment file, the `GraphStore` port, arras compatibility, and
-  upstream needs.
+  the reviewer comment file, the `GraphStore` port, arras compatibility,
+  upstream needs, and the local server's HTTP surface.
 - Out of scope: explorer screens, map layouts, typeset-page linking, index
   tables (Data Design).
 - Owning module: `packages/graph`.
@@ -119,6 +120,10 @@ application, database, or write path.
 |---|---|---|
 | Hosted or locally served | The page fetches `arras-static.json` and the two files | Any static file host that answers `GET` and `HEAD` |
 | Single offline file | The page and both texts are built into one HTML file | Opens from the local file system with no network request; required for the reviewer package (FR-46) |
+| Local server (`browse`, M) | A server on the author's computer answers the page's reads from data it holds in memory | Listens on the loopback address only, under the rules of M; the author's own export, never a reviewer package |
+
+The statements below about a single page, its policy, and reloading after an edit
+are about the offline file. The served page follows M.
 
 **The Stemma host page.** The plugin ships a page template, built with Stemma
 from the host, arras, React, and their styles, with the licenses of that code.
@@ -335,6 +340,9 @@ Stemma MUST NOT keep a private fork of the arras connected-graph view.
 
 ### H. `GraphStore` port
 
+The local server (M) does not implement this port and builds no index: it runs
+arras's own static loader and executor over an export held in memory.
+
 The disposable index (M1) and the graph engine (FR-63, P1) implement the same
 read interface, so features do not change at the switch.
 
@@ -366,8 +374,10 @@ Writes and wider server compatibility, including the arras Python backend
 contract (reads as Weft SQL; Weft is the family query compiler) and provider actions, come later and need a further surface in this contract.
 
 Transport (assumption): the first engine is a library called in process behind
-`GraphStore` and the `ArrasClient` read calls. It opens no network listener, and
-this version defines no HTTP surface.
+`GraphStore` and the `ArrasClient` read calls, and it opens no network listener
+of its own. It is not built. The one HTTP surface this version defines is the
+local server's (M), which uses arras's static executor and not this engine; when
+the engine is built, it may take the executor's place behind the same surface.
 
 ### J. Derived view data
 
@@ -408,8 +418,8 @@ record with no state is not shown to be clear.
 A **source view** (`stemma.sourceview/0`) answers one question about one ID: a
 citation record, a passage record, or a quotation of an assembled report
 (CONTRACT-006 I). `core` makes it from the corpus alone. It holds no time,
-machine value, local path, or fact about which originals are on a machine. A
-later server returns the same object. A page reads it and computes no state,
+machine value, local path, or fact about which originals are on a machine. The
+local server (M) returns the same object, made with no size cap. A page reads it and computes no state,
 offset, or filtering of its own.
 
 | Field | In | Holds |
@@ -584,6 +594,136 @@ highlights nothing and lists its places. On a narrow screen the pane lies over
 the lower part of the window and can be closed. The content security policy (D)
 is unchanged and the page sends no request.
 
+### M. The local server
+
+`browse` (CONTRACT-002 B; ADR-012) serves the explorer to a browser on the same
+computer. It serves the `author` audience only. This version has no search beyond
+the limits of G, opens no original, and has no MCP surface.
+
+**What is served.** The author export of B, E, F, J, K, and L, made in memory
+from the record files by the same functions, with no size cap on source views or
+the manuscript view, so no view is `not_exported` and no
+`source_views_cut` warning is given. The `large_graph` warning is left out: the
+served page does not load the graph. All other omissions and warnings are the
+export's. arras's pinned static loader loads the module and graph in the server,
+and its static client answers the reads. The page's `ArrasClient` forwards each
+read; for `moduleQuery` it sends the module name, query text, and variables
+unchanged, and gives arras the answer unchanged. The page folds search text
+before that, as the offline page does. Nothing is written in the project, no
+index is built, and `GraphStore` (H) is not implemented. An export directory is
+neither read nor written.
+
+**Processes.** The command holds the listener and the rules below. A child of it
+holds one built snapshot and answers from it, so that the command can answer
+while a rebuild runs. The child gets no secret and opens no listener. It ends
+when the command ends.
+
+**Surface.** Every request line outside this table is refused. The path is
+compared as the HTTP library gives it, whole; no query string is accepted; no
+part of a request names or reaches a file, since the three assets are held in
+memory.
+
+| Method and path | Body | Answer |
+|---|---|---|
+| `GET /`, `GET /app.js`, `GET /app.css` | none | The page shell, script, and styles. They hold no project data |
+| `POST /api/session` | `{"code"}` | `{"secret"}`, once |
+| `POST /api/status` | `{}` | `{"state": "current" \| "rebuilding" \| "failed", "data_identity"?, "message"?}` |
+| `POST /api/boot` | `{}` | Banner data and the manuscript view's state |
+| `POST /api/arras` | `{"call"}` with `call` one of `version`, `viewer`, `meta`, `status`, `schemaCatalog`; or `{"call": "export", "request"}` | What arras's static client answers |
+| `POST /api/query` | `{"module", "query", "variables"?}` | What arras's `moduleQuery` answers, or its refusal |
+| `POST /api/source-view` | `{"id"}` | The source view of that citation or passage, or none. The ID is only looked up in the snapshot |
+| `POST /api/manuscript` | `{}` | The manuscript view |
+
+Each answer made from the snapshot is `{"data_identity", "result"}`. A refusal
+is `{"error": {"code", "message"}}` with an HTTP status, and holds no value taken
+from the request. No call writes anything; arras's write, journal, and SQL calls
+are refused in the page as the static profile refuses them.
+
+**Rules.** Each is tested.
+
+1. The listener is bound to `127.0.0.1` only, on a port the system picks.
+2. Every request must carry `Host` exactly `127.0.0.1:<port>`; `localhost`, any
+   other name, address, or port, or no `Host`, is refused. This stops DNS
+   rebinding.
+3. Every `POST` must carry `Origin` exactly `http://127.0.0.1:<port>`. A `GET`
+   that carries an `Origin` must carry that one.
+4. No answer carries a cross-origin permission header, and `OPTIONS` and every
+   method other than `GET` and `POST` are refused, so a preflight fails.
+5. Every `POST` must carry `Content-Type` exactly `application/json` and the
+   header `X-Stemma-Request: 1`.
+6. Every `/api/` call but `session` must carry the run's secret in
+   `X-Stemma-Secret`. The secret is 256 random bits made at each start and is
+   compared in constant time. No cookie is set or read, since cookies are shared
+   between ports.
+7. The page gets the secret only by sending a one-time code (256 random bits) to
+   `session`. The code is accepted once, within 10 minutes of the start; after
+   that it is refused. A wrong code uses nothing up.
+8. The code reaches the browser in a file the command writes in a new directory
+   of the system's temporary directory (directory mode 700, file mode 600). The
+   file sends the browser to the server's address with the code in the fragment,
+   which is sent in no request. The command opens the browser on that file, or
+   prints the file's path for the author to open. So neither code nor secret is
+   in a process argument, standard output, standard error, or a log; the server
+   keeps no request log. The file is removed when the code is used or expires,
+   and when the command ends. The secret is written to no file by Stemma.
+9. The page removes the code from its address at once, keeps the secret in
+   `sessionStorage` only, and sends it only as the header. When it cannot reach
+   the server it drops the secret and shows nothing it loaded.
+10. A request's headers may take at most 16 KiB and its body at most 64 KiB; a
+    request must arrive whole within 10 seconds of its connection; at most 64
+    connections are open at once, and each carries one request.
+11. Every answer carries `X-Content-Type-Options: nosniff`,
+    `Referrer-Policy: no-referrer`, `Cache-Control: no-store`,
+    `Cross-Origin-Resource-Policy: same-origin`,
+    `Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY`, and the
+    content security policy `default-src 'none'; script-src 'self'; worker-src
+    'self'; style-src 'self'; img-src 'self' data:; connect-src 'self';
+    frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action
+    'none'`. The served page is its own template: its script and styles are
+    separate files, with none inline.
+12. The server and its child make no outbound request.
+
+**Freshness.** Data older than the record files is never presented as current.
+
+- The inputs are those of the data identity (J) and the export: `stemma.json`,
+  `rules.md`, and every file under `records/`, `sources/`, `manuscript/`,
+  `research/`, and `report/`.
+- Before it answers any `/api/` call but `session`, the server makes a stat scan
+  of the inputs (name, kind, size, inode, and modification and change times, to
+  the nanosecond where the system keeps it) that started after the request
+  arrived. Calls waiting together share one scan.
+- While the scan finds nothing changed, the answer is from the current snapshot.
+- When it finds a change, every call but `status` is refused with
+  `index_stale` (503) until a snapshot of the new files is current. The child
+  recomputes the data identity. When it is unchanged (and the research files are
+  the same set), the snapshot is kept. Otherwise a new child builds the whole
+  export again.
+- The scan a snapshot is compared with is the one made before its files were
+  read, so a change during a build leads to another build.
+- A build that fails leaves state `failed` with what is wrong; nothing is served
+  from the earlier snapshot, and the next change to the inputs starts another
+  build. A start whose first build fails ends the command.
+- The page asks for `status` every 2 seconds. When the state is not `current`,
+  or the data identity differs from what it loaded, it takes down what it shows
+  and says that the records changed and are being read again; when current again
+  it loads afresh at the same route.
+
+**Lifetime.** The command runs until it is interrupted or terminated, or 60
+minutes (`--idle-minutes`) pass with no accepted call. An open page keeps it
+running. It then removes the launch file and ends its child.
+
+**What this does not defend against.** A process that runs as the author can read
+the launch file, the browser's storage, and either process's memory, as it can
+already read the project. A browser extension allowed on the page reads what the
+page shows. Another user of the computer can connect to the port and use up
+connections; without the secret it reads nothing. The page notices a stopped
+server at its next call, so for up to its polling interval an open page can show
+what it last loaded; if another program took the same port within that
+interval, the page would send it the ended run's secret and believe its answers.
+Two writes to one input within the file system's time resolution that keep its
+size can pass the scan unseen. On Windows the file modes of rule 8 are not
+applied, and the temporary directory's own permissions are all that guard it.
+
 ## Precedence and Compatibility
 
 - Versioning: the manifest schema, mapping, and port share this contract's
@@ -618,6 +758,10 @@ is unchanged and the page sends no request.
 | `--audience reviewer` or `--chapter` in this version | Exit 2, not implemented: a partial filter could disclose withheld text | no | None yet |
 | Graph beyond the measured size | Export succeeds with a warning and the counts | yes | Scope by chapter |
 | Browser refuses to load | The page names the failing file or record | no | Re-export; report |
+| A served request breaks a rule of M | Refused with a status and code; nothing is read from the snapshot | no | Open the page from `browse` |
+| The inputs changed (M) | `index_stale` until rebuilt; the page says so | yes | Wait; the page loads again |
+| A rebuild fails (M) | State `failed` with what is wrong; no earlier data is served | after a change | Fix the project; run `check` |
+| The one-time code was already used or has expired (M) | The page says so and shows nothing | no | Stop `browse` and run it again |
 
 ## Examples
 

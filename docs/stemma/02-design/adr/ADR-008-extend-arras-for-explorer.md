@@ -26,6 +26,11 @@ committed to the repository, and is rebuilt when needed. After an edit the agent
 rebuilds the offline preview and the author reloads it; the reloaded page
 compiles Typst in the browser.
 
+**Amended by ADR-012**: the explorer may also be served by a server on the
+author's own computer. The bundle that needs no backend stays, unchanged, for
+reviewer packages and for use without the server. The statements here about an
+open preview not following edits are about that bundle.
+
 ## Why We Chose This
 
 ### Over a Stemma-only graph canvas

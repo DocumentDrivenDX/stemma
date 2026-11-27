@@ -11,6 +11,7 @@ ddx:
     - stemma.adr-005
     - stemma.adr-006
     - stemma.adr-008
+    - stemma.adr-012
     - CONTRACT-005
     - CONTRACT-006
     - CONTRACT-002
@@ -56,6 +57,7 @@ ddx:
 | BRW-01, BRW-02, BRW-06 (FR-76) | TypeScript bundle; single offline file; generated and untracked | `explorer`, `graph` | P0 |
 | BRW-03, BRW-04 (FR-76) | No network; record text rendered as text | host page | P0 |
 | BRW-05 (FR-76) | Page built only from the data it is given | `graph`, `explorer` | P0 |
+| SRV-01 to SRV-07 (FR-64; FR-61) | A loopback server over arras's static executor, with a stat scan and rebuild | `server`, `graph`, `explorer`, `cli` | P0 |
 
 ### NFR Impact on Architecture
 
@@ -124,6 +126,8 @@ defined by CONTRACT-006 D.
 - **BR-1210** — The connected view ships only from an arras release. It states omissions, opens a record from a node, and has a text list of its nodes and links.
 - **BR-1211** — The reviewer page offers comments on claims, saves them as one CONTRACT-005 E2 file, and says that unsaved or unexported comments can be lost.
 - **BR-1213** — Source text is highlighted only as CONTRACT-005 K allows. The page highlights only what a view cut as `quoted`, only when every view involved says `highlighted`, and never a view loaded for another record.
+- **BR-1215** — The served page shows only answers that carry the data identity it loaded. On any other answer, a state other than current, or a failed call, it takes down what it shows (CONTRACT-005 M).
+- **BR-1216** — The server passes nothing of a request to the file system, and writes no request, code, or secret anywhere.
 - **BR-1214** — A manuscript link or highlight comes only from the report builder's own data (CONTRACT-005 L): its segments, its note citations, and the formatter's entry IDs. Nothing is found by matching text. A quotation the builder refuses shows no text and no highlight.
 - **BR-1212** — Built pages are optional (`built_pages[]`, CONTRACT-005 J): an author export includes them only when a native build exists for the same manuscript inputs. They are a linked rendering made apart from the print PDF, labelled Built with the build identity and watermark state. Otherwise the Built view is unavailable. Built pages never stand in for browser compilation.
 
@@ -176,6 +180,14 @@ partly met.
 - **Requirements Addressed**: MAN-01 to MAN-07.
 - **Interfaces**: CONTRACT-005 L; routes `#/manuscript`, `#/manuscript/quotation/<id>`, `#/manuscript/citation/<note>/<index>`, and `#/manuscript/source/<source id>`. The record browser is not mounted while the manuscript is shown, so arras routing is untouched. A later server serves the same view.
 - **Not built**: a Stemma manuscript copy, originals, and the printed PDF.
+
+### Component: Local server (`server`, `graph`, `explorer`, `cli`)
+
+- **Purpose**: The explorer served on the author's computer, whole and current.
+- **Responsibilities**: `server` owns the HTTP rules of CONTRACT-005 M, the launch file and browser opener, the use of the input scan, and the rebuild states; it knows nothing of records. `workspace` makes the stat scan, listing the inputs as `readProject` does. `graph` makes the served data with the export's own function, with no size cap and no page. A child process, composed in `cli`, builds it, loads it into arras's static loader, and answers with arras's static client. `explorer` has a second entry for the served page: it gets the secret, forwards the `ArrasClient` reads, asks for source and manuscript views when shown, and polls for changes. BR-1215, BR-1216.
+- **Requirements Addressed**: SRV-01 to SRV-07.
+- **Interfaces**: CONTRACT-005 M; `stemma.sourceview/0` and `stemma.manuscript/0` unchanged. The record browser, source panel, and manuscript view are the offline page's components.
+- **Not built**: search beyond the arras limits, originals, MCP, and a SQLite index (`GraphStore`).
 
 ### Component: Connected view (arras contribution)
 
@@ -259,6 +271,7 @@ encoding, and its packaged release used an older Typst than the pinned 0.15.1.
 | BRW-01, BRW-02 | Bundle | Single file | Source inspection; local-file flow with network off |
 | BRW-03, BRW-04 | Host page | BR-1209 | Request monitor; hostile record and comment fixtures |
 | BRW-05 | Preview data | BR-1201 | Filtered input; seeded absent source not found in the file |
+| SRV-01 to SRV-07 | Local server | CONTRACT-005 M, BR-1215, BR-1216 | One refusal test per rule; sockets; output, argument, and file search; same answers as in process; edit while open; browser flow; plugin check |
 | BRW-06 | Export | CONTRACT-005 C | Fresh clone rebuild; git status clean |
 
 ### Experience Traceability
@@ -288,10 +301,11 @@ FEAT-012 has no Task Model; task names come from the UF-012 journeys.
 - **Constraints honored**: Tests and axe-core run locally and on release tags, advisory (ADR-007).
 - **ADRs referenced**: ADR-005, ADR-006, ADR-008, ADR-009.
 - **Departures**: None.
+- **ADR-012** adds the local server.
 
 ## Constraints & Assumptions
 
-- **Constraints**: No backend. Anyone with a file sees everything in it. Writes are refused; edits go to records.
+- **Constraints**: The offline page has no backend; the served page has only the local server. Anyone with a file sees everything in it. Writes are refused; edits go to records.
 - **Assumptions**: The arras browser accepts a Stemma host page and external routing; the compiler can run from one local file under a policy that still denies network connections. If either is false, the design must change.
 - **Dependencies**: arras 0.8.1 or a later pinned release, citeproc-js (license review open), a browser Typst compiler, SD-008, SD-011.
 

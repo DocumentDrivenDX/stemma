@@ -71,7 +71,8 @@ reviewed content changes. No language model produces or corrects source text.
 
 Stemma runs on the author's computer: a plugin skill that an agent host loads, a
 command line on Bun, a project directory of record files, and, from M3 (the
-third delivery step), a browser explorer. There is no Stemma server, account, or
+third delivery step), a browser explorer, which a local server on the author's
+computer can also serve (ADR-012). There is no hosted Stemma server, account, or
 database of record. The drivers are the PRD's M1 pilot (checks and takeover),
 M2 (new project to typeset PDF), and M3 (explorer and maps). Basic PDF
 typesetting is part of the M1 pilot: a watermarked draft or an unwatermarked basic
@@ -143,9 +144,12 @@ graph TB
 The knowledge graph lives in the author's repository as canonical record files
 (ADR-002). The browser never reads or writes them directly. `graph export`
 projects them into an arras module and graph file, filtered for an audience. In
-the page, arras's static client holds both in memory and answers every read, so
-no server application runs. A static file host can serve the page, or Stemma
-builds one offline HTML file with the data inlined. The export is derived
+the offline page, arras's static client holds both in memory and answers every
+read, so no server application runs. A static file host can serve the page, or
+Stemma builds one offline HTML file with the data inlined. `browse` instead
+holds both in a process on the author's computer, where the same arras client
+answers the reads that the page forwards over the loopback interface (ADR-012,
+CONTRACT-005 M). The export is derived
 (ADR-006). It is never committed: a fresh clone rebuilds it with
 `graph export --audience author --page` before browsing (CONTRACT-005 C). A page
 cannot see edits made after it loads, so the reliable update
@@ -179,6 +183,7 @@ Paths below are Bun workspace packages.
 | `packages/cite` | CSL-JSON projection, citeproc-js, citation Typst output | `CitationFormatter` | `records`, `manuscript`, `core`, citeproc-js | Other adapters; Bun-only APIs |
 | `packages/publish` | Markdown-to-Typst conversion, build orchestration, Typst process, reviewer package, which applies `core` redaction and runs the package scan | `Typesetter`, `Packager` | `records`, `manuscript`, `core`; `cite` and `graph` only through core ports | Direct citeproc-js import |
 | `packages/graph` | `GraphStore` implementations (disposable index now, engine later), arras export | CONTRACT-005 | `records`, `core`, `bun:sqlite` in its index code | Other adapters; writing record files |
+| `packages/server` | The local explorer server: HTTP rules, one-time code and secret, launch file, rebuild states (CONTRACT-005 M) | The `browse` server and the snapshot protocol | Bun and Node APIs, arras static client | Reading or writing records; outbound network |
 | `packages/cli` | Argument parsing, environment, output, composition root | CONTRACT-002 commands | All packages above | `explorer` |
 | `packages/explorer` | Browser application and host page | Built bundle | Browser-safe exports of `records`, `core` operations, `manuscript`, `cite`, and the pure Typst conversion in `publish/convert`; graph export types, React, arras UI | `workspace`, `extract`, `intake`, the rest of `publish`, `cli`; any Bun or Node API |
 | `skills/stemma` | Skill and mode instructions | CONTRACT-004 | The command line only | Importing or editing package code |
@@ -219,7 +224,7 @@ the contracts.
 skills/stemma/           SKILL.md, modes/, prompts/support/
 templates/               files copied into a new project
 dist/stemma.js           bundled command line, built from packages/; not committed, shipped in tagged release trees
-packages/{records,manuscript,core,workspace,extract,intake,cite,publish,graph,cli,explorer}/
+packages/{records,manuscript,core,workspace,extract,intake,cite,publish,graph,server,cli,explorer}/
 fixtures/                synthetic or openly licensed test material, seeded errors
 scripts/                 check, boundary, bundle, install-test scripts in TypeScript
 docs/stemma/             HELIX documents
@@ -331,7 +336,7 @@ format, or command depends on a particular model.
 
 | Decision | Status | Rationale | Follow-up |
 |----------|--------|-----------|-----------|
-| ADR-001 to ADR-011 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy; source files in the repository; shared manuscript editing with docsync | Their stated assumptions |
+| ADR-001 to ADR-012 | As each ADR states | Separate repository; plain records; reporting without blocking; Bun; Typst and citeproc-js; arras-compatible engine; local-first tests; arras graph view; Markdown manuscript copy; source files in the repository; shared manuscript editing with docsync; a local explorer server | Their stated assumptions |
 | Architecture style: hexagonal, ports and adapters (HELIX `hexagonal-architecture`) | Decided by the product owner; fills the `architecture-style` slot | One core is driven by the command line and tests and drives parts that are undecided or will change: the index, extraction, recognition, manuscript form, and citation formatting. `classic-layered` would let checks depend on files and SQLite directly; onion and clean styles add layers no requirement needs. Core rules (`records`, `manuscript`, `core`) are independent of applications, databases, and file tools | Boundary check |
 | Checks are pure over ports | Proposed | Repeatable tests and one result path for agent, build, and terminal | none |
 | Publish the built, unminified release tree as `plugins/stemma` in the DocumentDrivenDX/plugins marketplace repository | Decided by the product owner; SD-010 | No built file in the Stemma repository. Trade-off: a second publishing surface; unobserved in Claude desktop | Desktop install check |

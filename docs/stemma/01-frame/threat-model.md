@@ -19,7 +19,8 @@ ddx:
 ## Executive Summary
 
 **System Overview**: a plugin skill, a command line, plain record files in git,
-a restricted coordinate store, a Typst build, and an offline browser explorer, all run by
+a restricted coordinate store, a Typst build, a browser explorer (an offline file,
+or served on the loopback address by a local server, ADR-012), all run by
 one author with an AI agent.
 **Key Assets**: the author's machine; the captured source texts and unpublished material;
 restricted site positions; the integrity of citation evidence; the release
@@ -56,6 +57,7 @@ host, any static host the author chooses, and the publisher.
 | B6 | Project to reviewer, static host, or publisher |
 | B7 | Publisher of tools and releases to the author's machine |
 | B8 | Another person's changes into the project (clone, merge, comment file) |
+| B9 | Anything that can reach the local server's port (another web page in the author's browser, another local program or user) to the project's text |
 
 ### Components
 
@@ -72,6 +74,7 @@ host, any static host the author chooses, and the publisher.
 | C9 Build | Citation formatting, image conversion, Typst, packaging | Processes untrusted content |
 | C10 Explorer and exports | Graph export, offline page, reviewer package, comment file | Leaves the machine |
 | C11 Distribution and toolchain | Plugin, release package, Bun, Typst, libraries, fonts | Runs with the author's rights |
+| C12 Local server | `browse`: a loopback HTTP listener and a child process holding the author export | Trusted code; every request untrusted until it passes CONTRACT-005 M |
 
 ### Data Flows
 
@@ -142,6 +145,7 @@ modules, or the product owner for accepted risks.
 | C9 | n4 | TM-T-006 | TM-R-003 | TM-I-004, 006 | TM-D-007 | TM-E-004, 005 |
 | C10 | TM-S-005 | TM-T-008 | TM-R-003 | TM-I-006 to 008, 012 | TM-D-004 | TM-E-006 |
 | C11 | TM-S-004 | TM-T-007, 009 | TM-R-004 | TM-I-013 | TM-D-006 | TM-E-007 |
+| C12 | TM-S-008 | n5 | n1 | TM-I-016 to 018 | TM-D-010 | TM-E-008 |
 
 - n1: no separate actions or identities of its own; attribution falls under
   TM-R-001.
@@ -151,6 +155,7 @@ modules, or the product owner for accepted risks.
   that reads it.
 - n4: no identity is presented to or by this component; forged content counts as
   tampering.
+- n5: it writes nothing in the project and has no write call.
 
 ### Spoofing
 
@@ -163,6 +168,7 @@ modules, or the product owner for accepted risks.
 | TM-S-005 | A comment file claims another reviewer or package; a made-up package is shown as Stemma-checked | 2 | 2 | 4 | `core`, `publish` | SEC-002; CONTRACT-005 E2 |
 | TM-S-006 | `rules.md`, agent instruction files, or manuscript text from a shared project are followed as the author's rules | 4 | 2 | 8 | Author; `skills/stemma` | SEC-009; rules cannot relax the contract in text only |
 | TM-S-007 | A wrong or spoofed resolver or search response is saved as authoritative metadata | 2 | 1 | 2 | `workspace` | SEC-008; saved with source and date |
+| TM-S-008 | Another local user: after the server stops, a program takes the same port, and a still-open page sends it the ended secret or believes its answers | 2 | 1 | 2 | `server`, `explorer` | The page drops the secret and its data when a call fails; the ended secret opens nothing. A takeover within one polling interval is not detected |
 
 ### Tampering
 
@@ -211,6 +217,9 @@ modules, or the product owner for accepted risks.
 | TM-I-013 | Private sources, personal data, or secrets enter the public Stemma repository or a release | 4 | 2 | 8 | Release maintainer | SEC-026, SEC-029 |
 | TM-I-014 | Preserved legacy fields or file names carry local paths, private annotations, or names into committed records | 3 | 4 | 12 | `intake` | None; lossless import keeps them. Exports omit `legacy` |
 | TM-I-015 | The index and saved reports copy source text; sharing the working folder shares them | 3 | 2 | 6 | Author | SEC-019 |
+| TM-I-016 | Hostile web page in the author's browser reads the local server: a cross-origin fetch or form post, DNS rebinding to 127.0.0.1, framing, or guessing paths | 4 | 3 | 12 | `server` | SEC-034, SEC-036: exact Host and Origin, no cross-origin permission, JSON and custom header, secret header, no cookie, framing refused |
+| TM-I-017 | Another local port: a page or program on another loopback port reaches the server, or receives its cookie or secret | 4 | 2 | 8 | `server`, `explorer` | SEC-034: origin includes the port; no cookie (cookies are shared between ports); the secret is in per-origin session storage |
+| TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested |
 
 ### Denial of Service
 
@@ -225,6 +234,7 @@ modules, or the product owner for accepted risks.
 | TM-D-007 | Pathological content stalls citation formatting or Typst | 2 | 2 | 4 | `publish` | None specific |
 | TM-D-008 | Injected or oversized text makes the agent loop, spend, or stop | 2 | 2 | 4 | Author | Bounded excerpts |
 | TM-D-009 | The index is corrupt or stale | 1 | 2 | 2 | `graph` | Rebuilt from records |
+| TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds. Another user can still use up the connection limit while it connects; the author loses browsing, not data |
 
 ### Elevation of Privilege
 
@@ -237,6 +247,7 @@ modules, or the product owner for accepted risks.
 | TM-E-005 | Content becomes Typst code, reads files, or pulls a package | 4 | 2 | 8 | `publish` | SEC-010 |
 | TM-E-006 | Record, comment, resolver, or SVG content runs script in the explorer, including by breaking out of inlined data. In-browser Typst may need a looser policy | 4 | 3 | 12 | `explorer` | SEC-011 |
 | TM-E-007 | A malicious dependency, install script, or update runs with the author's rights | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
+| TM-E-008 | A crafted request reads a file outside the served set or makes the local server run something | 5 | 1 | 5 | `server` | SEC-036: fixed routes, assets held in memory, a record ID only looked up in the snapshot; arras runs queries over memory only |
 
 ## Risk Assessment
 
@@ -311,6 +322,22 @@ TM-E-004, TM-E-006, TM-E-007.
   author's backups. Removing material from git history or from recipients is
   manual, and material sent to a model cannot be recalled by Stemma.
 
+## Local server stages not yet built
+
+ADR-012's later stages add threats that are analysed here before they are built
+and have no control yet:
+
+- **Hostile PDF** (originals shown in the page): an original is a file from
+  outside that a PDF reader in the browser would parse. The plan is to serve only
+  files whose digest a source text records, as inert attachments, and to render
+  them with the pinned pdf.js with evaluation, scripting, and XFA off and links
+  inert; never the browser's own viewer. No original is opened now.
+- **Injection through MCP** (an MCP surface): record and source text returned to
+  an agent can pose as instructions (TM-S-001, TM-E-001), and a tool argument
+  can try to name an address or a file. The plan is read-only tools, results
+  marked as quoted data and bounded, record IDs only, and no tool that takes a
+  path or address. There is no MCP surface now.
+
 ## Assumptions and Dependencies
 
 - Attackers are authors of files, web pages, libraries, or upstream packages, and
@@ -318,7 +345,8 @@ TM-E-004, TM-E-006, TM-E-007.
   scope.
 - The author is not an attacker, but can make mistakes.
 - Host, model provider, git host, and tool publishers are external dependencies.
-- No control is built or tested. Linux, Windows, and desktop apps are untested.
+- Other than the local server's request rules and the local tests the security
+  architecture names, no control is built or tested. Linux, Windows, and desktop apps are untested.
   Linux is a target for the local tools only; no desktop-app integration is
   promised there in v1.
 

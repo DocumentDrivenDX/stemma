@@ -20,8 +20,9 @@ ddx:
 
 Stemma runs on the author's computer: a skill in an agent host, a command line, a
 project of plain files that holds the full text of its sources, a restricted
-store for coordinates, and static browser outputs. It has no server, account, or
-hosted database. Anyone who can read the project repository can read its source
+store for coordinates, static browser outputs, and, when the author asks to
+browse, a server that listens on the same computer's loopback address only
+(ADR-012). It has no hosted server, account, or hosted database. Anyone who can read the project repository can read its source
 files, so publishing the repository publishes them. The requirements protect the author's
 machine from hostile input, keep restricted values and unasked-for source files out of outputs Stemma generates and report what it cannot remove,
 protect the tool supply chain, and keep assurance claims honest. Threats and
@@ -49,6 +50,20 @@ Each item states its acceptance criterion.
 
 - **SEC-001**: A search of a seeded project, release package, and repository
   finds no Stemma account, token, or credential. No command asks for a password.
+- **SEC-034**: The local server gives project data only to a request that carries
+  the run's secret, with the exact `Host`, `Origin`, content type, and request
+  header of CONTRACT-005 M, rules 2 to 6. It sets no cookie and permits no
+  cross-origin read. A one-time code is exchanged for the secret once and within
+  10 minutes (rule 7). This is access control for the running server, not an
+  account.
+- **SEC-035**: Neither the secret nor the one-time code is in a process argument,
+  standard output or error, or a log; the code is in one launch file readable
+  only by its owner and removed after use, and the secret is in no file Stemma
+  writes (CONTRACT-005 M, rules 8 and 9).
+- **SEC-036**: The local server listens on 127.0.0.1 only, serves a fixed set of
+  routes, lets no request name a file, bounds request size, time, and
+  connections, sends the headers and policy of CONTRACT-005 M, rules 10 and 11,
+  writes nothing in the project, and makes no outbound request.
 - **SEC-002**: Every user-facing text about review marks, annotations, text
   reviews, comparisons, restriction marks, and support verdicts, including the disclosure, calls them
   records and not proof of who acted or verification of support.
@@ -99,7 +114,8 @@ controls cover only its instructions and its own commands.
   each produce the CONTRACT-002 C warning on screen and in the report, and a
   packaged report gives no location.
 - **SEC-023**: With network access denied, check, build, export, and explorer
-  viewing succeed with 0 network requests.
+  viewing succeed with 0 network requests. The served explorer's requests go to
+  its own loopback server only.
 - **SEC-031**: A seeded image with embedded location metadata (EXIF position data), placed in a
   build, produces a finding that names the file, and
   changes no original.
@@ -209,6 +225,9 @@ controls cover only its instructions and its own commands.
 | SEC-031 | Warn on image location metadata | P; TM-I-006 | Medium | Seeded image |
 | SEC-032 | Source text cannot form annotations | G: CONTRACT-007 F; TM-T-013 | High | Injection fixture |
 | SEC-033 | No model-written source text | G: FR-84, ADR-010; TM-T-014 | High | Refusal tests, skill review |
+| SEC-034 | Only the opened page reads the local server | G: CONTRACT-005 M, ADR-012; TM-S-008, TM-I-016, TM-I-017 | High | One refusal test per rule |
+| SEC-035 | Code and secret stay out of arguments, output, and files | G: CONTRACT-005 M; TM-I-017, TM-I-018 | High | Run and search output, arguments, files |
+| SEC-036 | Loopback only, fixed routes, bounds, no outbound request | G: CONTRACT-005 M; TM-D-010, TM-I-016, TM-E-008 | High | Socket, path, size, time, and header tests |
 
 ## Compliance Requirements
 
@@ -248,17 +267,20 @@ allows hosted processing. Stemma does not decide or enforce it.
 
 ## Security Architecture Requirements
 
-- [ ] Network segmentation: N/A, no service; SEC-023 bounds network use.
+- [ ] Network segmentation: the local server binds loopback only (SEC-036);
+  SEC-023 bounds network use.
 - [ ] Application security testing: hostile fixtures for the criteria above.
 - [ ] Dependency vulnerability scanning: SEC-026.
-- [ ] Server hardening: N/A, no server.
+- [ ] Server hardening: the local server follows SEC-034 to SEC-036. There is no
+  hosted server.
 - [ ] Patch management: pins change only through a new release (SEC-025, SEC-026).
 - [ ] Backup and recovery tested: the author backs up git, source files
   included, and the restricted store.
 
 ## Security Testing Requirements
 
-- [ ] Penetration testing: N/A, no deployed service.
+- [ ] Penetration testing: no deployed service. The local server's refusals are
+  tested; no outside review has been made.
 - [ ] Vulnerability assessments: advisory review at each release (SEC-026).
 - [ ] Security code review: parsers, Typst conversion, explorer rendering,
   packaging redaction, and path handling.

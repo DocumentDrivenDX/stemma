@@ -57,8 +57,9 @@ Considered and not selected:
   graph engine design if its schema becomes a long-lived interface.
 - `i18n-icu`: the requirements cover multilingual sources, not a translated
   interface. Reconsider when a pilot needs one.
-- `mcp-server`: no design has chosen the Model Context Protocol (a protocol for
-  connecting tools to AI hosts). Reconsider in the plugin architecture.
+- `mcp-server`: ADR-012 decides that the explorer may expose itself over the
+  Model Context Protocol (a protocol for connecting tools to AI hosts), in a later
+  stage. Select the concern when that stage is designed.
 - `frontend-architecture`: its server-state practices assume a backend the
   offline explorer lacks.
 
@@ -74,7 +75,7 @@ Considered and not selected:
 | e2e-playwright | Same runs locally and in CI | Local runs, and release-tag runs where a browser is available | ADR-007 |
 | a11y-wcag-aa | axe-core in CI | axe-core runs locally and on release tags | ADR-007 |
 | security-owasp | Secret scanning and dependency audit as CI gates | Run both before a release | ADR-007 |
-| react-vite | Backend `/api` routes, server-state library, history routing | The explorer is an offline bundle with no backend; routing must work from a local file | ADR-008 |
+| react-vite | Backend `/api` routes, server-state library, history routing | The explorer is an offline bundle with no backend; routing must work from a local file. The local server of ADR-012 has a fixed set of calls and the same fragment routing | ADR-008, ADR-012 |
 
 ## Area Labels
 
