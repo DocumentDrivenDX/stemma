@@ -64,7 +64,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 <li><h3>First check</h3><div><p>The check finds the slip and the uncited book, notices a file out of its standard layout, and says that a cited book is not in the project. It also notes that neither invented book was compared with a catalogue, which is not a problem.</p><details class="more"><summary>What the tool printed (step 3)</summary>
 <p class="record">3. Check: the seeded errors are reported and explained</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 4 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 14 result(s) passed.
+Checked the whole project: 15 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
@@ -114,7 +114,7 @@ No record problems found.
 
 <span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 17 result(s) passed.
+Checked the whole project: 18 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited source has no source file in the project, so this citation is unchecked.  [source.held, 2 places]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
@@ -173,7 +173,7 @@ No record problems found.
 <span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-ok">CHECKED CLEAN</span>: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 27 result(s) passed.
+Checked the whole project: 28 result(s) passed.
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - not compared with a catalogue: no lookup that found the work is saved: ledger1911
@@ -226,7 +226,7 @@ Warning: Cannot polyfill `Path2D`, rendering may be broken.
 == 4. Check
 <span class="v-ok">CHECKED CLEAN</span>: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 21 result(s) passed.
+Checked the whole project: 22 result(s) passed.
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - not compared with a catalogue: no lookup that found the work is saved: levy1911
@@ -280,7 +280,7 @@ No record problems found.
 
 <span class="cmd">$ stemma check --project $DEMO/quoting-book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 45 result(s) passed.
+Checked the whole project: 46 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
@@ -353,7 +353,7 @@ Stemma holds back no source: any source in this project may be sent to a hosted 
 <li><h3>Copy the project</h3><div><p>A copy of the project without the original files gives the same report.</p><details class="more"><summary>What the tool printed (step 10)</summary>
 <p class="record">10. A clone has everything the checks read: the originals are not needed</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/clone</span>
 <span class="v-warn">OPEN FINDINGS</span>: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 45 result(s) passed.
+Checked the whole project: 46 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
@@ -430,7 +430,7 @@ No record problems found.
 <span class="cmd">$ stemma check --project $DEMO/reading-list</span>
 <span class="v-ok">CHECKED CLEAN</span>: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 6 result(s) passed.
+Checked the whole project: 7 result(s) passed.
 
 The whole project is checked each time.
 Full report: $DEMO/reading-list/.stemma/reports/check.json
@@ -446,7 +446,7 @@ Demo finished as expected. The files are in $DEMO</pre></figure>
 <h3>A project with planted mistakes</h3><p>Mistakes planted on purpose, one or more for each kind the tests expect. <a href="reports/check-seeded.json">Data file for the seeded project</a>.</p><details class="more"><summary>Printed report for the seeded project</summary>
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/seeded</span>
 <span class="v-warn">OPEN FINDINGS</span>: 9 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 15 result(s) passed.
+Checked the whole project: 16 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
@@ -532,7 +532,7 @@ Full report: $PROJECTS/seeded/.stemma/reports/check.json
 <h3>A cited source that is not in the project</h3><p>One citation that resolves to a source that is not in the project, so it is reported as unchecked. <a href="reports/check-cited.json">Data file for the cited project</a>.</p><details class="more"><summary>Printed report for the cited project</summary>
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/cited</span>
 <span class="v-warn">OPEN FINDINGS</span>: 1 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 11 result(s) passed.
+Checked the whole project: 12 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
@@ -552,7 +552,7 @@ Full report: $PROJECTS/cited/.stemma/reports/check.json
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/clean</span>
 <span class="v-ok">CHECKED CLEAN</span>: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 8 result(s) passed.
+Checked the whole project: 9 result(s) passed.
 
 Full report: $PROJECTS/clean/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
@@ -560,7 +560,7 @@ Full report: $PROJECTS/clean/.stemma/reports/check.json
 <h3>A project with a manuscript file</h3><p>A project with a manuscript file. Stemma does not read it, and says that it could not check. <a href="reports/check-manuscript.json">Data file for the manuscript project</a>.</p><details class="more"><summary>Printed report for the manuscript project</summary>
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, with folder names replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/manuscript</span>
 <span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 1 could not be checked, 9 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 7 result(s) passed.
+Checked the whole project: 8 result(s) passed.
 
 1. <span class="v-warn">COULD NOT CHECK</span>: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
    Why it matters: The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.
