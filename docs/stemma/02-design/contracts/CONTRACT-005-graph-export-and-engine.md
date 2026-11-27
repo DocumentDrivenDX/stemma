@@ -1017,12 +1017,23 @@ Its tools only read. It serves the `author` audience.
 
 ```json
 "mcpServers": {"stemma": {"command": "sh", "args": [
-  "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh", "${CLAUDE_PLUGIN_DATA}", "mcp"]}}
+  "-c", "<guard>", "stemma-mcp", "${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PLUGIN_DATA}"]}}
 ```
 
-It names no project and sets no environment. A host that does not replace the two
-variables starts nothing that works: the launcher refuses a data directory that
-was not filled in, and writes nothing.
+The guard is a constant script that holds neither variable. It takes the two as
+its arguments, and unless both begin as absolute paths (`/…`, or a drive letter
+and a separator) it says that they were not filled in and ends with 4, having
+run nothing. Otherwise it replaces itself with
+`sh "$1/scripts/stemma.sh" "$2" mcp`. The declaration names no project and sets
+no environment.
+
+**Why the guard.** A host may read this declaration and start it without
+replacing the variables, and starts it in the session's directory. The plain form
+`sh ${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh` would then be a relative path, and a
+cloned repository holding a directory of that literal name would have its script
+run at session start. Codex 0.150.1 did exactly this with a planted script
+("Proof Status"). No form of the declaration may put an unfilled variable where
+a shell or a host would read it as a path or as part of a script.
 
 **Idle until asked.** A host starts the server in every session with the plugin,
 whatever the session is about. Until a tool is called it downloads nothing,
@@ -1229,6 +1240,8 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Originals (M, "Originals") | Local tests over invented PDFs and images: the page rule on every case and on the worked example's records (every part of its 14 source files is a page of its one PDF); links, swapped, changed, and unrecorded files; each refusal; headless Chromium from every place a source view appears, with each reason, a PDF with scripts, links, a form, XFA, and an attachment (no policy violation, other request, dialog, window, or download), JPEG 2000 and CCITT images drawn with every later script blocked, a character map, and changed answers. The installed plugin served an invented original and pdf.js's parts. One local run, not in the tests, with the worked example's own PDFs on one macOS system (Apple silicon): for one passage of each of the 14 source files, the passage's words were on the page the rule gives when that PDF was read again, and each page was drawn in 0.2 to 3.8 s from opening the passage, with no console message. The release grew by about 2.3 MB: the worker 1.33 MB, the two decoders 0.47 MB, and the served page's script from 0.42 to 0.94 MB | Other browsers, systems, and slower machines; PDFs of other kinds, very large ones, and those with embedded color profiles (not applied); a JBIG2 image in the tests (CCITT, which the same decoder reads, is tested); a JPEG page image drawn in the browser; Windows, which has no flag to refuse a link at opening; keyboard and screen-reader use by hand; any outside security review |
 | Served search (M, "Search") | Local tests against a brute-force scan on a synthetic project of 150 sources, every substring of 1 to 6 code points of Latin, Greek, Arabic, Japanese, Thai, and hostile test titles, bounds, and headless Chromium (every page of a search, and all 260 links of a record in each direction). Synthetic project of 5,000 sources (79,020 entries of 14 types, 20 million characters of search text, one macOS machine): 400 queries gave the matches, counts, and order of a brute-force scan over all 38,690 pages (7.7 million listed matches, up to 78,441 for one query); 542 records of every type were found by ID, and 294 by words read from their record files. One page took a median of 13 ms in the process (95th percentile 22 ms, at most 62 ms; 60 ms for 16 words), and about 0.2 s through the server, nearly all of it the freshness scan. Preparing search took 0.12 s and 22 MB of heap at the start of each snapshot; against the previous version the holding process's footprint grew from 1.42 GB to 1.46 GB, half a minute after a build that took 30.3 s before and 30.8 s after. The largest page of 200 matches measured 431 KB. In the page: the Search view showed a first page in 0.3 to 0.8 s and another page in 0.2 to 0.3 s; arras's box showed 200 matches in about 0.8 s, its 0.25 s typing delay included, at up to 3,400 elements (500 matches: up to 8,200, and narrowing to one type took 0.44 s against 0.30 s); a chapter's 375 citations and 125 claims were all listed after 12 presses of "Show more", each 0.3 to 0.5 s | A real author's project; much larger projects; other browsers, systems, and slower machines; a record with thousands of links; keyboard and screen-reader use by hand |
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
+| MCP: how hosts start it (spike, one macOS system, throwaway profiles, a stand-in model API on 127.0.0.1 and no sign-in) | Claude Code 2.1.236 started a probe plugin's server from `plugin.json`, both through `claude mcp list` and at the start of a headless session (`claude -p`), before any tool call: it filled `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}` in the arguments, set `CLAUDE_PROJECT_DIR` to the directory the session was started in (also a subdirectory of a git repository, not its root), used that as the working directory, had made the data directory, offered the tool to the model as `mcp__plugin_probe_probe__status`, and ended the server with SIGINT. A declared plugin dependency was still installed. **Codex CLI 0.150.1** read the same `mcpServers` from `.claude-plugin/plugin.json`, listed the variables unfilled, and in a session started the plain form from the session's directory, with its read-only sandbox: a script planted there under the literal name ran. With the guard, in the same setup, nothing ran, and Claude Code still connected. Anthropic's documentation says that claude.ai chat ignores local MCP servers and that Cowork loads them only for sessions on the author's computer (fetched 2026-11-27) | A tool call made by a real session's model; the desktop app; the interactive terminal; Cowork, claude.ai, ChatGPT desktop; Windows and Linux; how Codex shows the guard's refusal; later releases of any host |
+| MCP: protocol module (spike) | The official SDKs bundle with no unresolved import: `@modelcontextprotocol/sdk` 1.32.2 installs 92 packages and a minimal tools server bundles to 530 KB; `@modelcontextprotocol/server` 2.4.0 installs 3 and bundles to 805 KB; each bundle holds a `new Function`. Stemma's own module is used (ADR-012) | Another host's protocol behaviour |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 
 ## Schema Basis

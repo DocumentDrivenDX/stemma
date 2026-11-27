@@ -88,6 +88,9 @@ engine, and it would be reconsidered for a project many times that size.
 The plugin declares one MCP server that the host starts over standard input and
 output, through the plugin's one launcher, and CONTRACT-005 N states its rules.
 
+- **The declaration is guarded.** A host that does not fill in the plugin's
+  directories must run nothing: Codex 0.150.1 otherwise ran a script planted in
+  the session's directory (CONTRACT-005 N).
 - **The host starts it in every session**, so it does nothing until a tool is
   called, and its launcher never fetches Bun for it. Without Bun the launcher
   itself answers, in a few lines of shell, that setup has not run. A server that
@@ -162,8 +165,11 @@ beyond the search result's shape; a search that cuts results without saying so.
 ### MCP: a small protocol module over the official SDK
 
 The server offers five tools over standard input and output: four request kinds
-and one framing rule. Stemma writes that module itself. The evidence and the
-size of the alternative are in CONTRACT-005, "Proof Status". This is reconsidered
+and one framing rule. Stemma writes that module itself, about 200 lines. Both
+official SDKs bundle cleanly, but each would add third-party code that runs in
+every session of every author with the plugin (TM-E-007), 530 to 805 KB of it
+with code made at run time, for validation and transports these tools do not
+use. The evidence is in CONTRACT-005, "Proof Status". This is reconsidered
 if Stemma needs a remote transport, resources, or another part of the protocol
 that is more than this.
 

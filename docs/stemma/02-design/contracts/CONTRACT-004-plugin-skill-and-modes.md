@@ -53,7 +53,8 @@ and the obligations the agent has toward the command line and the records.
 - The plugin MUST NOT add other public skills.
 - The manifest MUST declare exactly one MCP server, `stemma`, which starts the
   command `mcp` through `scripts/stemma.sh` with the plugin root and data
-  directory the host fills in, and nothing else (CONTRACT-005 N). It MUST do
+  directory the host fills in, behind the guard of CONTRACT-005 N, so that a host
+  that does not fill them in runs nothing. It MUST do
   nothing until a tool is called. The skill MUST work without it, through the
   command line, in a host that does not load it.
 - The bundle MUST NOT be committed to the Stemma repository. A release MUST be

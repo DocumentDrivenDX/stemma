@@ -85,7 +85,9 @@ Each item states its acceptance criterion.
 - **SEC-040**: The MCP server downloads, writes, listens, reads no project
   file, and starts no lasting process until a tool is called; its launcher never
   fetches the runtime for it; and only protocol messages reach its standard
-  output (CONTRACT-005 N).
+  output (CONTRACT-005 N). A host that does not fill in the plugin's
+  directories runs nothing from the declaration, whatever the session's
+  directory holds.
 - **SEC-041**: No MCP tool takes a project, path, file, or address; each only
   reads the session's project, rejects what it does not name, and opens only the
   local server at a record found in the snapshot, within a rate limit. No result,

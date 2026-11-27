@@ -145,7 +145,7 @@ modules, or the product owner for accepted risks.
 | C9 | n4 | TM-T-006 | TM-R-003 | TM-I-004, 006 | TM-D-007 | TM-E-004, 005 |
 | C10 | TM-S-005 | TM-T-008 | TM-R-003 | TM-I-006 to 008, 012 | TM-D-004 | TM-E-006 |
 | C11 | TM-S-004 | TM-T-007, 009 | TM-R-004 | TM-I-013 | TM-D-006 | TM-E-007 |
-| C12 | TM-S-008, 010 | n5 | n1 | TM-I-016 to 018, 021, 022 | TM-D-010, 012 | TM-E-008, 010, 011 |
+| C12 | TM-S-008, 010 | n5 | n1 | TM-I-016 to 018, 021, 022 | TM-D-010, 012 | TM-E-008, 010 to 012 |
 
 - n1: no separate actions or identities of its own; attribution falls under
   TM-R-001.
@@ -257,6 +257,7 @@ modules, or the product owner for accepted risks.
 | TM-E-007 | A malicious dependency, install script, or update runs with the author's rights | 5 | 2 | 10 | Release maintainer | SEC-025 to SEC-028 |
 | TM-E-009 | A hostile PDF or image shown in the served page exploits pdf.js or the browser's image decoders, or its scripts, links, forms, or attachments act | 5 | 2 | 10 | `explorer` | SEC-039: only files whose digest a source file records; pinned pdf.js drawing a canvas from bytes, no scripting, XFA, evaluation, WebAssembly, annotation or link layer, or attachment; policy unchanged. A flaw in a parser or decoder is not contained beyond the page's policy |
 | TM-E-010 | A tool argument, possibly written by text the agent read, makes the MCP server open an address, read a file, choose another project, write, or run something; or the server acts in a session unasked | 5 | 2 | 10 | `server`, `cli` | SEC-040, SEC-041: five fixed tools; no path, address, or project argument; a record ID only looked up; the opener is given only the launch file the server made |
+| TM-E-012 | A host that reads the plugin's MCP declaration without filling in its variables starts it in the session's directory, so a cloned repository supplies the script it runs, at session start. Observed with Codex 0.150.1 and the plain form | 5 | 3 | 15 | `cli`, release maintainer | SEC-040: the guard of CONTRACT-005 N runs nothing unless both directories are absolute paths, and puts no unfilled value in a script or path. A package test plants the script |
 | TM-E-011 | **Injection through MCP**: record or source text in a tool result poses as an instruction, and the agent obeys it with its other tools (TM-S-001, TM-E-001). Expected, not hypothetical | 5 | 3 | 15 | `server`, `skills/stemma`; the author for host permissions | SEC-042, SEC-009: marked, JSON-escaped, bounded quoted data; the tools themselves can only read this project, open this server, and stop it. Nothing contains a steered agent |
 | TM-E-008 | A crafted request reads a file outside the served set or makes the local server run something | 5 | 1 | 5 | `server` | SEC-036: fixed routes, assets held in memory, a record ID only looked up in the snapshot; arras runs queries over memory only |
 
@@ -275,6 +276,7 @@ not day counts. No owner risk tolerance is recorded.
 | TM-I-003 | Injection-driven exfiltration | 5 | 3 | 15 | High |
 | TM-E-001 | Injection-driven commands and edits | 5 | 3 | 15 | High |
 | TM-E-011 | Injection through MCP tool results | 5 | 3 | 15 | High |
+| TM-E-012 | An unfilled MCP declaration runs a repository's script | 5 | 3 | 15 | High |
 
 Medium (10-14): TM-S-001, TM-S-002, TM-T-001, TM-T-002, TM-T-006, TM-T-007,
 TM-I-002, TM-I-004, TM-I-005, TM-I-006, TM-I-014, TM-D-002, TM-E-002 to
