@@ -141,5 +141,7 @@ describe("what is released", () => {
     expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("one");
     expect(publishInto(dir, releaseTree("1.0.1", "two")).changed).toBe(true);
     expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("two");
+    expect(() => publishInto(dir, releaseTree("1.0.0", "one"))).toThrow("older");
+    expect(readFileSync(join(dir, "plugins/stemma/a"), "utf8")).toBe("two");
   });
 });
