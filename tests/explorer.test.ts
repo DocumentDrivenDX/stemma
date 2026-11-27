@@ -9,7 +9,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { type Browser, chromium, type Page } from "@playwright/test";
 import { exportGraph, type Export } from "@stemma/graph";
 import { loadCorpus, normalizeSentence, searchFold, sha256 } from "@stemma/records";
-import { bundleHost, explorerLicenses } from "../packages/explorer/build.ts";
+import { bundleHost, explorerLicenses, servedLicenses } from "../packages/explorer/build.ts";
 import { writeExplorer } from "../scripts/build.ts";
 import { everyShape, fixtureId } from "./graph-fixture.ts";
 import { ROOT, temporary } from "./helpers.ts";
@@ -47,9 +47,15 @@ test("without headless Chromium, the check's last word is that the explorer page
 });
 
 test("every package whose code is in the page ships its license", async () => {
-  const inputs = [...(await bundleHost()).inputs, ...(await bundleHost("served.tsx")).inputs];
-  const bundled = [...new Set(inputs.flatMap((path) => /.*node_modules\/((?:@[^/]+\/)?[^/]+)\//.exec(path)?.[1] ?? []))].sort();
-  expect(bundled).toEqual(["@documentdrivendx/arras-ui", "@tanstack/query-core", "@tanstack/react-query", "react", "react-dom", "scheduler"]);
+  const bundledIn = async (entry: "host.tsx" | "served.tsx") =>
+    [...new Set((await bundleHost(entry)).inputs.flatMap((path) => /.*node_modules\/((?:@[^/]+\/)?[^/]+)\//.exec(path)?.[1] ?? []))].sort();
+  const shared = ["@documentdrivendx/arras-ui", "@tanstack/query-core", "@tanstack/react-query", "react", "react-dom", "scheduler"];
+  // The offline page holds no PDF library. The served one does, and its licenses ship beside it.
+  expect(await bundledIn("host.tsx")).toEqual(shared);
+  expect(await bundledIn("served.tsx")).toEqual([...shared, "pdfjs-dist"].sort());
+  expect(Object.keys(servedLicenses()).sort()).toEqual(["core-js.txt", "jbig2.txt", "openjpeg.txt", "pdfjs-dist.txt", "pdfjs-jbig2.txt", "pdfjs-openjpeg.txt"]);
+  expect(servedLicenses()["pdfjs-dist.txt"]).toContain("Apache License");
+  for (const text of Object.values(servedLicenses())) expect(text.length).toBeGreaterThan(300);
   const licenses = explorerLicenses();
   expect(Object.keys(licenses).sort()).toEqual(["arras-ui.md", "graphql.txt", "react-dom.txt", "react.txt", "scheduler.txt", "tailwindcss.txt", "tanstack-query-core.txt", "tanstack-react-query.txt"]);
   for (const text of Object.values(licenses)) expect(text).toMatch(/MIT License|Permission is hereby granted/);
