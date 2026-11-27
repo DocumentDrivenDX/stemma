@@ -4,3 +4,6 @@ export { type Entry, type EntryReading, readEntry, readReferenceLists, type Refe
 export * from "./match.ts";
 export * from "./word-reading.ts";
 export { readWord, WORD_LIMITS, WordError, type WordLimits } from "./word.ts";
+export * from "./legacy.ts";
+export * from "./legacy-import.ts";
+export * from "./legacy-export.ts";
