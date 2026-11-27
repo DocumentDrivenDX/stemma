@@ -145,7 +145,9 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       // Neither is in any header or body the page sent: each only signs. The local file's own address is not sent anywhere.
       expect(seen.sent.length).toBeGreaterThan(20);
       expect(seen.sent.filter((r) => r.includes(secret) || r.includes(code))).toEqual([]);
-      expect([seen.errors, seen.dialogs]).toEqual([[], []]);
+      // A call made while the records are being read again is answered 503 `index_stale`,
+      // which the browser logs whether or not it happens to be caught in that moment.
+      expect([seen.errors.filter((e) => !/Failed to load resource.*\b503\b/.test(e)), seen.dialogs]).toEqual([[], []]);
 
       expect(await run.stop()).toBe(0);
       await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });

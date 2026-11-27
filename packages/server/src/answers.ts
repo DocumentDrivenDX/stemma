@@ -58,9 +58,12 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
     const names = types === null || types === undefined ? undefined : types;
     if (Object.keys(more).length > 0 || typeof text !== "string" || (limit !== null && !wholeFrom(limit, 1, SEARCH_LIMITS.arrasPage))
       || (names !== undefined && !(Array.isArray(names) && names.every((name) => typeof name === "string" && search.hasType(name))))) return Promise.resolve(BAD);
-    const asked = module === moduleName && arrasAccepts(text) ? queryOf(text) : undefined;
+    // Only what arras refuses reaches arras, for its own words: anything it would
+    // search is searched here or refused, however it is padded.
     // Its limit is put within arras's own, so that what arras refuses is the text or the module.
-    if (!asked) return arras(() => client.moduleQuery(module, query, { ...variables, limit: 1 }));
+    if (module !== moduleName || !arrasAccepts(text)) return arras(() => client.moduleQuery(module, query, { ...variables, limit: 1 }));
+    const asked = queryOf(text.split(/\s+/u).filter((word) => word !== "").join(" "));
+    if (!asked) return Promise.resolve(BAD);
     const answered = search.arrasPage(asked, names as string[] | undefined, (limit as number | null) ?? 20, freshness);
     return Promise.resolve(ok({ data: { _search: answered }, errors: [], revision: probe.revision }));
   };

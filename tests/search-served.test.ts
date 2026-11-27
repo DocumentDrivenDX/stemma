@@ -253,6 +253,9 @@ describe("US-120-AC6 bounds", () => {
     for (const variables of [{ text: "ka", limit: 501 }, { text: "ka", limit: 0 }, { text: "ka", types: ["Nothing"] }, { text: 1 }, { text: "ka", more: 1 }]) {
       expect([variables, (await call("query", { module: "stemma", query: BROWSER_QUERY, variables })).status]).toEqual([variables, 400]);
     }
+    // Padding does not push a search arras accepts into arras's limited one.
+    const padded = (await call("query", { module: "stemma", query: BROWSER_QUERY, variables: { text: `${" ".repeat(450)}ka`, types: null, limit: 200 } })).json.result.data._search;
+    expect([padded.hits, padded.counts]).toEqual([found.hits, found.counts]);
     // No other query reaches arras's search.
     for (const query of ["query { _search(text: \"ka\") { truncated } }", "query { a: _search(text: \"ka\") { truncated } }", `${BROWSER_QUERY} `, BROWSER_QUERY.replace("limit: $limit", "limit: 50")]) {
       expect((await call("query", { module: "stemma", query, variables: { text: "ka" } })).json.error?.code).toBe("unsupported_search");
