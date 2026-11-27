@@ -161,6 +161,11 @@ describe("US-119-AC4 the served data is never older than the files", () => {
       writeFileSync(join(dir, "manuscript/part/one.md"), "Zebra.\n");
     }, true);
 
+    const chapter = join(dir, "manuscript/chp-aaaaaaaaaaaa.md");
+    await after("a chapter added", () => writeFileSync(chapter, "# A chapter\n\nZebra.\n"), true);
+    // Nothing but the name changes, and the name is the chapter's ID.
+    await after("a chapter renamed", () => renameSync(chapter, join(dir, "manuscript/chp-bbbbbbbbbbbb.md")), true);
+
     // The data identity does not cover research notes, but the export counts them.
     const omitted = async () => ((await one.call("/api/boot")).json.result.banner.omissions as { type: string; count: number }[]).find((o) => o.type === "ResearchNote")?.count ?? 0;
     const notes = await omitted();

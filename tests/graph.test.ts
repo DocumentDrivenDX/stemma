@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
 import { planAnnotation, runChecks } from "@stemma/core";
 import { ARRAS_VERSION, checkName, dataIdentity, type Export, exportBlockers, exportGraph, exportStaleness, ExportMappingError, fillPage, MANIFEST, propertyName, SEARCHED_TYPES, UnreadableProject } from "@stemma/graph";
-import { canonical, type Corpus, digest, KIND_TYPES, loadCorpus, type ProjectContent, REFERENCES, searchFold, serializeManifest } from "@stemma/records";
+import { canonical, type Corpus, digest, KIND_TYPES, loadCorpus, type ProjectContent, REFERENCES, searchFold, serializeManifest, sha256 } from "@stemma/records";
 import { readProject, randomToken } from "@stemma/workspace";
 import { everyShape, fixtureId, recordFile } from "./graph-fixture.ts";
 import { fixture, ROOT } from "./helpers.ts";
@@ -454,6 +454,42 @@ describe("data identity and staleness", () => {
     expect(dataIdentity(loadCorpus(manuscript("two"))).corpus_digest).toBe(one.corpus_digest);
     const noted = { ...manuscript("one"), research: [{ path: "research/a.md", bytes: text("# A") }] };
     expect(dataIdentity(loadCorpus(noted))).toEqual(one);
+  });
+
+  test("changes when a manuscript file is renamed, as what is checked does", () => {
+    const [a, b] = ["manuscript/chp-aaaaaaaaaaaa.md", "manuscript/chp-bbbbbbbbbbbb.md"];
+    const named = (files: Record<string, string>) => dataIdentity(loadCorpus(project([], {
+      manuscript: Object.entries(files).map(([path, value]) => ({ path, bytes: text(value) })),
+    })));
+    expect(named({ [b]: "one" }).data_identity).not.toBe(named({ [a]: "one" }).data_identity);
+    expect(named({ [b]: "one" }).corpus_digest).toBe(named({ [a]: "one" }).corpus_digest);
+    // The same contents under each other's names: which file comes first in path order has changed.
+    expect(named({ [a]: "two", [b]: "one" })).not.toEqual(named({ [a]: "one", [b]: "two" }));
+    // The order the files are listed in does not count.
+    expect(named({ [b]: "two", [a]: "one" })).toEqual(named({ [a]: "one", [b]: "two" }));
+    // A name that holds what separates lines cannot stand for two files.
+    const digest = sha256(text("one"));
+    expect(named({ [`a"\n${digest}\t"b`]: "one" })).not.toEqual(named({ a: "one", b: "one" }));
+  });
+
+  test("changes when a record is written another way with the same values, as record.valid does", () => {
+    const record = { ...base("src-identity00001", "source"), citation_key: "one", type: "book", intake: "raw", admission: "candidate", title: { value: "One book" } };
+    const tidy = loadCorpus(project([record]));
+    const loose = loadCorpus(project([], { records: [{ ...recordFile(record), bytes: text(JSON.stringify(record)) }] }));
+    expect(dataIdentity(loose).corpus_digest).toBe(dataIdentity(tidy).corpus_digest);
+    expect(make(tidy).states.records.get(record.id) ?? []).not.toContain("open_finding");
+    expect(make(loose).states.records.get(record.id)).toContain("open_finding");
+    expect(dataIdentity(loose).data_identity).not.toBe(dataIdentity(tidy).data_identity);
+  });
+
+  test("changes when a source file gains a byte-order mark or a byte that is not UTF-8", () => {
+    const held = (bytes: Uint8Array) => dataIdentity(loadCorpus(project([], { sources: [{ path: "sources/one/source.md", bytes }] })));
+    const marked = held(text("﻿---\n"));
+    expect(marked.corpus_digest).toBe(held(text("---\n")).corpus_digest);
+    expect(marked.data_identity).not.toBe(held(text("---\n")).data_identity);
+    const broken = held(new Uint8Array([0xff]));
+    expect(broken.corpus_digest).toBe(held(text("�")).corpus_digest);
+    expect(broken.data_identity).not.toBe(held(text("�")).data_identity);
   });
 
   test("an export is stale when the data, the exporter or a file differs", () => {

@@ -118,7 +118,8 @@ export class McpHost {
 export function stubOpener(exit = 0) {
   const directory = temporary();
   const program = join(directory, "opener");
-  writeFileSync(program, `#!/bin/sh\nfor a in "$@"; do printf '%s\\n' "$a" >> '${directory}/arguments'; done\ncp "$1" '${directory}/launch.html'\nexit ${exit}\n`);
+  // The call is noted after the copy is made, so that a test that sees the call can read the copy.
+  writeFileSync(program, `#!/bin/sh\ncp "$1" '${directory}/launch.html'\nfor a in "$@"; do printf '%s\\n' "$a" >> '${directory}/arguments'; done\nexit ${exit}\n`);
   chmodSync(program, 0o755);
   const read = (name: string) => (existsSync(join(directory, name)) ? readFileSync(join(directory, name), "utf8") : "");
   return {

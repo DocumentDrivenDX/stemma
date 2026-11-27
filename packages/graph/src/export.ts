@@ -2,7 +2,7 @@
 // The same record and manuscript bytes and the same exporter version give the
 // same bytes: no export holds a time, a user, a machine path or a git revision.
 import { highlightTargets, type HighlightTargets, type ManuscriptView, type RecordStates, recordStates, type TextOriginal, textOriginals } from "@stemma/core";
-import { compareCodePoints, type Corpus, corpusDigest, isObject, type LoadedFile, SEARCH_FOLD_VERSION, sha256 } from "@stemma/records";
+import { compareCodePoints, type Corpus, corpusDigest, decodeUtf8, isObject, type LoadedFile, SEARCH_FOLD_VERSION, sha256, type SourceFile } from "@stemma/records";
 import { graphDocument, jsonText, MODULE_NAME, moduleDocument, typeLabel, VIEW_VERSION } from "./module.ts";
 import { type ManuscriptPort, manuscriptFile, manuscriptOf, quotedPassages } from "./manuscript.ts";
 import { fillPage } from "./page.ts";
@@ -22,16 +22,48 @@ export const MEASURED = { entities: 1024, bytes: 7_900_000 };
 
 export interface DataIdentity { corpus_digest: string; data_identity: string }
 
+/** Whether a source file's bytes are UTF-8 with no byte-order mark, so that its text in the corpus digest is all of it. */
+function plainText(bytes: Uint8Array): boolean {
+  try {
+    return !decodeUtf8(bytes).startsWith("﻿");
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The files whose bytes can change what an export shows with the corpus digest
+ * the same. It digests a record's values, so not how a file that is not in
+ * canonical form is written, which `record.valid` reports. It digests a source
+ * file's decoded text, which drops a byte-order mark and replaces bytes that are
+ * not UTF-8, either of which can keep the file from being read.
+ */
+function unpinned(corpus: Corpus): SourceFile[] {
+  const records = [corpus.settings, ...corpus.records.filter((f) => !f.path.startsWith("sources/"))]
+    .filter((f) => f.data !== undefined && f.canonical === false);
+  return [...records, ...corpus.sources.filter((f) => f.bytes && !plainText(f.bytes))];
+}
+
 /**
  * The identity of what an export shows (CONTRACT-005 J): SHA-256 of the corpus
- * digest and then each manuscript file's digest, one a line, in digest order.
- * The report's list and template are manuscript files too.
+ * digest, then a line for each file the corpus digest does not pin, then a line
+ * for each manuscript file, each part in path order. A line ends with the path
+ * as a JSON string, so that no path can be read as part of another line. Paths
+ * count because results depend on them: a chapter's ID is its file's name. The
+ * report's list and template are manuscript files too.
  */
 export function dataIdentity(corpus: Corpus): DataIdentity {
   const corpus_digest = corpusDigest(corpus);
-  const report = corpus.report ? [corpus.report.spec, corpus.report.template ?? { path: "" }] : [];
-  const manuscript = [...corpus.manuscript, ...report].map((f) => (f.bytes ? sha256(f.bytes) : "unreadable")).sort(compareCodePoints);
-  return { corpus_digest, data_identity: sha256([corpus_digest, ...manuscript].map((d) => `${d}\n`).join("")) };
+  const lines = (files: SourceFile[], tag: string) => [...files].sort((a, b) => compareCodePoints(a.path, b.path))
+    .map((f) => `${tag}${f.bytes ? sha256(f.bytes) : "unreadable"}\t${JSON.stringify(f.path)}`);
+  const { report } = corpus;
+  const manuscript = [...corpus.manuscript, ...(report ? [report.spec, report.template ?? { path: "" }] : [])];
+  const all = [
+    corpus_digest, ...lines(unpinned(corpus), "bytes "), ...lines(manuscript, ""),
+    // Why the report is not read, which its view says.
+    ...(report?.problem === undefined ? [] : [`problem ${JSON.stringify(report.problem)}`]),
+  ];
+  return { corpus_digest, data_identity: sha256(all.map((line) => `${line}\n`).join("")) };
 }
 
 export interface Blocker { path: string; problems: string[] }

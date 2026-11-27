@@ -141,6 +141,12 @@ describe("the view is made from what the report is built from", () => {
     for (const changed of [corpusWith({ template: `${TEMPLATE}\nMore.` }), corpusWith({ quotations: [...LIST, quotation("unused", "volume1850", [one.id])] })]) {
       expect(exportStaleness(manifest, dataIdentity(changed), VERSION, read)).toMatchObject({ fresh: false, reasons: ["data_changed"] });
     }
+    // So is a template renamed with its text the same, and why a report is not read.
+    for (const change of [(c: Corpus) => (c.report!.template!.path += ".old"), (c: Corpus) => (c.report!.problem = "report is not a plain directory.")]) {
+      const other = corpusWith();
+      change(other);
+      expect(dataIdentity(other).data_identity).not.toBe(dataIdentity(corpusWith()).data_identity);
+    }
     // A template that has gone is a change too.
     const gone = corpusWith();
     delete gone.report!.template!.bytes;

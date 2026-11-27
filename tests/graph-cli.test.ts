@@ -2,7 +2,7 @@
 // B, C and its error table; US-094), and the page it makes for the worked
 // example, opened from a local file.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type Browser, chromium } from "@playwright/test";
@@ -211,6 +211,17 @@ describe("graph export", () => {
     mkdirSync(join(clone, "manuscript"), { recursive: true });
     writeFileSync(join(clone, "manuscript/one.md"), "# One\n");
     expect(cli(["graph", "status", "--project", clone]).code).toBe(1);
+  });
+
+  test("renaming a chapter file makes an export stale", () => {
+    const dir = project(false);
+    const chapter = join(dir, "manuscript/chp-aaaaaaaaaaaa.md");
+    writeFileSync(chapter, "# A chapter\n\nOne.[@one]\n");
+    expect(exportTo(dir).code).toBe(0);
+    expect(cli(["graph", "status", "--project", dir]).code).toBe(0);
+    renameSync(chapter, join(dir, "manuscript/chp-bbbbbbbbbbbb.md"));
+    const stale = cli(["graph", "status", "--project", dir, "--format", "json"]);
+    expect([stale.code, stale.json().state, stale.json().reasons]).toEqual([1, "stale", ["data_changed"]]);
   });
 
   test("an export without a page removes the page an earlier one left, and the same input gives the same bytes", () => {

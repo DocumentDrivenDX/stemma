@@ -394,12 +394,30 @@ digests in the manifest. Shapes are provisional and minimal; the explorer and
 maps designs extend them in a later revision. The page computes no state or
 filtering of its own.
 
-The **data identity** is the SHA-256 of the corpus digest and then each
-manuscript file's digest (SHA-256 of its bytes), in digest order, each followed
-by LF. The manuscript files are those under `manuscript/` and, when the project
-has `report/report.json`, that file and the template it names (L); one that is
-missing or cannot be read counts as `unreadable`; pages show its first 12 characters. `graph status` compares it, so a
-manuscript edit makes an export stale.
+The **data identity** is the SHA-256 of these lines, each followed by LF:
+
+1. the corpus digest;
+2. for each file whose bytes the corpus digest does not pin, in path order,
+   `bytes `, the SHA-256 of its bytes, a tab, and its path. These are
+   `stemma.json` and each record file under `records/` that is read but is not in
+   canonical form, and each file under `sources/` that is not UTF-8 or begins
+   with a byte-order mark;
+3. for each manuscript file, in path order, the SHA-256 of its bytes (or
+   `unreadable` for one that is missing or cannot be read), a tab, and its path;
+4. when the report is not read for more than a file's own bytes, `problem ` and
+   the reason (L).
+
+Each path and reason is written as a JSON string, so that no name can be read as
+part of another line. The manuscript files are those under `manuscript/` and,
+when the project has `report/report.json`, that file and the template it names
+(L); when report.json names no template that may be read, its line has the path
+`""`. Paths count because what an export shows depends on them: a chapter's ID is
+its file's name, a misnamed chapter file is refused, and of two files that use
+one citation ID the first in path order keeps it (CONTRACT-006). With no line of
+parts 2 to 4, the identity is the SHA-256 of the corpus digest and LF. Pages show
+its first 12 characters. `graph status` compares it, so a manuscript edit or
+rename makes an export stale. Research notes are outside it: nothing in them is
+exported, and only their number is, as an omission count.
 
 **States as built.** `unreviewed` (a record that the check report counts as
 unreviewed or not admitted: a cited claim, its attestations and evidence notes,
