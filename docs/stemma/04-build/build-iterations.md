@@ -6,7 +6,7 @@ work in progress elsewhere and wait until it reaches `main`.
 
 | # | Iteration | Specs | Needs | State |
 |---|---|---|---|---|
-| 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Held: takeover session's, after the unmerged manuscript reader |
+| 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Takeover session; the manuscript reader is on main, checks do not use it yet |
 | 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | Open |
 | 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover session; import codecs on main (0.0.15), no commands, no export after edits or across formats |
 | 4 | Citation formatter | ADR-005 | — | On main |
@@ -16,7 +16,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 8 | Rounds and first report | FR-73, 93 | 7 | Takeover session; after 7 |
 | 9 | Claim support records | FR-52 to 54 | 1, 2 | Held |
 | 10 | Runtime hardening and in-agent check trigger | FR-31, 75, 78 | — | Open; hosted runs stay advisory (ADR-007) |
-| 11 | Graph export and record browser | FR-62, 64 | — | In progress |
+| 11 | Graph export and record browser | FR-62, 64 | — | On main; search limits remain (iteration 26) |
 | 12 | Project start | FR-1, 60 | — | Open |
 | 13 | Constructs and claim relations | FR-22, 80 | 2 | Open |
 | 14 | Research and admission | FR-16, 17, 19 | 3 | Open |
@@ -30,9 +30,9 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Next after 11 |
-| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs the manuscript reader and citation formatter on main |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs 24 and 26 |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Requested; measuring |
-| 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand |
+| 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover session accepted it, specs first |
 
 ## Iteration 24: see a citation inline with its source
 
