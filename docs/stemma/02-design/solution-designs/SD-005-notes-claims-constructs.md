@@ -188,6 +188,9 @@ N/A: the feature is used through the agent and command line; FEAT-005 user stori
 
 ### Gaps
 
+- [ ] ACC-04 and FR-23 are partly met. No command edits a record, so an edit by the author is not told apart from any other: a hand edit reads as unreviewed until the record is marked again (CONTRACT-001 G, CONTRACT-002 B1).
+- [ ] As built, the report follows citation records to claims, attestations, and evidence notes only (CONTRACT-002 C).
+- [ ] Defaults open to the product owner: the thesis claim is not exempt from `claim.complete`; confidence is low, medium, or high; one note is required and its stance does not matter; in a batch given to `reviewed`, a stale digest does not stop the others.
 - [ ] CON-01 chapter use is whatever the records list. No check finds an unlisted use in manuscript text, and CONTRACT-006 has no construct marker.
 - [ ] Whether authors review anything when nothing requires it is untested; the pilot should measure it.
 
