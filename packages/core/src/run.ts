@@ -1,6 +1,7 @@
 // One run over one parsed corpus, and the single label rule (CONTRACT-002 C).
 import { type Corpus, compareCodePoints, corpusDigest, idOf, sha256 } from "@stemma/records";
 import { annotate } from "./annotations.ts";
+import { binaryResults } from "./checks/binaries.ts";
 import { active, citeKeyResults, resolveCitations, uncitedResults } from "./checks/bibliography.ts";
 import { coordinateResults } from "./checks/coordinates.ts";
 import { changedResults } from "./checks/changed.ts";
@@ -68,6 +69,7 @@ export interface CheckContext {
 /** The checks this version runs. The check reference on the website is generated from this. */
 export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckContext) => Result[]> = {
   "record.valid": recordResults,
+  "project.binary": binaryResults,
   "source.held": (c, x) => heldResults(c, x.texts),
   "source.pages": pageResults,
   "source.labels": labelResults,

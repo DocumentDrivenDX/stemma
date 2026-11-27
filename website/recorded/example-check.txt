@@ -1,7 +1,7 @@
 $ stemma check --all --project $PROJECTS/coral-reefs
 CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 5307 result(s) passed.
+Checked the whole project: 5308 result(s) passed.
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - observed in an original: printed page 232 is followed by 333 on the next page of the original, with nothing shown missing: txt-hcn5vw3frm4256b32xhe

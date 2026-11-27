@@ -210,6 +210,26 @@
       },
       {
         "annotations": [],
+        "check": "project.binary",
+        "evidence": [
+          {
+            "class": "metadata",
+            "name": "binary_files",
+            "value": "none found"
+          }
+        ],
+        "finding_key": "a86f7cc0a33d3162c38ff94aff1b59a01834bbf31f512e7a2b29eccdff6899e1",
+        "fixes": [],
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "subject": "project",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
         "check": "record.valid",
         "evidence": [
           {
@@ -277,7 +297,7 @@
       "fail": 0,
       "not_implemented": 9,
       "open": 1,
-      "pass": 7,
+      "pass": 8,
       "unreviewed": 0,
       "unverifiable": 2
     },

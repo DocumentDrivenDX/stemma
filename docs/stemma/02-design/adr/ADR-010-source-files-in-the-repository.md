@@ -70,7 +70,8 @@ that a converter cannot determine stays marked undetermined. Stemma owns the
 format and its converters. A conversion can be wrong, so what was compared with
 the original is recorded and shown.
 
-**Drift signals to watch**: A binary under `sources/`; a check that needs a file
+**Drift signals to watch**: A binary anywhere in the repository (`project.binary`
+reports it); a check that needs a file
 outside the clone to read text; a converter that assigns structure with no stated
 rule; a page file edited and not sealed.
 

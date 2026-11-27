@@ -21,6 +21,10 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     summary: "Reads stemma.json, every record file and the rule headings in rules.md.",
     limits: "For some record kinds, rules beyond the record shape are not checked. A report says so when such a record is present.",
   },
+  "project.binary": {
+    summary: "The repository must hold no binary file, such as a Word, PDF or image file. It reads the files git tracks or would add.",
+    limits: "A file that git ignores is not read. A file already removed stays in git history, which this does not read.",
+  },
   "cite.key": {
     summary: "Each citation record's key must name exactly one source record.",
     limits: "Reads citation records only, not manuscript files. It does not show that a source supports a sentence.",
