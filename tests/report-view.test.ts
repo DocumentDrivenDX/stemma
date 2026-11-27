@@ -126,6 +126,22 @@ describe("the view is made from what the report is built from", () => {
     expect(noteClusters(1, [{ cites: "volume1850", members: [{ locator: "2", text: "a" }, { locator: "2", text: "b" }] }])).toHaveLength(1);
   });
 
+  test("a paragraph locator is cited as a paragraph, never as a page", () => {
+    const numbered = { ...one, locator: { label: "paragraph", value: "7" } };
+    const corpus = corpusWith({ records: [numbered, two, note, letterPassage] });
+    const spec = { manuscript: "report.src", quotations: [quotation("one", "volume1850", [one.id])] } as ReportSpec;
+    const built = buildReport(corpus, spec, "It says {{q:one}}.[^one]\n");
+    expect(built.notes[0]!.clusters[0]!.items[0]).toMatchObject({ label: "paragraph", locator: "7" });
+    expect(built.files["report.md"]).toContain("para. 7");
+    expect(built.files["verification.md"]).toContain("| Place |");
+    expect(built.files["verification.md"]).toContain("| paragraph 7 |");
+    // One citation cannot give two kinds of place, and "note" marks a note on a page.
+    const mixed = { manuscript: "report.src", quotations: [quotation("both", "volume1850", [one.id, two.id])] } as ReportSpec;
+    expect(() => buildReport(corpus, mixed, "{{q:both}}[^both]\n")).toThrow(ReportError);
+    const onPage = { manuscript: "report.src", quotations: [quotation("one", "volume1850", [one.id], { note: true })] } as ReportSpec;
+    expect(() => buildReport(corpus, onPage, "{{q:one}}[^one]\n")).toThrow(ReportError);
+  });
+
   test("the same records give the same bytes, and the file is an export's own and digested", () => {
     expect(text(exported(corpusWith()))).toBe(text(out));
     expect(out.manifest.files[FILES.manuscript]).toBe(sha256(text(out)));
