@@ -56,7 +56,10 @@ stays plain Markdown in the repository (ADR-009).
 for an author who never shares a document, and every Stemma install takes docsync's
 latest published version. An update does not always add a new dependency: in
 Claude Code 2.1.236, updating an installed Stemma left docsync missing and Stemma
-not loaded until `claude plugin install stemma@documentdrivendx` was run again.
+not loaded. Running `claude plugin install stemma@documentdrivendx` again added
+docsync in isolated test profiles but not on one existing installation, so the
+documented fix is `claude plugin install docsync@documentdrivendx`. Refreshing the
+marketplace alone can show the same error before Stemma is updated.
 The [plugin dependency documentation](https://code.claude.com/docs/en/plugins/dependencies)
 says `claude plugin update` installs a missing dependency from 2.1.319.
 Codex documents no plugin dependencies, so its users would install both. docsync
