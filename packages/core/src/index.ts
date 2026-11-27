@@ -25,3 +25,4 @@ export { annotate, type AnnotationRequest, planAnnotation } from "./annotations.
 export { headingMatches, catalogueTitleMatches, imprintYears, misreadRoman } from "./checks/metadata.ts";
 export * from "./research.ts";
 export * from "./enrich.ts";
+export * from "./states.ts";

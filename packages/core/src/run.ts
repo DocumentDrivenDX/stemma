@@ -34,7 +34,7 @@ export function guarded(check: string, corpus: Corpus, run: (c: Corpus) => Resul
   }
 }
 
-function unreviewedItems(corpus: Corpus): Unreviewed[] {
+export function unreviewedItems(corpus: Corpus): Unreviewed[] {
   const reached = new Map<string, Unreviewed>();
   const add = (record: string, kind: string, reason: Unreviewed["reason"], location: string) => {
     const entry = reached.get(record) ?? { record, kind, reason, locations: [] };

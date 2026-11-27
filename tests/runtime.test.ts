@@ -98,11 +98,12 @@ describe("SEC-014 a working directory's bunfig.toml and .env", () => {
   });
 });
 
-test("module boundaries: records and core touch no filesystem, process, network, or adapter", () => {
+test("module boundaries: records, core and graph touch no filesystem, process, network, or adapter", () => {
   const forbidden: Record<string, RegExp> = {
     records: /from "(node:(?!crypto)|bun:|@stemma\/)|\bBun\./,
     core: /from "(node:|bun:|@stemma\/(?!records))|\bBun\./,
     workspace: /from "(bun:|@stemma\/cli)/,
+    graph: /from "(node:|bun:|@stemma\/(?!records|core))|\bBun\./,
   };
   for (const [name, pattern] of Object.entries(forbidden)) {
     for (const path of new Bun.Glob(`packages/${name}/src/**/*.ts`).scanSync(ROOT)) {
