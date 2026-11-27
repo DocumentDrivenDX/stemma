@@ -57,10 +57,13 @@ function keep(secret: string | undefined): void {
   }
 }
 
-/** The one-time code the launch file put in the address, taken out of it at once. */
+/**
+ * The one-time code the launch file put in the address, taken out of it at once.
+ * The address may also name a record to go to, only in this form.
+ */
 export function takeCode(): string | undefined {
-  const code = /^#code=([A-Za-z0-9_-]+)$/.exec(window.location.hash)?.[1];
-  if (code !== undefined) window.history.replaceState(null, "", window.location.pathname);
+  const [, code, to] = /^#code=([A-Za-z0-9_-]+)(?:&to=(explore\/stemma\/[A-Za-z0-9]+\/[A-Za-z0-9%._~-]+))?$/.exec(window.location.hash) ?? [];
+  if (code !== undefined) window.history.replaceState(null, "", window.location.pathname + (to === undefined ? "" : `#/${to}`));
   return code;
 }
 

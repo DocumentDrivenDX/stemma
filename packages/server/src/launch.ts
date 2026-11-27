@@ -14,13 +14,18 @@ export interface LaunchFile {
   remove(): void;
 }
 
+/** The record route a launch address may name: only this form (CONTRACT-005 N). */
+export const LAUNCH_ROUTE = /^explore\/stemma\/[A-Za-z0-9]+\/[A-Za-z0-9%._~-]+$/;
+
 /** The code goes in the fragment, which a browser sends in no request and no referrer. */
-export function writeLaunchFile(address: string, code: string, parent = tmpdir()): LaunchFile {
+export function writeLaunchFile(address: string, code: string, parent = tmpdir(), route?: string): LaunchFile {
   // mkdtemp makes the directory for its owner only; the modes are set again in case a system does not.
   const directory = mkdtempSync(join(parent, "stemma-browse-"));
   chmodSync(directory, 0o700);
   const path = join(directory, LAUNCH_NAME);
-  const target = `${address}#code=${code}`;
+  if (route !== undefined && !LAUNCH_ROUTE.test(route)) throw new Error("Not a record route.");
+  // `&amp;` because both places are attributes of the page below.
+  const target = `${address}#code=${code}${route === undefined ? "" : `&amp;to=${route}`}`;
   writeFileSync(path, [
     "<!doctype html>",
     '<meta charset="utf-8">',

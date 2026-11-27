@@ -39,6 +39,12 @@ export async function writeExplorer(outdir: string): Promise<void> {
   for (const [name, text] of Object.entries({ ...explorerLicenses(), ...servedLicenses() })) writeFileSync(join(licenses, name), text);
 }
 
+/** The MCP tools as one line, which the launcher gives when it has no Bun to run the command line with (CONTRACT-005 N). */
+export function writeMcpTools(outdir: string): void {
+  const text = JSON.stringify(JSON.parse(readFileSync(join(root, "packages/server/src/mcp-tools.json"), "utf8")));
+  writeFileSync(join(outdir, "mcp-tools.json"), text);
+}
+
 /** The licences of the citation processor, style and locale bundled into the command line (BR-1004). */
 export function copyCiteLicenses(outdir: string): void {
   cpSync(join(root, "packages/cite/vendor/licenses"), join(outdir, "licenses/cite"), { recursive: true });
@@ -63,6 +69,7 @@ export async function bundle(outdir: string): Promise<string> {
     .filter((i) => !(i.startsWith("./") && parts.includes(i.slice(2))));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
   copyPdfData(outdir);
+  writeMcpTools(outdir);
   await writeExplorer(outdir);
   copyCiteLicenses(outdir);
   return path;
@@ -78,6 +85,7 @@ if (import.meta.main) {
   for (const part of new Bun.Glob("*.js").scanSync(dist)) cpSync(join(dist, part), join(release, "dist", part));
   cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
   cpSync(join(dist, "explorer.template.html"), join(release, "dist/explorer.template.html"));
+  cpSync(join(dist, "mcp-tools.json"), join(release, "dist/mcp-tools.json"));
   cpSync(join(dist, "explorer-served"), join(release, "dist/explorer-served"), { recursive: true });
   cpSync(join(dist, "explorer-licenses"), join(release, "dist/explorer-licenses"), { recursive: true });
   cpSync(join(dist, "licenses"), join(release, "dist/licenses"), { recursive: true });

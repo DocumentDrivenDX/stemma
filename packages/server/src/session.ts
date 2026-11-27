@@ -45,9 +45,17 @@ export interface Admitted {
   verdict: "accepted" | "replayed" | "too_many";
 }
 
+/** The most earlier codes still recognized, so that each is told what became of it. */
+const MOST_CODES = 32;
+
 export interface Session {
-  /** The one-time code, for the launch file only. */
+  /** The first one-time code, for the launch file only. */
   readonly code: string;
+  /**
+   * A new one-time code for the same secret, for another launch file. At most one
+   * code can be redeemed at a time: one not yet used ends now, as expired.
+   */
+  issue(): string;
   /**
    * A request to redeem the code. Nothing for one not signed with it, which uses
    * nothing up. One signed with it gets the secret once, in time, and after
@@ -56,30 +64,42 @@ export interface Session {
   redeem(request: Signed): Redeemed | undefined;
   /** A call. Nothing for one not signed with the secret. Each nonce is accepted once. */
   admit(request: Signed): Admitted | undefined;
-  /** Ends the code's life: it is refused from now on. */
+  /** Ends every code's life: each is refused from now on. */
   expire(): void;
 }
 
 /**
- * `onCodeGone` runs once, when the code is used or expires, with which and when,
- * so that the launch file can be removed and the author told.
+ * `onCodeGone` runs once for each code, when it is used or expires, with which,
+ * when, and the code, so that its launch file can be removed and the author told.
  */
 export function createSession(
-  onCodeGone: (how: "used" | "expired", at: number) => void = () => {},
+  onCodeGone: (how: "used" | "expired", at: number, code: string) => void = () => {},
   lifeMs = CODE_MINUTES * 60_000, now: () => number = Date.now, nonces = NONCES,
 ): Session {
-  const code = randomBytes(32).toString("base64url");
   const secret = randomBytes(32).toString("base64url");
-  const until = now() + lifeMs;
-  let gone: "used" | "expired" | undefined;
-  const end = (how: "used" | "expired") => {
-    if (gone) return;
-    gone = how;
-    clearTimeout(timer);
-    onCodeGone(how, now());
+  interface Code {
+    code: string;
+    until: number;
+    gone?: "used" | "expired";
+    timer: ReturnType<typeof setTimeout>;
+  }
+  const end = (one: Code, how: "used" | "expired") => {
+    if (one.gone) return;
+    one.gone = how;
+    clearTimeout(one.timer);
+    onCodeGone(how, now(), one.code);
   };
-  const timer = setTimeout(() => end("expired"), lifeMs);
-  timer.unref();
+  const codes: Code[] = [];
+  const issue = (): Code => {
+    for (const earlier of codes) end(earlier, "expired");
+    const one = { code: randomBytes(32).toString("base64url"), until: now() + lifeMs } as Code;
+    one.timer = setTimeout(() => end(one, "expired"), lifeMs);
+    one.timer.unref();
+    codes.push(one);
+    if (codes.length > MOST_CODES) codes.shift();
+    return one;
+  };
+  const first = issue().code;
 
   /** Accepted nonces with their times, in the order they came. */
   const seen = new Map<string, number>();
@@ -102,19 +122,23 @@ export function createSession(
   }
 
   return {
-    code,
+    code: first,
+    issue: () => issue().code,
     redeem(request) {
-      if (!signedWith(code, TAGS.code, request)) return undefined;
-      const prove = proverOf(code, TAGS.code, request);
-      if (now() >= until) end("expired");
-      if (gone) return { prove, refused: gone === "used" ? "code_used" : "code_expired" };
-      end("used");
+      const one = codes.find((each) => signedWith(each.code, TAGS.code, request));
+      if (!one) return undefined;
+      const prove = proverOf(one.code, TAGS.code, request);
+      if (now() >= one.until) end(one, "expired");
+      if (one.gone) return { prove, refused: one.gone === "used" ? "code_used" : "code_expired" };
+      end(one, "used");
       return { prove, secret };
     },
     admit(request) {
       if (!signedWith(secret, TAGS.call, request)) return undefined;
       return { prove: proverOf(secret, TAGS.call, request), verdict: fresh(request.nonce) };
     },
-    expire: () => end("expired"),
+    expire() {
+      for (const one of codes) end(one, "expired");
+    },
   };
 }

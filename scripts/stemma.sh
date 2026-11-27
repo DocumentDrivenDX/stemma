@@ -7,6 +7,10 @@
 #   sh stemma.sh <absolute data directory> setup
 #   sh stemma.sh <absolute data directory> <command> [options]
 #
+# `mcp` is started by the host in every session (CONTRACT-005 N), so for it
+# nothing is ever fetched or written: without the pinned Bun, this script answers
+# the protocol itself and says that setup has not run.
+#
 # STEMMA_BUN_ARCHIVE names a local copy of the archive to use instead of
 # fetching it. It is checked against the same digest.
 set -eu
@@ -65,6 +69,82 @@ ready() {
   [ -f "$bun" ] && [ "$("$bun" --no-env-file --config=/dev/null --version 2>/dev/null)" = "$version" ]
 }
 
+# A request's ID as it may be repeated: a whole number, or a short plain string. Nothing else of a request is.
+mcp_id() {
+  case "$1" in
+    *'"id":'*) ;;
+    *) return 0 ;;
+  esac
+  # An ID that ends the message, one before the parameters, or else the last.
+  v=${1##*'"id":'}
+  v=${v# }
+  case "$v" in
+    *'}' ) case "${v%'}'}" in *[,{}]*) v= ;; *) v=${v%'}'} ;; esac ;;
+    *) v= ;;
+  esac
+  if [ -z "$v" ]; then
+    v=${1%%'"params"'*}
+    case "$v" in *'"id":'*) v=${v#*'"id":'} ;; *) v=${1##*'"id":'} ;; esac
+    v=${v# }
+    v=${v%%[,\}]*}
+  fi
+  case "$v" in
+    '"'*'"')
+      inner=${v#'"'}
+      inner=${inner%'"'}
+      case "$inner" in '' | *[!A-Za-z0-9_.:-]*) return 0 ;; esac
+      ;;
+    -) return 0 ;;
+    -*) case "${v#-}" in *[!0-9]*) return 0 ;; esac ;;
+    '' | *[!0-9]*) return 0 ;;
+  esac
+  [ "${#v}" -le 66 ] || return 0
+  printf '%s' "$v"
+}
+
+# The protocol while the pinned Bun is missing: the same tools, each saying so.
+# It returns when a tool is called and the pinned Bun is there by then, leaving
+# that call in `first`.
+mcp_without_bun() {
+  tools=$(cat "$root/dist/mcp-tools.json") || die "this copy of the plugin holds no list of its tools."
+  first=
+  while IFS= read -r line; do
+    case "$line" in *'"method"'*) ;; *) continue ;; esac
+    method=${line#*'"method"'}
+    method=${method#*'"'}
+    method=${method%%'"'*}
+    case "$method" in notifications/*) continue ;; esac
+    id=$(mcp_id "$line")
+    [ -n "$id" ] || continue
+    case "$method" in
+      initialize)
+        asked=2025-11-25
+        for known in 2024-11-05 2025-03-26 2025-06-18; do
+          case "$line" in *"\"$known\""*) asked=$known ;; esac
+        done
+        printf '{"jsonrpc":"2.0","id":%s,"result":{"protocolVersion":"%s","capabilities":{"tools":{}},"serverInfo":{"name":"stemma","version":"setup-needed"}}}\n' "$id" "$asked"
+        ;;
+      ping) printf '{"jsonrpc":"2.0","id":%s,"result":{}}\n' "$id" ;;
+      tools/list) printf '{"jsonrpc":"2.0","id":%s,"result":{"tools":%s}}\n' "$id" "$tools" ;;
+      tools/call)
+        if ready; then
+          first=$line
+          return 0
+        fi
+        printf '{"jsonrpc":"2.0","id":%s,"result":{"content":[{"type":"text","text":"setup_needed: Stemma has not had its one-time setup on this computer, so nothing was read, started or downloaded. Tell the author in one sentence that Stemma fetches its pinned copy of Bun into the plugin data directory and changes nothing else, run the plugin launcher with setup (the stemma skill, Run Stemma), then call this tool again."}],"isError":true}}\n' "$id"
+        ;;
+      *) printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32601,"message":"This server does not answer that method."}}\n' "$id" ;;
+    esac
+  done
+  exit 0
+}
+
+if [ "$1" = mcp ] && ! ready; then
+  mcp_without_bun
+  STEMMA_MCP_FIRST_LINE=$first
+  export STEMMA_MCP_FIRST_LINE
+fi
+
 if ! ready; then
   for tool in openssl tar; do
     command -v "$tool" >/dev/null 2>&1 || die "$tool is needed for setup and was not found."
@@ -101,6 +181,8 @@ fi
 
 [ -f "$root/dist/stemma.js" ] || die "this copy of the plugin holds no built command line."
 BUN_RUNTIME_TRANSPILER_CACHE_PATH="$data/transpiler-cache"
+# Nothing is written for a server that has not been asked for anything.
+[ "$1" != mcp ] || BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
 # The data directory also holds the pinned Typst, which `build report --pdf` fetches and checks.
 STEMMA_DATA="$data"
 export BUN_RUNTIME_TRANSPILER_CACHE_PATH STEMMA_DATA

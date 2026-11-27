@@ -4,8 +4,10 @@
 // which also answers arras's search query. Nothing here writes, opens a file, or
 // connects anywhere: a record ID is only looked up.
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
+import { agentRecordOf, agentSearch, agentView } from "./agent.ts";
 import { originalPage, recordedOriginals, type TextOriginal } from "../../core/src/original-pages.ts";
 import { ARRAS_SEARCH_QUERY, arrasAccepts, createSearch, queryOf, SEARCH_LIMITS, type SearchData } from "./search.ts";
+import type { SourceView } from "../../core/src/source-view.ts";
 import type { Answer } from "./snapshots.ts";
 
 export interface ServedData {
@@ -40,6 +42,7 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
   const client = createStaticClient(await loadStore(data.moduleText, data.graphText), data.moduleText);
   const { banner, views, manuscript, data_identity } = data;
   const search = createSearch(data.search);
+  const record = agentRecordOf(data.search.entries);
   const texts = data.originals ?? {};
   const recorded = recordedOriginals(texts);
   const moduleName = (JSON.parse(data.moduleText) as { id: string }).id;
@@ -83,6 +86,24 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
     }
     // Asked by the command alone, for `/original`: the page cannot name this call.
     if (route === "original-record") return ok(typeof body.sha256 === "string" ? recorded.get(body.sha256) : null);
+    // The three `agent-` calls are the MCP server's (CONTRACT-005 N): the page cannot name them.
+    if (route === "agent-record") return ok(typeof body.record === "string" ? record.shown(body.record) : null);
+    if (route === "agent-view") {
+      if (typeof body.record !== "string") return BAD;
+      const made = agentView(data.views as Record<string, SourceView>, body.record);
+      return ok(made ? { view: made } : { view: null, record: record.shown(body.record) });
+    }
+    if (route === "agent-search") {
+      const { text, type, offset, limit } = body;
+      if (type !== undefined && !(typeof type === "string" && search.hasType(type))) {
+        return refusal(400, "unknown_type", `No record of that type is held. The types are: ${data.search.types.map((t) => t.type).join(", ")}.`);
+      }
+      const asked = typeof text === "string" ? queryOf(text) : undefined;
+      if (!asked || !wholeFrom(offset, 0, Number.MAX_SAFE_INTEGER) || !wholeFrom(limit, 1, SEARCH_LIMITS.page)) {
+        return refusal(400, "bad_request", `A search is 1 to ${SEARCH_LIMITS.chars} characters and at most ${SEARCH_LIMITS.words} words.`);
+      }
+      return ok(agentSearch(search.page(asked, type as string | undefined, offset, limit), record.entry));
+    }
     if (route === "source-view") {
       if (typeof body.id !== "string") return BAD;
       return ok(Object.hasOwn(views, body.id) ? views[body.id] : null);

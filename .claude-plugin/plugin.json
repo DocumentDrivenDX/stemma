@@ -10,5 +10,11 @@
   "repository": "https://github.com/DocumentDrivenDX/stemma",
   "license": "MIT",
   "skills": "./skills/",
-  "dependencies": ["docsync"]
+  "dependencies": ["docsync"],
+  "mcpServers": {
+    "stemma": {
+      "command": "sh",
+      "args": ["-c", "for v in \"$1\" \"$2\"; do case $v in /*|[A-Za-z]:[/\\\\]*) ;; *) echo \"stemma: this host did not fill in the plugin directories, so nothing was started.\" >&2; exit 4 ;; esac; done; exec sh \"$1/scripts/stemma.sh\" \"$2\" mcp", "stemma-mcp", "${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PLUGIN_DATA}"]
+    }
+  }
 }

@@ -21,6 +21,7 @@ import { graphExport, graphStatus } from "./graph.ts";
 import { ingest } from "./ingest.ts";
 import { buildReportCommand, citeFormat } from "./publish.ts";
 import { browse } from "./browse.ts";
+import { mcp } from "./mcp.ts";
 import { PINNED_BUN, ISOLATION_FLAGS, runtimeProblem } from "./runtime.ts";
 import {
   coverage, passageCapture, passageFind, resolveCommand, reviewAdd, reviewList, sourceCompare, sourceConvert,
@@ -79,6 +80,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   browse [--no-open] [--idle-minutes <n>] [--originals <path>]...
              serves the explorer to a browser on this computer until stopped;
              originals are shown from .stemma/originals/ and the named places
+  mcp [--idle-minutes <n>] [--opener <program>]
+             read-only tools for an agent over standard input and output (MCP);
+             the plugin declares it, and the host starts it
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
@@ -108,7 +112,7 @@ const OPTIONS = {
   citation: STRING, quotation: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
   finding: STRING, effect: STRING, "add-identifier": LIST, set: LIST, author: LIST, lookup: STRING, replace: FLAG, from: STRING,
-  add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST, audience: STRING, page: FLAG, chapter: STRING, "no-open": FLAG, "idle-minutes": STRING,
+  add: LIST, remove: LIST, tag: LIST, stage: STRING, has: LIST, audience: STRING, page: FLAG, chapter: STRING, "no-open": FLAG, "idle-minutes": STRING, opener: STRING,
 };
 
 /** The options each command takes beyond --project and --format. A command not listed takes none. */
@@ -127,7 +131,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages", "citation", "quotation"], retire: ["actor", "reason", "replaced-by"],
   annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
-  check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes", "originals"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
+  check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes", "originals"], mcp: ["idle-minutes", "opener"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
 function version(options: Options): number {
@@ -352,6 +356,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "graph export": only(0); return graphExport(options);
     case "graph status": only(0); return graphStatus(options);
     case "browse": only(0); return browse(options);
+    case "mcp": only(0); return mcp(options);
     case "cite format": only(0); return citeFormat(options);
     case "build report": only(1); return buildReportCommand(options, rest[0]);
     default: throw usageError(`Unknown command: ${command}`);
