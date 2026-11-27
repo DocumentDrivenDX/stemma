@@ -285,6 +285,41 @@ describe("US-113-AC2: citation forms", () => {
   });
 });
 
+describe("US-113-AC2: working markers", () => {
+  const items = (text: string) => {
+    const [b] = matchAuthorDate([chapter(LIST, text)]).brackets;
+    if (!b || b.state === "unlinked") throw new Error(`not read: ${b?.reason}`);
+    return b.items.map((i) => [i.state, i.year, i.locator, i.marker]);
+  };
+
+  test("a marker that ends a part is kept exactly as typed with its last item", () => {
+    expect(items("(Adair 2017, 12 [CHECK])")).toEqual([["linked", "2017", "12", "[CHECK]"]]);
+    expect(items("(see Brel 1999, 2003 [Check  the page; and the year?] [NB])")).toEqual([
+      ["linked", "1999", undefined, undefined], ["linked", "2003", undefined, "[Check  the page; and the year?] [NB]"],
+    ]);
+    expect(items("(Adair 2017 [VERIFY]; Corso 2001: 4)")).toEqual([["linked", "2017", undefined, "[VERIFY]"], ["linked", "2001", "4", undefined]]);
+    expect(items("Corso (2001: 7 [CHECK]) wrote.")).toEqual([["linked", "2001", "7", "[CHECK]"]]);
+  });
+
+  test("a marker changes no state: no match stays unresolved", () => {
+    expect(items("(Zimmer 2017 [CHECK])")).toEqual([["unresolved", "2017", undefined, "[CHECK]"]]);
+    expect(one(LIST, "(Adair et al. 2017 [CHECK])")).toEqual(["(Adair et al. 2017 [CHECK]) => unresolved no_entry"]);
+  });
+
+  test.each([
+    "(Adair 2017 [1850])", "(Adair [1850] 2017)", "(Adair 2017 [checked 2024])", "(Adair 2017 [12])", "(Adair 2017[CHECK])",
+    "(Adair [CHECK] 2017)", "(Adair 2017 [CHECK], 12)", "(Adair 2017 [CHECK] and more)", "(Adair 2017 [a [b]])", "(Adair 2017 [CHECK)",
+  ])("other brackets in a part are other text: %s", (text) => {
+    expect(one(LIST, text)).toEqual([`${text} => unlinked unrecognized_form`]);
+  });
+
+  test("a part that is only a marker is no citation, and a marker does not hide a date range", () => {
+    expect(one(LIST, "(Adair 2017; [CHECK])", "(1516–1850 [CHECK])", "(1850 [CHECK])")).toEqual([
+      "(Adair 2017; [CHECK]) => unlinked mixed_parts", "(1516–1850 [CHECK]) => unlinked year_range", "(1850 [CHECK]) => unlinked no_author_form",
+    ]);
+  });
+});
+
 describe("US-113-AC3 to AC6: one match, or unresolved", () => {
   const solo = "Adair, J. 2017. Rivers.";
   const team = "Adair, J., K. Brel, and L. Corso. 2017. Rivers together.";

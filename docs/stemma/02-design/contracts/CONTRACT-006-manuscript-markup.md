@@ -199,7 +199,9 @@ contract. An unresolved ID or cross-reference is reported.
 - An unbound or ambiguous reference is written with key `?`.
 - An author-date parenthesis whose every part is a citation form (CONTRACT-003
   H) is replaced by one cluster, one item per work and year. Lead-ins become
-  `prefix` and pages a `page` locator. Here the locator comes from the form the
+  `prefix` and pages a `page` locator. A working marker that CONTRACT-003 H
+  keeps with an item is written as its `suffix`, exactly as typed, so it stays
+  with the citation. Here the locator comes from the form the
   intake profile names, not from a guess by the markup reader. Each item has its
   own `citation` record, whose `as_found` keeps the bracketed text as typed,
   with any narrative names, and whose `document_position` keeps where it was.
@@ -207,7 +209,8 @@ contract. An unresolved ID or cross-reference is reported.
   `mode="suppress-author"`. How a note style typesets it is not settled (PRD
   open question on the pilot's citation style).
 - A parenthesis left unlinked stays as text, escaped as B requires. So do the
-  author's own bracketed working markers.
+  author's own bracketed working markers, other than those written as an item's
+  `suffix`.
 - A tool edit (round choice, retired claim, repoint) MUST change only the
   affected byte span and leave the rest of the file identical. It MUST refuse if
   the file changed since it was read.

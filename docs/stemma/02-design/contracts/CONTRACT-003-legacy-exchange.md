@@ -280,6 +280,16 @@ semicolons.
   does not begin a name in brackets. A month or season is not a name unless
   some list of the project has it as a family name.
 - A lead-in is read ignoring case.
+- A **working marker** is text in square brackets at the end of a part, set off
+  by a space, with at least one letter, no year form, and no square bracket
+  inside, as in `(Adair 2017, 12 [CHECK])`. Markers do not stop a part from
+  being a citation form. Those at the end of a part, one or several, are kept
+  exactly as typed with its last item, as its `suffix` (CONTRACT-006 F). Their
+  words are not read. A marker changes no state, and a link says nothing about
+  what the marker asks. Brackets anywhere else in a part, or with a year form
+  inside, such as `[1850]`, are other text. A semicolon inside square brackets
+  does not split parts, a part that is only a marker is not a citation form,
+  and markers are not names when looking for a range of dates.
 - A page is a number, optionally followed by `f` or `ff`, or a lower-case Roman
   numeral. A range joins two with a hyphen or en dash. Further pages after a
   comma belong to the same locator, until a year form. The locator leaves out

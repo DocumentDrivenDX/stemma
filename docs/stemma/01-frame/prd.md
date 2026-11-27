@@ -763,7 +763,8 @@ Windows, desktop apps, and files saved by real tools are untested.
 - [ ] How are citations in tables read, when table layout arrives after the
   pilot (FR-35)? Design owner.
 - [ ] What do an author's own bracketed working markers, such as a note to
-  verify a statement, mean? Takeover keeps them as text; should it also report
+  verify a statement, mean? Takeover keeps them as typed, including one that
+  ends a citation in brackets, which stays with that citation; should it also report
   them, or treat them as needing a source? Product owner with the pilot author.
 - [ ] Should every check report count the parentheses left unlinked, or should
   an unsettled one affect the checked-clean label? Until answered, only the

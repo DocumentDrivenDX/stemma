@@ -34,6 +34,8 @@ export type CitationItem = Cited & {
   prefix?: string;
   /** A page locator, as printed. */
   locator?: string;
+  /** The author's bracketed working markers that follow this item, exactly as typed. */
+  marker?: string;
   candidates: Candidate[];
 } & ({ state: "linked"; entry: EntryRef } | { state: "unresolved"; reason: UnresolvedReason });
 
@@ -104,7 +106,21 @@ function pairs(text: string): { pairs: Pair[]; unpaired: number[] } {
 
 // ---- Parts and citation forms ----
 
-interface YearItem { year: string; suffix: string; locator?: string }
+interface YearItem { year: string; suffix: string; locator?: string; marker?: string }
+
+/** A part without the working markers that end it, and those markers as typed. */
+function withoutMarkers(part: string): { body: string; marker?: string } {
+  let body = part;
+  for (;;) {
+    const found = /(?<=\S)\s+\[([^[\]]*)\]\s*$/.exec(body);
+    if (!found || !/\p{L}/u.test(found[1]!) || yearForms(found[1]!).length > 0) break;
+    body = body.slice(0, found.index);
+  }
+  return body === part ? { body } : { body, marker: part.slice(body.length).trim() };
+}
+
+/** Parts are split at semicolons, except those inside square brackets. */
+const splitParts = (content: string): string[] => content.split(/;(?![^[\]]*\])/);
 
 const PAGE = String.raw`(?:\d+(?:ff?\.?(?![\p{L}]))?|[ivxlc]+)(?![\p{L}\p{N}])`;
 const RANGE = String.raw`${PAGE}(?:\s*[-‐‑–]\s*${PAGE})?`;
@@ -196,7 +212,14 @@ type Part =
 
 const LEAD_IN = /^(see also|see|cf\.|based on)\s+/i;
 
-function readPart(raw: string, known: Known): Part {
+function readPart(typed: string, known: Known): Part {
+  const { body, marker } = withoutMarkers(typed);
+  const part = readCitation(body, known);
+  if (marker && part.read !== "not_citation") part.items.push({ ...part.items.pop()!, marker });
+  return part;
+}
+
+function readCitation(raw: string, known: Known): Part {
   const text = raw.replace(/\s+/g, " ").trim();
   const only = yearItems(text, 0);
   if (only) return { read: "years_only", items: only };
@@ -346,7 +369,7 @@ type Reading =
   | { reason: UnlinkedReason; parts: PartReading[]; possibleNarrative: boolean };
 
 function readBracket(text: string, pair: Pair, location: Location, known: Known): Reading {
-  const raw = (pair.nested ? pair.own : text.slice(pair.start + 1, pair.end - 1)).split(";");
+  const raw = splitParts(pair.nested ? pair.own : text.slice(pair.start + 1, pair.end - 1));
   const parts = raw.map((part) => readPart(part, known));
   const yearsOnly = parts.every((p) => p.read === "years_only");
   const before = text.slice(0, pair.start);
@@ -358,7 +381,7 @@ function readBracket(text: string, pair: Pair, location: Location, known: Known)
     possibleNarrative: reason === "no_author_form" && /(?<![\p{L}])\p{Lu}[\p{L}\p{M}'’-]*[.,]?["'”’]?\s*$/u.test(before),
   });
   if (location === "table") return unlinked("in_table");
-  if (isDateRange(raw)) return unlinked("year_range");
+  if (isDateRange(raw.map((p) => withoutMarkers(p).body))) return unlinked("year_range");
   if (yearsOnly) {
     if (pair.nested) return unlinked("unrecognized_form");
     if (!readable) return unlinked("no_author_form");
