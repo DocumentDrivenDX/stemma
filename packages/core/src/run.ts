@@ -17,6 +17,7 @@ import { SourceTexts } from "./matching/texts.ts";
 import { coverageOf } from "./verification.ts";
 import { fileResults, rulesResults } from "./checks/records.ts";
 import { result, sortResults } from "./findings.ts";
+import { claimReach, isReviewed } from "./review.ts";
 import type { NotRun, ReportBody, Result, Summary, Unreviewed } from "./report.ts";
 import { QUOTE_PROFILE } from "./matching/quote-fold.ts";
 
@@ -55,8 +56,9 @@ export function unreviewedItems(corpus: Corpus): Unreviewed[] {
     const claims = citation.data!.claims;
     for (const id of Array.isArray(claims) ? claims : []) {
       const claim = claimsById.get(id);
-      const review = claim?.data!.review as { state?: string } | undefined;
-      if (claim && review?.state !== "reviewed") add(String(id), "claim", "unreviewed", location);
+      for (const record of claim ? claimReach(corpus, claim) : []) {
+        if (!isReviewed(record)) add(idOf(record)!, String(record.data!.kind), "unreviewed", location);
+      }
     }
   }
   return [...reached.values()].sort((a, b) => compareCodePoints(a.record, b.record));

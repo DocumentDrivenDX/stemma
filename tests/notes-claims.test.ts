@@ -1,11 +1,12 @@
 // Note and claim rules and review marks (FR-20, FR-21, FR-23; CONTRACT-002 B1
 // and C). The records are invented.
 import { describe, expect, test } from "bun:test";
-import { PROBLEMS, runChecks } from "@stemma/core";
-import { canonical, loadCorpus, type ProjectContent, recordPath } from "@stemma/records";
+import { PROBLEMS, recordStates, runChecks } from "@stemma/core";
+import { canonical, digest, loadCorpus, type ProjectContent, recordPath } from "@stemma/records";
 
 type Value = Record<string, unknown>;
 const AT = "2026-01-05T09:00:00Z";
+const person = { kind: "person", name: "An Author" };
 const model = { kind: "model", name: "a-model" };
 const unreviewed = { state: "unreviewed" };
 const bytes = (text: string): Uint8Array => new TextEncoder().encode(text);
@@ -45,5 +46,42 @@ describe("record.valid for notes, claims and attestations", () => {
     const missing = claim("clm-bbbbbbbb");
     delete missing.review;
     expect(of(project([missing]), "record.valid", "clm-bbbbbbbb").map((r) => [r.outcome, evidence(r, "field")[0]])).toEqual([["fail", "/review"]]);
+  });
+});
+
+/** CONTRACT-001 E: a mark on the record as it is now. */
+const reviewed = (record: Value): Value => {
+  const { review: _r, created: _c, ...content } = record;
+  return { ...record, review: { state: "reviewed", content_sha256: digest(content), decided: { at: AT, by: person } } };
+};
+const citation = (id: string, claims: string[]): Value => ({ ...base(id, "citation"), key: "one", claims, intake: "parsed" });
+
+describe("one review rule", () => {
+  const marked = reviewed(claim("clm-marked00"));
+  const edited = { ...reviewed(claim("clm-edited00")), text: "Edited since the mark" };
+  const said = claim("clm-nodigest", { review: { state: "reviewed" } });
+  const evidenceNote = note("nte-reached0");
+  const retiredNote = note("nte-retired0", { retired: { stamp: { at: AT, by: person }, reason: "gone" } });
+  const records = [
+    source, marked, edited, said, evidenceNote, retiredNote, note("nte-unreached"),
+    link("att-reached0", "clm-marked00", "nte-reached0"), link("att-retired0", "clm-marked00", "nte-retired0"),
+    citation("cit-aaaaaaaa", ["clm-marked00", "clm-edited00", "clm-nodigest"]),
+  ];
+
+  test("the report lists an edited reviewed claim, and a cited claim's attestations and evidence notes", () => {
+    const listed = check(project(records)).unreviewed.filter((u) => u.reason === "unreviewed");
+    expect(listed.map((u) => [u.record, u.kind, u.locations])).toEqual([
+      ["att-reached0", "attestation", ["cit-aaaaaaaa"]], ["att-retired0", "attestation", ["cit-aaaaaaaa"]],
+      ["clm-edited00", "claim", ["cit-aaaaaaaa"]], ["clm-nodigest", "claim", ["cit-aaaaaaaa"]], ["nte-reached0", "note", ["cit-aaaaaaaa"]],
+    ]);
+    expect(check(project(records)).summary.unreviewed).toBe(check(project(records)).unreviewed.length);
+  });
+
+  test("the export states agree with the report, and also mark what nothing cites", () => {
+    const corpus = loadCorpus(project(records));
+    const states = recordStates(corpus).records;
+    const has = (id: string) => states.get(id)?.includes("unreviewed") ?? false;
+    for (const item of check(project(records)).unreviewed) expect(has(item.record), item.record).toBe(true);
+    expect([has("clm-marked00"), has("nte-unreached"), has("nte-retired0")]).toEqual([false, true, false]);
   });
 });

@@ -4,10 +4,10 @@
 // A record with no state has not been shown to be clear of anything.
 import { compareCodePoints, type Corpus, idOf, isObject, isRetired, type LoadedFile } from "@stemma/records";
 import { annotate } from "./annotations.ts";
-import { itemOf } from "./checks/records.ts";
 import { sortResults } from "./findings.ts";
 import { SourceTexts } from "./matching/texts.ts";
 import type { Result } from "./report.ts";
+import { isReviewed } from "./review.ts";
 import { guarded, IMPLEMENTED_CHECKS, unreviewedItems } from "./run.ts";
 
 export type RecordState = "unreviewed" | "retired_link" | "support_missing" | "support_stale" | "support_unsupported" | "annotated" | "open_finding";
@@ -63,9 +63,7 @@ export function recordStates(corpus: Corpus): RecordStates {
   for (const item of unreviewedItems(corpus)) add(item.record, "unreviewed");
   for (const file of corpus.records.filter(live)) {
     const id = idOf(file)!;
-    const { review } = file.data!;
-    // CONTRACT-001 G: a review mark applies only while the content is what was reviewed.
-    if (isObject(review) && (review.state !== "reviewed" || review.content_sha256 !== itemOf(file)!.content_sha256)) add(id, "unreviewed");
+    if (isObject(file.data!.review) && !isReviewed(file)) add(id, "unreviewed");
     const retired = file.references.some((r) => {
       if (/^\/(legacy|retired)\//.test(r.field)) return false;
       const target = corpus.byId.get(r.id);
