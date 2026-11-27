@@ -6,13 +6,37 @@
       "value": {
         "value": "Proceedings of the American Academy of Arts and Sciences"
       }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "51"
+      }
+    },
+    {
+      "name": "issue",
+      "value": {
+        "value": "4"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "157–251"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Glacial-Control Theory"
+      }
     }
   ],
   "changed": {
-    "at": "2026-11-27T03:14:52Z",
+    "at": "2026-11-27T03:40:01Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -26,6 +50,50 @@
       "field": "tags",
       "from": "report/report.md, section 4",
       "value": "position:critic"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:00Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.volume",
+      "from": "cover of the separate (file index 2): volume and number; text runs from the unnumbered title page before page 158 (file index 4) to page 251 (file index 98)",
+      "value": "51"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:00Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.issue",
+      "from": "cover of the separate (file index 2): volume and number; text runs from the unnumbered title page before page 158 (file index 4) to page 251 (file index 98)",
+      "value": "4"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:00Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.page",
+      "from": "cover of the separate (file index 2): volume and number; text runs from the unnumbered title page before page 158 (file index 4) to page 251 (file index 98)",
+      "value": "157–251"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:01Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Glacial-Control Theory"
     }
   ],
   "citation_key": "daly1915",

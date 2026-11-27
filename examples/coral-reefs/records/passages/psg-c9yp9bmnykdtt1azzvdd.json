@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2172,
+      "index": 41,
+      "page_sha256": "1ef4b1601444f7e4c02cbe010f01ad60490ac4dec36147c75f2aa7ead32e0925",
+      "start": 2101,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:47Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-c9yp9bmnykdtt1azzvdd",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xxxii"
+  },
+  "quote": {
+    "exact": "Most important is an extensive system of boring\nat well-selected points"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

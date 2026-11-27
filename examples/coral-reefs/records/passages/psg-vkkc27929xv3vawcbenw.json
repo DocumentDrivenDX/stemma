@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1887,
+      "index": 94,
+      "page_sha256": "860845c19eecb65b54befa3a593eed14bb4f337267cbc27c3bb2df78d9a9246d",
+      "start": 1821,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:59Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-vkkc27929xv3vawcbenw",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "247"
+  },
+  "quote": {
+    "exact": "sunk well inside the reefs of atolls and barrier-encircled islands"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "source_record_sha256": "f80fb498ea6e5ceb1213c2bf41bda39e2f32bdd4016ac0bae2767a66a427205e",
+  "text": "txt-8q5sdvm520cwygpgjvn8"
+}

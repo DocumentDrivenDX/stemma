@@ -7,6 +7,8 @@
     "@stemma/records": "workspace:*",
     "@stemma/core": "workspace:*",
     "@stemma/workspace": "workspace:*",
-    "@stemma/extract": "workspace:*"
+    "@stemma/extract": "workspace:*",
+    "@stemma/cite": "workspace:*",
+    "@stemma/publish": "workspace:*"
   }
 }

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1252,
+      "index": 14,
+      "page_sha256": "2c6e0faf8c5a46b504b4e825ca94c685dec765695d830fb1a741d5d2b85761ef",
+      "start": 1125,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-pbzvtqs1827v47j0f715",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "vii"
+  },
+  "quote": {
+    "exact": " had been made, and cores brought up for examination from a boring, which\nhad been carried down to a depth of at least 600 feet"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

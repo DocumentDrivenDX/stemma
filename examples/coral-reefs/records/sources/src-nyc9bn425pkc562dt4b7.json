@@ -1,0 +1,72 @@
+{
+  "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:40:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:32Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 4",
+      "value": "position:subsidence"
+    }
+  ],
+  "citation_key": "darwin-semper1879",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Darwin",
+        "given": "Charles"
+      },
+      "lid": "a1",
+      "role": "author"
+    },
+    {
+      "as_printed": {
+        "family": "Semper",
+        "given": "Karl"
+      },
+      "lid": "a2",
+      "role": "recipient"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:17Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "dates": [
+    {
+      "date": {
+        "edtf": "1879-10-02"
+      },
+      "variable": "event-date"
+    }
+  ],
+  "id": "src-nyc9bn425pkc562dt4b7",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-a04mqd3jch9s39zbmpjp",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "position:subsidence"
+  ],
+  "type": "personal_communication"
+}

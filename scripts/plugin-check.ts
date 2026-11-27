@@ -112,6 +112,24 @@ if (!added.includes("method text_layer")) fail("the installed copy did not read 
 if (added.includes("cMapUrl") || added.includes("standardFontDataUrl")) fail("the packaged font or character-map data was not found");
 if (!readFileSync(join(reading, directory, "pages/p0000.md"), "utf8").includes("\u6e2f\u306e\u901a\u884c\u7a0e")) fail("the text did not come out of the PDF");
 
+// Formatting a citation with the bundled citeproc-js, style and locale, whose licences ship beside it.
+for (const licence of ["CPAL-1.0.txt", "CC-BY-SA-3.0.txt", "citeproc-js-LICENSE", "NOTICE.txt"]) {
+  if (!files.includes(join("dist/licenses/cite", licence))) fail(`the installed plugin lacks dist/licenses/cite/${licence}`);
+}
+const invented = join(base, "invented-source.json");
+writeFileSync(invented, JSON.stringify({
+  kind: "source", citation_key: "example1987", type: "book", title: { value: "An Invented Harbour Survey" },
+  contributions: [{ lid: "a1", role: "author", as_printed: { family: "Example", given: "Ann" } }], issued: { edtf: "1987" },
+  bib: [{ name: "publisher", value: { value: "Invented Press" } }],
+}));
+run([...launcher, "record", "add", "source", "--input", invented, "--actor", "software:plugin-check", "--project", reading]);
+const clusters = join(base, "clusters.json");
+writeFileSync(clusters, JSON.stringify({ notes: [[{ key: "example1987", locator: "41" }], [{ key: "example1987", locator: "42" }]] }));
+const cited = run([...launcher, "cite", "format", "--input", clusters, "--project", reading]);
+for (const expected of ["1. Ann Example, An Invented Harbour Survey (Invented Press, 1987), 41.", "2. Example, Invented Harbour Survey, 42.", "Example, Ann. An Invented Harbour Survey. Invented Press, 1987."]) {
+  if (!cited.replaceAll("*", "").includes(expected)) fail(`the installed command line did not format the citation: expected ${expected}`);
+}
+
 if (readdirSync(home).some((name) => name.startsWith(".bun") || /profile|rc$/.test(name))) fail("something was written to the home directory");
 
 console.log(`
@@ -120,6 +138,6 @@ plugin installs from a local stand-in for the DocumentDrivenDX marketplace
 into an empty profile with one skill, and with no bun on the search path the
 launcher fetches the pinned Bun into the plugin data directory and runs the installed
 command line, which reads the text of a synthetic PDF with the packaged library data and
-no native module. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
+no native module, and formats Chicago notes and a bibliography with the bundled citeproc-js. The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);

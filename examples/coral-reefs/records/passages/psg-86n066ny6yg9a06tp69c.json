@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1382,
+      "index": 181,
+      "page_sha256": "01963b5b82293f69f4a6ce6d84de2f18147184de55c97a8fe9c96e9889328bec",
+      "start": 1209,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:29Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-86n066ny6yg9a06tp69c",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "154"
+  },
+  "quote": {
+    "exact": "The necessity, also, that a foundation\nshould have existed at the proper depth for the growth\nof the corals over certain large areas, almost compels\nus to accept this theory"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "source_record_sha256": "5439812aad6f92b8499b1d4afaae0243088e005d33f33c9d7fb4dbf37566b5e9",
+  "text": "txt-0j25y9a786mfy0ntdtcx"
+}

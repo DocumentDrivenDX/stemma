@@ -1,0 +1,112 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "title-short",
+      "value": {
+        "value": "General Report"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:47Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:45Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "contents (file index 10): section X, page 167; running head on page 180 (file index 211)",
+      "value": "General Report on the Materials Sent from Funafuti, and the Methods of Dealing with Them"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:45Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "contents (file index 10): section X, page 167; running head on page 180 (file index 211)",
+      "value": "Judd, J. W."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:46Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:46Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "funafuti"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:47Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "General Report"
+    }
+  ],
+  "citation_key": "judd1904-report",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Judd",
+        "given": "J. W."
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:44Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-atqz5dng7yp7yw2v8jm2",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-n7pw0cvq9y0d742wr45f",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "evidence:boring",
+    "funafuti"
+  ],
+  "title": {
+    "value": "General Report on the Materials Sent from Funafuti, and the Methods of Dealing with Them"
+  },
+  "type": "chapter"
+}

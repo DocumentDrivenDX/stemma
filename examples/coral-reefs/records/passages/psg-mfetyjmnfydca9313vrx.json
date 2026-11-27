@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 332,
+      "index": 6,
+      "page_sha256": "231a55ea718cb73614e3bb50e862951a1316399f36992fe54dc193429fa6f7fd",
+      "start": 291,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:59Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-mfetyjmnfydca9313vrx",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "title page"
+  },
+  "quote": {
+    "exact": "BONNEY, PROFESSOR T. G., F.R S., Chairman"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

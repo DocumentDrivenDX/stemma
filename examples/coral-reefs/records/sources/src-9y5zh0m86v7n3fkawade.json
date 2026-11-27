@@ -6,13 +6,31 @@
       "value": {
         "value": "Annual Review of Ecology, Evolution, and Systematics"
       }
+    },
+    {
+      "name": "volume",
+      "value": {
+        "value": "55"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "301–22"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Renaissance of Atoll Ecology"
+      }
     }
   ],
   "changed": {
-    "at": "2026-11-27T03:14:54Z",
+    "at": "2026-11-27T03:40:06Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -26,34 +44,83 @@
       "field": "tags",
       "from": "report/report.md, section 6",
       "value": "position:later-assessment"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:05Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.volume",
+      "from": "first page (file index 0): authors and 'Annu. Rev. Ecol. Evol. Syst. 2024. 55:301–22'",
+      "value": "55"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:05Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.page",
+      "from": "first page (file index 0): authors and 'Annu. Rev. Ecol. Evol. Syst. 2024. 55:301–22'",
+      "value": "301–22"
+    },
+    {
+      "action": "replaced",
+      "at": "2026-11-27T03:40:05Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "first page (file index 0): authors and 'Annu. Rev. Ecol. Evol. Syst. 2024. 55:301–22'",
+      "previous": "Steibl; Bunbury; Young; Russell",
+      "value": "Steibl, Sebastian; Bunbury, Nancy; Young, Hillary S.; Russell, James C."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:06Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Renaissance of Atoll Ecology"
     }
   ],
   "citation_key": "steibl2024",
   "contributions": [
     {
       "as_printed": {
-        "family": "Steibl"
+        "family": "Steibl",
+        "given": "Sebastian"
       },
       "lid": "a1",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Bunbury"
+        "family": "Bunbury",
+        "given": "Nancy"
       },
       "lid": "a2",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Young"
+        "family": "Young",
+        "given": "Hillary S."
       },
       "lid": "a3",
       "role": "author"
     },
     {
       "as_printed": {
-        "family": "Russell"
+        "family": "Russell",
+        "given": "James C."
       },
       "lid": "a4",
       "role": "author"

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2271,
+      "index": 192,
+      "page_sha256": "1bae87f6345da22a6fb7007e89c6b73fda08a1ceabcb5854e0d92d7be5dd88dc",
+      "start": 1984,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:50Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-xzvm5pq4x1ceqzjr48vy",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "117"
+  },
+  "quote": {
+    "exact": "the existence of alternate layers of\nbeach rock and of recent conglomerate or of coral rubble does not by any\nmeans indicate a talus; it merely indicates a reef flat over which the sea\nhas either been building up beaches, or cutting down ledges, or adding masses\nof coral sand or shingle"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

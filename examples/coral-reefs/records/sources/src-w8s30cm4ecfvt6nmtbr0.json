@@ -1,10 +1,42 @@
 {
   "admission": "candidate",
+  "bib": [
+    {
+      "name": "collection-title",
+      "value": {
+        "value": "Memoirs of the Museum of Comparative Zoölogy at Harvard College"
+      }
+    },
+    {
+      "name": "collection-number",
+      "value": {
+        "value": "28"
+      }
+    },
+    {
+      "name": "publisher",
+      "value": {
+        "value": "Printed for the Museum"
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "Cambridge, U.S.A."
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Coral Reefs of the Tropical Pacific"
+      }
+    }
+  ],
   "changed": {
-    "at": "2026-11-27T03:14:52Z",
+    "at": "2026-11-27T03:39:57Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -18,6 +50,61 @@
       "field": "tags",
       "from": "report/report.md, section 4",
       "value": "position:critic"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:56Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.collection-title",
+      "from": "title page (file index 14)",
+      "value": "Memoirs of the Museum of Comparative Zoölogy at Harvard College"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:56Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.collection-number",
+      "from": "title page (file index 14)",
+      "value": "28"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:56Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher",
+      "from": "title page (file index 14)",
+      "value": "Printed for the Museum"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:56Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher-place",
+      "from": "title page (file index 14)",
+      "value": "Cambridge, U.S.A."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:57Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Coral Reefs of the Tropical Pacific"
     }
   ],
   "citation_key": "agassiz1903",

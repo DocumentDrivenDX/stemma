@@ -56,6 +56,16 @@ another step. Typst offers no verified Word export; manuscript export is deferre
 and may be blocked by host or arras security policies. The PRD (FR-55 to FR-57)
 states the resulting print and image scope.
 
+**License review (2026-11-27)**: citeproc-js 2.4.63 (npm `citeproc`) declares
+`CPAL-1.0 OR AGPL-1.0` in its package metadata; its notice offers CPAL version 1
+or later, or AGPL version 3 or later. Stemma distributes it under CPAL-1.0,
+unmodified and unminified in the bundled command line, with its notice, the
+CPAL text, and a notice that the source is in the bundle and at its published
+addresses. Neither the package nor its repository gives CPAL Exhibit B
+Attribution Information, so CPAL 14(c) requires no display. The Chicago style
+and en-US locale are CC BY-SA 3.0, bundled unchanged with their credits and the
+license text. This is a reading of the license texts, not legal advice.
+
 **Drift signals to watch**: Hand-edited citation output; a PDF/X claim; preview
 pages that differ from print without a flag.
 

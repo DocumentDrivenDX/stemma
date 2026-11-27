@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2258,
+      "index": 41,
+      "page_sha256": "1fb4229e158db993346f3e0d29ed42b02671b6cec16c78ae1c6dc99c988202ac",
+      "start": 2087,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:00Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-7ptq1wks0832r0r7thgf",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "899"
+  },
+  "quote": {
+    "exact": "The deep drilling on Eniwetok, however, firmly\nestablished the fact that the foundation of that atoll\nis a basaltic volcano that rises 2 miles above the floor\nof the ocean"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "225881d33fe38eaf9bb75d49af608a97a79e1e16c426bdbd20e236b4560bbb75",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

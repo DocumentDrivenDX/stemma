@@ -41,11 +41,11 @@ describe("one pinned runtime", () => {
 });
 
 describe("no run-time packages", () => {
-  test("the one library from outside is the PDF reader, pinned exactly and bundled", () => {
-    const outside = ["package.json", ...["records", "core", "workspace", "cli", "extract"].map((p) => `packages/${p}/package.json`)]
+  test("the libraries from outside are the PDF reader and the citation processor, pinned exactly and bundled", () => {
+    const outside = ["package.json", ...["records", "core", "workspace", "cli", "extract", "cite", "publish"].map((p) => `packages/${p}/package.json`)]
       .flatMap((path) => Object.entries<string>(JSON.parse(read(path)).dependencies ?? {}))
       .filter(([, version]) => version !== "workspace:*");
-    expect(outside).toEqual([["pdfjs-dist", "6.5.438"]]);
+    expect(outside).toEqual([["citeproc", "2.4.63"], ["pdfjs-dist", "6.5.438"]]);
   });
 
   test("the bundle imports only what is built into Bun", async () => {

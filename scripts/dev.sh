@@ -7,9 +7,9 @@
 #                                  compare, and check it; --fetch downloads them
 #                                  from the recorded addresses
 #   ./scripts/dev.sh report        rebuild the worked example's research report
-#                                  (examples/coral-reefs/report/) from the committed
-#                                  source files; also typesets report.pdf when the
-#                                  pinned Typst is in .tools/typst-0.15.1/
+#                                  (examples/coral-reefs/report/) with stemma build
+#                                  report, and typeset report.pdf with the pinned
+#                                  Typst, which it fetches into .tools/ if missing
 #   ./scripts/dev.sh report-check  fail if the report's generated files are stale
 #   ./scripts/dev.sh demo          build, then run the demo in a fresh temporary directory
 #   ./scripts/dev.sh plugin-check  build, then install into an isolated Claude profile
@@ -58,15 +58,11 @@ case "${1:-check}" in
     run scripts/build.ts >/dev/null
     run dist/stemma.js ingest --project "$root/examples/coral-reefs" --reconvert --actor software:dev-example "$@" ;;
   report)
-    python3 -I -B examples/coral-reefs/report/tools/build.py
-    typst="$root/.tools/typst-0.15.1/typst-aarch64-apple-darwin/typst"
-    if [ -x "$typst" ]; then
-      "$typst" compile --root examples/coral-reefs/report examples/coral-reefs/report/report.typ examples/coral-reefs/report/report.pdf
-      echo "wrote examples/coral-reefs/report/report.pdf"
-    else
-      echo "report.pdf not typeset: Typst 0.15.1 is not in .tools/typst-0.15.1/"
-    fi ;;
-  report-check) python3 -I -B examples/coral-reefs/report/tools/build.py --check ;;
+    run scripts/build.ts >/dev/null
+    STEMMA_DATA="$root/.tools" run dist/stemma.js build report report --pdf --project "$root/examples/coral-reefs" ;;
+  report-check)
+    run scripts/build.ts >/dev/null
+    run dist/stemma.js build report report --check --project "$root/examples/coral-reefs" ;;
   demo) run scripts/build.ts >/dev/null && run scripts/demo.ts ;;
   plugin-check) run scripts/build.ts >/dev/null && run scripts/plugin-check.ts ;;
   publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;

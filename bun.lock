@@ -20,11 +20,19 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/cite": {
+      "name": "@stemma/cite",
+      "dependencies": {
+        "@stemma/records": "workspace:*",
+      },
+    },
     "packages/cli": {
       "name": "@stemma/cli",
       "dependencies": {
+        "@stemma/cite": "workspace:*",
         "@stemma/core": "workspace:*",
         "@stemma/extract": "workspace:*",
+        "@stemma/publish": "workspace:*",
         "@stemma/records": "workspace:*",
         "@stemma/workspace": "workspace:*",
       },
@@ -37,6 +45,14 @@
     },
     "packages/extract": {
       "name": "@stemma/extract",
+    },
+    "packages/publish": {
+      "name": "@stemma/publish",
+      "dependencies": {
+        "@stemma/cite": "workspace:*",
+        "@stemma/core": "workspace:*",
+        "@stemma/records": "workspace:*",
+      },
     },
     "packages/records": {
       "name": "@stemma/records",
@@ -120,11 +136,15 @@
 
     "@playwright/test": ["@playwright/test@1.63.0", "", { "dependencies": { "playwright": "1.63.0" }, "bin": { "playwright": "cli.js" } }, "sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ=="],
 
+    "@stemma/cite": ["@stemma/cite@workspace:packages/cite"],
+
     "@stemma/cli": ["@stemma/cli@workspace:packages/cli"],
 
     "@stemma/core": ["@stemma/core@workspace:packages/core"],
 
     "@stemma/extract": ["@stemma/extract@workspace:packages/extract"],
+
+    "@stemma/publish": ["@stemma/publish@workspace:packages/publish"],
 
     "@stemma/records": ["@stemma/records@workspace:packages/records"],
 

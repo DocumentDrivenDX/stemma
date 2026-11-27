@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2077,
+      "index": 253,
+      "page_sha256": "c88b549dc2ea19d7acbe8256e78597c81f41f8b2c345ff4d354fb243c0f4a829",
+      "start": 1835,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:33Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-fwncnazk0shh2gvd1dd9",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "232"
+  },
+  "quote": {
+    "exact": "if, as Dana says, all kinds of\nreefs may originate during subsidence, the structure of the reef\nitself is of no importance in investigating the question as te\nwhether in any given spot subsidence or upheaval is taking\nplace or has taken place"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-nmf90sqdz27921jbh6j4",
+  "source_record_sha256": "61aa033c899a88ed1fe2651f3b847770dfd7726744cf5a40bccdbc3d6139c2a6",
+  "text": "txt-1sdwsxr0wr9rewcayqpr"
+}

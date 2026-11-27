@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2437,
+      "index": 192,
+      "page_sha256": "1bae87f6345da22a6fb7007e89c6b73fda08a1ceabcb5854e0d92d7be5dd88dc",
+      "start": 2273,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-aaz9n521ffzn2gf8f6h3",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "117"
+  },
+  "quote": {
+    "exact": "This may explain much of the character of the\nsuccessive layers of rock met with by boring through the upper strata at\nFunafuti, said to have been due to subsidence"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

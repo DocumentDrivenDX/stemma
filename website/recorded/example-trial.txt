@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/coral-reefs-trial
 OPEN FINDINGS: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 5302 result(s) passed.
+Checked the whole project: 5683 result(s) passed.
 
 1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.

@@ -24,23 +24,23 @@ Read with git show only. The microsite example follows the 1842 first edition fr
 
 ## Method and tooling
 
-- First draft (2026-11-26): passages were captured against scratch conversions of the 14 stored PDFs. Second pass (2026-11-27): every passage was located again in the worked example's committed source files (`examples/coral-reefs/sources/`, all 14 works), and captured afresh with `stemma passage capture` against a copy of that project. All 117 quoted segments were found unchanged, once each, on the same page indexes, so no quotation, correction or page number changed. The passage records in `records/passages/` name the committed text IDs and source records; the build reads only the repository.
+- First draft (2026-11-26): passages were captured against scratch conversions of the 14 stored PDFs. Second pass (2026-11-27): every passage was located again in the worked example's committed source files (`examples/coral-reefs/sources/`, all 14 works), and captured afresh with `stemma passage capture` against a copy of that project. All 117 quoted segments were found unchanged, once each, on the same page indexes, so no quotation, correction or page number changed. The passage records name the committed text IDs and source records; the build reads only the repository.
 - The committed Agassiz introduction and Funafuti preface pages carried no page labels, so `passage capture` refused them. Their printed roman numbers were added to the committed source files with `stemma source label` (evidence `page_image`, actor the model): Agassiz file indexes 22–41 as xiii–xxxii, Funafuti 19–20 as xii–xiii, the ends of each run read from page images. The words are unchanged, and the example's check output is the same before and after.
-- `passage capture` still refuses the first page of the Funafuti preface, which carries no printed number. Two passages there are selected by character offsets in `records/passages.json`, with the page digest, and the locator vii taken from the contents page.
+- The first page of the Funafuti preface carries no printed number. It was labelled vii with `source label` on the author's statement, from the volume's contents page, so that `passage capture` could copy its passages and locator.
 - Located passages with `passage find` (typed search words only locate a range; the text comes from the source file) or by exact character offsets.
 - Cross-page passages are two captures joined by the build; running heads, footnotes and note reference marks between them are omitted and the omissions listed in verification.md.
-- Every quoted page was rendered with `examples/coral-reefs/tools/render-pages.swift` and read by the model. Sixteen corrections (fifteen distinct text-layer errors, one of them in two overlapping passages) are recorded as model-read corrections in `records/passages.json` (see verification.md); none was silently fixed.
+- Every quoted page was rendered with `examples/coral-reefs/tools/render-pages.swift` and read by the model. Sixteen corrections (fifteen distinct text-layer errors, one of them in two overlapping passages) are recorded as model-read corrections in `report.json` (see verification.md); none was silently fixed.
 - Italics in quotations (*Challenger*, *Halimeda*, *Globigerina*, *in situ*) are applied from a list checked against the images; the text layer does not carry them.
 - Note 9 carries a comment added by the coordinating agent on the doubled negative ("might not be formed"). Checked against the page images of both editions (1842 p. 89, file index 106; 1889 p. 120, index 147): both print it. Its quoted phrases are now passages, and the note cites the 1889 page.
 - The Typst PDF is built with Typst 0.15.1 (the version pinned in the design documents), fetched from the typst GitHub release into the git-ignored `.tools/`; its SHA-256 matched the digest GitHub publishes for the asset.
 
 ## What the tooling could not yet do
 
-- No record, check or command connects a passage to the sentence that uses it; the report's template and `tools/build.py` do that outside Stemma.
+- No record or check connects a passage to the sentence that uses it; the report's manuscript (`report.src`) and quotation list (`report.json`) do, and `stemma build report` assembles them.
 - `passage capture` stores the exact text with line breaks and line-end hyphens; turning it into a quotation (joining hyphens, deciding which hyphens belong to the word, joining segments across pages, omitting note markers) is done by the build script with listed decisions.
 - There is no way to record a correction to a quotation made by a model; the format's `corrected` annotation requires a person. Corrections are therefore kept in this report's records, marked as model readings not reviewed by a person.
 - Running heads that include the folio were not classified as furniture in these IA scans, so a cross-page range includes them; the build joins two captures instead.
 - Footnotes in the scans stay in the main stream (structure undetermined), so the note locator "n" was added by hand from the images.
 - Italics are not in the text layer.
-- No Chicago-style note or bibliography generator exists yet; `records/works.json` holds hand-built templates read from title pages.
-- Passage records live in this report's `records/passages/`, not in the project's `records/`, so that the example's own record set and check results stay as they are; they name the project's text and source records.
+- Notes and bibliography are formatted by citeproc-js 2.4.63 with the Chicago Manual of Style 18th edition notes-and-bibliography style, from the project's source records; each bibliographic detail's page is in the record's change log (`source history`).
+- The passages were captured again into the project's `records/passages/` after the source records gained the details the citations need; every quotation and locator came out the same.

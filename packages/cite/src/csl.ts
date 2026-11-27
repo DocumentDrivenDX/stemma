@@ -35,9 +35,11 @@ function names(record: JsonObject): Record<string, JsonObject[]> {
   const out: Record<string, JsonObject[]> = {};
   for (const c of Array.isArray(record.contributions) ? record.contributions.filter(isObject) : []) {
     const role = String(c.role);
-    if (!NAME_ROLES.has(role) || !isObject(c.as_printed)) continue;
-    const parts = Object.fromEntries(["family", "given", "literal", "suffix"].flatMap((k) => (typeof c.as_printed![k] === "string" ? [[k, c.as_printed![k]]] : [])));
-    if (typeof (c.as_printed as JsonObject).particle === "string") parts["non-dropping-particle"] = (c.as_printed as JsonObject).particle!;
+    const printed = c.as_printed;
+    if (!NAME_ROLES.has(role) || !isObject(printed)) continue;
+    const parts: Record<string, string> = {};
+    for (const k of ["family", "given", "literal", "suffix"]) if (typeof printed[k] === "string") parts[k] = printed[k];
+    if (typeof printed.particle === "string") parts["non-dropping-particle"] = printed.particle;
     (out[role] ??= []).push(parts as JsonObject);
   }
   return out;
@@ -95,10 +97,19 @@ export function cslItem(corpus: Corpus, record: JsonObject): CslItem {
   if (container) {
     const theirs = own(container);
     if (typeof theirs.title === "string") item["container-title"] ??= theirs.title;
-    if (Array.isArray(theirs.author) && item.type !== "personal_communication") item["container-author"] ??= theirs.author;
+    // A corporate author of the volume (a committee, a society) is not repeated as
+    // "by …" after each part's own authors; the volume's title and imprint name it.
+    const people = Array.isArray(theirs.author) ? (theirs.author as JsonObject[]).filter((n) => n.literal === undefined) : [];
+    if (people.length > 0 && item.type !== "personal_communication") item["container-author"] ??= people;
     if (Array.isArray(theirs.editor)) item.editor ??= theirs.editor;
     for (const name of INHERITED) if (theirs[name] !== undefined) item[name] ??= theirs[name];
     if (theirs.issued !== undefined) item.issued ??= theirs.issued;
+  }
+  // With no shortened title recorded, the short form uses the main title: the
+  // title before a subtitle that a colon, semicolon or full stop introduces.
+  if (item["title-short"] === undefined && typeof item.title === "string") {
+    const main = /^(.*?\p{L}{3,})[:;.]\s+\p{Lu}/u.exec(item.title)?.[1];
+    if (main) item["title-short"] = main;
   }
   if (item.type === "article-journal" && item.page === undefined && typeof item.number === "string") {
     item.page = item.number;

@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1289,
+      "index": 294,
+      "page_sha256": "30e644200a47ecae51649cf6bc98963a291fee5d1f6676ada186d1874fa3551a",
+      "start": 1232,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:46Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-nb8cc9bvhrv5zjhx65qz",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "273"
+  },
+  "quote": {
+    "exact": "not merely probable but positive evi-\ndence of subsidence"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-eepzpt4f02f9tcv2b06n",
+  "source_record_sha256": "3f05610d26b6f92fc2544617eb4ebf00fade8df0fbcf2c33374723f72646a8d2",
+  "text": "txt-adczshjjk43q6v0qryx8"
+}

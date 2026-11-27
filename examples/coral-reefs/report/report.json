@@ -1,0 +1,1348 @@
+{
+ "manuscript": "report.src",
+ "quotations": [
+  {
+   "id": "L-borings",
+   "cites": "darwin-agassiz1881",
+   "passages": [
+    {
+     "passage": "psg-9hwzf099800m4855wwem"
+    }
+   ],
+   "checked": "Page image, file index 193: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-banks",
+   "cites": "darwin-agassiz1881",
+   "passages": [
+    {
+     "passage": "psg-47w1ajgmvn9kaqmx8fbx"
+    }
+   ],
+   "checked": "Page image, file index 193: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-foresaw",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-ag2h3sa70bxth80a5ttk"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-future",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-538my34rpdqf45mhbpnx"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-troubled",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-e3ds3rybs43hkxwn4g69"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LY-crater",
+   "cites": "lyell1832",
+   "passages": [
+    {
+     "passage": "psg-canw74xkt67evynrbyga"
+    }
+   ],
+   "checked": "Page image, file index 315: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LY-size",
+   "cites": "lyell1832",
+   "passages": [
+    {
+     "passage": "psg-tw2zk47a1tg47xf3gsqt"
+    }
+   ],
+   "checked": "Page image, file index 316: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D37-crater",
+   "cites": "darwin1837-areas",
+   "passages": [
+    {
+     "passage": "psg-7xbpp4wr458swjbnc8ft"
+    }
+   ],
+   "checked": "Page image, file index 467: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D37-encircling",
+   "cites": "darwin1837-areas",
+   "passages": [
+    {
+     "passage": "psg-zereratr6z5vy49211ky"
+    }
+   ],
+   "checked": "Page image, file index 467: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D37-number",
+   "cites": "darwin1837-areas",
+   "passages": [
+    {
+     "passage": "psg-vgyyxzg2417vbewbvnfc"
+    }
+   ],
+   "checked": "Page image, file index 468: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D37-keeling",
+   "cites": "darwin1837-areas",
+   "passages": [
+    {
+     "passage": "psg-jssxwjvb3hmpxbs1scp8"
+    }
+   ],
+   "checked": "Page image, file index 468: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-received",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-n5vnt6dcv5j7dftbs1mx"
+    }
+   ],
+   "checked": "Page image, file index 105: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-bow",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-rjd31gmtcebz85akdm73"
+    }
+   ],
+   "checked": "Page image, file index 105: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-concession",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-680rv3jc6vg6te1rprn7"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-foundation",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-nj95r6y7yva1pv3btp3m"
+    }
+   ],
+   "checked": "Page image, file index 109: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-improbable",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-c8dd2akwb9tbn8n8y7x5"
+    }
+   ],
+   "checked": "Page image, file index 110: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-necessity",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-av4b2qskyewfp7d9mh2a"
+    },
+    {
+     "passage": "psg-h8saz1radsba9rwcj8qe",
+     "join": " ",
+     "join_note": "page break; running head of page 94 omitted"
+    }
+   ],
+   "checked": "Page images, file index 110, 111: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-chamisso",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-xgr5vsxh24q2q38zeb4k"
+    }
+   ],
+   "note": true,
+   "checked": "Page image, file index 111: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-confirm",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-y6bb6jaq3m76wepqjd77"
+    }
+   ],
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-section",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-yf0xnz66y1xva04gq9cv"
+    }
+   ],
+   "note": true,
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D89-incredible",
+   "cites": "darwin1889",
+   "passages": [
+    {
+     "passage": "psg-pyngt84p2y3d4d4kz5my"
+    }
+   ],
+   "checked": "Page image, file index 147: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D89-compels",
+   "cites": "darwin1889",
+   "passages": [
+    {
+     "passage": "psg-86n066ny6yg9a06tp69c"
+    }
+   ],
+   "checked": "Page image, file index 181: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BO-insufficient",
+   "cites": "bonney1889-summary",
+   "passages": [
+    {
+     "passage": "psg-v82c2g3hs3me51dp7wya"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "insufiicient",
+     "now": "insufficient",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 359: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BO-premature",
+   "cites": "bonney1889-summary",
+   "passages": [
+    {
+     "passage": "psg-ts428685qm3rrv0rv06r"
+    }
+   ],
+   "checked": "Page image, file index 359: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "SE-structure",
+   "cites": "semper1881",
+   "passages": [
+    {
+     "passage": "psg-b5m8yjye235ggkcjazf8"
+    }
+   ],
+   "checked": "Page image, file index 253: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "SE-ignore",
+   "cites": "semper1881",
+   "passages": [
+    {
+     "passage": "psg-fwncnazk0shh2gvd1dd9"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "as te whether",
+     "now": "as to whether",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 253: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "SE-blocks",
+   "cites": "semper1881",
+   "passages": [
+    {
+     "passage": "psg-34rr2wbf4wpx4nczwzgb"
+    }
+   ],
+   "checked": "Page image, file index 260: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-object",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-pa462v6k4mhda3nm5bdy"
+    }
+   ],
+   "checked": "Page image, file index 523: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-improb",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-7atwk4gct89e2ttm80y0"
+    },
+    {
+     "passage": "psg-nqjtx7jr97ts6m57jg58",
+     "join": " ",
+     "join_note": "page break; footnote of page 510 and running head of page 511 omitted"
+    }
+   ],
+   "checked": "Page images, file index 527, 528: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-banks",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-20pzd95zrp4s2swbehn8"
+    }
+   ],
+   "checked": "Page image, file index 528: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-summary",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-mfqkmm105j30z1vw1x2a"
+    }
+   ],
+   "checked": "Page image, file index 534: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-local",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-6dfab9dqpytadtje46hn"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "theory,_but",
+     "now": "theory, but",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 312: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-free",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-m01wp9bq8h178h2av9t9"
+    }
+   ],
+   "checked": "Page image, file index 313: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-noproof",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-6srgq4asq4d83xzh7ajb"
+    }
+   ],
+   "checked": "Page image, file index 313: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-positive",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-hcd97g5sz4bf923wxr3k"
+    }
+   ],
+   "checked": "Page image, file index 294: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-opposed",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-08v3e16rvy17h8xt3gm6"
+    }
+   ],
+   "checked": "Page image, file index 23: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-reply",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-5fqyrmabbkpvvybpq55s"
+    }
+   ],
+   "note": true,
+   "checked": "Page image, file index 29: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-funafuti",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-wbnw7pb0xre3v6wk7vpq"
+    }
+   ],
+   "checked": "Page image, file index 31: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-layers",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-aaz9n521ffzn2gf8f6h3"
+    }
+   ],
+   "checked": "Page image, file index 192: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-boring",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-c9yp9bmnykdtt1azzvdd"
+    }
+   ],
+   "checked": "Page image, file index 41: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-unknown",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-hf6cwgq2qv04hs7kpfk3"
+    }
+   ],
+   "checked": "Page image, file index 40: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-facts",
+   "cites": "bonney1904-preface",
+   "passages": [
+    {
+     "passage": "psg-4k4wmc02dxyzt1fr8sfj"
+    }
+   ],
+   "checked": "Page image, file index 20: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-near",
+   "cites": "bonney1904-preface",
+   "passages": [
+    {
+     "passage": "psg-cn2vs2kctdxcxp2z1900"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "Frenp’s",
+     "now": "Field’s",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 19: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-david",
+   "cites": "david1904-narrative",
+   "passages": [
+    {
+     "passage": "psg-xdqpz8kwjaw10mb124d4"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "attaimed",
+     "now": "attained",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 77: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-pteropod",
+   "cites": "david1904-dredging",
+   "passages": [
+    {
+     "passage": "psg-xwa1p33f2rgh96s6zm8c"
+    }
+   ],
+   "checked": "Page image, file index 187: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-judd",
+   "cites": "judd1904-report",
+   "passages": [
+    {
+     "passage": "psg-9vad2s3jw2bz1vdxhzvj"
+    }
+   ],
+   "checked": "Page image, file index 211: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-crowns",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-5zkz7sk388hcqn1tak77"
+    }
+   ],
+   "checked": "Page image, file index 6: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-novertical",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-y2ka85vkr56zp9mqwy84"
+    }
+   ],
+   "checked": "Page image, file index 6: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-drowned",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-3m2jedrf25ynpz93tztp"
+    }
+   ],
+   "checked": "Page image, file index 71: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-rising",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-jtvk69k1ks68vxxgs4q7"
+    }
+   ],
+   "checked": "Page image, file index 71: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-deceptive",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-dyz938qjp5kd5y4jgm6h"
+    }
+   ],
+   "checked": "Page image, file index 92: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-site",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-ryc8jhebx8tdbk7kqrs0"
+    }
+   ],
+   "checked": "Page image, file index 94: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-inside",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-vkkc27929xv3vawcbenw"
+    }
+   ],
+   "checked": "Page image, file index 94: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-abstract",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-n2hmpsg5qay1ryb3wpwe"
+    }
+   ],
+   "checked": "Page image, file index 5: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-established",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-7ptq1wks0832r0r7thgf"
+    }
+   ],
+   "checked": "Page image, file index 41: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-features",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-yp3j3wyjmkntgkxvgypw"
+    }
+   ],
+   "checked": "Page image, file index 41: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-eocene",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-j7qa7hh45cjbbdxg7fwh"
+    }
+   ],
+   "checked": "Page image, file index 41: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-emergence",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-hgpmb2b1gzjskqrcm47y"
+    }
+   ],
+   "checked": "Page image, file index 42: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BL-insufficient",
+   "cites": "blanchon2014",
+   "passages": [
+    {
+     "passage": "psg-yhscq05cs48am01d4zvd"
+    },
+    {
+     "passage": "psg-fr7awyps0x963bcm53eh",
+     "join": "",
+     "join_note": "superscript reference number 9 omitted"
+    }
+   ],
+   "checked": "Page image, file index 0: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BL-complex",
+   "cites": "blanchon2014",
+   "passages": [
+    {
+     "passage": "psg-ahqw1yaq7v5p4c4jr0mv"
+    }
+   ],
+   "checked": "Page image, file index 0: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BL-retreat",
+   "cites": "blanchon2014",
+   "passages": [
+    {
+     "passage": "psg-67fwktn6v69gkx3bz8ds"
+    }
+   ],
+   "checked": "Page image, file index 0: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "ST-correct",
+   "cites": "steibl2024",
+   "passages": [
+    {
+     "passage": "psg-xwpz2w9867f86a99jn3c"
+    }
+   ],
+   "checked": "Page image, file index 2: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "ST-transient",
+   "cites": "steibl2024",
+   "passages": [
+    {
+     "passage": "psg-4t5frrk137nq1gtw3mzy"
+    }
+   ],
+   "checked": "Page image, file index 2: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-bank",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-kcaze8gn9n01awv488rw"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-inapplicable",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-6w9c3mvyb55807zrxh0d"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-bermuda",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-ck8kmdmwq69k4gzzpyg6"
+    },
+    {
+     "passage": "psg-t5vevpdjnwy55mm4hnch",
+     "join": " ",
+     "join_note": "page break; footnotes 76 and 77 of page 247 and running head of page 248 omitted"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "p>oints",
+     "now": "points",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page images, file index 94, 95: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-asked",
+   "cites": "david1904-narrative",
+   "passages": [
+    {
+     "passage": "psg-35qmyd6wr6sw7fq3x86x"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "500-600",
+     "now": "500–600",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 77: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-outer",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-yg02aszyhtbgz07epjp3"
+    }
+   ],
+   "italic": [
+    "Globigerina"
+   ],
+   "checked": "Page image, file index 42: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-uncertain",
+   "cites": "bonney1904-preface",
+   "passages": [
+    {
+     "passage": "psg-j9qej8mb5jwz2rnbh7s2"
+    },
+    {
+     "passage": "psg-pbzvtqs1827v47j0f715",
+     "join": "",
+     "join_note": "note reference mark (*) after 'himself' omitted"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "CuHarntes",
+     "now": "Charles",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 14: quotation compared word by word with the image, and the printed page number read from it (the page itself is unnumbered; see the locator note)."
+  },
+  {
+   "id": "MU-semper",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-zq0hwbw6s8mnk6205ghz"
+    }
+   ],
+   "checked": "Page image, file index 523: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-proofs",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-ynj5287r8fp1m1sx1wfm"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-staff",
+   "cites": "darwinletters1887",
+   "passages": [
+    {
+     "passage": "psg-s38kkftmbfc4grd2maq4"
+    }
+   ],
+   "italic": [
+    "Challenger"
+   ],
+   "checked": "Page image, file index 192: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-adhere",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-j5gh2xyd6b3ms3ze6gh2"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-lagoon",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-b7h0yc00ycfftq5f0trm"
+    }
+   ],
+   "checked": "Page image, file index 534: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-dana",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-r7eeq0ks3w3v141gbrsq"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "acceptanceof",
+     "now": "acceptance of",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 22: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-platform",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-mgk1dpb9ydjq1ef7ea95"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "Algze",
+     "now": "Algæ",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 29: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-guppy",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-ydvwnvrvbzpm4h268bry"
+    }
+   ],
+   "checked": "Page image, file index 312: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-tortugas",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-zccjt6p5c053x44z9mwg"
+    }
+   ],
+   "checked": "Page image, file index 313: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-colonize",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-43nq37twrd7gy9rhfajf"
+    }
+   ],
+   "checked": "Page image, file index 6: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-depth",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-3mmhvs8a34m9q71xwk9g"
+    }
+   ],
+   "checked": "Page image, file index 6: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-talus",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-f8a0dmg9a5fg26q31p4k"
+    }
+   ],
+   "italic": [
+    "in situ"
+   ],
+   "checked": "Page image, file index 94: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-david-long",
+   "cites": "david1904-narrative",
+   "passages": [
+    {
+     "passage": "psg-nwrtn3146gwz1xcp530b"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "attaimed",
+     "now": "attained",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 77: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-judd-rate",
+   "cites": "judd1904-report",
+   "passages": [
+    {
+     "passage": "psg-894nvgp7dy0nm2pcwpte"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "ot Halimeda",
+     "now": "of Halimeda",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "italic": [
+    "Halimeda"
+   ],
+   "checked": "Page image, file index 211: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-tests",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-k0m569rgbcg8n5ez7ezj"
+    }
+   ],
+   "checked": "Page image, file index 5: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-leach",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-452dvn0yqp0a2ybark3p"
+    }
+   ],
+   "keep_hyphens": [
+    "aragonite-secreting"
+   ],
+   "checked": "Page image, file index 42: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-differ",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-e85qy340v7v9sgby7r7t"
+    }
+   ],
+   "checked": "Page image, file index 41: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BL-tahiti",
+   "cites": "blanchon2014",
+   "passages": [
+    {
+     "passage": "psg-7yrqxs88gqh80etxej78"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "D arwin’s",
+     "now": "Darwin’s",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 0: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-chamisso-view",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-4mzfqfh5dneq2ze8nzvs"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-spaces",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-dqs8ewsk6djcwtkmhkky"
+    }
+   ],
+   "checked": "Page image, file index 109: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-elevation",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-c59m8ydb0n7kwf0bz9ga"
+    }
+   ],
+   "checked": "Page image, file index 110: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-questions1",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-5z9zf8kebeqgt245dhjn"
+    }
+   ],
+   "keep_hyphens": [
+    "barrier-reefs"
+   ],
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-questions2",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-wj87m68rdq3h3kgg8gm0"
+    }
+   ],
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-ancient",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-7dm1a433jp14j3a313h3"
+    }
+   ],
+   "note": true,
+   "corrections": [
+    {
+     "was": "coral 'Strata",
+     "now": "coral-strata",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-untenable",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-2dc2pfgqgwksqggh8g0h"
+    }
+   ],
+   "checked": "Page image, file index 22: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-semper",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-7pkzjk62c6q8nb4e9sgt"
+    }
+   ],
+   "checked": "Page image, file index 22: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-inapplicable-short",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-sv8vwmgs66xn6bnaf6cr"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-confirm-short",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-qcts2jhdmhdxahn7ajth"
+    }
+   ],
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-section-short",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-20x375e4e2mkcemm9wqr"
+    }
+   ],
+   "note": true,
+   "checked": "Page image, file index 133: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "SE-blocks-short",
+   "cites": "semper1881",
+   "passages": [
+    {
+     "passage": "psg-mzx2ym461sbzsghm855d"
+    }
+   ],
+   "checked": "Page image, file index 260: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "MU-banks-short",
+   "cites": "murray1880-structure",
+   "passages": [
+    {
+     "passage": "psg-vdwt6fv2vkkfetrtx3qb"
+    }
+   ],
+   "checked": "Page image, file index 528: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-banks-short",
+   "cites": "darwin-agassiz1881",
+   "passages": [
+    {
+     "passage": "psg-n27fwt0a07fen8c2f9nd"
+    }
+   ],
+   "checked": "Page image, file index 193: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DA-positive-short",
+   "cites": "dana1890",
+   "passages": [
+    {
+     "passage": "psg-nb8cc9bvhrv5zjhx65qz"
+    }
+   ],
+   "checked": "Page image, file index 294: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "DY-rising-short",
+   "cites": "daly1915",
+   "passages": [
+    {
+     "passage": "psg-0ezgb2rymxxzwgf4kj7r"
+    }
+   ],
+   "checked": "Page image, file index 71: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-unknown-short",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-ab6qegrezzvrkndxe2bg"
+    }
+   ],
+   "checked": "Page image, file index 40: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-layers-short",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-56vt89gtg4m4kb60ks19"
+    }
+   ],
+   "checked": "Page image, file index 192: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "AG-reefflat",
+   "cites": "agassiz1903",
+   "passages": [
+    {
+     "passage": "psg-xzvm5pq4x1ceqzjr48vy"
+    }
+   ],
+   "checked": "Page image, file index 192: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-emergence-short",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-ggwjknfrpx3x24cxsyrg"
+    }
+   ],
+   "checked": "Page image, file index 42: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LS-outer-short",
+   "cites": "ladd1960",
+   "passages": [
+    {
+     "passage": "psg-p1tx44t01zhpsxjdd9tx"
+    }
+   ],
+   "checked": "Page image, file index 42: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "BL-complex-short",
+   "cites": "blanchon2014",
+   "passages": [
+    {
+     "passage": "psg-5jtjm4srck4wdjyv0akw"
+    }
+   ],
+   "checked": "Page image, file index 0: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "LY-elevation",
+   "cites": "lyell1832",
+   "passages": [
+    {
+     "passage": "psg-0k11d46m4dhcn21bzmfg"
+    }
+   ],
+   "checked": "Page image, file index 316: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "L-mistake",
+   "cites": "darwin-semper1879",
+   "passages": [
+    {
+     "passage": "psg-e0xryhky4cgwj05m0gfg"
+    }
+   ],
+   "corrections": [
+    {
+     "was": "' Coral ' book",
+     "now": "‘Coral’ book",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 191: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-footnote",
+   "cites": "bonney1904-preface",
+   "passages": [
+    {
+     "passage": "psg-wzzdss88ym2ctyda4bhx"
+    }
+   ],
+   "note": true,
+   "corrections": [
+    {
+     "was": "«Life",
+     "now": "‘Life",
+     "by": "model:claude-opus-5-5",
+     "basis": "page image"
+    }
+   ],
+   "checked": "Page image, file index 14: quotation compared word by word with the image, and the printed page number read from it (the page itself is unnumbered; see the locator note)."
+  },
+  {
+   "id": "D42-farfrom",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-dd2pqda7zqszhhe7z8es"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D42-somesuch",
+   "cites": "darwin1842",
+   "passages": [
+    {
+     "passage": "psg-39dj7rr4abacytstekag"
+    }
+   ],
+   "checked": "Page image, file index 106: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "D89-mnbf",
+   "cites": "darwin1889",
+   "passages": [
+    {
+     "passage": "psg-ye9gyxqty8hbe954ffcf"
+    }
+   ],
+   "checked": "Page image, file index 147: quotation compared word by word with the image, and the printed page number read from it."
+  },
+  {
+   "id": "FU-titlepage",
+   "cites": "funafuti1904",
+   "passages": [
+    {
+     "passage": "psg-mfetyjmnfydca9313vrx"
+    }
+   ],
+   "checked": "Page image, file index 6: quotation compared word by word with the image, which prints “F.R S.” as the text has it; the page carries no printed number."
+  }
+ ],
+ "verification": {
+  "preamble": [
+   "**Who checked.** Every comparison below was made by an AI model (claude-opus-5-5) reading page images drawn from the stored PDFs with `examples/coral-reefs/tools/render-pages.swift` at 900 pixels wide. **No person has reviewed any quotation, page number, correction or bibliographic detail.**",
+   "**What was compared.** The rendered quotation, word by word and punctuation included, with the page image. Not treated as textual differences: line breaks; spacing before punctuation; the glyph shape of quotation marks and apostrophes, which follows the text layer; small capitals, given in ordinary capitals and lower case. Line-end hyphens were joined unless listed as kept; each join is listed and was judged against the image."
+  ]
+ }
+}

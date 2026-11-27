@@ -24,6 +24,11 @@ export function unresolvedImports(bundle: string): string[] {
   return imports.map((i) => i.path).filter((path) => !isBuiltin(path) && !path.startsWith("bun:"));
 }
 
+/** The licences of the citation processor, style and locale bundled into the command line (BR-1004). */
+export function copyCiteLicenses(outdir: string): void {
+  cpSync(join(root, "packages/cite/vendor/licenses"), join(outdir, "licenses/cite"), { recursive: true });
+}
+
 export async function bundle(outdir: string): Promise<string> {
   const built = await Bun.build({
     entrypoints: [join(root, "packages/cli/src/main.ts")],
@@ -34,6 +39,7 @@ export async function bundle(outdir: string): Promise<string> {
   const left = unresolvedImports(readFileSync(path, "utf8"));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
   copyPdfData(outdir);
+  copyCiteLicenses(outdir);
   return path;
 }
 
@@ -46,6 +52,7 @@ if (import.meta.main) {
   mkdirSync(join(release, "dist"));
   cpSync(built, join(release, "dist/stemma.js"));
   cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
+  cpSync(join(dist, "licenses"), join(release, "dist/licenses"), { recursive: true });
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });
   // The launcher is the only script the plugin ships.
   mkdirSync(join(release, "scripts"));

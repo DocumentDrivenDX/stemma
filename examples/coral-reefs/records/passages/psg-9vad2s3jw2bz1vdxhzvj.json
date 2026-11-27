@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2509,
+      "index": 211,
+      "page_sha256": "f2573c9885dd6454e82cbd419f827d6e7f268f17e3d659753ec61742c516168e",
+      "start": 2432,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-9vad2s3jw2bz1vdxhzvj",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "180"
+  },
+  "quote": {
+    "exact": "a subsidence of 25 fathoms (150 feet) must\nhave taken place in this 800 years"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

@@ -1,10 +1,30 @@
 {
   "admission": "candidate",
+  "bib": [
+    {
+      "name": "publisher",
+      "value": {
+        "value": "Royal Society of London"
+      }
+    },
+    {
+      "name": "publisher-place",
+      "value": {
+        "value": "London"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Atoll of Funafuti"
+      }
+    }
+  ],
   "changed": {
-    "at": "2026-11-27T03:14:53Z",
+    "at": "2026-11-27T03:39:59Z",
     "by": {
       "kind": "model",
-      "name": "claude-sonnet-5-5"
+      "name": "claude-opus-5-5"
     }
   },
   "changes": [
@@ -29,6 +49,39 @@
       "field": "tags",
       "from": "report/report.md, section 5",
       "value": "funafuti"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:58Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher",
+      "from": "title page (file index 6)",
+      "value": "Royal Society of London"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:58Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.publisher-place",
+      "from": "title page (file index 6)",
+      "value": "London"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:39:59Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Atoll of Funafuti"
     }
   ],
   "citation_key": "funafuti1904",

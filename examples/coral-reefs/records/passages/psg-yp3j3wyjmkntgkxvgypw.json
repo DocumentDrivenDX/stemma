@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2844,
+      "index": 41,
+      "page_sha256": "1fb4229e158db993346f3e0d29ed42b02671b6cec16c78ae1c6dc99c988202ac",
+      "start": 2724,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:01Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-yp3j3wyjmkntgkxvgypw",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "899"
+  },
+  "quote": {
+    "exact": "features of Darwin's subsidence theory, which\npostulated that atolls may develop on the tops of slowly\nsinking mountains"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "225881d33fe38eaf9bb75d49af608a97a79e1e16c426bdbd20e236b4560bbb75",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

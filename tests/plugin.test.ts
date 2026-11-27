@@ -120,7 +120,8 @@ describe("what is released", () => {
   test("beside the one built file go the PDF reader's data and licenses, and no native module", () => {
     const files = readdirSync(join(plugin, "dist"), { recursive: true }).map(String);
     expect(files.filter((f) => /\.(node|dylib|so|dll)$|node_modules/i.test(f))).toEqual([]);
-    for (const needed of ["pdfjs/cmaps/UniJIS-UCS2-H.bcmap", "pdfjs/cmaps/LICENSE", "pdfjs/standard_fonts/LICENSE_FOXIT", "pdfjs/standard_fonts/LICENSE_LIBERATION", "pdfjs/LICENSE"]) {
+    for (const needed of ["pdfjs/cmaps/UniJIS-UCS2-H.bcmap", "pdfjs/cmaps/LICENSE", "pdfjs/standard_fonts/LICENSE_FOXIT", "pdfjs/standard_fonts/LICENSE_LIBERATION", "pdfjs/LICENSE",
+      "licenses/cite/CPAL-1.0.txt", "licenses/cite/citeproc-js-LICENSE", "licenses/cite/CC-BY-SA-3.0.txt", "licenses/cite/NOTICE.txt"]) {
       expect(files).toContain(needed);
     }
     // The worker is inside the built file, so none is looked for beside it.

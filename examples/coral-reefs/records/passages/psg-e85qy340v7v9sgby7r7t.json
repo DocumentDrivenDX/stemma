@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 4482,
+      "index": 41,
+      "page_sha256": "1fb4229e158db993346f3e0d29ed42b02671b6cec16c78ae1c6dc99c988202ac",
+      "start": 4381,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:42:32Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-e85qy340v7v9sgby7r7t",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "899"
+  },
+  "quote": {
+    "exact": "Below 1,400\nfeet in the two deepest holes there were conspicuous\ndifferences in lithologic characters"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "225881d33fe38eaf9bb75d49af608a97a79e1e16c426bdbd20e236b4560bbb75",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

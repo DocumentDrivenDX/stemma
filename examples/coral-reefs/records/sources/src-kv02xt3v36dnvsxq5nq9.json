@@ -1,0 +1,93 @@
+{
+  "admission": "candidate",
+  "changed": {
+    "at": "2026-11-27T03:40:39Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:38Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "contents (file index 10): section IV, page 40; running head on page 54 (file index 77)",
+      "value": "Narrative of the Second and Third Expeditions"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:38Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "contents (file index 10): section IV, page 40; running head on page 54 (file index 77)",
+      "value": "David, T. W. Edgeworth"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:39Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:39Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 5",
+      "value": "funafuti"
+    }
+  ],
+  "citation_key": "david1904-narrative",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "David",
+        "given": "T. W. Edgeworth"
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:37Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-kv02xt3v36dnvsxq5nq9",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-n7pw0cvq9y0d742wr45f",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "evidence:boring",
+    "funafuti"
+  ],
+  "title": {
+    "value": "Narrative of the Second and Third Expeditions"
+  },
+  "type": "chapter"
+}

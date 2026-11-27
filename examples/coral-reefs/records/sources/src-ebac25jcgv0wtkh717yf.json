@@ -1,0 +1,134 @@
+{
+  "admission": "candidate",
+  "bib": [
+    {
+      "name": "genre",
+      "value": {
+        "value": "appendix"
+      }
+    },
+    {
+      "name": "page",
+      "value": {
+        "value": "281–332"
+      }
+    },
+    {
+      "name": "title-short",
+      "value": {
+        "value": "Summary of the Principal Contributions"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T03:40:16Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:14Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "title",
+      "from": "title page of the 1889 edition (file index 10) names Bonney's appendix; contents page xv (file index 22) gives Appendix II, pages 281–332, and its title",
+      "value": "Summary of the Principal Contributions to the History of Coral-Reefs since the Year 1874"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:14Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.genre",
+      "from": "title page of the 1889 edition (file index 10) names Bonney's appendix; contents page xv (file index 22) gives Appendix II, pages 281–332, and its title",
+      "value": "appendix"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:14Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.page",
+      "from": "title page of the 1889 edition (file index 10) names Bonney's appendix; contents page xv (file index 22) gives Appendix II, pages 281–332, and its title",
+      "value": "281–332"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:14Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "authors",
+      "from": "title page of the 1889 edition (file index 10) names Bonney's appendix; contents page xv (file index 22) gives Appendix II, pages 281–332, and its title",
+      "value": "Bonney, T. G."
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:15Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 4",
+      "value": "position:later-assessment"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:40:16Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-opus-5-5"
+      },
+      "field": "bib.title-short",
+      "from": "shortened title for the notes, chosen by the author of the report (not a printed value)",
+      "value": "Summary of the Principal Contributions"
+    }
+  ],
+  "citation_key": "bonney1889-summary",
+  "contributions": [
+    {
+      "as_printed": {
+        "family": "Bonney",
+        "given": "T. G."
+      },
+      "lid": "a1",
+      "role": "author"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:40:13Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "src-ebac25jcgv0wtkh717yf",
+  "intake": "parsed",
+  "kind": "source",
+  "relations": [
+    {
+      "lid": "r1",
+      "target": "src-48g9pqaf1748q15bbpqs",
+      "type": "part_of"
+    }
+  ],
+  "schema": "stemma.record/0",
+  "tags": [
+    "position:later-assessment"
+  ],
+  "title": {
+    "value": "Summary of the Principal Contributions to the History of Coral-Reefs since the Year 1874"
+  },
+  "type": "chapter"
+}

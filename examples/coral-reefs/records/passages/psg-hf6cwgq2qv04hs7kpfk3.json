@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 1928,
+      "index": 40,
+      "page_sha256": "090515a75311d83834332e32c2ababb75e50743336a8a7c99b5b280180e3087c",
+      "start": 1719,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:48Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-hf6cwgq2qv04hs7kpfk3",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xxxi"
+  },
+  "quote": {
+    "exact": "Islands and groups colored yellow indicate low atolls elevated perhaps\na few feet, but of which the land rim consists of modern reef rock or con-\nglomerate or breccia, the underlying base of which is not known"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-w8s30cm4ecfvt6nmtbr0",
+  "source_record_sha256": "176773f3860db0506c75559c0d971006e8557243834724ad47e5ae7f752bc8ee",
+  "text": "txt-r774cmd8fg4a77tvvk4g"
+}

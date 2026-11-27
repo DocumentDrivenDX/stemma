@@ -1,39 +1,53 @@
-// The worked example's research report is generated from records that point into
-// the example's committed source files. The committed output must be what the
-// build gives now, and every quotation must still be found where its record says.
-import { describe, expect, test } from "bun:test";
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-import { ROOT } from "./helpers.ts";
+// The worked example's research report is built by `stemma build report` from the
+// project's passage and source records. The committed output must be what the
+// command gives now, from a copy that holds nothing but the committed files.
+import { beforeAll, describe, expect, test } from "bun:test";
+import { cpSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { bundle } from "../scripts/build.ts";
+import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
+import { ROOT, temporary } from "./helpers.ts";
 
-const REPORT = join(ROOT, "examples/coral-reefs/report");
-const build = (...args: string[]) => Bun.spawnSync(["python3", "-I", "-B", join(REPORT, "tools/build.py"), ...args], { cwd: ROOT });
+const EXAMPLE = join(ROOT, "examples/coral-reefs");
+const REPORT = join(EXAMPLE, "report");
+let cli = "";
+let copy = "";
+const run = (...args: string[]) => Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, ...args, "--project", copy],
+  { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
+
+beforeAll(async () => {
+  const work = temporary();
+  cli = await bundle(join(work, "plugin/dist"));
+  copy = join(work, "coral-reefs");
+  cpSync(EXAMPLE, copy, { recursive: true, filter: (path) => !/^(\.stemma|build|report\/build|report\/report\.pdf)(\/|$)/.test(relative(EXAMPLE, path)) });
+}, 120_000);
 
 describe("the worked example's research report", () => {
-  test("report.md, report.typ and verification.md are current with the committed records and source files", () => {
-    const done = build("--check");
+  test("report.md, report.typ and verification.md are what build report gives now", () => {
+    const done = run("build", "report", "report", "--check");
     expect(done.stderr.toString()).toBe("");
+    expect(done.stdout.toString()).toContain("are current: 75 notes");
     expect(done.exitCode).toBe(0);
-  });
+  }, 60_000);
 
-  test("every passage record names a text and source record of the example project", () => {
-    const sources = new Map<string, string>();
-    for (const name of readdirSync(join(ROOT, "examples/coral-reefs/sources"))) {
-      const text = readFileSync(join(ROOT, "examples/coral-reefs/sources", name, "source.md"), "utf8");
-      const manifest = JSON.parse(text.slice(4, text.indexOf("\n---\n", 4)));
-      sources.set(manifest.id, manifest.source);
-    }
-    const files = readdirSync(join(REPORT, "records/passages"));
-    expect(files.length).toBeGreaterThan(100);
-    for (const file of files) {
-      const passage = JSON.parse(readFileSync(join(REPORT, "records/passages", file), "utf8"));
-      expect(sources.get(passage.text), file).toBe(passage.source);
-      expect(readdirSync(join(ROOT, "examples/coral-reefs/records/sources"))).toContain(`${passage.source}.json`);
-    }
-  });
+  test("a changed note is found stale, and a rebuild restores the committed bytes", () => {
+    const path = join(copy, "report/report.md");
+    const committed = readFileSync(path, "utf8");
+    writeFileSync(path, committed.replace("[^1]: “", "[^1]: ‘"));
+    expect(run("build", "report", "report", "--check").exitCode).toBe(1);
+    expect(run("build", "report", "report").exitCode).toBe(0);
+    expect(readFileSync(path, "utf8")).toBe(committed);
+  }, 120_000);
 
   test("the publication itself says nothing about the tool", () => {
     const text = readFileSync(join(REPORT, "report.md"), "utf8");
-    for (const word of ["Stemma", "passage record", "text layer", "verification", "psg-", "txt-"]) expect(text, word).not.toContain(word);
+    for (const word of ["Stemma", "passage record", "text layer", "verification", "psg-", "txt-", "pers. comm."]) expect(text, word).not.toContain(word);
+  });
+
+  test("every note gives each quotation verbatim from its passage, then its citation", () => {
+    const text = readFileSync(join(REPORT, "report.md"), "utf8");
+    const notes = text.split("\n").filter((l) => /^\[\^\d+\]: /.test(l));
+    expect(notes.length).toBe(75);
+    for (const note of notes) expect(note, note.slice(0, 40)).toMatch(/^\[\^\d+\]: “/);
   });
 });

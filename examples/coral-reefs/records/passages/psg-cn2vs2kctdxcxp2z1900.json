@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 527,
+      "index": 19,
+      "page_sha256": "74fd4e58edb9197962e2addc7d31c95a9f1d60fcf3c566d6616c25aae4b021ed",
+      "start": 280,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:50Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-cn2vs2kctdxcxp2z1900",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xii"
+  },
+  "quote": {
+    "exact": "the submarine contour of the island,\ndetermined by Captain Frenp’s soundings, suggested that the base of the coral reef\nmight be very near, so the Boring was continued in 1898, as narrated in Section IV,\nuntil a depth of 1114 feet had been reached"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}

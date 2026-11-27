@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2587,
+      "index": 20,
+      "page_sha256": "8389a46d408d4e03f8802eda6bbd11d33cd1c917789f7ab60ce16c953f84b0b0",
+      "start": 2339,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T03:41:49Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-4k4wmc02dxyzt1fr8sfj",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "xiii"
+  },
+  "quote": {
+    "exact": "Into the controversies about the development of coral reefs, those who have been\nconcerned in the preparation of this volume have not attempted to enter. They\nhave endeavoured to state facts and leave it to readers to interpret these for\nthemselves"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-n7pw0cvq9y0d742wr45f",
+  "source_record_sha256": "c324e6c54643bacc6b6c9da94b6971145646403f21d7b65055cfd7c3b25efddd",
+  "text": "txt-4vrzvbkd3jhbdzzbd0f9"
+}
