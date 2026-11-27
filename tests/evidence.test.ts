@@ -135,10 +135,14 @@ describe("the evidence ledger", () => {
   }, 120_000);
 
   test("US-124-AC7: a dismissed result stays listed beside the label, without its reason", () => {
+    const openNow = () => (JSON.parse(run(["check", "--format", "json"]).stdout.toString()) as { body: { results: { open: boolean; finding_key: string }[] } }).body.results.filter((r) => r.open);
+    // The small project has a finding of its own, so what the claim adds is what is looked for.
+    const before = openNow().map((r) => r.finding_key);
+    expect(build().checks.open).toBe(before.length);
     done(["record", "add", "claim", "--input", "-", "--actor", "person:author"], JSON.stringify({ text: "An invented claim.", role: "claim" }));
-    expect(build().checks).toMatchObject({ label: "open_findings", dismissals: [] });
-    const report = JSON.parse(run(["check", "--format", "json"]).stdout.toString()) as { body: { results: { open: boolean; finding_key: string }[] } };
-    const open = report.body.results.filter((r) => r.open);
+    const open = openNow();
+    expect(open.filter((r) => !before.includes(r.finding_key))).toHaveLength(1);
+    expect(build().checks).toMatchObject({ label: "open_findings", open: before.length + 1, dismissals: [] });
     for (const finding of open) {
       done(["annotate", "--finding", finding.finding_key, "--effect", "dismiss", "--reason", "an invented reason to dismiss it", "--actor", "person:author"]);
     }

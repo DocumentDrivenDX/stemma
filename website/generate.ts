@@ -192,11 +192,11 @@ const walk = (dir: string, prefix = ""): string[] =>
     : [];
 
 /**
- * What is wrong with the committed content. PNG bytes differ between machines'
- * font rendering, so a screenshot is current when the page it was captured from
- * is unchanged and the file is the one that capture wrote. No browser is needed.
+ * What in `directory` differs from what the current code makes; `fresh` is that,
+ * if it was made already. PNG bytes differ between machines' font rendering, so a
+ * screenshot is current when the page it was captured from is unchanged and the
+ * file is the one that capture wrote. No browser is needed.
  */
-/** What in `directory` differs from what the current code makes; `fresh` is that, if it was made already. */
 export async function staleness(directory = GENERATED, fresh?: Map<string, string>): Promise<string[]> {
   fresh ??= await generateText();
   const problems: string[] = [];
