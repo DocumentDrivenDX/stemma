@@ -50,6 +50,12 @@ export interface Formatted {
   /** One Markdown string for each cluster, in order. */
   citations: string[];
   bibliography: string[];
+  /** For each cluster, its citation without the text its items put before them. */
+  bare: string[];
+  /** For each cluster, the sources its items name, with the source each is listed under in the bibliography. */
+  cited: { source: string; listed: string }[][];
+  /** For each bibliography entry, in order, the IDs of the sources the processor made it from. */
+  bibliographyIds: string[][];
   problems: Problem[];
   /** The CSL-JSON items given to the processor, by source ID. */
   items: Record<string, CslItem>;
@@ -136,21 +142,29 @@ export function formatCitations(corpus: Corpus, clusters: Cluster[], include: st
   const describeLetter = letterDescriber(corpus);
   const lettersSeen = new Set<string>();
   const citations: string[] = [];
+  const bare: string[] = [];
+  const cited: Formatted["cited"] = [];
   const pre: [string, number][] = [];
   clusters.forEach((cluster, n) => {
     const holds: string[] = [];
     const hold = (text: string) => `${HOLD_OPEN}${holds.push(text) - 1}${HOLD_CLOSE}`;
+    const befores = new Set<number>();
+    const named: Formatted["cited"][number] = [];
     const citationItems: object[] = [];
     const missing: string[] = [];
+    const missingBare: string[] = [];
     for (const item of cluster.items) {
       const id = idOf(item.key, cluster.note);
       if (!id) {
-        missing.push(`${item.before ?? ""}[no source for the key ${item.key}]${item.after ?? ""}`);
+        const mark = `[no source for the key ${item.key}]${item.after ?? ""}`;
+        missing.push(`${item.before ?? ""}${mark}`);
+        missingBare.push(mark);
         continue;
       }
       const record = corpus.byId.get(id)!.data!;
       const container = record.type === "personal_communication" ? containerOf(corpus, record) : undefined;
       let target = id;
+      if (item.before) befores.add(holds.length);
       let prefix = item.before ? hold(item.before) : "";
       if (container) {
         const described = describeLetter(record);
@@ -159,20 +173,26 @@ export function formatCitations(corpus: Corpus, clusters: Cluster[], include: st
         target = String(container.id);
         items[target] ??= cslItem(corpus, container);
       }
+      named.push({ source: id, listed: target });
       citationItems.push({
         id: target, ...(item.locator ? { locator: item.locator, label: item.label ?? "page" } : {}),
         ...(prefix ? { prefix } : {}), ...(item.after ? { suffix: hold(item.after) } : {}),
       });
     }
     let text = "";
+    let without = "";
     if (citationItems.length > 0) {
       const id = `c${n}`;
       const [, changed] = engine.processCitationCluster({ citationID: id, citationItems, properties: { noteIndex: cluster.note } }, pre, []) as [unknown, [number, string, string][]];
       pre.push([id, cluster.note]);
-      text = markdown(changed.find((c) => c[2] === id)?.[1] ?? "")
-        .replace(new RegExp(`${HOLD_OPEN}(\\d+)${HOLD_CLOSE}`, "g"), (_, i: string) => holds[Number(i)]!);
+      const made = markdown(changed.find((c) => c[2] === id)?.[1] ?? "");
+      const fill = (put: (i: number) => string) => made.replace(new RegExp(`${HOLD_OPEN}(\\d+)${HOLD_CLOSE}`, "g"), (_, i: string) => put(Number(i)));
+      text = fill((i) => holds[i]!);
+      without = fill((i) => (befores.has(i) ? "" : holds[i]!));
     }
     citations.push([text, ...missing].filter(Boolean).join(" "));
+    bare.push([without, ...missingBare].filter(Boolean).join(" "));
+    cited.push(named);
   });
   // The bibliography: a letter is listed under its collection.
   const listed = new Set<string>();
@@ -190,9 +210,10 @@ export function formatCitations(corpus: Corpus, clusters: Cluster[], include: st
     if (id) add(id);
   }
   engine.updateItems([...listed].sort());
-  const made = engine.makeBibliography() as [unknown, string[]] | false;
+  const made = engine.makeBibliography() as [{ entry_ids: unknown[][] }, string[]] | false;
   const bibliography = made ? made[1].map((e) => markdown(e.trim())) : [];
-  return { citations, bibliography, problems, items };
+  const bibliographyIds = made ? made[0].entry_ids.map((ids) => ids.map(String)) : [];
+  return { citations, bibliography, bare, cited, bibliographyIds, problems, items };
 }
 
 export type { CslItem };

@@ -29,7 +29,7 @@ export interface ReportSpec {
   verification?: { preamble?: string[] };
 }
 
-interface Rendered {
+export interface Rendered {
   id: string; cites: string; text: string; locator: string; joined: string[]; spec: QuotationSpec;
   provenance: { passage: string; address: string; labelBasis: string[] }[];
 }
@@ -65,7 +65,7 @@ export function span(locs: string[]): string {
   return lo === hi ? String(lo) : pageRange(String(lo), String(hi));
 }
 
-function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec): Rendered {
+export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec): Rendered {
   const cited = sourceByKey(corpus, spec.cites);
   if (!cited) throw new ReportError(`${spec.id}: no source record has the key ${spec.cites}`);
   const container = containerOf(corpus, cited);
@@ -131,24 +131,137 @@ function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec): Render
  */
 export const quotedInNote = (text: string): string => `“${text}${/[.?!]$/.test(text) ? "" : "."}”`;
 
+/** What a note's citation is made from: one quotation, with no page and no text when it cannot be built. */
+export interface Member { id: string; locator?: string; text?: string }
+
 /**
  * The citations of one note. Each run of consecutive quotations from the same
  * work and the same page is given, then one citation of that work at that
  * page; a quotation on another page starts another citation, so a locator is
- * never repeated and each quotation is followed by its own page.
+ * never repeated and each quotation is followed by its own page. Each citation
+ * keeps the IDs of the quotations it supports.
  */
-export function noteClusters(note: number, groups: { cites: string; members: { locator: string; text: string }[] }[]): Cluster[] {
-  const clusters: Cluster[] = [];
+function noteCitations(note: number, groups: { cites: string; members: Member[] }[]): { cluster: Cluster; quotations: string[] }[] {
+  const citations: { cluster: Cluster; quotations: string[] }[] = [];
   for (const { cites, members } of groups) {
     for (const p of members) {
-      const last = clusters.at(-1)?.items[0];
-      if (last && last.key === cites && last.locator === p.locator && clusters.at(-1)!.items.length === 1) {
-        last.before = `${last.before}${quotedInNote(p.text)} `;
-      } else clusters.push({ note, items: [{ key: cites, label: "page", locator: p.locator, before: `${quotedInNote(p.text)} ` }] });
+      const before = p.text === undefined ? "" : `${quotedInNote(p.text)} `;
+      const last = citations.at(-1);
+      const item = last?.cluster.items[0];
+      if (last && item && p.locator !== undefined && item.key === cites && item.locator === p.locator && last.cluster.items.length === 1) {
+        item.before = `${item.before}${before}`;
+        last.quotations.push(p.id);
+      } else {
+        citations.push({
+          cluster: { note, items: [{ key: cites, ...(p.locator === undefined ? {} : { label: "page", locator: p.locator }), before }] },
+          quotations: [p.id],
+        });
+      }
     }
   }
-  return clusters;
+  return citations;
 }
+
+/** The citations of one note, without the IDs of their quotations. */
+export const noteClusters = (note: number, groups: { cites: string; members: { locator: string; text: string }[] }[]): Cluster[] =>
+  noteCitations(note, groups.map((g) => ({ cites: g.cites, members: g.members.map((m) => ({ ...m, id: "" })) }))).map((c) => c.cluster);
+
+/** A piece of the manuscript as the template gives it. */
+export type Segment = { kind: "text"; text: string } | { kind: "quotation"; id: string } | { kind: "note"; number: number };
+export type Paragraph = { kind: "bibliography" } | { kind: "text"; segments: Segment[] };
+export interface AssembledNote {
+  number: number;
+  /** In order. A quotation with no known work has no cluster, so no citation is formatted for it. */
+  citations: { quotations: string[]; cluster?: Cluster }[];
+  /** The IDs the note cites. */
+  passages: string[];
+  /** The IDs quoted in the text or the comment since the note before, that this note does not cite. */
+  inline: string[];
+  comment?: Segment[];
+}
+export interface Assembly { paragraphs: Paragraph[]; notes: AssembledNote[] }
+
+/** What the assembly needs of a quotation: the work it is cited to and, when it can be built, its page and words. */
+export type Resolve = (id: string, where: string) => { cites?: string; locator?: string; text?: string };
+
+/** The manuscript template as segments: the one reading of it, behind both `report.md` and the manuscript view. */
+export function assemble(manuscript: string, resolve: Resolve): Assembly {
+  const notes: AssembledNote[] = [];
+  const paragraphs: Paragraph[] = [];
+  for (const raw of manuscript.split("\n\n")) {
+    const para = raw.replace(/^\n+|\n+$/g, "");
+    if (para === "{{bibliography}}") {
+      paragraphs.push({ kind: "bibliography" });
+      continue;
+    }
+    let quotedSinceNote = new Set<string>();
+    const tokens = [
+      ...[...para.matchAll(QUOTE)].map((m) => ({ m, kind: "q" as const })),
+      ...[...para.matchAll(NOTE)].map((m) => ({ m, kind: "n" as const })),
+    ].sort((a, b) => a.m.index! - b.m.index!);
+    const segments: Segment[] = [];
+    const text = (value: string) => {
+      if (value !== "") segments.push({ kind: "text", text: value });
+    };
+    const quotation = (id: string, where: string): Segment => {
+      quotedSinceNote.add(id);
+      resolve(id, where);
+      return { kind: "quotation", id };
+    };
+    let pos = 0;
+    for (const { m, kind } of tokens) {
+      if (m.index! < pos) continue; // a quotation inside a note's comment, rendered with the note
+      text(para.slice(pos, m.index));
+      pos = m.index! + m[0].length;
+      if (kind === "q") {
+        segments.push(quotation(m[1]!, "the text"));
+        continue;
+      }
+      const ids = m[1]!.split(",").filter(Boolean);
+      let comment: Segment[] | undefined;
+      if (m[2]) {
+        comment = [];
+        let at = 0;
+        for (const q of m[2].matchAll(QUOTE)) {
+          if (q.index > at) comment.push({ kind: "text", text: m[2].slice(at, q.index) });
+          comment.push(quotation(q[1]!, "a note"));
+          at = q.index + q[0].length;
+        }
+        if (at < m[2].length) comment.push({ kind: "text", text: m[2].slice(at) });
+      }
+      const number = notes.length + 1;
+      const citations: AssembledNote["citations"] = [];
+      let groups: { cites: string; members: Member[] }[] = [];
+      const close = () => {
+        citations.push(...noteCitations(number, groups));
+        groups = [];
+      };
+      for (const id of ids) {
+        const found = resolve(id, "a note");
+        if (found.cites === undefined) {
+          close();
+          citations.push({ quotations: [id] });
+          continue;
+        }
+        if (groups.at(-1)?.cites !== found.cites) groups.push({ cites: found.cites, members: [] });
+        groups.at(-1)!.members.push({ id, ...(found.locator === undefined ? {} : { locator: found.locator }), ...(found.text === undefined ? {} : { text: found.text }) });
+      }
+      close();
+      notes.push({
+        number, citations, passages: ids, inline: [...quotedSinceNote].filter((id) => !ids.includes(id)).sort(),
+        ...(comment ? { comment } : {}),
+      });
+      segments.push({ kind: "note", number });
+      quotedSinceNote = new Set();
+    }
+    text(para.slice(pos));
+    paragraphs.push({ kind: "text", segments });
+  }
+  return { paragraphs, notes };
+}
+
+/** Every citation of the report, in note order. */
+export const clustersOf = (notes: AssembledNote[]): Cluster[] => notes.flatMap((n) => n.citations.flatMap((c) => (c.cluster ? [c.cluster] : [])));
 
 export interface Built { files: Record<string, string>; notes: Note[]; words: number; problems: string[] }
 
@@ -164,55 +277,17 @@ export function buildReport(corpus: Corpus, spec: ReportSpec, manuscript: string
     if (!p) throw new ReportError(`unknown quotation ${id} in ${where}`);
     return p;
   };
-  const quoted = (p: Rendered) => `“${p.text}”`;
-  const notes: Note[] = [];
-  const paragraphs: string[] = [];
-  for (const raw of manuscript.split("\n\n")) {
-    const para = raw.replace(/^\n+|\n+$/g, "");
-    if (para === "{{bibliography}}") {
-      paragraphs.push(para);
-      continue;
-    }
-    let quotedSinceNote = new Set<string>();
-    const tokens = [
-      ...[...para.matchAll(QUOTE)].map((m) => ({ m, kind: "q" as const })),
-      ...[...para.matchAll(NOTE)].map((m) => ({ m, kind: "n" as const })),
-    ].sort((a, b) => a.m.index! - b.m.index!);
-    const out: string[] = [];
-    let pos = 0;
-    for (const { m, kind } of tokens) {
-      if (m.index! < pos) continue; // a quotation inside a note's comment, rendered with the note
-      out.push(para.slice(pos, m.index));
-      pos = m.index! + m[0].length;
-      if (kind === "q") {
-        quotedSinceNote.add(m[1]!);
-        out.push(quoted(get(m[1]!, "the text")));
-        continue;
-      }
-      const ids = m[1]!.split(",").filter(Boolean);
-      const comment = m[2] ? m[2].replace(QUOTE, (_, id: string) => {
-        quotedSinceNote.add(id);
-        return quoted(get(id, "a note"));
-      }) : undefined;
-      const groups: { cites: string; members: Rendered[] }[] = [];
-      for (const id of ids) {
-        const p = get(id, "a note");
-        if (groups.at(-1)?.cites === p.cites) groups.at(-1)!.members.push(p);
-        else groups.push({ cites: p.cites, members: [p] });
-      }
-      const number = notes.length + 1;
-      notes.push({
-        number, clusters: noteClusters(number, groups), passages: ids, inline: [...quotedSinceNote].filter((id) => !ids.includes(id)).sort(),
-        ...(comment ? { comment } : {}), text: "",
-      });
-      out.push(`[^${number}]`);
-      quotedSinceNote = new Set();
-    }
-    out.push(para.slice(pos));
-    paragraphs.push(out.join(""));
-  }
-  const clusters = notes.flatMap((n) => n.clusters);
-  const formatted = formatCitations(corpus, clusters, include);
+  const assembly = assemble(manuscript, get);
+  const written = (segments: Segment[]) => segments.map((s) => (
+    s.kind === "text" ? s.text : s.kind === "note" ? `[^${s.number}]` : `“${passages.get(s.id)!.text}”`)).join("");
+  const notes: Note[] = assembly.notes.map((n) => {
+    const comment = n.comment ? written(n.comment) : undefined;
+    return {
+      number: n.number, clusters: clustersOf([n]), passages: n.passages, inline: n.inline, ...(comment ? { comment } : {}), text: "",
+    };
+  });
+  const paragraphs = assembly.paragraphs.map((p) => (p.kind === "bibliography" ? "{{bibliography}}" : written(p.segments)));
+  const formatted = formatCitations(corpus, clustersOf(assembly.notes), include);
   const problems = formatted.problems.map((p) => `note ${p.note}: ${p.problem === "no_source" ? `no source has the key ${p.key}` : `the record of ${p.key} holds characters the formatter reserves`}`);
   let at = 0;
   for (const n of notes) {
@@ -309,6 +384,14 @@ function toTypst(body: string[], notes: Note[]): string {
 
 // ---------- verification table ----------
 
+/** How a quotation as the report gives it differs from the source text, and what its locator rests on. */
+export const changesOf = (p: Rendered): string[] => [
+  ...(p.spec.corrections ?? []).map((c) => `correction “${c.was}” → “${c.now}”, read from the ${c.basis} by ${c.by}${c.by.startsWith("person:") ? "" : ", not reviewed by a person"}`),
+  ...p.joined, ...(p.spec.italic ?? []).map((w) => `italic: ${w} (as on the page)`),
+  ...p.spec.passages.flatMap((s) => (s.join_note ? [s.join_note] : [])),
+  ...p.provenance.flatMap((pr) => pr.labelBasis.map((b) => `locator: ${b}`)),
+];
+
 function verification(corpus: Corpus, spec: ReportSpec, notes: Note[], passages: Map<string, Rendered>, items: Record<string, unknown>): string {
   const rows = [
     "# Verification of the report’s notes", "",
@@ -322,12 +405,7 @@ function verification(corpus: Corpus, spec: ReportSpec, notes: Note[], passages:
     for (const id of [...n.inline, ...n.passages]) {
       const p = passages.get(id)!;
       const address = p.provenance.map((pr) => `\`${pr.address}\` (record \`${pr.passage}\`)`).join("<br>");
-      const changes = [
-        ...(p.spec.corrections ?? []).map((c) => `correction “${c.was}” → “${c.now}”, read from the ${c.basis} by ${c.by}${c.by.startsWith("person:") ? "" : ", not reviewed by a person"}`),
-        ...p.joined, ...(p.spec.italic ?? []).map((w) => `italic: ${w} (as on the page)`),
-        ...p.spec.passages.flatMap((s) => (s.join_note ? [s.join_note] : [])),
-        ...p.provenance.flatMap((pr) => pr.labelBasis.map((b) => `locator: ${b}`)),
-      ];
+      const changes = changesOf(p);
       rows.push(`| ${n.number} | ${id}${n.inline.includes(id) ? " (quoted in the text)" : ""} | ${address} | ${p.locator} | ${p.spec.checked ?? "not recorded"} | ${changes.join("; ") || "none"} |`);
     }
   }
