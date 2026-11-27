@@ -39,8 +39,9 @@ for browsing without a server.
 Delivery is in stages. The server (`stemma browse`, CONTRACT-005 M) comes first,
 then search beyond the arras limits (M, "Search"), then originals shown
 unhighlighted beside the text (M, "Originals"), then MCP (N, "Agents over MCP"
-below). Highlighting on originals is a later stage, specified before it is
-built. None of them is built by this decision alone.
+below). Highlighting on originals (M, "Highlighting on originals", and below)
+comes last, specified before it was built. None of them is built by this
+decision alone.
 
 ## Originals in the page
 
@@ -58,6 +59,36 @@ they travel as signed calls with proved answers.
 
 Whether a part of a source file is a page of its original is decided from the
 record alone (CONTRACT-007 C). Where it is not established, no page is shown.
+
+## Highlighting on originals
+
+The product owner requires that clicking a reference opens the source material
+with the text highlighted. CONTRACT-005 M, "Highlighting on originals", states
+the rules. The decision is that a wrong box is worse than none.
+
+- **The server, not the page, places boxes,** from the bytes whose digest it has
+  checked, and only where the page it reads again has exactly the text of the
+  source file's part. Matching text in the page's own text layer would find a
+  likely place, which is a guess.
+- **Equality is strict and of one page.** A comparison of the converter's three
+  text streams would also have been defensible, but it needs the whole document
+  converted again. The strict form refused 16 more of 5,022 real pages than the
+  stream form, all two-column pages the converter reordered.
+- **Positions come from the drawing operators.** pdf.js's text content gives one
+  box for a run of text, which cannot place part of a line, and says nothing of
+  whether the run is visible. The operators give each glyph and how it is painted.
+  The reading of them is Stemma's own code over pdf.js's list, held to account by
+  the cross-check with the text content and by tests that compare boxes with
+  rendered pixels. Anything it does not know refuses the page.
+- **No boxes on scans with a recognition layer.** Their positions are a
+  recognition engine's estimates over an image, which nothing here can check
+  against the image. This is the common case for scanned books: on the worked
+  example, 12 of its 14 originals are such scans, so their pages are shown with no
+  box. Reconsider only with a check that ties each box to the image, or if the
+  product owner accepts boxes labelled as a recognition layer's estimates.
+- **No page rendering in the server.** Comparing rendered pixels with and without
+  the quoted words would prove visibility better, but needs a canvas in the
+  server, which means a native module the plugin does not ship.
 
 ## Search in the server
 

@@ -226,12 +226,18 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   say so with both numbers. The offline file keeps arras's limits and states
   them.
 - SRV-09. A search request's cost and a served answer's size must be bounded.
+- SRV-14. On a page of an original that the served explorer shows, it must mark the
+  quoted words only where the server, reading that page again from the same bytes,
+  finds its text equal to the source text's page and finds the words' glyphs drawn
+  visibly where the boxes lie (CONTRACT-005 M). The page must say that the boxes
+  are positions from the PDF's text layer. In any doubt, a scan with a
+  recognition layer included, it must mark nothing and say why.
 - SRV-10. Wherever the served explorer shows a source view (the record panel, and
   a manuscript quotation, note citation, and bibliography entry), it must show the
   page of the original beside the highlighted text, from the PDF or page image
   whose digest the source file records, where the record establishes which page
-  that is (CONTRACT-007 C), and never a guessed one. The original is not
-  highlighted, and the page must say so. Where it cannot be shown, the page must
+  that is (CONTRACT-007 C), and never a guessed one. Where the original is not
+  highlighted (SRV-14), the page must say so. Where it cannot be shown, the page must
   say why and keep the text.
 - SRV-11. Originals must be looked for only in the project's originals cache and
   in places the author names, following no link, and only bytes whose digest was
@@ -278,6 +284,7 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
 - [US-119 — Browse through the local server](../user-stories/US-119-browse-through-the-local-server.md)
 - [US-121 — See the original page beside the highlighted text](../user-stories/US-121-see-the-original-page.md)
 - [US-122 — Ask the assistant to show a record](../user-stories/US-122-ask-to-see-a-record.md)
+- [US-123 — See the quoted words marked on the original](../user-stories/US-123-see-the-words-on-the-original.md)
 
 ## Edge Cases and Error Handling
 
@@ -340,8 +347,7 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
-- Highlighting on an original or page image: a later stage of ADR-012, not yet
-  specified.
+- Marking a page image, or a scan whose only text is a recognition layer.
 - Searching source page text, manuscript files, or research notes.
 - Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).

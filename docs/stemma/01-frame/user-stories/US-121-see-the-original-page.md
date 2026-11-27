@@ -28,18 +28,18 @@ The project holds converted text, never the originals (ADR-010). The author has
 the originals on their own computer. The record ties each source file to them by
 digest. An original is a file from outside, and a page shown for the wrong words
 would mislead, so only a matching file and an established page are shown. Where
-that cannot be done, the converted text is what remains. Highlighting on the
-original itself is a later stage.
+that cannot be done, the converted text is what remains. Marking words on the
+original itself is US-123.
 
 ## Walkthrough
 
 1. Margit asks to browse, and says where her originals are; the agent starts `browse --originals <folder>`.
-2. In her report she clicks a quotation. The converted text is highlighted, and beside it the PDF page, or page image, is shown, saying that nothing is marked on it.
+2. In her report she clicks a quotation. The converted text is highlighted, and beside it the PDF page, or page image, is shown, saying either what is marked on it or that nothing is (US-123).
 3. Where a file is missing or changed, or no page can be established, the page says which, and the text is still there.
 
 ## Acceptance Criteria
 
-- [ ] **US-121-AC1** — Given a held PDF or page image of a passage's source, when she opens its source from the record panel, a manuscript quotation or note citation, or a bibliography entry, then the original page is shown beside the highlighted text, with a statement that the original is not highlighted.
+- [ ] **US-121-AC1** — Given a held PDF or page image of a passage's source, when she opens its source from the record panel, a manuscript quotation or note citation, or a bibliography entry, then the original page is shown beside the highlighted text, with a statement of what is marked on it, or that it is not highlighted.
 - [ ] **US-121-AC2** — Given a source text whose parts are tied to no page of an original (CONTRACT-007 C), when its source is opened, then no page is shown and the reason is given; a PDF whose page count differs from the record shows no page.
 - [ ] **US-121-AC3** — Given a missing, changed, oversize, or unsupported original, a physical one, or the offline file, then the page says which, and the text is shown.
 - [ ] **US-121-AC4** — Given files outside the originals cache and the named places, links to a matching file, or a file swapped for another, then their bytes are not served.
@@ -75,4 +75,4 @@ original itself is a later stage.
 
 ## Out of Scope
 
-- Highlighting on the original, MCP, TIFF conversion, and originals in the offline file or a reviewer package.
+- Marking words on the original (US-123), MCP, TIFF conversion, and originals in the offline file or a reviewer package.

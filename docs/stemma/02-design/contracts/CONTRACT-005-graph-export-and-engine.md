@@ -593,8 +593,8 @@ that rests on it `not_exported`.
 opens the manuscript, at the fragment route `#/manuscript`, in place of the
 record browser. It says that this is the manuscript as the export read it, not
 the printed PDF; the offline page also says that it cannot show originals, and the
-served page that they are shown unhighlighted beside the text (M). Text is rendered as text
-nodes, isolated and with hidden characters shown as in K. `*italic*` becomes
+served page that they are shown beside the text, marked only as M allows. Text
+is rendered as text nodes, isolated and with hidden characters shown as in K. `*italic*` becomes
 emphasis and a bare `http` or `https` address a link as in K; in a quotation only
 the italics its list entry names are applied. A quotation, a citation, and a
 bibliography entry each open a pane at their own route. The pane shows quotation
@@ -656,6 +656,7 @@ for by a digest the snapshot records, in places the command was given
 | `POST /api/manuscript` | `{}` | The manuscript view |
 | `POST /api/original-page` | `{"text", "index"}`, a source file ID and a part's index | Which page of which original the part is, or why none is established ("Originals") |
 | `POST /original` | `{"sha256"}` | The bytes of the original with that digest, or why they cannot be given ("Originals") |
+| `POST /api/original-highlight` | `{"passage", "index"}`, a passage ID and a part's index, and nothing else | Boxes to draw on that page of the original, or why none is drawn ("Highlighting on originals") |
 | `POST /pdfjs-data` | `{"name"}` | A character map or standard font of the pinned pdf.js, looked up by name among those held in memory |
 
 Each answer made from the snapshot is `{"data_identity", "result"}`. The
@@ -812,8 +813,9 @@ hold all.
 served page shows that page of the original: a page of a PDF, drawn by the pinned
 pdf.js, or the page image. This is so wherever a source view is shown: the record
 panel, and a manuscript quotation, note citation, and bibliography entry (L). The
-original is **not highlighted**, and the page says so beside it: the highlight is
-in the converted text only. When the original cannot be shown, the page says
+original is marked only as "Highlighting on originals" allows. Otherwise it is
+**not highlighted**, and the page says so beside it, with why: the highlight is
+then in the converted text only. When the original cannot be shown, the page says
 which of these is so and why, and the text stays: the offline file; a physical
 original; a type that is not shown (a TIFF image included, which is not
 converted); no page established; not held; changed (the digest does not match);
@@ -874,6 +876,88 @@ too large; or it could not be drawn.
   source text and an export leave out, such as a download stamp that names a
   person, or a restricted position. It is shown on the author's computer only,
   and no export holds it.
+
+**Highlighting on originals.** A box on an original is a claim that the quoted
+words are there. A wrong one is the worst failure this page can have, so every
+doubt draws nothing, and the page says why. The text beside it stays highlighted.
+
+- **Who decides.** Only the server decides. The page matches no text, reads no
+  text layer, and works out no position: it draws the boxes the server gives, or
+  none.
+- **What is asked.** `/api/original-highlight` takes a passage ID and a part's
+  index. Both are only looked up in the snapshot. The passage's view must be
+  `highlighted` (K) and have a segment on that part, and the record must establish
+  that the part is a page of a PDF (CONTRACT-007 C). A page image holds no word
+  positions, so it is never marked.
+- **The same bytes.** The server finds the original as `/original` does, and reads
+  only bytes whose SHA-256 it has just found to be the recorded one. The answer
+  names that digest, page, and page count, and the page draws boxes only over a
+  drawing of that page of that digest.
+- **Text equality.** The server reads that one page again with the pinned pdf.js,
+  by the same code that converts a PDF: no compatibility folding, download stamps
+  removed, lines without ink dropped, control characters made spaces. The page's
+  text is those lines in the order the file gives them. The part's text is every
+  line of every block of the source file's part, in file order, with annotation
+  tags removed, the words and note markers inside them kept, and escapes decoded.
+  The two must be equal, character for character. Nothing is folded, trimmed,
+  reordered, or matched approximately, so an edited or corrected part, a
+  transcription that differs, and a page whose columns the converter reordered
+  get no box. The quoted words are then found by their recorded offsets in the
+  part, never by search.
+- **Positions.** Boxes come from the page's drawing operators, not from the text
+  layer's word list. Every non-space character of the page's text must come, in
+  order, from a glyph the operators draw: the two sequences must be equal for the
+  whole page. Each quoted glyph's box is its advance width and its outline.
+  As a cross-check, each quoted glyph must lie on the baseline of, and within, the
+  piece of pdf.js's text content that holds its character.
+- **Drawn to be seen.** A quoted glyph must be filled (text rendering mode 0) in
+  a dark color, fully opaque, in normal blend mode, at least 4 units high, inside
+  the page and inside every clipping rectangle, with an outline that lies within
+  its advance width. Nothing else may be painted where a box lies, before or
+  after: an image, a path (a white fill painted before the text excepted), a
+  shading, or other text. The operators the server knows are listed in its code;
+  a page with any other, with a transparency group, a soft mask, optional content,
+  a Type 3 font, a text clipping mode, or a non-rectangular clipping path that
+  reaches a box, gets no box.
+- **Unclear geometry.** No box is given for a rotated page; rotated, skewed, or
+  mirrored text; vertical text; right-to-left text on a quoted line; a quoted
+  ligature (one glyph for several characters); a quotation that joins, begins, or
+  ends at a word split by a hyphen at a line end, a page break included; or a
+  quoted glyph with no width.
+- **A scan with a recognition layer gets no box.** Such a page shows an image, and
+  its text is drawn invisibly over it (rendering mode 3). The positions are the
+  recognition engine's estimate of where words are in that image. Nothing the
+  server can check ties them to the image: the layer may be shifted, scaled, or
+  made for another rendering of the scan, and its glyph widths are not those of
+  the printed letters. Equal text shows only that the layer says what the source
+  file says. So the page says that the only positions are a recognition layer's,
+  and marks nothing. Showing them, labelled as such, is not done.
+- **What the page checks.** Before it marks anything, the page checks in its own
+  drawing that each box holds both dark and light pixels. A box that does not is a
+  disagreement between the two drawings, and then no box is drawn. This check can
+  only remove a highlight.
+- **What the page says.** With boxes, it says that they are positions from the
+  PDF's text layer, that the server read the page again, found its text equal to
+  the source text, and found those glyphs drawn there with nothing detected over
+  or under them. Without, it says that the original is not highlighted, and why.
+  The answer is `state` `boxes` (`sha256`, `page`, `page_count`, and `boxes`,
+  each `left`, `top`, `width`, and `height` as fractions of the page as drawn) or
+  `none` (`reason` and `why`). `why` holds fixed words, and no path or text from
+  the file.
+- **Bounds.** The page is read in a process of its own, which gets the file's
+  bytes and the target, gets no secret, opens no listener, makes no outbound
+  request, and writes nothing. It is ended when it has answered, and after 20
+  seconds. One runs at a time; at most 8 requests wait, and a further one gets
+  `none` with `reason` `busy`. A page with more than 300,000 operators or 100,000
+  glyphs, or a highlight of more than 500 boxes, gets no box. The original it
+  reads counts among the two held at once (rule 13). The server keeps no result.
+- **What this does not show.** That a glyph's outline looks like the character the
+  file's text layer gives it: a font can draw one letter and name another, and the
+  text, taken from that layer, then agrees with itself. That nothing in a way of
+  hiding the operators do not show, such as a color the same as an unusual
+  background that nothing painted, hides the words; the page's pixel check
+  narrows this. Nor that the converted text is right: that is what comparing it
+  with the original is for, and the highlight is where to look.
 
 **Proofs.** Once a server stops, another program can take its port at once, and
 an open page would reach it. So each side shows the other, on every `POST`, that
