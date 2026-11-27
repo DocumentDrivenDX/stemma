@@ -37,6 +37,8 @@ export function refusal(status: number, code: string, message: string): Answer {
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const BAD = refusal(400, "bad_request", "The request body is not what this call takes.");
+/** How many units of the source text on each side of the quoted words go to the reader of a page. */
+const WORDS_AROUND = 400;
 
 /** The most an answer to a query or a search may take (rule 13). */
 export const MOST_ANSWER_BYTES = 8 * 1024 * 1024;
@@ -88,13 +90,22 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
   const highlightAsk = (passage: string, index: number): HighlightAsk => {
     const view = Object.hasOwn(data.views, passage) ? (data.views as Record<string, SourceView>)[passage] : undefined;
     const text = view?.kind === "passage" && view.state === "highlighted" ? view.source_text?.id : undefined;
-    const found = text !== undefined && view!.segments.some((s) => s.index === index) ? data.highlights?.[passage]?.[index] : undefined;
+    const segment = text !== undefined ? view!.segments.find((s) => s.index === index) : undefined;
+    const found = segment ? data.highlights?.[passage]?.[index] : undefined;
     if (text === undefined || !found || !Object.hasOwn(texts, text)) return { none: "no_segment" };
     const page = originalPage(texts[text]!, index);
     if (page.state === "image") return { none: "page_image" };
     if (page.state === "none") return { none: "no_pdf_page" };
-    if ("refused" in found) return { none: found.refused };
-    return { target: { sha256: page.sha256, size: page.size, page: page.page, page_count: page.page_count, text_sha256: found.text_sha256, ranges: found.ranges } };
+    if ("refused" in found && found.refused === "no_segment") return { none: found.refused };
+    // The words, from the view the page already shows, are for an estimate where a scan's page cannot be matched exactly.
+    const words = { quoted: segment!.quoted, before: segment!.before.slice(-WORDS_AROUND), after: segment!.after.slice(0, WORDS_AROUND) };
+    return {
+      target: {
+        sha256: page.sha256, size: page.size, page: page.page, page_count: page.page_count,
+        ...("ranges" in found ? { text_sha256: found.text_sha256, ranges: found.ranges } : { text_sha256: "", ranges: [] }),
+        ...("refused" in found ? { refused: found.refused as "hyphen_split" | "unsupported_text" } : {}), words,
+      },
+    };
   };
   const answer = async (route: string, body: unknown): Promise<Answer> => {
     if (!isObject(body)) return BAD;
