@@ -13,28 +13,429 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
 <div class="shell">
-<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
-<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html" aria-current="page">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html" aria-current="page">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="postgres.html">PostgreSQL example</a></li><li><a href="darwin.html">Darwin example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="shell page">
-<div class="opening"><h1>How it works</h1>
+<main id="main" tabindex="-1" class="shell page page-how">
+<div class="opening"><div class="opening-text"><h1>How it works</h1>
 <p class="lead">You ask in plain words. Claude does the clerical work, scripts do the comparing, and you make the decisions.</p>
-</div>
+<nav class="contents" aria-label="Parts of this page"><ul><li><a href="#loop">The research cycle</a></li><li><a href="#sources">What Stemma reads</a></li><li><a href="#evidence">Claims and evidence</a></li><li><a href="#report">The report</a></li><li><a href="#places">Where material lives</a></li></ul></nav></div><img class="opening-mark" src="mark.svg" alt="" width="112" height="112"></div>
 <section class="spread" aria-labelledby="loop">
 <h2 id="loop">The research cycle</h2>
-<figure class="cycle">
+<figure class="cycle plate">
 <ol aria-label="The research cycle"><li><h3>Gather</h3><p class="who">You and Claude</p><p>Choose a work. Claude writes down what it is and where each detail came from.</p></li><li><h3>Capture and read</h3><p class="who">Claude and scripts</p><p>Your copy becomes text files in your project, page by page. Page numbers are proposed for review.</p></li><li><h3>Write and cite</h3><p class="who">You and Claude</p><p>Research and write. Each citation is recorded with its sentence, page and any quotation.</p></li><li><h3>Check</h3><p class="who">Scripts</p><p>The records are compared with your sources. Every finding comes with its evidence and a suggestion.</p></li><li><h3>Decide</h3><p class="who">You</p><p>Look at the page, then fix, replace or leave it. Nothing waits for you.</p></li></ol>
 <p class="cycle-return">Then go round again: a new source, a better scan, a corrected sentence. Check as often as you like.</p>
+<figcaption>This site’s drawing of one round of research. The steps are the order of work; none holds back the next.</figcaption>
 </figure>
 </section>
 <section class="band"><div class="band-head"><h2>One round, step by step</h2></div><div class="band-body">
-<ol class="steps"><li><h3>Start a project</h3><div><p class="ask"><span>You might say</span> &ldquo;Start a Stemma project in this folder.&rdquo;</p><p>Claude creates a few project files and overwrites nothing.</p><p>One of them, <code>rules.md</code>, holds your standing rules, such as how to spell a place name. Claude is instructed to read it at the start of each session.</p></div></li><li><h3>Gather your sources</h3><div><p class="ask"><span>You might say</span> &ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</p><p>Claude writes a record of the work and tells you where each detail came from. It is instructed never to invent one.</p></div></li><li><h3>Capture your sources</h3><div><p class="ask"><span>You might say</span> &ldquo;Capture this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</p><p>Stemma turns it into text files in your project, one for each page, with where and when you got it. A digital fingerprint ties them to the exact original, which is not added to the project.</p><p>It reads the text a PDF already contains, and reads EPUB, web pages, Word documents, Markdown, Project Gutenberg and plain text files. It cannot read words from a picture of a page: you supply that text, made by a recognition tool or typed.</p><p>Anyone who can read your project can read these files, so publishing it publishes them. You can note that material is unpublished, restricted by a community, or under a particular license. These notes inform you; they stop nothing.</p></div></li><li><h3>Check the text and page numbers</h3><div><p class="ask"><span>You might say</span> &ldquo;Compare the text with the original and look at the page numbers.&rdquo;</p><p>Stemma proposes page numbers only where the numbers printed on the pages support them. A book with no pages is cited by chapter or paragraph.</p><p>It can convert the original again to show that the text still matches. For text a computer recognized, you can compare it with another reading and note what you looked at. None of that is required.</p></div></li><li><h3>Write, and cite</h3><div><p class="ask"><span>You might say</span> &ldquo;Find where that book discusses atolls, and cite the passage I choose.&rdquo;</p><p>When you choose a passage, a script copies its words and page, so nobody retypes them.</p><p>A citation you already have is recorded exactly as you wrote it, with its sentence, source, page and any quotation.</p><p>You can ask to see a few pages while you write. They are marked as text quoted from the source, which may contain errors.</p></div></li><li><h3>Check</h3><div><p class="ask"><span>You might say</span> &ldquo;Check the project and explain what is open.&rdquo;</p><p>The whole project is checked. Claude explains what is wrong, shows the evidence, says why it matters and suggests what to do.</p><p>A check that cannot be done is reported as <em>could not check</em>. It never counts as a pass.</p><p>What nothing shows or contradicts, such as a source not compared with any catalogue, is listed as coverage. It is not a problem and asks nothing of you.</p></div></li><li><h3>Decide, and go round again</h3><div><p class="ask"><span>You might say</span> &ldquo;I have a better scan of this book. Replace the old one.&rdquo;</p><p>You choose what to fix. When a source is replaced, you see what relied on the old one. This version cannot note that you have looked again, so those items stay listed.</p><p>Ask <q>Are any of my source files missing or changed?</q> to find files that have gone missing or been edited.</p></div></li></ol>
+<ol class="steps"><li><h3>Start a project</h3><div><p class="ask"><span>You might say</span> &ldquo;Start a Stemma project in this folder.&rdquo;</p><p>Claude creates a few project files and overwrites nothing.</p><p>One of them, <code>rules.md</code>, holds your standing rules, such as how to spell a place name. Claude is instructed to read it at the start of each session.</p></div></li><li><h3>Gather your sources</h3><div><p class="ask"><span>You might say</span> &ldquo;Add a source record for this book, taking the details from its title page.&rdquo;</p><p>Claude writes a record of the work and tells you where each detail came from. It is instructed never to invent one.</p></div></li><li><h3>Capture your sources</h3><div><p class="ask"><span>You might say</span> &ldquo;Capture this PDF as my copy of that source. I downloaded it from the library today.&rdquo;</p><p>Stemma turns it into text files in your project, one for each page, with where and when you got it. A digital fingerprint ties them to the exact original, which is not added to the project.</p><p>You can record more than one place the original can be had, such as its web address and a copy in a web archive. Only a file with the same fingerprint counts as that original.</p><p>It reads the text a PDF already contains, and reads EPUB, web pages, Word documents, Markdown, Project Gutenberg and plain text files. It cannot read words from a picture of a page: you supply that text, made by a recognition tool or typed.</p><p>Anyone who can read your project can read these files, so publishing it publishes them. You can note that material is unpublished or restricted by a community. These notes inform you; they stop nothing.</p></div></li><li><h3>Check the text and page numbers</h3><div><p class="ask"><span>You might say</span> &ldquo;Compare the text with the original and look at the page numbers.&rdquo;</p><p>Stemma proposes page numbers only where the numbers printed on the pages support them. A book with no pages is cited by chapter or paragraph.</p><p>It can convert the original again to show that the text still matches. For text a computer recognized, you can compare it with another reading and note what you looked at. None of that is required.</p></div></li><li><h3>Write, and cite</h3><div><p class="ask"><span>You might say</span> &ldquo;Find where that book discusses atolls, and cite the passage I choose.&rdquo;</p><p>When you choose a passage, a script copies its words and page, so nobody retypes them.</p><p>A citation you already have is recorded exactly as you wrote it, with its sentence, source, page and any quotation.</p><p>You can ask to see a few pages while you write. They are marked as text quoted from the source, which may contain errors.</p></div></li><li><h3>Check</h3><div><p class="ask"><span>You might say</span> &ldquo;Check the project and explain what is open.&rdquo;</p><p>The whole project is checked. Claude explains what is wrong, shows the evidence, says why it matters and suggests what to do.</p><p>A check that cannot be done is reported as <em>could not check</em>. It never counts as a pass.</p><p>What nothing shows or contradicts, such as a source not compared with any catalogue, is listed as coverage. It is not a problem and asks nothing of you.</p></div></li><li><h3>Decide, and go round again</h3><div><p class="ask"><span>You might say</span> &ldquo;I have a better scan of this book. Replace the old one.&rdquo;</p><p>You choose what to fix. When a source is replaced, you see what relied on the old one. This version cannot note that you have looked again, so those items stay listed.</p><p>Ask <q>Are any of my source files missing or changed?</q> to find files that have gone missing or been edited.</p></div></li></ol>
 </div></section>
+<section class="spread" aria-labelledby="sources">
+<h2 id="sources">What Stemma reads, and how each is cited</h2>
+<p>Much of what you read on a technical subject has no page numbers. A paragraph number is counted through Stemma’s copy of a page: it is not printed on the page itself, and another copy of the same address may count differently. That is one reason the text you cite is kept in your project.</p>
+<figure class="plate diagram diagram-locators">
+<div class="drawing drawing-wide"><svg style="max-width:572px" xmlns="http://www.w3.org/2000/svg" viewBox="-286 -359 572 718" width="572" height="718" class="lini" role="img" aria-labelledby="dgm-locators-title dgm-locators-desc">
+  <title id="dgm-locators-title">What Stemma reads, and how each is cited</title>
+  <desc id="dgm-locators-desc">6 kinds of source, from each to how a place in it is cited. Each box on the left leads to the box beside it on the right.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-314" y="-387" width="628" height="774" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(-157,-322.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">PDF paper or manual</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(157,-322.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Printed page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(-157,-193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Web page you saved</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(157,-193.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Paragraph or chapter</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(-157,-64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">EPUB book</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(157,-64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Page where it is marked</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(-157,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Word document</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(157,64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Never a page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n9" transform="translate(-157,193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Markdown or plain text</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n10" style="stroke-width: 2" transform="translate(157,193.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Chapter or paragraph</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n11" transform="translate(-157,322.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Scan or page images</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n12" style="stroke-width: 2" transform="translate(157,322.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Text you supply</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M -36 -322.5 L 32.5 -322.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,-322.5 27.5,-318 27.5,-327"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M -36 -193.5 L 32.5 -193.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,-193.5 27.5,-189 27.5,-198"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M -36 -64.5 L 32.5 -64.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,-64.5 27.5,-60 27.5,-69"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n8">
+      <path d="M -36 64.5 L 32.5 64.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,64.5 27.5,69 27.5,60"/>
+    </g>
+    <g class="lini-link" data-from="visual.n9" data-to="visual.n10">
+      <path d="M -36 193.5 L 32.5 193.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,193.5 27.5,198 27.5,189"/>
+    </g>
+    <g class="lini-link" data-from="visual.n11" data-to="visual.n12">
+      <path d="M -36 322.5 L 32.5 322.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,322.5 27.5,327 27.5,318"/>
+    </g>
+  </g>
+</svg></div>
+<div class="drawing drawing-narrow"><svg style="max-width:258px" xmlns="http://www.w3.org/2000/svg" viewBox="-129 -746 258 1492" width="258" height="1492" class="lini" role="img" aria-labelledby="dgm-locators-narrow-title dgm-locators-narrow-desc">
+  <title id="dgm-locators-narrow-title">What Stemma reads, and how each is cited</title>
+  <desc id="dgm-locators-narrow-desc">6 kinds of source, from each to how a place in it is cited. Each box on the left leads to the box beside it on the right.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-157" y="-774" width="314" height="1548" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(0,-709.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">PDF paper or manual</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(0,-580.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Printed page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(0,-451.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Web page you saved</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(0,-322.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Paragraph or chapter</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,-193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">EPUB book</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(0,-64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Page where it is marked</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(0,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Word document</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(0,193.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Never a page number</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n9" transform="translate(0,322.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Markdown or plain text</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n10" style="stroke-width: 2" transform="translate(0,451.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Chapter or paragraph</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n11" transform="translate(0,580.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Scan or page images</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n12" style="stroke-width: 2" transform="translate(0,709.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Text you supply</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M 0 -681 L 0 -612.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-608.5 -4.5,-617.5 4.5,-617.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 0 -423 L 0 -354.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-350.5 -4.5,-359.5 4.5,-359.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 0 -165 L 0 -96.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-92.5 -4.5,-101.5 4.5,-101.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n8">
+      <path d="M 0 93 L 0 161.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,165.5 -4.5,156.5 4.5,156.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n9" data-to="visual.n10">
+      <path d="M 0 351 L 0 419.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,423.5 -4.5,414.5 4.5,414.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n11" data-to="visual.n12">
+      <path d="M 0 609 L 0 677.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,681.5 -4.5,672.5 4.5,672.5"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of the kinds of source Stemma reads, and how a place in each is cited.</figcaption>
+</figure>
+<div class="equivalent equivalent-locators"><ul aria-label="6 kinds of source, from each to how a place in it is cited"><li><p class="equivalent-term">PDF paper or manual → Printed page number</p><p>One file for each page. Page numbers are taken from those printed on the pages, where they support them. A passage on a page with no established number gets no page.</p></li><li><p class="equivalent-term">Web page you saved → Paragraph or chapter</p><p>Documentation, release notes and articles usually have no pages: a passage is cited by paragraph number, or by chapter where the headings number chapters. A page that marks its own page numbers keeps them.</p></li><li><p class="equivalent-term">EPUB book → Page where it is marked</p><p>Cited by page where the book marks its page numbers, and otherwise by chapter or paragraph.</p></li><li><p class="equivalent-term">Word document → Never a page number</p><p>A Word file has no fixed pages, so it is cited by chapter or paragraph. To cite pages, export a PDF and capture that.</p></li><li><p class="equivalent-term">Markdown or plain text → Chapter or paragraph</p><p>This includes Project Gutenberg texts. Plain text that marks its page breaks is kept page by page instead.</p></li><li><p class="equivalent-term">Scan or page images → Text you supply</p><p>Stemma cannot read words from a picture of a page. You supply them, from a recognition tool or typed, page by page.</p></li></ul></div>
+</section>
+<section class="spread" aria-labelledby="evidence">
+<h2 id="evidence">Claims, and what bears on them</h2>
+<p>A thesis and the claims under it can be recorded with how sure you are and why, and linked to notes on passages. Each link says whether the note supports the claim, supports it in part, qualifies it, contradicts it or only gives context, so evidence against you is kept beside evidence for you. A check lists a recorded claim that lacks a note, a level of confidence or a reason. It does not judge whether a note supports a claim.</p>
+<figure class="plate diagram diagram-evidence scrolls">
+<p class="scroll-hint">Scroll the drawing sideways to see all of it. The list holds the same.</p>
+<div class="drawing drawing-scroll" tabindex="0" role="region" aria-label="Drawing: What bears on a thesis. It scrolls sideways on a narrow screen."><svg style="max-width:896px;min-width:717px" xmlns="http://www.w3.org/2000/svg" viewBox="-448 -236 896 472" width="896" height="472" class="lini" role="img" aria-labelledby="dgm-evidence-title dgm-evidence-desc">
+  <title id="dgm-evidence-title">What bears on a thesis</title>
+  <desc id="dgm-evidence-desc">A thesis and 4 of the notes linked to it: one supports it, one supports it, one qualifies it, one contradicts it. Each note rests on one source.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-476" y="-264" width="952" height="528" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path" data-id="n1" style="stroke-width: 2" transform="translate(-320,-168)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Docs: architecture</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(-320,-56)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Docs: replication</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(-320,56)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Release notes: 19</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(-320,168)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Pavlo and Zhang, 2023</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,-168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Supports: a process each</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n6" transform="translate(0,-56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Supports: one writer</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(0,56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Qualifies: version 19</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n8" transform="translate(0,168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Contradicts: storage</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n9" style="stroke-width: 3" transform="translate(320,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+<rect class="stm-inner" x="-115" y="-22.5" width="230" height="45" rx="4" ry="4"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Thesis</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n5">
+      <path d="M -199 -168 L -124.5 -168"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,-168 -129.5,-163.5 -129.5,-172.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n6">
+      <path d="M -199 -56 L -124.5 -56"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,-56 -129.5,-51.5 -129.5,-60.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n7">
+      <path d="M -199 56 L -124.5 56"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,56 -129.5,60.5 -129.5,51.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n8">
+      <path d="M -199 168 L -124.5 168"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,168 -129.5,172.5 -129.5,163.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n9">
+      <path d="M 121 -168 L 158.4747 -168 A 16 16 0 0 1 174.4747 -152 L 174.4747 -29 A 16 16 0 0 0 190.4747 -13 L 195 -13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,-13 190,-8.5 190,-17.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n6" data-to="visual.n9">
+      <path d="M 121 -56 L 142.4747 -56 A 16 16 0 0 1 158.4747 -40 L 158.4747 -32.6667 A 28.3333 28.3333 0 0 0 186.8081 -4.3333 L 195 -4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,-4.3333 190,0.1667 190,-8.8333"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n9">
+      <path d="M 121 56 L 129.0253 56 A 16 16 0 0 0 145.0253 40 L 145.0253 32.6667 A 28.3333 28.3333 0 0 1 173.3586 4.3333 L 195 4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,4.3333 190,8.8333 190,-0.1667"/>
+    </g>
+    <g class="lini-link stm-opposing" data-from="visual.n8" data-to="visual.n9">
+      <path d="M 121 168 L 145.0253 168 A 16 16 0 0 0 161.0253 152 L 161.0253 29 A 16 16 0 0 1 177.0253 13 L 195 13"/>
+      <line class="stm-bar" x1="193.15" y1="20.65" x2="193.15" y2="5.35"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of part of the records of the <a href="postgres.html">PostgreSQL worked example</a>: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.</figcaption><p class="legend"><span><i class="line-solid" aria-hidden="true"></i>Solid line, arrowhead: leads to, supports or qualifies</span> <span><i class="line-opposing" aria-hidden="true"></i>Dashed line, bar end: opposes, as a note that contradicts does</span></p>
+</figure>
+<div class="equivalent equivalent-evidence"><ul aria-label="The thesis, and 4 of the 13 notes linked to it"><li><p class="equivalent-term">Thesis (confidence: medium)</p><p>PostgreSQL 18 is a sound default primary datastore for a web application while the application’s writes fit comfortably on one primary server and that server’s upkeep is attended to. The limits to plan for follow from that single write primary: a process for each connection, row versions and transaction IDs that vacuum has to keep reclaiming, and replication that does not divide writes.</p></li><li><p class="equivalent-term">Docs: architecture → Supports: a process each → Thesis</p><p>Each client connection is served by its own server process, forked for it. This note supports the thesis. It rests on one passage of “Architectural Fundamentals”.</p></li><li><p class="equivalent-term">Docs: replication → Supports: one writer → Thesis</p><p>PostgreSQL does not offer synchronous multimaster replication; in partitioning, only one server can modify each set. This note supports the thesis. It rests on 2 passages of “Comparison of Different Solutions”.</p></li><li><p class="equivalent-term">Release notes: 19 → Qualifies: version 19 → Thesis</p><p>The version 19 release notes announce online table repacking and a command for reading one’s own writes on a standby. This note qualifies the thesis. It rests on 2 passages of “Release 19”.</p></li><li><p class="equivalent-term">Pavlo and Zhang, 2023 → Contradicts: storage → Thesis</p><p>Pavlo judges the multiversion implementation the worst among the widely used relational systems he names. This note contradicts the thesis. It rests on one passage of “The Part of PostgreSQL We Hate the Most”.</p></li></ul></div>
+</section>
+<section class="spread" aria-labelledby="report">
+<h2 id="report">The report</h2>
+<p>Ask Claude to build the report. Each quotation is copied from your source’s text through the passage you chose, so nobody retypes it, and citations are written in Chicago notes-and-bibliography style from your source records.</p>
+<figure class="plate diagram diagram-report-build scrolls">
+<p class="scroll-hint">Scroll the drawing sideways to see all of it. The list holds the same.</p>
+<div class="drawing drawing-scroll" tabindex="0" role="region" aria-label="Drawing: What goes into a report. It scrolls sideways on a narrow screen."><svg style="max-width:896px;min-width:717px" xmlns="http://www.w3.org/2000/svg" viewBox="-448 -236 896 472" width="896" height="472" class="lini" role="img" aria-labelledby="dgm-report-build-title dgm-report-build-desc">
+  <title id="dgm-report-build-title">What goes into a report</title>
+  <desc id="dgm-report-build-desc">Four inputs lead into the report build, which leads to three outputs.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-476" y="-264" width="952" height="528" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(-320,-168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Your manuscript</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(-320,-56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">List of quotations</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(-320,56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage records</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(-320,168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Source records</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n5" style="stroke-width: 3" transform="translate(0,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Build the report</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(320,-112)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Report with footnotes</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n7" style="stroke-width: 2" transform="translate(320,0)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Verification table</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(320,112)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Evidence ledger</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n5">
+      <path d="M -199 -168 L -161.5253 -168 A 16 16 0 0 1 -145.5253 -152 L -145.5253 -29 A 16 16 0 0 0 -129.5253 -13 L -125 -13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,-13 -130,-8.5 -130,-17.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n5">
+      <path d="M -199 -56 L -177.5253 -56 A 16 16 0 0 1 -161.5253 -40 L -161.5253 -32.6667 A 28.3333 28.3333 0 0 0 -133.1919 -4.3333 L -125 -4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,-4.3333 -130,0.1667 -130,-8.8333"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n5">
+      <path d="M -199 56 L -190.9747 56 A 16 16 0 0 0 -174.9747 40 L -174.9747 32.6667 A 28.3333 28.3333 0 0 1 -146.6414 4.3333 L -125 4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,4.3333 -130,8.8333 -130,-0.1667"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M -199 168 L -174.9747 168 A 16 16 0 0 0 -158.9747 152 L -158.9747 29 A 16 16 0 0 1 -142.9747 13 L -125 13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,13 -130,17.5 -130,8.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 121.5 -8 L 144.25 -8 A 16 16 0 0 0 160.25 -24 L 160.25 -96 A 16 16 0 0 1 176.25 -112 L 195.5 -112"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,-112 190.5,-107.5 190.5,-116.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n7">
+      <path d="M 121.5 8 L 195.5 8"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,8 190.5,12.5 190.5,3.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n8">
+      <path d="M 0 29 L 0 96 A 16 16 0 0 0 16 112 L 195.5 112"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,112 190.5,116.5 190.5,107.5"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of what the report build reads and writes.</figcaption>
+</figure>
+<div class="equivalent equivalent-report-build"><ul aria-label="What goes into the build and what comes out"><li><p class="equivalent-term">Your manuscript → Build the report</p><p>The report's own words. The build never changes them.</p></li><li><p class="equivalent-term">List of quotations → Build the report</p><p>Which passages the report quotes, and where.</p></li><li><p class="equivalent-term">Passage records → Build the report</p><p>The words and place of each quotation, as a script copied them.</p></li><li><p class="equivalent-term">Source records → Build the report</p><p>The details of each work, from which its citations are written.</p></li><li><p class="equivalent-term">Build the report → Report with footnotes</p><p>Markdown and a typesetting file, and a PDF if you ask. Each note gives a quotation, then its citation.</p></li><li><p class="equivalent-term">Build the report → Verification table</p><p>A table, kept apart from the report, of where each quotation was copied from and how it was checked, as recorded.</p></li><li><p class="equivalent-term">Build the report → Evidence ledger</p><p>What is recorded behind each sentence. It does not judge whether a sentence is supported.</p></li></ul></div>
+</section>
 <section class="spread" aria-labelledby="rounds">
 <h2 id="rounds">What going round looks like</h2>
 <p>In the demo, one project is checked four times. The numbers fall as things are fixed, added and looked at.</p>
-<figure class="rounds">
+<figure class="rounds plate">
 <ol aria-label="Three checks of the demo project, in order"><li><h3>First check</h3><dl><div><dt>Problems</dt><dd>4</dd></div><div><dt>Could not check</dt><dd>0</dd></div></dl><p>A mistyped citation key, a listed work that is never cited, a file out of its standard layout, and a cited book that is not in the project.</p></li><li><h3>After three fixes</h3><dl><div><dt>Problems</dt><dd>2</dd></div><div><dt>Could not check</dt><dd>0</dd></div></dl><p>The key is corrected, the extra listing removed and the file tidied. There is still no text of the cited book to compare with.</p></li><li><h3>Its text is added</h3><dl><div><dt>Problems</dt><dd>0</dd></div><div><dt>Could not check</dt><dd>0</dd></div></dl><p>Text for a scan of the book is supplied. Nothing is open. The report says what it could not cover: nothing shows the title page, and the invented book is in no catalogue.</p></li></ol>
 <figcaption>This site's drawing of three runs in the <a href="examples.html#demo">demo</a>, with the counts each run printed. All names and sources in the demo are invented.</figcaption>
 </figure>
@@ -44,16 +445,17 @@
 </div></section>
 <section class="spread" aria-labelledby="places">
 <h2 id="places">Where your material lives</h2>
-<figure class="places">
+<figure class="places plate">
 <ul aria-label="Where things are kept">
 <li><h3>Your project folder</h3><p>Plain files you can open, compare and back up like any others.</p><ul><li>The text of your sources, with its pages</li><li>A record for each source, passage and citation</li><li>Your standing rules, in <code>rules.md</code></li></ul><p>Anyone who can read the folder can read your sources, so publishing it publishes them.</p></li>
 <li><h3>Your original files</h3><p>PDFs, page images and the like stay out of the project's published files.</p><ul><li>The project notes where each came from and its digital fingerprint</li><li>Keep them to convert and compare again</li></ul></li>
 <li><h3>The AI model</h3><p>Claude is instructed to read only the pages a task needs.</p><ul><li>Stemma holds back no source: anything in a project may be sent</li><li>If something may not go to a hosted model, leave it out of the project</li></ul></li>
 </ul>
+<figcaption>This site’s drawing of where a project’s material is kept, and what reaches the model.</figcaption>
 </figure>
 </section>
 <section class="band"><div class="band-head"><h2>Words used here</h2></div><div class="band-body">
-<dl class="entries"><div><dt>Record</dt><dd>A small plain file about one thing: a source, where its original came from, a passage or a citation.</dd></div><div><dt>Original</dt><dd>The file the text was made from, such as a PDF. It is not added to the project.</dd></div><div><dt>Source files</dt><dd>The text of a work, kept in your project: one file for each page, or for each section where there are no pages.</dd></div><div><dt>Passage</dt><dd>A piece of a source chosen by its place. A script copies its words and page.</dd></div><div><dt>Page label</dt><dd>The number printed on a page, where it could be established.</dd></div><div><dt>Finding</dt><dd>One thing a check reports, with its evidence and a suggestion.</dd></div><div><dt>Could not check</dt><dd>Something needed was missing, so there is no answer yet.</dd></div><div><dt>Coverage</dt><dd>What a report covered by other means, or did not cover, and what it saw in an original. It is not a list of things to do.</dd></div><div><dt>Checked clean</dt><dd>The checks found nothing open. It does not mean the book is correct.</dd></div><div><dt>Unreviewed, not admitted</dt><dd>A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding.</dd></div></dl>
+<dl class="entries"><div><dt>Record</dt><dd>A small plain file about one thing: a source, where its original came from, a passage or a citation.</dd></div><div><dt>Original</dt><dd>The file the text was made from, such as a PDF. It is not added to the project.</dd></div><div><dt>Source files</dt><dd>The text of a work, kept in your project: one file for each page, or for each section where there are no pages.</dd></div><div><dt>Passage</dt><dd>A piece of a source chosen by its place. A script copies its words and page.</dd></div><div><dt>Page label</dt><dd>The number printed on a page, where it could be established.</dd></div><div><dt>Note</dt><dd>A short extract or paraphrase that names the passages it rests on, or a comment of your own.</dd></div><div><dt>Claim</dt><dd>Something your report asserts, recorded with how sure you are and why. Notes can support it, support it in part, qualify it, contradict it or give its context.</dd></div><div><dt>Finding</dt><dd>One thing a check reports, with its evidence and a suggestion.</dd></div><div><dt>Could not check</dt><dd>Something needed was missing, so there is no answer yet.</dd></div><div><dt>Coverage</dt><dd>What a report covered by other means, or did not cover, and what it saw in an original. It is not a list of things to do.</dd></div><div><dt>Checked clean</dt><dd>The checks found nothing open. It does not mean the book is correct.</dd></div><div><dt>Unreviewed, not admitted</dt><dd>A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding.</dd></div></dl>
 </div></section>
 </main>
 <footer class="colophon">

@@ -13,14 +13,14 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
 <div class="shell">
-<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
-<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html" aria-current="page">Design</a></li></ul></nav>
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="postgres.html">PostgreSQL example</a></li><li><a href="darwin.html">Darwin example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html" aria-current="page">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="shell page">
-<div class="opening"><h1>Design language</h1>
+<main id="main" tabindex="-1" class="shell page page-design">
+<div class="opening"><div class="opening-text"><h1>Design language</h1>
 <p class="lead">How Stemma looks and speaks: like a careful report.</p>
-<p class="note">This summarizes how this site looks and speaks, from the design system in the repository, <code>docs/stemma/02-design/DESIGN.md</code>.</p></div>
+<p class="note">This summarizes how this site looks and speaks, from the design system in the repository, <code>docs/stemma/02-design/DESIGN.md</code>.</p></div><img class="opening-mark" src="mark.svg" alt="" width="112" height="112"></div>
 <section class="band"><div class="band-head"><h2>Identity</h2></div><div class="band-body">
 <p><img src="mark.svg" alt="The Stemma mark: a small family tree with one root and three descendants" width="96" height="96"></p>
 <p>The mark is a small <em>stemma codicum</em>: one filled node for the earliest witness, and lines of descent to three open ones, one of them through an intermediate branch. It depicts no real manuscript tradition. Write the name <strong>Stemma</strong>, and <code>stemma</code> for the command. Keep clear space of a quarter of the mark's width around it, and do not use it below 16 pixels.</p>
@@ -47,15 +47,28 @@
 <p class="specimen-mono">src-demo0harbour01 &nbsp; cite.key &nbsp; 0O 1lI</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Spacing and shape</h2></div><div class="band-body">
-<p>Spacing steps of 4, 8, 12 and 16 pixels; 6-pixel control corners and 10-pixel card corners. Borders that carry meaning use the strong line. No shadows and no animation.</p>
+<p>Spacing steps of 4, 8, 12 and 16 pixels; 6-pixel control corners and 10-pixel card corners. Borders that carry meaning use the strong line. Tinted plates and cards use the surface tokens. No shadows, gradients or animation.</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Components</h2></div><div class="band-body">
 <h3>Page layout</h3>
-<p>A page opens with its title. On wide screens each section's heading sits in the margin and stays in view while the section is read; on narrow screens it sits above the text. Running text keeps a short line; transcripts and entries may use the whole column.</p>
-<h3>Drawings</h3>
+<p>A page opens in a plate with its title, and the mark large beside it on wide screens; the first page opens with the drawing from an original source to a footnote beside its title. On wide screens each section's heading sits in the margin, under its number, and stays in view while the section is read; on narrow screens it sits above the text. Running text keeps a short line; drawings, transcripts and entries may use the whole width. The section numbers are ornament; where sections are steps, as in a worked example, the step's number is part of the heading.</p>
+<h3>Plates</h3>
+<p>A full-width drawing sits in a plate: the sunken surface, a hairline and the card radius, with no shadow. Its caption begins with its number on the page and says that the drawing is this site's own.</p>
+<h3 id="generated">Generated diagrams</h3>
+<p>A <a href="how.html#sources">drawing of boxes and lines</a> is made from data in the repository when the site's generated files are written: names and counts are read from records, <a href="https://github.com/DocumentDrivenDX/umf-visual">umf-visual</a> and the Lini renderer it carries lay it out, and the committed SVG is written into the page, where these pages' color tokens draw it in light and dark. Nothing runs in your browser. Each has a name and a description for a screen reader, and a visible list that holds the same boxes, lines and relation words.</p>
+<ul class="plain-list"><li>Lines carry no labels. A line's relation is written first in the box it starts from, and repeated in the list.</li>
+<li>A solid line ends in an arrowhead. A line that opposes, such as a note that contradicts a thesis, is dashed and ends in a bar. No relation has a color of its own.</li>
+<li>The thesis has a double border. The ends of a chain have a heavier one. Sources and what a thing is compared with have a folded corner.</li>
+<li>On narrow screens a drawing takes a one-column layout, or keeps its size in a region that scrolls and can be reached by keyboard. Its smallest text stays at least 11.5 pixels at 320 pixels wide.</li></ul>
+<h3>Other drawings</h3>
 <p>The <a href="how.html#loop">research cycle</a>, the <a href="how.html#rounds">demo's rounds of checking</a>, <a href="how.html#places">where material lives</a> and the <a href="darwin.html#pages">example's page numbers</a> are drawn with HTML and lines, so the words in each drawing are its text.</p>
+<h3>Figures in numbers</h3>
+<p>A short row of large numerals, each with a label, for counts read from record files or a run. Never a score or a share.</p>
+<dl class="numbers"><div><dt>checks</dt><dd>19</dd></div><div><dt>citations in the Darwin example</dt><dd>4</dd></div></dl>
+<h3>Example card</h3>
+<p>One for each <a href="index.html#worked">worked example</a>: its subject, its question, figures from its records, and one link, to its page or to its folder on GitHub.</p>
 <h3>Line of descent</h3>
-<p>The drawing on the <a href="index.html#descent">first page</a> is a nested list of records with lines drawn between them, so its text is the drawing. As in the mark, the filled node is the one the rest descend from. Its caption says where it came from.</p>
+<p>The family tree on the <a href="index.html#descent">first page</a> is a nested list of records with lines drawn between them, so its text is the drawing. As in the mark, the filled node is the one the rest descend from. Its caption says where it came from.</p>
 <h3>Status label</h3>
 <p>The script's own word in a bordered label. Never a check mark.</p>
 <p><span class="status status-pass">pass</span> <span class="status status-fail">fail</span> <span class="status status-unverifiable">unverifiable</span></p>

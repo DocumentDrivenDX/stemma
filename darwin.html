@@ -13,18 +13,18 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
 <div class="shell">
-<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
-<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html" aria-current="page">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="postgres.html">PostgreSQL example</a></li><li><a href="darwin.html" aria-current="page">Darwin example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="shell page">
-<div class="opening"><h1>Worked example: Darwin and coral reefs</h1>
+<main id="main" tabindex="-1" class="shell page page-darwin">
+<div class="opening"><div class="opening-text"><h1>Worked example: Darwin and coral reefs</h1>
 <p class="lead">A real book from 1842, followed from its title page to four checked quotations.</p>
-<p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The example holds the text of 14 works on coral reefs. No PDF or page picture is published with it.</p>
-<nav class="contents" aria-label="Steps of the worked example"><ul><li><a href="#works">1. The works</a></li><li><a href="#original">2. One original</a></li><li><a href="#text">3. Its source files</a></li><li><a href="#pages">4. Its page numbers</a></li><li><a href="#citations">5. Four citations</a></li><li><a href="#check">6. The check</a></li><li><a href="#mistakes">7. Planted mistakes</a></li><li><a href="#again">8. Checking it again</a></li><li><a href="#facts">Where the facts come from</a></li><li><a href="#limits">What this does not show</a></li></ul></nav></div>
+<dl class="numbers"><div><dt>works held</dt><dd>14</dd></div><div><dt>pages of the cited book’s text</dt><dd>258</dd></div><div><dt>citations of it</dt><dd>4</dd></div></dl><p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The example holds the text of 14 works on coral reefs. No PDF or page picture is published with it.</p>
+<nav class="contents" aria-label="Steps of the worked example"><ul><li><a href="#works">1. The works</a></li><li><a href="#original">2. One original</a></li><li><a href="#text">3. Its source files</a></li><li><a href="#pages">4. Its page numbers</a></li><li><a href="#citations">5. Four citations</a></li><li><a href="#check">6. The check</a></li><li><a href="#mistakes">7. Planted mistakes</a></li><li><a href="#again">8. Checking it again</a></li><li><a href="#facts">Where the facts come from</a></li><li><a href="#limits">What this does not show</a></li></ul></nav></div><img class="opening-mark" src="mark.svg" alt="" width="112" height="112"></div>
 <section class="spread" aria-labelledby="whole">
 <h2 id="whole">The whole example at a glance</h2>
-<figure class="descent">
+<figure class="descent plate">
 <div class="descent-head"><p class="descent-title"><cite>The Structure and Distribution of Coral Reefs</cite></p>
 <p>Charles Darwin, 1842. The source record.</p><p class="record"><code>src-darwinreefs1842</code></p></div>
 <ul class="descent-tree" aria-label="What descends from the source record">
@@ -38,7 +38,7 @@
 <figcaption>This site's drawing of the files in this example; it is not a Stemma screen. A script copied the quotations from passages an AI model chose, and the model compared them with images of the pages; no person has confirmed them.</figcaption>
 </figure>
 </section>
-<section class="band"><div class="band-head"><h2 id="works">1. The works</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="works"><span class="numeral">1</span> The works</h2></div><div class="band-body">
 <p>The example gathers these works in the old argument over how coral reefs form. Its four citations are of Darwin's 1842 book.</p>
 <ul class="plain-list"><li>Charles Lyell. <cite>Principles of Geology</cite>. 1832.</li><li><cite>Proceedings of the Geological Society of London</cite>. 1838.</li><li>Charles Darwin. <cite>The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836</cite>. 1842.</li><li><cite>Proceedings of the Royal Society of Edinburgh</cite>. 1880.</li><li>Karl Semper. <cite>Animal Life as Affected by the Natural Conditions of Existence</cite>. 1881.</li><li>Francis Darwin (editor). <cite>The Life and Letters of Charles Darwin, including an Autobiographical Chapter</cite>. 1887.</li><li>Charles Darwin. <cite>The Structure and Distribution of Coral Reefs</cite>. 1889.</li><li>James D. Dana. <cite>Corals and Coral Islands</cite>. 1890.</li><li>Alexander Agassiz. <cite>The Coral Reefs of the Tropical Pacific</cite>. 1903.</li><li>Coral Reef Committee of the Royal Society. <cite>The Atoll of Funafuti</cite>. 1904.</li><li>Reginald A. Daly. &ldquo;The Glacial-Control Theory of Coral Reefs&rdquo;. <cite>Proceedings of the American Academy of Arts and Sciences</cite>. 1915.</li><li>Harry S. Ladd and Seymour O. Schlanger. <cite>Drilling Operations on Eniwetok Atoll</cite>. 1960.</li><li>Paul Blanchon and others. &ldquo;Postglacial Fringing-Reef to Barrier-Reef conversion on Tahiti links Darwin’s reef types&rdquo;. <cite>Scientific Reports</cite>. 2014.</li><li>Sebastian Steibl and others. &ldquo;A Renaissance of Atoll Ecology&rdquo;. <cite>Annual Review of Ecology, Evolution, and Systematics</cite>. 2024.</li></ul>
 <p>The short label <code>darwin1842</code> is how citations refer to Darwin's book. It is marked as a <em>candidate</em>: nobody has formally accepted it into the project.</p>
@@ -120,7 +120,7 @@
 }</pre></figure>
 </details>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="original">2. One original</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="original"><span class="numeral">2</span> One original</h2></div><div class="band-body">
 <p>The original of Darwin's book is a 15.8 MB scan from the Internet Archive (Internet Archive item b29331213). Its record notes the address it came from, when it was obtained, and a fingerprint of the exact file. If the file changed by even one character, the fingerprint would no longer match. The PDF itself is not in the project.</p>
 <p class="record">Address: https://archive.org/download/b29331213/b29331213.pdf</p>
 <details class="more"><summary>The record file: <code>ups-kbcb4f2s3c2qjwbvf9f9.json</code></summary>
@@ -178,7 +178,7 @@
 }</pre></figure>
 </details>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="text">3. Its source files</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="text"><span class="numeral">3</span> Its source files</h2></div><div class="band-body">
 <p>The PDF already contains text, made by a computer reading the page pictures. Stemma wrote it into the project as 258 files, one for each page, blank pages included. Nobody has proofread it, and its quality is marked as not assessed. Where the layout of a page, such as its paragraphs or footnotes, could not be told, the file says so.</p>
 <p>The PDF was then converted a second time, and every page agreed.</p>
 <details class="more"><summary>The start of the file for printed page 88</summary>
@@ -213,15 +213,15 @@ CORAL-REEFS.</pre></figure>
 </details>
 <p class="record">Source files: <code>txt-bm6whwjm6vv9ce26mgbr</code></p>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="pages">4. Its page numbers</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="pages"><span class="numeral">4</span> Its page numbers</h2></div><div class="band-body">
 <p>The third page of a PDF is rarely page 3 of the book. Stemma took page numbers from the numbers printed on the pages, and left 45 pages without one.</p>
 <p>Among them is a publisher's list of other books, bound in at the back with numbering of its own. Its numbers repeat the book's, so they were not used. A number printed on a page does not always number the work.</p>
-<figure class="pagemap">
+<figure class="pagemap plate">
 <ol aria-label="Pages of the PDF, in order"><li style="flex-grow: 19"><p><strong>No page label</strong></p><p>PDF pages 0 to 18, counting from 0 (19 pages)</p></li><li class="mapped" style="flex-grow: 213"><p><strong>Printed pages 2 to 214</strong></p><p>PDF pages 19 to 231, counting from 0 (213 pages)</p></li><li style="flex-grow: 26"><p><strong>No page label, including a publisher's list that has its own numbers</strong></p><p>PDF pages 232 to 257, counting from 0 (26 pages)</p></li></ol>
 <figcaption>This site's drawing of the page labels in the book's source files, which cover a PDF of 258 pages. Widths are roughly in proportion.</figcaption>
 </figure>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="citations">5. Four citations</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="citations"><span class="numeral">5</span> Four citations</h2></div><div class="band-body">
 <p>Each sentence below is this example's own wording around a short quotation, which is underlined. The words and page of each quotation were copied by script from a passage in the source files.</p>
 <ol class="citations"><li><p class="locator">page 2</p><div><p class="sentence">Of the word atoll he writes, “<span class="quoted">I have invariably used in this volume the term</span>”, and treats it as a synonym for lagoon-island.</p><p class="record"><code>cit-darwinreefs0003</code></p></div></li><li><p class="locator">page 88</p><div><p class="sentence">Darwin opens his fifth chapter with the received view: “<span class="quoted">The theory most generally received on the formation of atolls, is that they are based on submarine craters</span>”.</p><p class="record"><code>cit-darwinreefs0001</code></p></div></li><li><p class="locator">page 89</p><div><p class="sentence">He calls Chamisso’s account earlier and better than the crater theory, yet finds that a difficulty of the same kind makes “<span class="quoted">this view inapplicable to the greater number of atolls</span>”.</p><p class="record"><code>cit-darwinreefs0002</code></p></div></li><li><p class="locator">page 89</p><div><p class="sentence">He does not rule the crater rim out altogether: “<span class="quoted">I am far from denying that a reef like a perfectly characterized atoll might not be formed</span>”.</p><p class="record"><code>cit-darwinreefs0004</code></p></div></li></ol>
 <details class="more"><summary>The record file: <code>psg-pq7x9hm7n70adgxe36db.json</code></summary>
@@ -284,7 +284,7 @@ CORAL-REEFS.</pre></figure>
 }</pre></figure>
 </details>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="check">6. The check</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="check"><span class="numeral">6</span> The check</h2></div><div class="band-body">
 <p>All four citations pass: each quotation is in the source's text, on the page cited. One matched after rejoining the word <em>denying</em>, split at the end of a line; the report points that out so you can look.</p>
 <p>The project as a whole is checked clean: nothing across the works is open. No person had to approve anything. The report also says how it got there. The computer-read text of Darwin's title page leaves out the year, and a saved library record of the same copy bears it out. In another volume the printed page numbers jump from 232 to 333; every page of the original is there and the text runs on, so the report records the jump as something seen in the original. <em>Checked clean</em> does not mean the work is correct, only that these checks found nothing wrong.</p>
 <details class="more"><summary>What the tool printed</summary>
@@ -324,7 +324,7 @@ Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
 </details>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="mistakes">7. Planted mistakes</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="mistakes"><span class="numeral">7</span> Planted mistakes</h2></div><div class="band-body">
 <p>To see whether the checks would notice, two citations in a throwaway copy of the project were changed as if an author had typed them wrongly: <q>greater</q> became <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
 <p>Both were caught. The changed quotation is shown beside the wording in the source (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words are: page 88.</p>
 <details class="more"><summary>What the tool printed for the planted mistakes</summary>
@@ -403,7 +403,7 @@ Full report: $PROJECTS/coral-reefs-trial/.stemma/reports/check.json
 <h3>A correct quotation that would be flagged</h3>
 <p>On page 2, the computer-read text has a stray space after a quotation mark. A quotation typed correctly from the page across that mark would be reported as only a near match. A finding means <em>look at the page</em>, not <em>you are wrong</em>.</p>
 </div></section>
-<section class="band"><div class="band-head"><h2 id="again">8. Checking it again</h2></div><div class="band-body">
+<section class="band"><div class="band-head"><h2 id="again"><span class="numeral">8</span> Checking it again</h2></div><div class="band-body">
 <p>The text of every source is in the project, so anyone who downloads the example gets the same check results without the PDFs. Someone who obtains the originals can also have them converted again and compared with the published text.</p>
 <p><a href="https://github.com/DocumentDrivenDX/stemma/tree/main/examples/coral-reefs">How to do that, with all the example's files and notes, on GitHub</a></p>
 </div></section>

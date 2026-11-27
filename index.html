@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="description" content="Create academically rigorous research reports and books with Claude. Stemma checks citations and quotations against the sources in your project. Pre-release.">
+<meta name="description" content="Create academically rigorous research reports and books on technical subjects with Claude. Stemma checks citations and quotations against the sources in your project. Pre-release.">
 <title>Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
@@ -13,31 +13,192 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="masthead">
 <div class="shell">
-<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="36" height="36">Stemma</a>
-<nav aria-label="Main"><ul class="nav"><li><a href="index.html" aria-current="page">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="darwin.html">Worked example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html" aria-current="page">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="postgres.html">PostgreSQL example</a></li><li><a href="darwin.html">Darwin example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
 </div>
 </header>
-<main id="main" tabindex="-1" class="shell page">
-<div class="opening opening-home"><h1>Create academically rigorous research reports and books</h1>
-<p class="lead">Research and write with Claude. The Stemma plugin keeps your sources in your project, checks your citations and quotations against them, and explains what it finds in plain language.</p>
-<p class="actions"><a class="button button-primary" href="install.html">Get started</a> <a class="button" href="how.html">See how it works</a> <span class="stage">Pre-release</span></p></div>
+<main id="main" tabindex="-1" class="shell page page-index">
+<div class="hero">
+<div class="hero-text">
+<p class="eyebrow"><img src="mark.svg" alt="" width="48" height="48"> <span>A Claude plugin for research you can trace</span></p>
+<h1>Create academically rigorous research reports and books</h1>
+<p class="lead">Research technical subjects with Claude: documentation for the version you name, release notes, papers and engineering write-ups. The Stemma plugin keeps their text in your project, checks your citations and quotations against it, and explains what it finds in plain language.</p>
+<p class="actions"><a class="button button-primary" href="install.html">Get started</a> <a class="button" href="how.html">See how it works</a> <span class="stage">Pre-release</span></p>
+</div>
+<figure class="plate diagram diagram-chain hero-figure">
+<div class="drawing drawing-wide"><svg style="max-width:573px" xmlns="http://www.w3.org/2000/svg" viewBox="-286.5 -231 573 462" width="573" height="462" class="lini" role="img" aria-labelledby="dgm-chain-title dgm-chain-desc">
+  <title id="dgm-chain-title">From an original source to a footnote</title>
+  <desc id="dgm-chain-desc">7 links, each leading to the next: original source, upstream record, source files, passage, citation, claim, sentence and footnote.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-314.5" y="-259" width="629" height="518" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(-157,-194)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Original source</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(157.5,-194)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(-157,-64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(157.5,-64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Source files</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(-157,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n6" transform="translate(157.5,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Claim</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n7" style="stroke-width: 3" transform="translate(-157,194)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Sentence and footnote</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M -35.5 -194 L 33 -194"/>
+      <polygon class="lini-marker lini-marker-arrow" points="37,-194 28,-189.5 28,-198.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 157.5 -165.5 L 157.5 -96.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="157.5,-92.5 153,-101.5 162,-101.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 36.5 -64.5 L -32.5 -64.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-36.5,-64.5 -27.5,-69 -27.5,-60"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M -157 -36 L -157 32.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-157,36.5 -161.5,27.5 -152.5,27.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M -36 56.5 L 33 56.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="37,56.5 28,61 28,52"/>
+    </g>
+    <g class="lini-link" data-from="visual.n6" data-to="visual.n7">
+      <path d="M 36.5 72.5 L 16.5 72.5 A 16 16 0 0 0 0.5 88.5 L 0.5 178 A 16 16 0 0 1 -15.5 194 L -32 194"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-36,194 -27,189.5 -27,198.5"/>
+    </g>
+  </g>
+</svg></div>
+<div class="drawing drawing-narrow"><svg style="max-width:259px" xmlns="http://www.w3.org/2000/svg" viewBox="-129.5 -424.5 259 849" width="259" height="849" class="lini" role="img" aria-labelledby="dgm-chain-narrow-title dgm-chain-narrow-desc">
+  <title id="dgm-chain-narrow-title">From an original source to a footnote</title>
+  <desc id="dgm-chain-narrow-desc">7 links, each leading to the next: original source, upstream record, source files, passage, citation, claim, sentence and footnote.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-157.5" y="-452.5" width="315" height="905" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(0,-387.5)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Original source</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(0,-258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(0,-129)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Source files</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(0,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,129)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n6" transform="translate(0,258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Claim</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n7" style="stroke-width: 3" transform="translate(0,387.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Sentence and footnote</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M 0 -358.5 L 0 -290"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-286 -4.5,-295 4.5,-295"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 0 -229.5 L 0 -161"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-157 -4.5,-166 4.5,-166"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 0 -100.5 L 0 -32"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-28 -4.5,-37 4.5,-37"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M 0 28.5 L 0 97"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,101 -4.5,92 4.5,92"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 0 157.5 L 0 226"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,230 -4.5,221 4.5,221"/>
+    </g>
+    <g class="lini-link" data-from="visual.n6" data-to="visual.n7">
+      <path d="M 0 286.5 L 0 355"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,359 -4.5,350 4.5,350"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of the links Stemma keeps, from an original source to a footnote. Each is explained below.</figcaption>
+</figure>
+</div>
+<section class="spread unnumbered" aria-labelledby="links">
+<h2 id="links">From an original source to a footnote</h2>
+<div class="equivalent equivalent-chain"><ol aria-label="The seven links, each leading to the next"><li><p class="equivalent-term">Original source</p><p>The paper, page or book as you got it, such as a PDF or a saved web page. It is not added to your project.</p></li><li><p class="equivalent-term">Upstream record</p><p>Where the original came from, and its digital fingerprint, which no other file shares.</p></li><li><p class="equivalent-term">Source files</p><p>Its text, kept in your project: one file for each page, or for each section where there are no pages.</p></li><li><p class="equivalent-term">Passage</p><p>Words you chose by their place. A script copies them, with their page, chapter or paragraph.</p></li><li><p class="equivalent-term">Citation</p><p>A record that ties your sentence to the source, with the place and any quotation.</p></li><li><p class="equivalent-term">Claim</p><p>What your report asserts, where you record it, with how sure you are and why. Notes on passages bear on it.</p></li><li><p class="equivalent-term">Sentence and footnote</p><p>The sentence in your report, with a footnote that gives the quotation and then its citation.</p></li></ol></div>
+</section>
 <section class="band"><div class="band-head"><h2>Why rigor takes more</h2></div><div class="band-body">
 <p class="statement">An AI assistant can produce a reference that does not exist, give a real title the wrong author, cite a page the work does not have, or invent a quotation.</p>
 <p>Checking all of that by hand can cost the time the assistant saved. With Stemma, the comparing that a computer can do reliably is done for you, against your own sources. The report also tells you what it could not check, so you know where to look yourself.</p>
 </div></section>
+<section class="spread" aria-labelledby="technical">
+<h2 id="technical">Made for researching technical subjects</h2>
+<ul class="tiles" aria-label="Kinds of technical source"><li><h3>Documentation, for the version you name</h3><p>Capture the pages for the version you are writing about, and note the version on the record. Your project keeps their text as you captured it, even if the page online changes.</p></li><li><h3>Release notes</h3><p>Quote what changed from the notes themselves, with the release they belong to.</p></li><li><h3>Papers</h3><p>A PDF is read page by page, and cited by its printed page numbers where those on the pages support them.</p></li><li><h3>Engineering write-ups</h3><p>A saved article usually has no pages, so a passage in it is cited by paragraph number.</p></li></ul>
+<p><a href="how.html#sources">What Stemma reads, and how each source is cited</a></p>
+</section>
 <section class="spread" aria-labelledby="cycle">
 <h2 id="cycle">Research in rounds</h2>
-<p>Research is rarely finished in one pass. You find another source, get a better scan, or rewrite a sentence. Stemma fits that loop.</p>
-<figure class="cycle">
+<p>Research is rarely finished in one pass. You find another source, get a better copy, or rewrite a sentence. Stemma fits that loop.</p>
+<figure class="cycle plate">
 <ol aria-label="The research cycle"><li><h3>Gather</h3><p class="who">You and Claude</p><p>Choose a work. Claude writes down what it is and where each detail came from.</p></li><li><h3>Capture and read</h3><p class="who">Claude and scripts</p><p>Your copy becomes text files in your project, page by page. Page numbers are proposed for review.</p></li><li><h3>Write and cite</h3><p class="who">You and Claude</p><p>Research and write. Each citation is recorded with its sentence, page and any quotation.</p></li><li><h3>Check</h3><p class="who">Scripts</p><p>The records are compared with your sources. Every finding comes with its evidence and a suggestion.</p></li><li><h3>Decide</h3><p class="who">You</p><p>Look at the page, then fix, replace or leave it. Nothing waits for you.</p></li></ol>
 <p class="cycle-return">Then go round again: a new source, a better scan, a corrected sentence. Check as often as you like.</p>
+<figcaption>This site’s drawing of one round of research. The steps are the order of work; none holds back the next.</figcaption>
 </figure>
 <p><a href="how.html">How a round works, step by step</a></p>
+</section>
+<section class="spread" aria-labelledby="worked">
+<h2 id="worked">Two worked examples</h2>
+<p>Each is a real project, with its records in plain files that you can read. One researches a technical subject; the other a question in the history of science.</p>
+<ul class="cards" aria-label="Worked examples"><li class="card"><p class="card-subject">A technical subject</p><h3>PostgreSQL for web applications</h3><p>When is PostgreSQL a sound default for a web application’s main database, and where does that default end? It cites documentation, release notes, engineering articles and papers. An AI model made it, and no person has reviewed it.</p><dl class="numbers"><div><dt>works cited</dt><dd>17</dd></div><div><dt>citations</dt><dd>43</dd></div><div><dt>claims recorded</dt><dd>14</dd></div></dl><p><a class="card-link" href="postgres.html">Follow the PostgreSQL for web applications example</a></p></li><li class="card"><p class="card-subject">History of science</p><h3>Darwin and coral reefs</h3><p>A real book from 1842, followed from its title page to four checked quotations. An AI model made it, and no person has confirmed its facts.</p><dl class="numbers"><div><dt>works held</dt><dd>14</dd></div><div><dt>work cited</dt><dd>1</dd></div><div><dt>citations</dt><dd>4</dd></div></dl><p><a class="card-link" href="darwin.html">Follow the Darwin and coral reefs example</a></p></li></ul>
 </section>
 <section class="spread" aria-labelledby="descent">
 <h2 id="descent">Every citation has a family tree</h2>
 <p>Scholars draw a <em>stemma codicum</em> to show which copy of a manuscript comes from which. Stemma does something similar for your work: each citation leads back to the words and page it came from, to the text of the source in your project, and to the original that text was made from.</p>
-<figure class="descent">
+<figure class="descent plate">
 <div class="descent-head"><p class="descent-title"><cite>The Structure and Distribution of Coral Reefs</cite></p>
 <p>Charles Darwin, 1842. The source record.</p><p class="record"><code>src-darwinreefs1842</code></p></div>
 <ul class="descent-tree" aria-label="What descends from the source record">
@@ -48,7 +209,7 @@
 <li><p class="descent-kind">Cited at page 89</p><blockquote><p>this view inapplicable to the greater number of atolls</p></blockquote><p class="record"><code>cit-darwinreefs0002</code></p></li>
 <li><p class="descent-kind">Cited at page 89</p><blockquote><p>I am far from denying that a reef like a perfectly characterized atoll might not be formed</p></blockquote><p class="record"><code>cit-darwinreefs0004</code></p></li>
 </ul>
-<figcaption>This site's drawing of the files in the <a href="darwin.html">worked example</a>; it is not a Stemma screen. A script copied the quotations from passages an AI model chose, and the model compared them with images of the pages; no person has confirmed them.</figcaption>
+<figcaption>This site's drawing of the files in the <a href="darwin.html">Darwin worked example</a>; it is not a Stemma screen. A script copied the quotations from passages an AI model chose, and the model compared them with images of the pages; no person has confirmed them.</figcaption>
 </figure>
 </section>
 <section class="band"><div class="band-head"><h2>What gets checked</h2></div><div class="band-body">
@@ -78,7 +239,7 @@
 <p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It checks the citations in manuscript files written in Stemma's marked-up Markdown, or else the citations that have been recorded; it does not check a Word file. Nothing ever stops you from writing.</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Part of a family</h2></div><div class="band-body">
-<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it.</p>
+<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it. The drawings of boxes and lines on this site are made from data with <a href="https://github.com/DocumentDrivenDX/umf-visual">umf-visual</a>.</p>
 </div></section>
 </main>
 <footer class="colophon">

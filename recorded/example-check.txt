@@ -1,0 +1,34 @@
+$ stemma check --all --project $PROJECTS/coral-reefs
+CHECKED CLEAN: the checks found nothing open.
+This does not mean that the book is correct. It covers only what is in these project files.
+Checked the whole project: 5689 result(s) passed.
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - observed in an original: printed page 232 is followed by 333 on the next page of the original, with nothing shown missing: txt-hcn5vw3frm4256b32xhe
+   - the title page text does not show the year; a saved catalogue record bears it out: darwin1842
+
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/agassiz1903 (ocr): 0 of 494 parts reviewed whole by a person; fresh conversion: 494 of 494 parts agree
+   - sources/blanchon2014 (text_layer): 0 of 9 parts reviewed whole by a person; fresh conversion: 9 of 9 parts agree
+   - sources/daly1915 (ocr): 0 of 104 parts reviewed whole by a person; fresh conversion: 104 of 104 parts agree
+   - sources/dana1890 (ocr): 0 of 474 parts reviewed whole by a person; fresh conversion: 474 of 474 parts agree
+   - sources/darwin1842 (ocr): 0 of 258 parts reviewed whole by a person; fresh conversion: 258 of 258 parts agree
+   - sources/darwin1889 (ocr): 0 of 380 parts reviewed whole by a person; fresh conversion: 380 of 380 parts agree
+   - sources/darwinletters1887 (ocr): 0 of 432 parts reviewed whole by a person; fresh conversion: 432 of 432 parts agree
+   - sources/funafuti1904 (ocr): 0 of 466 parts reviewed whole by a person; fresh conversion: 466 of 466 parts agree
+   - sources/geolsoc1838 (ocr): 0 of 632 parts reviewed whole by a person; fresh conversion: 632 of 632 parts agree; 1 flag(s)
+   - sources/ladd1960 (ocr): 0 of 49 parts reviewed whole by a person; fresh conversion: 49 of 49 parts agree; 1 flag(s)
+   - sources/lyell1832 (ocr): 0 of 364 parts reviewed whole by a person; fresh conversion: 364 of 364 parts agree
+   - sources/murray1880 (ocr): 0 of 836 parts reviewed whole by a person; fresh conversion: 836 of 836 parts agree
+   - sources/semper1881 (ocr): 0 of 502 parts reviewed whole by a person; fresh conversion: 502 of 502 parts agree
+   - sources/steibl2024 (text_layer): 0 of 22 parts reviewed whole by a person; fresh conversion: 22 of 22 parts agree
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
+[exit 0]

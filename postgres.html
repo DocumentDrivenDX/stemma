@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="A research report on a technical question, followed from its thesis to one documentation page, and to what its checks leave open.">
+<title>Worked example: PostgreSQL for web applications | Stemma</title>
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+<div class="shell">
+<a class="wordmark" href="index.html"><img src="mark.svg" alt="" width="40" height="40">Stemma</a>
+<nav aria-label="Main"><ul class="nav"><li><a href="index.html">What Stemma is</a></li><li><a href="how.html">How it works</a></li><li><a href="install.html">Get started</a></li><li><a href="checks.html">Checks</a></li><li><a href="postgres.html" aria-current="page">PostgreSQL example</a></li><li><a href="darwin.html">Darwin example</a></li><li><a href="examples.html">Examples</a></li><li><a href="principles.html">Principles</a></li><li><a href="design.html">Design</a></li></ul></nav>
+</div>
+</header>
+<main id="main" tabindex="-1" class="shell page page-postgres">
+<div class="opening"><div class="opening-text"><h1>Worked example: PostgreSQL for web applications</h1>
+<p class="lead">A research report on a technical question, followed from its thesis to the documentation page behind one footnote, and to what its checks leave open.</p>
+<dl class="numbers"><div><dt>works cited</dt><dd>17</dd></div><div><dt>citations</dt><dd>43</dd></div><div><dt>claims recorded</dt><dd>14</dd></div></dl><p class="note">An AI model (claude-sonnet-5-5) chose the sources, made every record and wrote the report. <strong>No person has reviewed any of it.</strong> The checks leave findings open, so the example is not checked clean.</p>
+<nav class="contents" aria-label="Steps of the worked example"><ul><li><a href="#question">1. The question</a></li><li><a href="#works">2. The works</a></li><li><a href="#followed">3. One page, followed</a></li><li><a href="#against">4. Evidence against</a></li><li><a href="#report">5. The report</a></li><li><a href="#check">6. The check</a></li><li><a href="#mistakes">7. Planted mistakes</a></li><li><a href="#text">8. Text not held here</a></li><li><a href="#limits">What no check shows</a></li></ul></nav></div><img class="opening-mark" src="mark.svg" alt="" width="112" height="112"></div>
+<section class="band"><div class="band-head"><h2 id="question"><span class="numeral">1</span> The question, and a thesis revised twice</h2></div><div class="band-body">
+<p>The report, <cite>The Cost of One Writer</cite>, opens with its question:</p>
+<blockquote class="quote"><p>This report asks when PostgreSQL is a sound default for a web application’s primary datastore.</p></blockquote>
+<p>A <em>thesis</em> is the answer a report argues for. The research log, kept beside the report, records two that were dropped. These are its words.</p>
+<ol class="revisions"><li><p class="revision-name">Throughput ceiling</p><p class="sentence"><q>PostgreSQL is a sound default until an application's write throughput exceeds what one server can do.</q></p><p><strong>Rejected after reading.</strong> Notion's account says vacuum stalled and that upkeep tends to degrade before hardware limits are reached; Sentry's outage was exhaustion of transaction IDs; Figma names vacuum trouble beside an input and output limit. A thesis about throughput alone would have missed what two of the three accounts describe first or most prominently.</p></li><li><p class="revision-name">Upkeep fails first</p><p class="sentence"><q>the first limit a growing application meets is vacuum upkeep.</q></p><p><strong>Rejected as overstated.</strong> Figma's account says its earlier scaling work was aimed at processor use, so upkeep was not the first pressure it met, and no source measures which limit ordinary applications meet first.</p></li>
+<li><p class="revision-name">The thesis kept</p><p class="sentence">PostgreSQL 18 is a sound default primary datastore for a web application while the application’s writes fit comfortably on one primary server and that server’s upkeep is attended to. The limits to plan for follow from that single write primary: a process for each connection, row versions and transaction IDs that vacuum has to keep reclaiming, and replication that does not divide writes.</p><p><strong>Confidence recorded: medium.</strong> The version 18 documentation states each mechanism, and three operators’ accounts report trouble with upkeep or write capacity on large or heavily written databases. Medium, not high: nothing here measures how often ordinary applications meet these limits, the accounts are self-selected, and no other database is compared.</p></li></ol>
+<p class="note">The confidence and the reason are the model’s own judgement, recorded so that you can weigh them. No check judges them.</p>
+<p><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/report/research-log.md">The whole research log, on GitHub</a></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="works"><span class="numeral">2</span> The works</h2></div><div class="band-body">
+<p>The report cites 17 works. In a project of your own you would usually hold the text of every source you cite. This published copy holds the text of 10. For the other 7 it holds their records, the fingerprints of their originals and the quoted passages, and their text can be <a href="#text">fetched again</a>.</p>
+<ul class="works" aria-label="The works the report cites"><li><div><p class="work-title">Architectural Fundamentals <code>pg18arch</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Connections and Authentication <code>pg18connections</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Comparison of Different Solutions <code>pg18ha</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Heap-Only Tuples (HOT) <code>pg18hot</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Transaction Isolation <code>pg18isolation</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">JSON Types <code>pg18json</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Log-Shipping Standby Servers <code>pg18standby</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Routine Vacuuming <code>pg18vacuum</code></p><p class="work-about">Documentation. PostgreSQL 18 documentation; read 2026-11-27.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Release 19 <code>pg19notes</code></p><p class="work-about">Release notes. PostgreSQL 19 documentation; 2026-11-19.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Release 9.6 <code>pg96notes</code></p><p class="work-about">Release notes. PostgreSQL 9.6.0 release notes; 2016-09-29.</p></div><p class="work-held">Text held</p></li><li><div><p class="work-title">Features <code>pgbouncer</code></p><p class="work-about">Web page. read 2026-11-27.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">How Figma’s Databases Team Lived to Tell the Scale <code>figma2024</code></p><p class="work-about">Article. 2024-03-14.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">Herding Elephants: Lessons Learned from Sharding Postgres at Notion <code>notion2021</code></p><p class="work-about">Article. 2021-10-06.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">The Part of PostgreSQL We Hate the Most <code>pavlo2023</code></p><p class="work-about">Article. 2023-04-26.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">Transaction ID Wraparound in Postgres <code>sentry2015</code></p><p class="work-about">Article. 2015-07-23.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">Serializable Snapshot Isolation in PostgreSQL <code>ports2012</code></p><p class="work-about">Paper. 2012.</p></div><p class="work-held work-away">Text not held in this copy</p></li><li><div><p class="work-title">An Empirical Evaluation of In-Memory Multi-Version Concurrency Control <code>wu2017</code></p><p class="work-about">Paper. 2017.</p></div><p class="work-held work-away">Text not held in this copy</p></li></ul>
+<p>The short name beside each title, such as <code>pg18vacuum</code>, is how a citation refers to it. Every source is marked as a <em>candidate</em>: nobody has formally accepted it into the project.</p>
+</div></section>
+<section class="spread" aria-labelledby="followed">
+<h2 id="followed"><span class="numeral">3</span> One page, followed to a footnote</h2>
+<p>Here is one page of the PostgreSQL documentation, and one footnote of the report that quotes it.</p>
+<figure class="plate diagram diagram-followed">
+<div class="drawing drawing-wide"><svg style="max-width:574px" xmlns="http://www.w3.org/2000/svg" viewBox="-287 -166.5 574 333" width="574" height="333" class="lini" role="img" aria-labelledby="dgm-followed-title dgm-followed-desc">
+  <title id="dgm-followed-title">One documentation page, followed to a footnote</title>
+  <desc id="dgm-followed-desc">6 links, each leading to the next: a documentation page, upstream record, 3 files, one per section, passage: paragraph 22, citation: paragraph 22, footnote 12 in the report.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-315" y="-194.5" width="630" height="389" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(-157.5,-129.5)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A documentation page</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(157.5,-129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(-157.5,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(157.5,0)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">3 files, one per section</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(-157.5,129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n6" style="stroke-width: 3" transform="translate(157.5,129.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Footnote 12 in the report</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M -36 -129.5 L 33 -129.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="37,-129.5 28,-125 28,-134"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 157.5 -101 L 157.5 -32"/>
+      <polygon class="lini-marker lini-marker-arrow" points="157.5,-28 153,-37 162,-37"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 36.5 0 L -33 0"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-37,0 -28,-4.5 -28,4.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M -157.5 28.5 L -157.5 97.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-157.5,101.5 -162,92.5 -153,92.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M -36.5 129.5 L 32.5 129.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,129.5 27.5,134 27.5,125"/>
+    </g>
+  </g>
+</svg></div>
+<div class="drawing drawing-narrow"><svg style="max-width:259px" xmlns="http://www.w3.org/2000/svg" viewBox="-129.5 -360 259 720" width="259" height="720" class="lini" role="img" aria-labelledby="dgm-followed-narrow-title dgm-followed-narrow-desc">
+  <title id="dgm-followed-narrow-title">One documentation page, followed to a footnote</title>
+  <desc id="dgm-followed-narrow-desc">6 links, each leading to the next: a documentation page, upstream record, 3 files, one per section, passage: paragraph 22, citation: paragraph 22, footnote 12 in the report.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-157.5" y="-388" width="315" height="776" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path stm-focus" data-id="n1" style="stroke-width: 3" transform="translate(0,-323)">
+        <path d="M -121.5 -29 L 106.5 -29 L 121.5 -14 L 121.5 29 L -121.5 29 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106.5 -29 L 121.5 -14 L 106.5 -14 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A documentation page</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(0,-193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Upstream record</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(0,-64.5)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">3 files, one per section</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(0,64.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,193.5)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Citation: paragraph 22</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n6" style="stroke-width: 3" transform="translate(0,323)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Footnote 12 in the report</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M 0 -294 L 0 -225.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-221.5 -4.5,-230.5 4.5,-230.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n3">
+      <path d="M 0 -165 L 0 -96.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,-92.5 -4.5,-101.5 4.5,-101.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M 0 -36 L 0 32.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,36.5 -4.5,27.5 4.5,27.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M 0 93 L 0 161.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,165.5 -4.5,156.5 4.5,156.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 0 222 L 0 290.5"/>
+      <polygon class="lini-marker lini-marker-arrow" points="0,294.5 -4.5,285.5 4.5,285.5"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of one citation in the PostgreSQL example, made from its records and its report. An AI model made them, and no person has reviewed them.</figcaption>
+</figure>
+<div class="equivalent equivalent-followed"><ol aria-label="The 6 links, each leading to the next"><li><p class="equivalent-term">A documentation page</p><p>“Routine Vacuuming”, from the PostgreSQL 18 documentation, as it was fetched. The saved page itself is not added to the project.</p></li><li><p class="equivalent-term">Upstream record</p><p>Where the page came from, when, and the fingerprint (SHA-256) of the exact file fetched, which begins 693b9857f691.</p></li><li><p class="equivalent-term">3 files, one per section</p><p>The page’s text, kept in the project: one without a heading, “24.1. Routine Vacuuming”, “Submit correction”.</p></li><li><p class="equivalent-term">Passage: paragraph 22</p><p>Words chosen by their place in the section “24.1. Routine Vacuuming”. A script copied them, with the paragraph number.</p></li><li><p class="equivalent-term">Citation: paragraph 22</p><p>A record that ties the report’s sentence to the source, with the quotation and paragraph 22.</p></li><li><p class="equivalent-term">Footnote 12 in the report</p><p>The sentence, and a footnote that gives the quotation and then the reference.</p></li></ol></div>
+</section>
+<section class="band"><div class="band-head"><h2>Where the page can be had</h2></div><div class="band-body">
+<p>The documentation is cited at an address that names its version, PostgreSQL 18 documentation. Such a page can still change, so the <em>upstream record</em> keeps the fingerprint of the exact file fetched. It can also list other places the file might be had. Each is a place to look: only a file with the same fingerprint counts as the original.</p>
+<dl class="places-tried"><div><dt>The page’s own address, <code>https://www.postgresql.org/docs/18/routine-vacuuming.html</code></dt><dd>The recorded original: the file fetched on 2026-11-27</dd></div><div><dt>A copy at a web archive, <code>https://web.archive.org/web/20261114215731id_/https://www.postgresql.org/docs/18/routine-vacuuming.html</code></dt><dd>Other bytes, so it is not the recorded original (compared 2026-11-27)</dd></div></dl>
+<p>Across the whole example, 17 copies at the Internet Archive were compared in this way: 4 gave the recorded original byte for byte, and 13 gave other bytes.</p>
+<details class="more"><summary>The record file: <code>ups-kfhnsg515nf1wsc0vc8j.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;changed&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T18:35:08Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T18:02:34Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;ups-kfhnsg515nf1wsc0vc8j&quot;,
+  &quot;kind&quot;: &quot;upstream&quot;,
+  &quot;locations&quot;: [
+    {
+      &quot;added&quot;: {
+        &quot;at&quot;: &quot;2026-11-27T18:35:08Z&quot;,
+        &quot;by&quot;: {
+          &quot;kind&quot;: &quot;model&quot;,
+          &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+        }
+      },
+      &quot;compared&quot;: {
+        &quot;at&quot;: &quot;2026-11-27T18:35:08Z&quot;,
+        &quot;sha256&quot;: &quot;db76cf7a79bea5a92e0921255d13287bc51a8b896d76abf3597fefde16763096&quot;
+      },
+      &quot;kind&quot;: &quot;web_archive&quot;,
+      &quot;note&quot;: &quot;Internet Archive capture, asked for in its unmodified (id_) form&quot;,
+      &quot;url&quot;: &quot;https://web.archive.org/web/20261114215731id_/https://www.postgresql.org/docs/18/routine-vacuuming.html&quot;
+    }
+  ],
+  &quot;media_type&quot;: &quot;text/html&quot;,
+  &quot;retrieved_at&quot;: &quot;2026-11-27T18:02:34Z&quot;,
+  &quot;retrieved_by&quot;: {
+    &quot;kind&quot;: &quot;model&quot;,
+    &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+  },
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;sha256&quot;: &quot;693b9857f69158f8777369be46c774908e68df1d82d56af83570adc7ea6e04ea&quot;,
+  &quot;size&quot;: 67459,
+  &quot;source&quot;: &quot;src-seb0h7jfjxxsweary6a5&quot;,
+  &quot;url&quot;: &quot;https://www.postgresql.org/docs/18/routine-vacuuming.html&quot;,
+  &quot;version&quot;: &quot;PostgreSQL 18 documentation&quot;
+}</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2>Its text, and the passage</h2></div><div class="band-body">
+<p>The page’s text is in the project as 3 files, one for each section. Web pages have no page numbers, so a place is a paragraph number. Stemma counts it through its copy of the whole page, menus and all: it is not printed on the page, and you cannot count to it in a browser. To find the place, look for the quoted words.</p>
+<details class="more"><summary>The start of the file for the section “24.1. Routine Vacuuming”</summary>
+<figure class="excerpt"><figcaption>The first lines of a source file, as it is in the repository.</figcaption><pre tabindex="0">---
+{
+  &quot;columns&quot;: &quot;1&quot;,
+  &quot;index&quot;: 1,
+  &quot;label_status&quot;: &quot;unpaged&quot;,
+  &quot;level&quot;: &quot;unassessed&quot;,
+  &quot;method&quot;: &quot;markup&quot;,
+  &quot;section&quot;: &quot;24.1. Routine Vacuuming #&quot;,
+  &quot;undetermined&quot;: []
+}
+---
+
+&lt;!-- stemma:block role=&quot;heading&quot; level=&quot;2&quot; basis=&quot;markup&quot; --&gt;
+24.1. Routine Vacuuming #
+
+&lt;!-- stemma:block role=&quot;paragraph&quot; basis=&quot;markup&quot; --&gt;
+24.1.1. Vacuuming Basics
+
+&lt;!-- stemma:block role=&quot;paragraph&quot; basis=&quot;markup&quot; --&gt;
+24.1.2. Recovering Disk Space
+
+&lt;!-- stemma:block role=&quot;paragraph&quot; basis=&quot;markup&quot; --&gt;
+24.1.3. Updating Planner Statistics
+
+&lt;!-- stemma:block role=&quot;paragraph&quot; basis=&quot;markup&quot; --&gt;
+24.1.4. Updating the Visibility Map
+
+&lt;!-- stemma:block role=&quot;paragraph&quot; basis=&quot;markup&quot; --&gt;
+24.1.5. Preventing Transaction ID Wraparound Failures</pre></figure>
+</details>
+<p>A <em>passage</em> is chosen by its place, and a script copies its words, so nobody retypes them. This one is paragraph 22:</p>
+<blockquote class="quote"><p>For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon</p></blockquote>
+<details class="more"><summary>The record file: <code>psg-wz6dkr1sm59cznsv71g4.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;anchor&quot;: [
+    {
+      &quot;end&quot;: 402,
+      &quot;index&quot;: 1,
+      &quot;page_sha256&quot;: &quot;2160a7f028c04852b904af826ae1914520516da7ca99277ece12fb2f8c0f7bc2&quot;,
+      &quot;start&quot;: 307,
+      &quot;stream&quot;: &quot;main&quot;
+    }
+  ],
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T18:03:53Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;psg-wz6dkr1sm59cznsv71g4&quot;,
+  &quot;kind&quot;: &quot;passage&quot;,
+  &quot;locator&quot;: {
+    &quot;label&quot;: &quot;paragraph&quot;,
+    &quot;value&quot;: &quot;22&quot;
+  },
+  &quot;quote&quot;: {
+    &quot;exact&quot;: &quot;For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon&quot;
+  },
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;source&quot;: &quot;src-seb0h7jfjxxsweary6a5&quot;,
+  &quot;source_record_sha256&quot;: &quot;aa9624853dc36039b7aed01f4dd8660a79616d5407f1b32696abfd903bb65e2f&quot;,
+  &quot;text&quot;: &quot;txt-4brymw2wbhf991zas33z&quot;
+}</pre></figure>
+</details>
+<details class="more"><summary>The record file: <code>cit-cs670qx1rx2s7se8ydx7.json</code></summary>
+<figure class="excerpt"><figcaption>A record file, as it is in the repository.</figcaption><pre tabindex="0">{
+  &quot;created&quot;: {
+    &quot;at&quot;: &quot;2026-11-27T18:09:42Z&quot;,
+    &quot;by&quot;: {
+      &quot;kind&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;claude-sonnet-5-5&quot;
+    }
+  },
+  &quot;id&quot;: &quot;cit-cs670qx1rx2s7se8ydx7&quot;,
+  &quot;intake&quot;: &quot;parsed&quot;,
+  &quot;key&quot;: &quot;pg18vacuum&quot;,
+  &quot;kind&quot;: &quot;citation&quot;,
+  &quot;locator&quot;: {
+    &quot;label&quot;: &quot;paragraph&quot;,
+    &quot;value&quot;: &quot;22&quot;
+  },
+  &quot;passage&quot;: &quot;psg-wz6dkr1sm59cznsv71g4&quot;,
+  &quot;quotation&quot;: &quot;For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon&quot;,
+  &quot;schema&quot;: &quot;stemma.record/0&quot;,
+  &quot;sentence&quot;: {
+    &quot;sha256&quot;: &quot;3fa753b75a62fc7e8acfec355cd3ee87c721bbf35305f99bb39ffabfd09d2ba5&quot;,
+    &quot;text&quot;: &quot;Vacuum normally runs by itself, and the documentation calls this enough for much ordinary use: “For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon”.&quot;
+  }
+}</pre></figure>
+</details>
+</div></section>
+<section class="band"><div class="band-head"><h2>The claim it bears on</h2></div><div class="band-body">
+<p>A <em>claim</em> is something the report asserts, recorded with how sure its author is and why. A <em>note</em> says what a passage shows, and a link says how the note bears on a claim. A note on this passage says:</p>
+<blockquote class="quote"><p>Updated and deleted row versions stay until vacuum reclaims them; the ordinary form mostly does not give space back to the operating system. The automatic daemon is described as enough for many installations.</p></blockquote>
+<p>It is recorded as supporting this claim, and the thesis:</p>
+<p class="sentence">Updates and deletes leave old row versions for vacuum, and updates avoid new index entries only under stated conditions.</p>
+<p><strong>Confidence recorded: high.</strong> Stated in the documentation for vacuuming and heap-only tuples; Pavlo’s account agrees on the mechanism.</p>
+<p class="note">The link from this claim to the report runs through the passage. The report’s manuscript does not mark which sentence states which claim, and no check judges whether the note supports the claim.</p>
+</div></section>
+<section class="band"><div class="band-head"><h2>The sentence and its footnote</h2></div><div class="band-body">
+<p>In the report, the sentence reads, with the quotation underlined:</p>
+<p class="sentence">Vacuum normally runs by itself, and the documentation calls this enough for much ordinary use: “<span class="quoted">For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon</span>”.<sup>12</sup></p>
+<div class="footnote"><p class="locator">Footnote 12</p><div><p>“For many installations, it is sufficient to let vacuuming be performed by the autovacuum daemon.” PostgreSQL Global Development Group, “Routine Vacuuming,” para. 22.</p></div></div>
+<p>The build copied the quotation from the passage and wrote the reference from the source record, in its short form because the page is cited earlier in the report. <q>para.</q> says the number is a paragraph, not a page.</p>
+</div></section>
+<section class="spread" aria-labelledby="against">
+<h2 id="against"><span class="numeral">4</span> Evidence against</h2>
+<p>Evidence against a thesis is recorded in the same way as evidence for it, as a note whose link says <em>contradicts</em>. A drawing of part of what is linked to this thesis:</p>
+<figure class="plate diagram diagram-evidence scrolls">
+<p class="scroll-hint">Scroll the drawing sideways to see all of it. The list holds the same.</p>
+<div class="drawing drawing-scroll" tabindex="0" role="region" aria-label="Drawing: What bears on a thesis. It scrolls sideways on a narrow screen."><svg style="max-width:896px;min-width:717px" xmlns="http://www.w3.org/2000/svg" viewBox="-448 -236 896 472" width="896" height="472" class="lini" role="img" aria-labelledby="dgm-evidence-title dgm-evidence-desc">
+  <title id="dgm-evidence-title">What bears on a thesis</title>
+  <desc id="dgm-evidence-desc">A thesis and 4 of the notes linked to it: one supports it, one supports it, one qualifies it, one contradicts it. Each note rests on one source.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-476" y="-264" width="952" height="528" rx="8" ry="8"/>
+      <g class="lini-node lini-note lini-path" data-id="n1" style="stroke-width: 2" transform="translate(-320,-168)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Docs: architecture</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(-320,-56)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Docs: replication</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n3" style="stroke-width: 2" transform="translate(-320,56)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Release notes: 19</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(-320,168)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Pavlo and Zhang, 2023</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(0,-168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Supports: a process each</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n6" transform="translate(0,-56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Supports: one writer</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(0,56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Qualifies: version 19</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n8" transform="translate(0,168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Contradicts: storage</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n9" style="stroke-width: 3" transform="translate(320,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+<rect class="stm-inner" x="-115" y="-22.5" width="230" height="45" rx="4" ry="4"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Thesis</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n5">
+      <path d="M -199 -168 L -124.5 -168"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,-168 -129.5,-163.5 -129.5,-172.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n6">
+      <path d="M -199 -56 L -124.5 -56"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,-56 -129.5,-51.5 -129.5,-60.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n7">
+      <path d="M -199 56 L -124.5 56"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,56 -129.5,60.5 -129.5,51.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n8">
+      <path d="M -199 168 L -124.5 168"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-120.5,168 -129.5,172.5 -129.5,163.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n9">
+      <path d="M 121 -168 L 158.4747 -168 A 16 16 0 0 1 174.4747 -152 L 174.4747 -29 A 16 16 0 0 0 190.4747 -13 L 195 -13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,-13 190,-8.5 190,-17.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n6" data-to="visual.n9">
+      <path d="M 121 -56 L 142.4747 -56 A 16 16 0 0 1 158.4747 -40 L 158.4747 -32.6667 A 28.3333 28.3333 0 0 0 186.8081 -4.3333 L 195 -4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,-4.3333 190,0.1667 190,-8.8333"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n9">
+      <path d="M 121 56 L 129.0253 56 A 16 16 0 0 0 145.0253 40 L 145.0253 32.6667 A 28.3333 28.3333 0 0 1 173.3586 4.3333 L 195 4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199,4.3333 190,8.8333 190,-0.1667"/>
+    </g>
+    <g class="lini-link stm-opposing" data-from="visual.n8" data-to="visual.n9">
+      <path d="M 121 168 L 145.0253 168 A 16 16 0 0 0 161.0253 152 L 161.0253 29 A 16 16 0 0 1 177.0253 13 L 195 13"/>
+      <line class="stm-bar" x1="193.15" y1="20.65" x2="193.15" y2="5.35"/>
+    </g>
+  </g>
+</svg></div>
+<figcaption>This site’s drawing of part of the example’s records: its thesis, and some of the notes linked to it, each on one source. An AI model made these records, and no person has reviewed them.</figcaption><p class="legend"><span><i class="line-solid" aria-hidden="true"></i>Solid line, arrowhead: leads to, supports or qualifies</span> <span><i class="line-opposing" aria-hidden="true"></i>Dashed line, bar end: opposes, as a note that contradicts does</span></p>
+</figure>
+<div class="equivalent equivalent-evidence"><ul aria-label="The thesis, and 4 of the 13 notes linked to it"><li><p class="equivalent-term">Thesis (confidence: medium)</p><p>PostgreSQL 18 is a sound default primary datastore for a web application while the application’s writes fit comfortably on one primary server and that server’s upkeep is attended to. The limits to plan for follow from that single write primary: a process for each connection, row versions and transaction IDs that vacuum has to keep reclaiming, and replication that does not divide writes.</p></li><li><p class="equivalent-term">Docs: architecture → Supports: a process each → Thesis</p><p>Each client connection is served by its own server process, forked for it. This note supports the thesis. It rests on one passage of “Architectural Fundamentals”.</p></li><li><p class="equivalent-term">Docs: replication → Supports: one writer → Thesis</p><p>PostgreSQL does not offer synchronous multimaster replication; in partitioning, only one server can modify each set. This note supports the thesis. It rests on 2 passages of “Comparison of Different Solutions”.</p></li><li><p class="equivalent-term">Release notes: 19 → Qualifies: version 19 → Thesis</p><p>The version 19 release notes announce online table repacking and a command for reading one’s own writes on a standby. This note qualifies the thesis. It rests on 2 passages of “Release 19”.</p></li><li><p class="equivalent-term">Pavlo and Zhang, 2023 → Contradicts: storage → Thesis</p><p>Pavlo judges the multiversion implementation the worst among the widely used relational systems he names. This note contradicts the thesis. It rests on one passage of “The Part of PostgreSQL We Hate the Most”.</p></li></ul></div>
+</section>
+<section class="band"><div class="band-head"><h2>The case against, and what was done with it</h2></div><div class="band-body">
+<p>The note that contradicts the thesis rests on these words of <cite>The Part of PostgreSQL We Hate the Most</cite>:</p>
+<blockquote class="quote"><p>its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.</p></blockquote>
+<p>Its sharper form is recorded as a <em>rival reading</em>, another way to read the same evidence:</p>
+<p class="sentence">PostgreSQL’s multiversion design is the worst among widely used relational databases, so its update costs are a reason against it.</p>
+<p><strong>Confidence recorded: low.</strong> Pavlo argues this and the documentation confirms parts of the mechanism. The research evidence read here is mixed and does not measure PostgreSQL, so the ranking is not established.</p>
+<p>An <em>objection</em> to the report’s own evidence is recorded too:</p>
+<p class="sentence">Accounts of limits reached come from a few large companies that chose to write about them, and say little about the ordinary web application.</p>
+<p><strong>Confidence recorded: high.</strong> It follows from what the sources are: three engineering articles by operators of large systems, with no survey among the sources.</p>
+<p>The research log says of one paper sought on this question: <q>It cuts both ways: delta storage did about twice as well on rows of 100 attributes with one touched (p. 789), and append-only did better on the TPC-C-based test (p. 790).</q> The report’s answer begins <q>The objection therefore stands in a limited form.</q> It goes on to say: <q>It is not shown here that another database would do better.</q></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="report"><span class="numeral">5</span> The report</h2></div><div class="band-body">
+<p><cite>The Cost of One Writer</cite> has these sections and 42 footnotes:</p>
+<ul class="outline"><li>1. Question and evidence</li><li>2. What the default includes</li><li>3. A process for each connection</li><li>4. Old row versions</li><li>5. A finite counter</li><li>6. One writer</li><li>7. The case against the design</li><li>8. Limits that move</li><li>9. Conclusion</li><li>10. Scope</li></ul>
+<p>Read it, and what the build wrote beside it, on GitHub. A PDF is not published with the example.</p>
+<ul class="plain-list"><li><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/report/report.md">The report, with its footnotes and bibliography</a></li>
+<li><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/report/verification.md">The verification table: where each quotation was copied from and how it was compared, as recorded</a></li>
+<li><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/report/evidence.json">The evidence ledger: what is recorded behind each sentence</a></li>
+<li><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/report/research-log.md">The research log</a></li></ul>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="check"><span class="numeral">6</span> The check</h2></div><div class="band-body">
+<p>With the text of all 17 works present, the check ends with two problems open and nothing it could not check. This version also does not run 2 kinds of check that apply here. So the project is <strong>not checked clean</strong>.</p>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>, first lines, of a real run on a copy that also held the text of the works the published copy leaves out. Each part of that text matched the fingerprint recorded for it.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/postgres-web-apps</span>
+<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 1019 result(s) passed.</pre></figure>
+<h3>The first problem: a reference and its page disagree</h3>
+<p>The page of the 9.6 release notes calls itself by a general title, and its first parts are menus. Stemma compares the record with those, and finds neither the record’s title nor its authors or year there. The page does give the release number and its date further down. The record was not changed to match the general title, which would make the reference worse.</p>
+<details class="more"><summary>What the tool printed</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>: one finding of a real run on the copy with all the text, with its number left off. The last line is a note a model recorded; it is not a person’s review.</figcaption><pre tabindex="0">PROBLEM: The source record disagrees with what the captured copy states about itself.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one.
+   - src-qmw5m7hjrx4a41abv94v
+       source file: records/sources/src-qmw5m7hjrx4a41abv94v.json
+       key: pg96notes
+       source text: sources/pg96notes/source.md
+       identity basis: the document's title and meta elements
+       title page parts: index 0, 1
+       title in record: Release 9.6
+       title the copy states: PostgreSQL: Release Notes
+       title result: the copy states otherwise, and the title page text does not show the record's value
+       authors in record: PostgreSQL Global Development Group
+       authors result: not found in what the copy states or in its title page text
+       year in record: 2016
+       year result: not found in what the copy states or in its title page text
+       venue in record: PostgreSQL Release Notes
+       venue result: not found in what the copy states or in its title page text
+       finding key: ca24987ff5530c3a86db2138633f269f86298cef7dfb2de8763e25a9db7cfaf6
+       explained by model claude-sonnet-5-5 (ann-jw9dbw4kb5sasm35grwm): The page's own title is the general 'PostgreSQL: Release Notes', and the parts taken as its title page are navigation. The converted text states 'E.25. Release 9.6' and 'Release date: 2016-09-29' in section 4. A model's reading, not a person's review.</pre></figure>
+</details>
+<h3>The second: a footnote lost its marker</h3>
+<p>In converting the page on JSON types, Stemma kept the words of one of the page’s footnotes but did not read its marker as a marker. No quotation in the report comes from that footnote.</p>
+<details class="more"><summary>What the tool printed</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>: one finding of a real run on the copy with all the text, with its number left off. The last line is a note a model recorded; it is not a person’s review.</figcaption><pre tabindex="0">PROBLEM: A note has no marker in the text of its page or section.  [source.footnotes]
+   Why it matters: A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.
+   What to do: Compare the page with the original. If the note continues from an earlier page, mark its block continued.
+   - txt-t7p2y2hxdtsg7e4whwp7
+       file: sources/pg18json/source.md
+       where: the text
+       note label: 7
+       finding key: d7853929243575b9f21aaa11e6609db6b6f061f55498e8e07971317fd21088c5
+       explained by model claude-sonnet-5-5 (ann-qg899cezk1pwmxnejytz): The stored HTML marks footnote 7's marker with a link and a superscript of class 'footnote', which the converter treats as a note body and not as a note reference. The marker's characters and the note's words are both in the text, and no quotation comes from the note. A model's reading, not a person's review.</pre></figure>
+</details>
+<h3>What was not run</h3>
+<details class="more"><summary>What the tool printed about what it did not check</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>: part of the same run.</figcaption><pre tabindex="0"><span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - your own claims presented as quotations from a source  [quote.self]
+   - whether each cited claim has a current claim-support record  [support.current]</pre></figure>
+</details>
+<p><a href="recorded/postgres-check-full.txt">The whole transcript of this run</a></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="mistakes"><span class="numeral">7</span> Planted mistakes</h2></div><div class="band-body">
+<p>To see what the checks would notice, two citations of the documentation were changed in a throwaway copy, as if an author had typed them wrongly. In one quotation, <q>does not immediately remove</q> lost its <q>not</q>, which turns the sentence around. Another citation was moved from paragraph 22 to paragraph 32.</p>
+<p>Both were caught. The changed quotation is shown beside the wording in the source. For the moved one, the report says the words are in the source but not where the citation says.</p>
+<details class="more"><summary>What the tool printed for the planted mistakes</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run on a throwaway copy of the published example with two planted mistakes: its first lines and the two findings that the run without them does not have, their numbers left off. [&#8230;] marks lines left out here.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/postgres-web-apps-trial</span>
+<span class="v-warn">OPEN FINDINGS</span>: 4 problem(s), 155 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 769 result(s) passed.
+
+[…]
+
+PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+   Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
+   What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
+   - cit-cs670qx1rx2s7se8ydx7
+       citation file: records/citations/cit-cs670qx1rx2s7se8ydx7.json
+       key: pg18vacuum
+       locator: paragraph 32
+       source text: sources/pg18vacuum/source.md
+       found on: section 1 &quot;24.1. Routine Vacuuming #&quot;
+       address: txt-4brymw2wbhf991zas33z/1:main:307-402
+
+[…]
+
+PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-hfmzynsaf9666zt1attb
+       citation file: records/citations/cit-hfmzynsaf9666zt1attb.json
+       key: pg18vacuum
+       cited text: In PostgreSQL, an UPDATE or DELETE of a row does immediately remove the old version of the row.
+       match: near
+       profile: quote-fold/0
+       source passage: In PostgreSQL, an UPDATE or DELETE of a row does not immediately remove the old version of the row.
+       source text: sources/pg18vacuum/source.md
+       found on: section 1 &quot;24.1. Routine Vacuuming #&quot;
+       address: txt-4brymw2wbhf991zas33z/1:main:2544-2643
+       text method: markup, quality unassessed</pre></figure>
+</details>
+<p><a href="recorded/postgres-trial.txt">The whole transcript of this run</a></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="text"><span class="numeral">8</span> Text not held here</h2></div><div class="band-body">
+<p>The published copy does not hold the text of 7 works. Run on that copy, the same check has the same two problems, and 155 items it <em>could not check</em>. A could-not-check never counts as a pass.</p>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>, first lines, of a real run on a copy of this example that holds only what is published, which does not hold the text of 7 works.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/postgres-web-apps</span>
+<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 155 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 772 result(s) passed.</pre></figure>
+<p>For each of those works the report says once that its text is <em>not held here</em>, which is not the same as damaged, and lists what rests on it. What cannot be checked includes the quotations from it, their places, and whether anything they rest on has changed.</p>
+<details class="more"><summary>What the tool printed about the text that is not held</summary>
+<figure class="excerpt"><figcaption><strong>Transcript</strong>: one finding of the same run, with its number left off.</figcaption><pre tabindex="0">COULD NOT CHECK: The source's text is not held here: its manifest is present and none of its page or section files is. Nothing shows that anything is damaged.  [source.pages, 7 places]
+   Why it matters: Quotations, pages and anything else that rests on this text cannot be checked in this copy of the project.
+   What to do: Fetch it again with `ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;`, which asks the recorded addresses, or give a copy of the original with `ingest --originals &lt;dir&gt;`. The text is written only if it is exactly what the manifest records. If you keep the text elsewhere, or it was typed or recognized by another tool, copy it back.
+   - txt-0rfw84rtpxz3jxy7g3bn
+       source text: sources/figma2024/source.md
+       parts: none of the 17 listed section files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-156d9jnzqm5sp5kn4v9x
+       source text: sources/ports2012/source.md
+       parts: none of the 12 listed page files is here
+       rests on it: 1 passage(s) and 1 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-44w8mtetezbxysnrekak
+       source text: sources/pavlo2023/source.md
+       parts: none of the 6 listed section files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-a8vhfj4nsh105h8w3gf8
+       source text: sources/wu2017/source.md
+       parts: none of the 12 listed page files is here
+       rests on it: 4 passage(s) and 4 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-f62s1msgvp2hxn56ekew
+       source text: sources/sentry2015/source.md
+       parts: none of the 8 listed section files is here
+       rests on it: 3 passage(s) and 3 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-kzpqm7d8sd0z9bh1ejh0
+       source text: sources/pgbouncer/source.md
+       parts: none of the 5 listed section files is here
+       rests on it: 1 passage(s) and 1 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original
+   - txt-r399jtz3g4qna2srbhje
+       source text: sources/notion2021/source.md
+       parts: none of the 7 listed section files is here
+       rests on it: 3 passage(s) and 3 citation record(s) taken from this text cannot be checked
+       fetch again: ingest --fetch --actor &lt;kind&gt;:&lt;name&gt;, or ingest --originals &lt;dir&gt; when you have the original</pre></figure>
+</details>
+<p><a href="recorded/postgres-check.txt">The whole transcript of this run</a></p>
+<h3>Getting the text back</h3>
+<p>Ask Claude to fetch the text again, or give it your own copies of the originals. Stemma tries the places recorded for each work, or looks at your files, for one with the recorded fingerprint. It writes the missing text only if every part matches what the project recorded. Where a page now differs, it says that the copy fetched is not the recorded original, and writes the text only on the same condition. A web page can change at any time, so this may stop working for any of them. Until the text is back, the report cannot be rebuilt, and whether it is current cannot be told.</p>
+<p><a href="https://github.com/DocumentDrivenDX/stemma/tree/main/examples/postgres-web-apps">The example, with all its files and how to fetch the text, on GitHub</a></p>
+</div></section>
+<section class="band"><div class="band-head"><h2 id="limits">What no check shows</h2></div><div class="band-body">
+<p>No check tells you that a source supports the sentence that cites it, that the argument holds, or that these are the right sources. Documentation says how software is meant to behave, not how it behaves under load. The research also has gaps:</p>
+<ul class="plain-list"><li>No systematic search was run. An AI model chose the sources from what it already knew, which favors well-known documents.</li><li>Two articles are named as not used: OpenAI’s article of 2026 on scaling PostgreSQL, and Uber’s article of 2016 on leaving it. Nothing in the report rests on either.</li><li>Nothing in it measures PostgreSQL 18 or 19, compares current releases with other databases, or shows how often applications meet the limits discussed.</li></ul>
+<p><a href="https://github.com/DocumentDrivenDX/stemma/blob/main/examples/postgres-web-apps/research">The note on how sources were chosen, and what is missing</a></p>
+</div></section>
+</main>
+<footer class="colophon">
+<div class="shell">
+<p>Stemma is pre-release, free and open source (MIT license), and part of <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. <a href="https://github.com/DocumentDrivenDX/stemma">Source on GitHub</a>.</p>
+<p>Set in Source Serif 4, Inter and JetBrains Mono. These pages run no scripts and request nothing from another host.</p>
+</div>
+</footer>
+</body>
+</html>
