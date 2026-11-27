@@ -9,12 +9,36 @@
     }
   ],
   "changed": {
-    "at": "2026-11-27T02:26:41Z",
+    "at": "2026-11-27T03:14:54Z",
     "by": {
       "kind": "model",
       "name": "claude-sonnet-5-5"
     }
   },
+  "changes": [
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:53Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, sections 5 and 6",
+      "value": "evidence:boring"
+    },
+    {
+      "action": "added",
+      "at": "2026-11-27T03:14:54Z",
+      "by": {
+        "kind": "model",
+        "name": "claude-sonnet-5-5"
+      },
+      "field": "tags",
+      "from": "report/report.md, section 6",
+      "value": "eniwetok"
+    }
+  ],
   "citation_key": "ladd1960",
   "contributions": [
     {
@@ -54,6 +78,10 @@
   },
   "kind": "source",
   "schema": "stemma.record/0",
+  "tags": [
+    "eniwetok",
+    "evidence:boring"
+  ],
   "title": {
     "value": "Drilling Operations on Eniwetok Atoll"
   },

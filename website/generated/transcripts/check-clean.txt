@@ -1,7 +1,7 @@
 $ stemma check --all --project $PROJECTS/clean
 CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 8 result(s) passed.
+Checked the whole project: 9 result(s) passed.
 
 Full report: $PROJECTS/clean/.stemma/reports/check.json
 [exit 0]

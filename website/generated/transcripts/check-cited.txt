@@ -1,6 +1,6 @@
 $ stemma check --all --project $PROJECTS/cited
 OPEN FINDINGS: 1 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 11 result(s) passed.
+Checked the whole project: 12 result(s) passed.
 
 1. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.

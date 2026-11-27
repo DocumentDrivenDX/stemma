@@ -15,6 +15,36 @@ import { itemOf, subjectOf } from "./records.ts";
 export const sourceBinding = (source: JsonObject): string =>
   digest(Object.fromEntries(SOURCE_BINDING_FIELDS.flatMap((f) => (source[f] === undefined ? [] : [[f, source[f]]]))));
 
+/** The source with one logged addition undone. */
+function without(source: JsonObject, field: string, value: string): JsonObject {
+  const key = field.startsWith("bib.") ? "bib" : field === "authors" ? "contributions" : field;
+  const out: JsonObject = { ...source };
+  const keep = field === "identifiers" ? (e: JsonObject) => `${String(e.scheme)}:${String(e.value)}` !== value
+    : field === "authors" ? (e: JsonObject) => e.role !== "author"
+    : field.startsWith("bib.") ? (e: JsonObject) => `bib.${String(e.name)}` !== field : undefined;
+  const left = keep && Array.isArray(out[key]) ? (out[key] as JsonObject[]).filter(keep) : [];
+  if (left.length > 0) out[key] = left;
+  else delete out[key];
+  return out;
+}
+
+/**
+ * Whether details have only been added since a binding was made, by the changes
+ * the record logs (FR-94). A detail added contradicts nothing that was selected
+ * before; a detail changed or removed, or an edit the log does not show, may.
+ */
+export function onlyAdded(source: JsonObject, bound: string): boolean {
+  let state = source;
+  for (const change of (Array.isArray(source.changes) ? source.changes.filter(isObject) : []).reverse()) {
+    const field = String(change.field);
+    if (!field.startsWith("bib.") && field !== "authors" && !(SOURCE_BINDING_FIELDS as readonly string[]).includes(field)) continue;
+    if (change.action !== "added") return false;
+    state = without(state, field, String(change.value));
+    if (sourceBinding(state) === bound) return true;
+  }
+  return false;
+}
+
 interface Change { reason: "depends_on_retired" | "text_changed" | "source_details_changed"; record: LoadedFile; what: string; through: string[] }
 
 interface Walk { changes: Change[]; reached: number; unread: boolean }
@@ -51,7 +81,8 @@ function walker(corpus: Corpus) {
       } else if (now.state === "unavailable") walk.unread = true;
       next([...list(data.text), ...list(data.source)]);
       const source = corpus.byId.get(String(data.source));
-      if (source?.data?.kind === "source" && typeof data.source_record_sha256 === "string" && data.source_record_sha256 !== sourceBinding(source.data)) {
+      if (source?.data?.kind === "source" && typeof data.source_record_sha256 === "string" && data.source_record_sha256 !== sourceBinding(source.data)
+        && !onlyAdded(source.data, data.source_record_sha256)) {
         walk.changes.push({ reason: "source_details_changed", record: source, what: `source details changed since passage ${id} was anchored`, through: [...through, id] });
       }
     }

@@ -1,10 +1,17 @@
-stemma 0.0.7
+stemma 0.0.9
 The plugin runs this through its launcher: sh scripts/stemma.sh <data directory> <command> [options]
 
   version
   doctor
   init --project <dir>
   ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups]
+  source capture <original> --actor <kind>:<name> --acquired-at <time> [--source <id|key>] [--origin <text>]
+             [--source-version <text>]
+  source enrich <id|key> --actor <kind>:<name> [--from <text>] [--add-identifier <scheme>:<value>]...
+             [--set <name>=<value>]... [--author "<Family, Given>"]... [--replace] | --lookup <resolution id>
+  source tag <id|key>... --actor <kind>:<name> [--add <tag>]... [--remove <tag>]... [--from <text>]
+  source list [--tag <tag|namespace:>]... [--stage record|captured|text] [--has identifiers|lookup|tags]...
+  source history <id|key>
   source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]
   source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>]
              [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]...

@@ -45,7 +45,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 
 $ stemma check --project $DEMO/book
 OPEN FINDINGS: 4 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 14 result(s) passed.
+Checked the whole project: 15 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
@@ -96,7 +96,7 @@ No record problems found.
 
 $ stemma check --project $DEMO/book
 OPEN FINDINGS: 2 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 17 result(s) passed.
+Checked the whole project: 18 result(s) passed.
 
 1. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held, 2 places]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
@@ -156,7 +156,7 @@ No record problems found.
 $ stemma check --project $DEMO/book
 CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 27 result(s) passed.
+Checked the whole project: 28 result(s) passed.
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - not compared with a catalogue: no lookup that found the work is saved: ledger1911
@@ -210,7 +210,7 @@ Warning: Cannot polyfill `Path2D`, rendering may be broken.
 == 4. Check
 CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 21 result(s) passed.
+Checked the whole project: 22 result(s) passed.
 
 Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
    - not compared with a catalogue: no lookup that found the work is saved: levy1911
@@ -266,7 +266,7 @@ No record problems found.
 
 $ stemma check --project $DEMO/quoting-book
 OPEN FINDINGS: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 45 result(s) passed.
+Checked the whole project: 46 result(s) passed.
 
 1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
@@ -341,7 +341,7 @@ Stemma holds back no source: any source in this project may be sent to a hosted 
 
 $ stemma check --project $DEMO/clone
 OPEN FINDINGS: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 45 result(s) passed.
+Checked the whole project: 46 result(s) passed.
 
 1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
    Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
@@ -419,7 +419,7 @@ No record problems found.
 $ stemma check --project $DEMO/reading-list
 CHECKED CLEAN: the checks found nothing open.
 This does not mean that the book is correct. It covers only what is in these project files.
-Checked the whole project: 6 result(s) passed.
+Checked the whole project: 7 result(s) passed.
 
 The whole project is checked each time.
 Full report: $DEMO/reading-list/.stemma/reports/check.json

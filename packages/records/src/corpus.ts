@@ -79,6 +79,8 @@ export interface ProjectContent {
   manuscript: SourceFile[];
   /** Every file under research/: the author's and the assistant's research notes. */
   research: SourceFile[];
+  /** Paths of the binary files that the project's repository holds or would take in. Finding them reads every file, so only a check asks. */
+  binaries?: () => string[];
 }
 
 /** One part of a source file: a page, or a section of a source with no pages. */
@@ -121,6 +123,8 @@ export interface Corpus {
   manuscript: SourceFile[];
   /** Notes, not records or evidence: outside the corpus digest. */
   research: SourceFile[];
+  /** Binary files in the repository, by path. A project holds none. */
+  binaries: () => string[];
 }
 
 export const idOf = (file: LoadedFile): string | undefined =>
@@ -331,7 +335,7 @@ export function loadCorpus(content: ProjectContent): Corpus {
   checkKeys(records.filter((f) => f.state === "ok" && f.data?.kind === "source"));
   for (const file of [settings, ...records]) checkReferences(file, byId, unreadableIds);
   const texts = new Map(found.texts.flatMap((t) => (idOf(t.manifest) ? [[idOf(t.manifest)!, t] as const] : [])));
-  const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript, research: content.research };
+  const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript, research: content.research, binaries: content.binaries ?? (() => []) };
   if (content.rules) corpus.rules = content.rules;
   return corpus;
 }

@@ -77,7 +77,14 @@ DocumentDrivenDX schema format) core `0.10.0` document using the `umf.ddd`
 
 Binaries and paper originals are not part of a project. Text captured from them
 is in source files, tied to each original by hash and size or by description
-(CONTRACT-007 C).
+(CONTRACT-007 C). This covers every binary file, the author's own drafts and
+material brought in from elsewhere included: it stays where the author holds it,
+and what is read or cited is converted to source files. `init` adds ignore
+entries, in any letter case, for the document, ebook, slide, spreadsheet, and
+archive formats `pdf`, `doc`, `docx`, `odt`, `rtf`, `pages`, `epub`, `mobi`,
+`ppt`, `pptx`, `key`, `xls`, `xlsx`, `numbers`, and `zip`. `project.binary`
+(CONTRACT-002 C) reports a binary file that git tracks or would add. How figures
+for a typeset book are held is not decided yet (FEAT-008).
 
 Takeover and later fixes write only to `manuscript/` and records. Original
 files are never changed.
@@ -384,6 +391,16 @@ current value and it is not retired. `written.by` records who wrote it; a
 `dismiss` takes effect only when `written.by.kind` is `person`. Which findings
 can be dismissed is in CONTRACT-002. Annotations are listed in reports and the
 disclosure. They record intent and are not forgery-proof.
+
+**Tags and logged changes (FR-94).** A source's `tags` are unique, sorted
+strings of at most 80 characters: lowercase letters (or letters with no case),
+digits, `-`, `_`, and `.`, starting with a letter or digit, with an optional
+namespace of the same form before one colon, such as `position:subsidence`. A
+source's `changes` is an append-only log of what commands changed on it: `at`,
+`by`, `action` (`added`, `replaced`, `removed`), `field` (`tags`,
+`identifiers`, `authors`, a source field, or `bib.<name>`), `value`, and where
+known `previous` and `from`. Neither is part of `SourceBinding` (E), so tagging
+makes nothing stale. Commands enforce the tag form; `record.valid` does not yet.
 
 ### H. Places and restricted coordinates
 

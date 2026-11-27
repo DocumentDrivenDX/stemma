@@ -30,6 +30,31 @@ You are how the author uses it: they ask in plain words, and you set it up, run
 it, and explain the results. Never ask them to install a runtime, run a command,
 or edit a record file.
 
+## Capture iteratively
+
+A source is usable at any stage, and the author adds to it over time. Take each
+step when it is wanted, in any later session; do not hold one back for another.
+
+| The author says | You run |
+|---|---|
+| "Keep this file" | `source capture` (no text or details needed) |
+| "I want to read or quote it" | `source convert --source <id>`; what capture recorded is not asked again |
+| "This is its DOI", "it was published by…" | `source enrich` with `--add-identifier`, `--set`, or `--author`, and `--from` saying where the value comes from |
+| "Look it up" | `resolve <id>`, then `source enrich <id> --lookup <resolution id>` |
+| "Tag these", "these argue against it" | `source tag … --add position:critic` (`--remove` to undo) |
+| "Which sources are tagged…?", "what has no text yet?" | `source list --tag …`, `--stage record\|captured\|text`, `--has …` |
+| "Where did this come from?" | `source history <id>` |
+
+- Adding details or tags never touches source text or passage addresses, so
+  never convert again to add them. Use these commands, not hand edits, so that
+  who, when, and from where are recorded.
+- When `source enrich` shows a disagreement, show the author both values and
+  where each comes from. Use `--replace` only when they choose the new one.
+- Reuse the project's tags (`source list` counts them); use a namespace such as
+  `position:` or `topic:` for a family of tags. A tag you choose is your
+  classification: say so, and give `--from` what you based it on.
+- Never present what is not yet captured as a problem or a task.
+
 ## The pipeline you drive
 
 1. **Capture** the upstream sources: from a library by the access route it
@@ -49,6 +74,47 @@ or edit a record file.
    thesis test, open questions) in a research note.
 4. **Assemble** the argument citing those passages. (Footnote generation and
    builds are not available yet; say so.)
+
+## No binary files in the repository
+
+A project holds text. Never copy, move, download, unpack or commit a binary file
+into the project: Word, PDF, EPUB, slide or spreadsheet files, archives, images.
+This covers every way material arrives: taking over an existing project, bringing
+in folders from another tool, archiving old drafts, and the author's own work.
+A request to import, copy or keep such files means:
+
+- **Leave the originals where they are**, unchanged. Do not make a second copy
+  in the project, not even in an `import/` or `archive/` folder. Tell the author
+  that the originals need their own backup.
+- **Convert what is to be read, kept or cited** with `source convert` or
+  `ingest`, reading the original from where it is (`--originals`). Each document
+  gets a source record, the author's own drafts included. The Markdown in
+  `sources/` is what the project stores and cites, tied to the original by hash.
+- **Use the built-in converter**, not another program or a script of your own,
+  for the formats it reads (DOCX, PDF, EPUB, HTML, Markdown, plain text). Say
+  what conversion leaves behind: for DOCX, comments, tracked deletions, page
+  numbers, running heads, images, automatic list and heading numbers, and
+  characters inserted as symbols.
+- **Pages.** What keeps a citation checkable is the page it is on and its exact
+  characters. A PDF becomes one Markdown file per page. A DOCX has no fixed
+  pages, so it becomes one file per section and is never given page numbers: do
+  not cite it by page, or work one out. When pages are needed, ask the author for
+  a PDF of the version they cite, exported from the word processor they use, and
+  convert that. The page breaks belong to that rendering: another program, font
+  or setting can move them, so the PDF's hash is what ties them, and the author
+  keeps that PDF with the original. Use `--auto-pages` or `source pages` for the
+  printed numbers. The DOCX's own conversion reads the characters as typed,
+  while a PDF's are read from the rendered layout: where exact words matter,
+  find them in the DOCX conversion too (`passage find`). Stemma cannot yet
+  compare a paged conversion with an unpaged one as a whole.
+- **For other formats**, such as images, slides or spreadsheets, record in a
+  research note what each is, its SHA-256 hash, and where the author says it is
+  held, without an absolute local path.
+
+If the author asks outright to commit a binary, say what that costs and let them
+decide. `check` reports binary files in the repository (`project.binary`);
+`init` makes git ignore the common document formats. In a project that already
+holds them, report this; do not delete files or rewrite git history unasked.
 
 ## Rules for source text and quotations
 
@@ -136,6 +202,10 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `ingest --actor <kind>:<name> [--plan <file>] [--originals <dir>]... [--fetch] [--refresh-lookups]` | Stages 1 and 2: capture the plan's entries, compare every source file with a fresh conversion of its original, make listed lookups (with `--fetch`), and check. Safe to run again |
 | `source convert <original> --source <id> --acquired-at <time> --actor <kind>:<name> [--auto-pages] [--origin <text>] [--identity <file>]` | Convert one file the author supplies |
 | `source convert --source <id> … --transcription <file>\|--text-layer <file> --method ocr\|manual [--tool <name> --tool-version <v>]` | Paper or page images: supplied recognized or typed text, with `--description` and `--held-at` for paper, `--image <file>` for page images |
+| `source capture <original> --acquired-at <time> --actor <kind>:<name> [--source <id>] [--origin <text>]` | Record an original before it has any text; running it again writes nothing |
+| `source enrich <id\|key> --actor <kind>:<name> --from <text> [--add-identifier <scheme>:<value>] [--set <name>=<value>] [--author "<Family, Given>"] [--replace]`, or `… --lookup <resolution id>` | Add library details; never replaces a recorded value without `--replace` |
+| `source tag <id\|key>... [--add <tag>] [--remove <tag>] [--from <text>] --actor <kind>:<name>` | Add and remove tags, plain or `namespace:name` |
+| `source list [--tag <tag\|namespace:>] [--stage record\|captured\|text] [--has identifiers\|lookup\|tags]` / `source history <id\|key>` | Find sources; show how one came to be as it is |
 | `source pages <original> [--page-numbers <file>] [--out <file>]` / `source label <text id> --page-map <file>` | Propose page labels for review; set them |
 | `source verify <text id> --original <file>` / `source compare <text id> --with <file> --against <what>` | Record a comparison with the original, or with another text of the same pages |
 | `source seal <text id> --actor person:<name>` | Record edits a person made to page files |

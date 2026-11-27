@@ -323,6 +323,7 @@ a `basis` records those states; with neither, the page is `undetermined`.
 | Unknown or unclosed annotation, raw `<`, text outside a block, a correction not by a person | `record_invalid` naming the file and line | no | Correct the markup |
 | Part missing, unlisted, edited without sealing, or out of sequence | `source.pages` fails; dependants cannot be checked | yes | Restore the file from git, or review the edit and run `source seal` |
 | A binary or other stray file in `sources/` | `record_misplaced` | no | Move it out of the repository |
+| A binary file elsewhere in the repository | `project.binary` fails (CONTRACT-002 C) | no | Keep it outside the repository; convert it if it is to be read or cited |
 
 ## Examples
 
