@@ -401,7 +401,13 @@ describe("local paths", () => {
 });
 
 describe("record states", () => {
-  const claim = (id: string, review: object) => ({ ...base(id, "claim"), text: `Claim ${id}`, role: "claim", review });
+  const claim = (id: string, review: object) => ({ ...base(id, "claim"), text: `Claim ${id}`, role: "claim", confidence: "low", reason: "Because.", review });
+  /** A note behind each claim, so that claim.complete has nothing to report. */
+  const noted = (ids: string[]) => [
+    { ...base("src-statesource01", "source"), citation_key: "states", type: "book", intake: "raw", admission: "candidate", title: { value: "A book" } },
+    { ...base("nte-statenote0001", "note"), type: "comment", source: "src-statesource01", body: "A remark", review: { state: "unreviewed" } },
+    ...ids.map((id) => ({ ...base(id.replace("clm-", "att-"), "attestation"), claim: id, evidence: "nte-statenote0001", stance: "supports", review: { state: "unreviewed" } })),
+  ];
 
   /** CONTRACT-001 E: `content_sha256`, over the record without its review and bookkeeping. */
   const reviewed = (record: object) => {
@@ -413,7 +419,8 @@ describe("record states", () => {
     const marked = claim("clm-statemarked001", { state: "reviewed", content_sha256: "0".repeat(64) });
     marked.review = { state: "reviewed", content_sha256: reviewed(marked) };
     const edited = { ...claim("clm-stateedited001", marked.review), text: "Edited since" };
-    const out = make(loadCorpus(project([marked, edited, claim("clm-stateunread001", { state: "unreviewed" })])));
+    const unread = claim("clm-stateunread001", { state: "unreviewed" });
+    const out = make(loadCorpus(project([marked, edited, unread, ...noted([marked.id, edited.id, unread.id])])));
     expect(out.states.records.get(marked.id)).toBeUndefined();
     expect(out.states.records.get(edited.id)).toEqual(["unreviewed"]);
     expect(out.states.records.get("clm-stateunread001")).toEqual(["unreviewed"]);

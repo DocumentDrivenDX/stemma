@@ -22,7 +22,7 @@ export const NOT_COMPUTED_STATES: RecordState[] = ["support_missing", "support_s
  */
 export const STATE_CHECKS = [
   "record.valid", "source.held", "source.pages", "source.labels", "source.footnotes", "source.changed",
-  "cite.key", "bib.uncited", "quote.present", "quote.page", "locator.extent", "number.present",
+  "cite.key", "bib.uncited", "quote.present", "quote.page", "locator.extent", "number.present", "claim.complete",
 ];
 
 /** The other checks this version runs, with why their findings give no state. */

@@ -85,3 +85,78 @@ describe("one review rule", () => {
     expect([has("clm-marked00"), has("nte-unreached"), has("nte-retired0")]).toEqual([false, true, false]);
   });
 });
+
+describe("claim.complete", () => {
+  const ID = "clm-aaaaaaaa";
+  const good = [source, claim(ID), note("nte-aaaaaaaa"), link("att-aaaaaaaa", ID, "nte-aaaaaaaa", { stance: "contradicts" })];
+  const one = (content: ProjectContent) => {
+    const found = of(content, "claim.complete");
+    expect(found).toHaveLength(1);
+    return found[0]!;
+  };
+  const without = (records: Value[], id: string) => records.filter((r) => r.id !== id);
+  const swap = (records: Value[], changed: Value) => records.map((r) => (r.id === changed.id ? changed : r));
+  const gone = { retired: { stamp: { at: AT, by: person }, reason: "gone" } };
+
+  test("a claim with confidence, a reason and a note passes, whatever the note's stance and review", () => {
+    const body = check(project(good));
+    expect(one(project(good))).toMatchObject({ outcome: "pass", subject: ID, open: false });
+    expect(body.not_run.map((n) => n.check)).not.toContain("claim.complete");
+  });
+
+  test("each missing part is named, the thesis included", () => {
+    const cases: [Value[], string][] = [
+      [without(good, "att-aaaaaaaa"), "note"],
+      [without(good, "nte-aaaaaaaa"), "note"],
+      [swap(good, note("nte-aaaaaaaa", gone)), "note"],
+      [swap(good, link("att-aaaaaaaa", ID, "nte-aaaaaaaa", gone)), "note"],
+      [[source, claim(ID, { confidence: undefined, role: "thesis" }), ...good.slice(2)], "confidence"],
+      [swap(good, claim(ID, { confidence: "certain" })), "confidence"],
+      [swap(good, claim(ID, { reason: "  " })), "reason"],
+      [[source, claim(ID, { confidence: "", reason: "" })], "note, confidence, reason"],
+    ];
+    for (const [records, missing] of cases) {
+      const content = project(records.map((r) => JSON.parse(JSON.stringify(r)) as Value));
+      const found = one(content);
+      expect([found.outcome, found.reason_code, found.open, evidence(found, "missing")[0]]).toEqual(["fail", "claim_incomplete", true, missing]);
+      expect([found.message, found.why, ...found.suggestions].join(" ")).not.toMatch(/review|approv|verif/i);
+    }
+  });
+
+  test("a passage linked directly is not a note, and the evidence says why the link does not count", () => {
+    const passage = { ...base("psg-aaaaaaaa", "passage"), source: source.id };
+    const found = one(project([source, claim(ID), passage, link("att-aaaaaaaa", ID, "psg-aaaaaaaa")]));
+    expect(evidence(found, "attestation_without_a_note")).toEqual(["records/attestations/att-aaaaaaaa.json: its evidence is a passage, not a note"]);
+  });
+
+  test("a retired claim gives no result", () => {
+    expect(of(project([claim(ID, gone)]), "claim.complete")).toEqual([]);
+  });
+
+  test("with no note reached, an unreadable related record leaves it unverifiable, and other missing parts are still named", () => {
+    for (const path of ["records/attestations/att-broken00.json", "records/notes/nte-aaaaaaaa.json"]) {
+      const records = path.includes("notes") ? [source, claim(ID, { reason: "" }), good[3]!] : [source, claim(ID, { reason: "" })];
+      const content = project(records);
+      content.records.push({ path, bytes: bytes("{ not json") });
+      const found = one(content);
+      expect([found.outcome, found.reason_code, found.open]).toEqual(["unverifiable", "record_unreadable", true]);
+      expect(evidence(found, "cannot_be_read")).toEqual([path]);
+      expect(evidence(found, "missing")).toEqual(["reason"]);
+    }
+    // Something unreadable that cannot lead to a note changes nothing, and nor does one beside a note.
+    const unrelated = project([source, claim(ID)]);
+    unrelated.records.push({ path: "records/notes/nte-broken00.json", bytes: bytes("{") });
+    expect(one(unrelated).reason_code).toBe("claim_incomplete");
+    const beside = project(good);
+    beside.records.push({ path: "records/attestations/att-broken00.json", bytes: bytes("{") });
+    expect(one(beside).outcome).toBe("pass");
+  });
+
+  test("it runs with manuscript files present, and gives the claim its state in the export", () => {
+    const content = project([claim(ID)], { manuscript: [{ path: "manuscript/a.md", bytes: bytes("Words.\n") }] });
+    expect(one(content).outcome).toBe("fail");
+    const states = recordStates(loadCorpus(content));
+    expect(states.checks).toContain("claim.complete");
+    expect(states.records.get(ID)).toContain("open_finding");
+  });
+});

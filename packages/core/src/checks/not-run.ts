@@ -52,7 +52,6 @@ export function notRun(corpus: Corpus): NotRun[] {
   const applies: Record<string, boolean> = {
     "quote.self": has("claim") && (manuscript || quoting),
     "construct.credit": has("construct"),
-    "claim.complete": has("claim"),
     "construct.complete": has("construct"),
     "claim.inactive": manuscript && has("claim"),
     "cite.unlinked": manuscript && has("claim"),

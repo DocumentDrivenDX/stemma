@@ -5,6 +5,7 @@ import { binaryResults } from "./checks/binaries.ts";
 import { active, citeKeyResults, resolveCitations, uncitedResults } from "./checks/bibliography.ts";
 import { coordinateResults } from "./checks/coordinates.ts";
 import { changedResults } from "./checks/changed.ts";
+import { claimResults } from "./checks/claims.ts";
 import { heldResults } from "./checks/held.ts";
 import { locatorResults } from "./checks/locators.ts";
 import { identifierResults, resolverResults, sourceMetaResults } from "./checks/metadata.ts";
@@ -93,6 +94,7 @@ export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckC
   "meta.resolver": (c, x) => resolverResults(c, x.texts),
   "id.resolves": (c, x) => identifierResults(c, x.texts),
   "number.present": (c, x) => numberResults(c, x.texts),
+  "claim.complete": claimResults,
   "coordinate.stray": coordinateResults,
 };
 

@@ -94,6 +94,37 @@
     ]
   },
   {
+    "id": "claim.complete",
+    "summary": "Each claim record must have a confidence level, a reason, and a note behind it, linked through an attestation.",
+    "limits": "It counts what is there. It does not show that the note supports the claim, that the reason is good or that the confidence is right, and the note's stance does not matter. It reads claim records only, not manuscript files.",
+    "findings": [
+      {
+        "reason": "claim_incomplete",
+        "message": "A claim in the ledger is incomplete: the evidence names what is missing of a note behind it, a confidence level and a reason.",
+        "why": "Without all three, nobody can see later what the claim rests on, how sure its writer was, or why the sources support it.",
+        "suggestions": [
+          "For a missing note, record a note on the source passage and link it to the claim with an attestation; a passage linked directly is not a note, and a retired note or attestation no longer counts. For a missing confidence level (low, medium or high) or reason, add them to the claim. Stemma has no command that edits a record: change the claim's file and run `fmt` on it. If you no longer hold the claim, retire it. Writing can carry on meanwhile, and a claim that is rightly left as it is, such as your own thesis, can be explained or dismissed."
+        ]
+      },
+      {
+        "reason": "record_unreadable",
+        "message": "Whether a note lies behind this claim could not be checked: a record that could link it to one cannot be read. Any other missing part is named in the evidence.",
+        "why": "Without all three, nobody can see later what the claim rests on, how sure its writer was, or why the sources support it.",
+        "suggestions": [
+          "Repair the files named in the evidence (see the record.valid findings), then run `check` again. Add whatever else the evidence names as missing."
+        ]
+      },
+      {
+        "reason": "check_error",
+        "message": "The check itself failed while running, so this was not checked.",
+        "why": "This is a defect in Stemma, not a pass.",
+        "suggestions": [
+          "Report the defect together with the Stemma version."
+        ]
+      }
+    ]
+  },
+  {
     "id": "coordinate.stray",
     "summary": "Warns about written map coordinates in project files, without repeating the value.",
     "limits": "Recognizes only geo: addresses, degrees with N, S, E and W, and comma-separated decimal pairs with at least three decimal places. It cannot tell whether a site is restricted.",

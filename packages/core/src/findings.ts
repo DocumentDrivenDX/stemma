@@ -19,6 +19,7 @@ const META_WHY = "A reference with the wrong author, title or year points reader
 const ID_WHY = "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.";
 const NUMBER_WHY = "A figure attributed to a source that does not hold it misreports the source.";
 const KEY_WHY = "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.";
+const CLAIM_WHY = "Without all three, nobody can see later what the claim rests on, how sure its writer was, or why the sources support it.";
 const CHANGED_WHY = "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.";
 const QUOTE_WHY = "Readers take quoted words to be the source's own. Words the source does not hold misreport it.";
 const UNCOMPARED_WHY = "Until the quotation can be compared with the source's text, it is unchecked.";
@@ -177,6 +178,13 @@ export const TEMPLATES = {
     "The text or the tools changed after the last fresh conversion was compared, so it no longer says anything.", ORIGINAL_WHY,
     ["Run `source verify <text id> --original <file>`, or `ingest` with the originals."], ["verify_original"]),
   "source.original:check_error": CHECK_FAILED,
+  "claim.complete:claim_incomplete": explain(
+    "A claim in the ledger is incomplete: the evidence names what is missing of a note behind it, a confidence level and a reason.", CLAIM_WHY,
+    ["For a missing note, record a note on the source passage and link it to the claim with an attestation; a passage linked directly is not a note, and a retired note or attestation no longer counts. For a missing confidence level (low, medium or high) or reason, add them to the claim. Stemma has no command that edits a record: change the claim's file and run `fmt` on it. If you no longer hold the claim, retire it. Writing can carry on meanwhile, and a claim that is rightly left as it is, such as your own thesis, can be explained or dismissed."]),
+  "claim.complete:record_unreadable": explain(
+    "Whether a note lies behind this claim could not be checked: a record that could link it to one cannot be read. Any other missing part is named in the evidence.", CLAIM_WHY,
+    ["Repair the files named in the evidence (see the record.valid findings), then run `check` again. Add whatever else the evidence names as missing."]),
+  "claim.complete:check_error": CHECK_FAILED,
   "source.changed:depends_on_retired": explain(
     "This rests on a source file or source that has since been replaced or retired.", CHANGED_WHY,
     ["Compare what you took from it with what replaced it, then correct or retire this item if it no longer holds. Stemma cannot yet record that you have looked, so the finding stays listed."]),
