@@ -1,0 +1,90 @@
+$ stemma check --all --project $PROJECTS/postgres-web-apps
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 1019 result(s) passed.
+
+1. PROBLEM: The source record disagrees with what the captured copy states about itself.  [meta.source]
+   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
+   What to do: Compare both values with the title page of the work. Correct the record if it is wrong; if the copy is a different edition or a misdescribed file, capture the right one.
+   - src-qmw5m7hjrx4a41abv94v
+       source file: records/sources/src-qmw5m7hjrx4a41abv94v.json
+       key: pg96notes
+       source text: sources/pg96notes/source.md
+       identity basis: the document's title and meta elements
+       title page parts: index 0, 1
+       title in record: Release 9.6
+       title the copy states: PostgreSQL: Release Notes
+       title result: the copy states otherwise, and the title page text does not show the record's value
+       authors in record: PostgreSQL Global Development Group
+       authors result: not found in what the copy states or in its title page text
+       year in record: 2016
+       year result: not found in what the copy states or in its title page text
+       venue in record: PostgreSQL Release Notes
+       venue result: not found in what the copy states or in its title page text
+       finding key: ca24987ff5530c3a86db2138633f269f86298cef7dfb2de8763e25a9db7cfaf6
+       explained by model claude-sonnet-5-5 (ann-jw9dbw4kb5sasm35grwm): The page's own title is the general 'PostgreSQL: Release Notes', and the parts taken as its title page are navigation. The converted text states 'E.25. Release 9.6' and 'Release date: 2016-09-29' in section 4. A model's reading, not a person's review.
+
+2. PROBLEM: A note has no marker in the text of its page or section.  [source.footnotes]
+   Why it matters: A marker without its note, or a note without its marker, suggests text was lost or put in the wrong stream in conversion.
+   What to do: Compare the page with the original. If the note continues from an earlier page, mark its block continued.
+   - txt-t7p2y2hxdtsg7e4whwp7
+       file: sources/pg18json/source.md
+       where: the text
+       note label: 7
+       finding key: d7853929243575b9f21aaa11e6609db6b6f061f55498e8e07971317fd21088c5
+       explained by model claude-sonnet-5-5 (ann-qg899cezk1pwmxnejytz): The stored HTML marks footnote 7's marker with a link and a superscript of class 'footnote', which the converter treats as a note body and not as a note reference. The marker's characters and the note's words are both in the text, and no quotation comes from the note. A model's reading, not a person's review.
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: figma2024, notion2021, pavlo2023, pg18arch, pg18connections, pg18ha, pg18hot, pg18isolation, pg18json, pg18standby, pg18vacuum, pg19notes, pg96notes, pgbouncer, ports2012, sentry2015, wu2017
+   - not corroborated: neither the title page text nor a saved catalogue record shows the authors or the venue: figma2024, pg18arch, pg18connections, pg18ha, pg18hot, pg18isolation, pg18json, pg18vacuum, pg19notes
+   - not corroborated: neither the title page text nor a saved catalogue record shows the venue: notion2021, pavlo2023, pg18standby, sentry2015
+   - not corroborated: neither the title page text nor a saved catalogue record shows the year or the venue: ports2012
+
+For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-rxmqp114s1fpzvvc11h8: be-|havior
+
+For information, not findings: what has been compared with and reviewed for each source file.
+   - sources/figma2024 (markup): 0 of 17 parts reviewed whole by a person; fresh conversion: 17 of 17 parts agree
+   - sources/notion2021 (markup): 0 of 7 parts reviewed whole by a person; fresh conversion: 7 of 7 parts agree
+   - sources/pavlo2023 (markup): 0 of 6 parts reviewed whole by a person; fresh conversion: 6 of 6 parts agree
+   - sources/pg18arch (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18connections (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18ha (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18hot (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18isolation (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18json (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18standby (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg18vacuum (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg19notes (markup): 0 of 3 parts reviewed whole by a person; fresh conversion: 3 of 3 parts agree
+   - sources/pg96notes (markup): 0 of 9 parts reviewed whole by a person; fresh conversion: 9 of 9 parts agree
+   - sources/pgbouncer (markup): 0 of 5 parts reviewed whole by a person; fresh conversion: 5 of 5 parts agree
+   - sources/ports2012 (text_layer): 0 of 12 parts reviewed whole by a person; fresh conversion: 12 of 12 parts agree
+   - sources/sentry2015 (markup): 0 of 8 parts reviewed whole by a person; fresh conversion: 8 of 8 parts agree
+   - sources/wu2017 (text_layer): 0 of 12 parts reviewed whole by a person; fresh conversion: 12 of 12 parts agree
+
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - your own claims presented as quotations from a source  [quote.self]
+   - whether each cited claim has a current claim-support record  [support.current]
+
+For information, not a finding: 17 cited item(s) are unreviewed or not admitted.
+   - src-01n2wr6cy5qmwqd6fc3t (not admitted)
+   - src-0n87kc5wgjgwp0fxjwg0 (not admitted)
+   - src-4tn0091eh4cc829322kj (not admitted)
+   - src-8jrmssahm9f1stb929c7 (not admitted)
+   - src-927xc3h01n3ns1ewxfjg (not admitted)
+   - src-bhya83cxjbhya1bpxjg5 (not admitted)
+   - src-gf8p7mknx1fgq150x3k6 (not admitted)
+   - src-h7njqhwyqcz4hesxe37z (not admitted)
+   - src-jzgwnaqrcsjhpegjbn7z (not admitted)
+   - src-kvfq6m31x122sa7qgs53 (not admitted)
+   - src-mfaaxnw4et2z8359btzf (not admitted)
+   - src-nen925hmc37x2yzp9231 (not admitted)
+   - src-qmw5m7hjrx4a41abv94v (not admitted)
+   - src-r7741gv5gb10aq6fv2bz (not admitted)
+   - src-seb0h7jfjxxsweary6a5 (not admitted)
+   - src-v9mg0p5d9mcmyyedvwek (not admitted)
+   - src-y7k7tzzv3s40j0p1e5tq (not admitted)
+
+Full report: $PROJECTS/postgres-web-apps/.stemma/reports/check.json
+[exit 1]
