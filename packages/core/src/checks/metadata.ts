@@ -2,7 +2,7 @@
 // BR-717): a source record's title, authors, year and venue against what the
 // captured copy states and shows, and against saved catalogue lookups. They show
 // disagreement; they do not decide which side is right.
-import { type Corpus, idOf, isObject, isRetired, type JsonObject, type LoadedFile } from "@stemma/records";
+import { type Corpus, idOf, isObject, isRetired, type JsonObject, type LoadedFile, toRoman } from "@stemma/records";
 import { result } from "../findings.ts";
 import { SourceTexts, type TextView } from "../matching/texts.ts";
 import type { Evidence, Result } from "../report.ts";
@@ -91,7 +91,9 @@ export function againstCopy(record: Described, view: TextView): { statuses: Map<
     const byIdentity = stated.authors.length === 0 ? undefined : record.authors.every((a) => holds(names, foldName(a)));
     judge("authors", record.authors.join("; "), byIdentity, record.authors.every((a) => holds(pages.text, foldName(a))), stated.authors.join("; "));
   }
-  if (record.year) judge("year", record.year, stated.year === undefined ? undefined : stated.year === record.year, holds(pages.text, record.year), stated.year);
+  if (record.year) judge("year", record.year, stated.year === undefined ? undefined : stated.year === record.year,
+      // A title page may print its year as a roman numeral.
+      holds(pages.text, record.year) || holds(pages.text, toRoman(Number(record.year))), stated.year);
   if (record.venue) {
     judge("venue", record.venue, stated.venue === undefined ? undefined : titlesMatch(record.venue, stated.venue), holds(pages.text, foldName(record.venue)), stated.venue);
   }

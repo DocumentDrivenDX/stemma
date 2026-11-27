@@ -62,7 +62,9 @@ type Tagged = { line: PdfLine; role: string; basis?: string; label?: string; col
 
 /** Footnotes are assigned only where a raised marker and a small line at the foot begin with the same marker. */
 function pairNotes(body: Tagged[], size: number): void {
-  const candidates = body.flatMap((t) => raisedMarkers(t.line).map((m) => ({ ...m, tagged: t })));
+  const raised = body.flatMap((t) => raisedMarkers(t.line).map((m) => ({ ...m, tagged: t })));
+  // A label raised more than once on the page may be an exponent or a repeated reference: it is not paired.
+  const candidates = raised.filter((c) => raised.filter((o) => o.label === c.label).length === 1);
   if (candidates.length === 0) return;
   let first = body.length;
   while (first > 0 && lineSize(body[first - 1]!.line) <= size * PDF_RULES.note_ratio) first--;

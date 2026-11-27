@@ -251,9 +251,9 @@ two of a page whose letters recur at that edge on at least three pages
 (`repeated-line`); `folio` to an edge line that is exactly the page's label
 (`printed-label`); `columns` `2` and left-then-right order only when no line
 crosses a clear gutter and each side holds at least five lines. In a PDF not
-marked as recognized text, it assigns `footnote` and `fnref` only when a raised
-small marker in the body and a smaller line at the foot of the same page begin
-with the same marker, and `heading` only to a short line set at least 1.2 times
+marked as recognized text, it assigns `footnote` and `fnref` only when a small
+raised marker that occurs once in the body and a smaller line at the foot of the
+same page begin with the same marker, and `heading` only to a short line set at least 1.2 times
 the body size. Everything else stays `undetermined`.
 
 For markup, elements with roles that carry no stated meaning stay as paragraphs.

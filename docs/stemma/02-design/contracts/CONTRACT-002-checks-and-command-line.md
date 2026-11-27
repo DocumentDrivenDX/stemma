@@ -230,7 +230,7 @@ hyphens, and white space are folded. A title matches when it equals the other,
 or equals the other's main title before a colon or full stop; `meta.source`
 also accepts the record title found as consecutive words on a title page. Each
 author's family name must appear among the stated contributors or on a title
-page. The year must be the stated issue year or appear on a title page; a venue
+page. The year must be the stated issue year or appear on a title page, in figures or as a roman numeral; a venue
 is compared only when the record names one. A field the lookup does not state is
 listed as not compared. `meta.source` fails when the copy's stated identity
 disagrees and the title page text does not bear out the record; a value found in
