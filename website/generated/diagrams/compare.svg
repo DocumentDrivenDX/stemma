@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-286 -294.5 572 589" width="572" height="589" class="lini" role="img" aria-labelledby="dgm-compare-title dgm-compare-desc">
+  <title id="dgm-compare-title">What a check compares with what</title>
+  <desc id="dgm-compare-desc">5 comparisons the checks make, from what is checked to what it is compared with. Each box on the left leads to the box beside it on the right.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-314" y="-322.5" width="628" height="645" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(-157,-258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Your quotation</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n2" style="stroke-width: 2" transform="translate(157,-258)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">The source&apos;s own text</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(-157,-129)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">The place you cite</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n4" style="stroke-width: 2" transform="translate(157,-129)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">What the work holds</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n5" transform="translate(-157,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A figure in a sentence</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(157,0)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">That source&apos;s text</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n7" transform="translate(-157,129)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Author, title and date</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(157,129)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Title page and catalogues</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n9" transform="translate(-157,258)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A source&apos;s text files</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n10" style="stroke-width: 2" transform="translate(157,258)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">A fresh conversion</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n2">
+      <path d="M -36 -258 L 32.5 -258"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,-258 27.5,-253.5 27.5,-262.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n4">
+      <path d="M -36 -129 L 32.5 -129"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,-129 27.5,-124.5 27.5,-133.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M -36 0 L 32.5 0"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,0 27.5,4.5 27.5,-4.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n7" data-to="visual.n8">
+      <path d="M -36 129 L 32.5 129"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,129 27.5,133.5 27.5,124.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n9" data-to="visual.n10">
+      <path d="M -36 258 L 32.5 258"/>
+      <polygon class="lini-marker lini-marker-arrow" points="36.5,258 27.5,262.5 27.5,253.5"/>
+    </g>
+  </g>
+</svg>

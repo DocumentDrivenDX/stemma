@@ -1,20 +1,45 @@
-// The worked example as the site reads it: its records and the manifest and pages
-// of its source files. Nothing about the example is typed into the site twice.
-import { readdirSync, readFileSync } from "node:fs";
+// The worked examples as the site reads them: their records, and for the Darwin
+// book the manifest and pages of its source files. Nothing about an example is
+// typed into the site twice.
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const EXAMPLE = join(import.meta.dir, "../../examples/coral-reefs");
+const EXAMPLES_ROOT = join(import.meta.dir, "../../examples");
 
-export const records = (kind: string): any[] =>
-  readdirSync(join(EXAMPLE, "records", kind)).filter((f) => f.endsWith(".json")).sort()
-    .map((f) => JSON.parse(readFileSync(join(EXAMPLE, "records", kind, f), "utf8")));
+/** The folder of a worked example, by its name under examples/. */
+export const exampleDir = (name: string): string => join(EXAMPLES_ROOT, name);
 
-export const frontMatter = (path: string): any => {
-  const text = readFileSync(join(EXAMPLE, path), "utf8");
+export const EXAMPLE = exampleDir("coral-reefs");
+
+/** The records of one kind (a folder under records/) in an example, in file order. A kind with none has no folder. */
+export const readRecords = (example: string, kind: string): any[] => {
+  const folder = join(example, "records", kind);
+  return existsSync(folder) ? readdirSync(folder).filter((f) => f.endsWith(".json")).sort()
+    .map((f) => JSON.parse(readFileSync(join(folder, f), "utf8"))) : [];
+};
+
+/** The Darwin example's records of one kind. */
+export const records = (kind: string): any[] => readRecords(EXAMPLE, kind);
+
+export const frontMatter = (path: string, example = EXAMPLE): any => {
+  const text = readFileSync(join(example, path), "utf8");
   const end = text.indexOf("\n---\n", 4);
   if (!text.startsWith("---\n") || end < 0) throw new Error(`${path} has no front matter`);
   return JSON.parse(text.slice(4, end));
 };
+
+/** What an example holds, counted from its records: works (a part of another work is not counted), citations, claims and notes. */
+export function exampleCounts(example: string) {
+  const works = readRecords(example, "sources").filter((s) => !(s.relations ?? []).some((r: any) => r.type === "part_of"));
+  const citations = readRecords(example, "citations");
+  return {
+    works: works.length,
+    cited: new Set(citations.map((c) => c.key)).size,
+    citations: citations.length,
+    claims: readRecords(example, "claims").length,
+    notes: readRecords(example, "notes").length,
+  };
+}
 
 /** The Darwin book: its record, where its original came from, and its source files. */
 export function darwinBook() {

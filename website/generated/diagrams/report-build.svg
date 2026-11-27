@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-448 -236 896 472" width="896" height="472" class="lini" role="img" aria-labelledby="dgm-report-build-title dgm-report-build-desc">
+  <title id="dgm-report-build-title">What goes into a report</title>
+  <desc id="dgm-report-build-desc">Four inputs lead into the report build, which leads to three outputs.</desc>
+  <g class="lini-scene">
+    <g class="lini-node lini-group lini-block" data-id="visual" style="fill: none; stroke: none; stroke-width: 0; stroke-dasharray: 3,2.5" transform="translate(0,0)">
+      <rect x="-476" y="-264" width="952" height="528" rx="8" ry="8"/>
+      <g class="lini-node lini-box lini-block" data-id="n1" transform="translate(-320,-168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Your manuscript</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n2" transform="translate(-320,-56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">List of quotations</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n3" transform="translate(-320,56)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Passage records</text>
+      </g>
+      <g class="lini-node lini-box lini-block" data-id="n4" transform="translate(-320,168)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Source records</text>
+      </g>
+      <g class="lini-node lini-box lini-block stm-focus" data-id="n5" style="stroke-width: 3" transform="translate(0,0)">
+        <rect x="-120" y="-27.5" width="240" height="55" rx="8" ry="8"/>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Build the report</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n6" style="stroke-width: 2" transform="translate(320,-112)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Report with footnotes</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n7" style="stroke-width: 2" transform="translate(320,0)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Verification table</text>
+      </g>
+      <g class="lini-node lini-note lini-path" data-id="n8" style="stroke-width: 2" transform="translate(320,112)">
+        <path d="M -121 -28.5 L 106 -28.5 L 121 -13.5 L 121 28.5 L -121 28.5 Z"/>
+        <g class="lini-node lini-path" style="fill: var(--stm-color-line-strong); stroke: none; stroke-width: 0" transform="translate(0,0)">
+          <path d="M 106 -28.5 L 121 -13.5 L 106 -13.5 Z"/>
+        </g>
+        <text class="lini-text" x="0" y="0" dy="0.358em">Evidence ledger</text>
+      </g>
+    </g>
+  </g>
+  <g class="lini-links">
+    <g class="lini-link" data-from="visual.n1" data-to="visual.n5">
+      <path d="M -199 -168 L -161.5253 -168 A 16 16 0 0 1 -145.5253 -152 L -145.5253 -29 A 16 16 0 0 0 -129.5253 -13 L -125 -13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,-13 -130,-8.5 -130,-17.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n2" data-to="visual.n5">
+      <path d="M -199 -56 L -177.5253 -56 A 16 16 0 0 1 -161.5253 -40 L -161.5253 -32.6667 A 28.3333 28.3333 0 0 0 -133.1919 -4.3333 L -125 -4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,-4.3333 -130,0.1667 -130,-8.8333"/>
+    </g>
+    <g class="lini-link" data-from="visual.n3" data-to="visual.n5">
+      <path d="M -199 56 L -190.9747 56 A 16 16 0 0 0 -174.9747 40 L -174.9747 32.6667 A 28.3333 28.3333 0 0 1 -146.6414 4.3333 L -125 4.3333"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,4.3333 -130,8.8333 -130,-0.1667"/>
+    </g>
+    <g class="lini-link" data-from="visual.n4" data-to="visual.n5">
+      <path d="M -199 168 L -174.9747 168 A 16 16 0 0 0 -158.9747 152 L -158.9747 29 A 16 16 0 0 1 -142.9747 13 L -125 13"/>
+      <polygon class="lini-marker lini-marker-arrow" points="-121,13 -130,17.5 -130,8.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n6">
+      <path d="M 121.5 -8 L 144.25 -8 A 16 16 0 0 0 160.25 -24 L 160.25 -96 A 16 16 0 0 1 176.25 -112 L 195.5 -112"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,-112 190.5,-107.5 190.5,-116.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n7">
+      <path d="M 121.5 8 L 195.5 8"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,8 190.5,12.5 190.5,3.5"/>
+    </g>
+    <g class="lini-link" data-from="visual.n5" data-to="visual.n8">
+      <path d="M 0 29 L 0 96 A 16 16 0 0 0 16 112 L 195.5 112"/>
+      <polygon class="lini-marker lini-marker-arrow" points="199.5,112 190.5,116.5 190.5,107.5"/>
+    </g>
+  </g>
+</svg>
