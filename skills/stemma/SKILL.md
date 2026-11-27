@@ -2,8 +2,9 @@
 name: stemma
 description: |
   Stemma skill, the single public entrypoint for researching and writing
-  academic books with checked citations. Engage on prompts to start a book
-  project; add or record a source and keep a copy of it; read a PDF's text and
+  academically rigorous research reports and books with checked citations.
+  Engage on prompts to start a report or book project; add or record a source
+  and keep a copy of it; read a PDF's text and
   its page numbers; record the citations in a manuscript; check citations,
   quotations, page numbers, records, or the project and explain what is open;
   show what a stored source says on a page; replace a stored copy; or find out
@@ -13,7 +14,8 @@ argument-hint: "[intent or scope]"
 
 # Stemma
 
-Stemma checks a book's citations with scripts against the author's own stored
+Stemma checks the citations in a research report or book with scripts against
+the author's own stored
 copies and explains what it finds. You are how the author uses it: they ask in
 plain words, and you set it up, run it, and explain the results. Never ask them
 to install a runtime, run a command, or edit a record file.

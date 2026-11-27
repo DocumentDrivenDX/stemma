@@ -1,16 +1,31 @@
 # Stemma
 
-A Claude plugin that helps scholars write books with checked citations. Ask
-Claude in plain words; Stemma's scripts check your project against your own
-stored copies of your sources and explain what they find. Its own documents are
-specified with [HELIX](https://github.com/DocumentDrivenDX/helix), which authors
-do not need.
+**Create academically rigorous research reports and books.**
+
+Research and write with Claude. The Stemma plugin keeps your sources in order,
+checks your citations against your own copies of them, and explains what it finds
+in plain language. Ask in plain words; there is nothing else to set up.
 
 A *stemma codicum* is the family tree of a text's manuscripts: it shows which copy
-derives from which. Stemma gives a book's citations a line of descent to a stored
+derives from which. Stemma gives your citations a line of descent to a stored
 source.
 
-Pre-release.
+Pre-release. [Read more on the website](https://documentdrivendx.github.io/stemma/),
+including [how it works](https://documentdrivendx.github.io/stemma/how.html) and a
+[worked example](https://documentdrivendx.github.io/stemma/darwin.html).
+
+## Research in rounds
+
+1. **Gather:** record each work, saying where each detail came from.
+2. **Keep and read:** store your copy privately, read its text, and review its
+   page numbers.
+3. **Write and cite:** record each citation with its sentence, page, and any
+   quotation.
+4. **Check:** scripts compare those records with your copies.
+5. **Decide:** look at the page, then fix, replace, or leave it. Nothing is
+   blocked.
+
+Then go round again with a new source, a better scan, or a corrected sentence.
 
 ## Install
 
@@ -38,6 +53,13 @@ changes no system or shell setting, and Claude's usual permission prompts apply.
 - "Check the project and explain what is open."
 - "What does that book say on page 89?"
 - "Is anything missing from my source store?"
+
+## Before you add material
+
+Anything in a project may be sent to the AI model. Stemma is for material that
+may be sent to a language model, and it holds back no individual source. Your
+copies and their text live in a private store outside the project, and backing it
+up is your job.
 
 ## What it does
 
@@ -75,9 +97,6 @@ marketplace on GitHub with the Claude command-line tool (version 0.0.1). The
 Claude desktop app, a live Claude session using the skill, Windows, and Linux are
 untested. Setup on Windows needs Git Bash.
 
-Stemma is for material that may be sent to a language model. It holds back no
-individual source.
-
 ## Layout
 
 ```text
@@ -92,8 +111,27 @@ docs/stemma/      Stemma's own governed documents
 ```
 
 [`website/`](website/) is a static microsite whose examples and screenshots are
-generated from real runs. The product requirements and design are under
-[`docs/stemma/`](docs/stemma/).
+generated from real runs; the worked example's runs that need its private copy
+are recorded under `website/recorded/`. The product requirements and design are
+under [`docs/stemma/`](docs/stemma/).
+
+## Developing Stemma
+
+Stemma's own documents are specified and designed with
+[HELIX](https://github.com/DocumentDrivenDX/helix). You need it to work on those
+documents. Authors who use Stemma do not need it.
+
+To install HELIX in Claude Code, from a terminal:
+
+```sh
+claude plugin marketplace add https://github.com/DocumentDrivenDX/helix
+claude plugin install helix@helix --scope user
+```
+
+Then, in a session in this repository, use `/helix` to frame, design, evolve, or
+align the documents under `docs/stemma/`. For Codex and other hosts, follow
+HELIX's [install guide](https://github.com/DocumentDrivenDX/helix/blob/main/docs/install/README.md).
+Rules for working in this repository are in [AGENTS.md](AGENTS.md).
 
 ## License
 
