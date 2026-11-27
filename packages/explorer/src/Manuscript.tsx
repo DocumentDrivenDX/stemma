@@ -24,15 +24,17 @@ const Runs = ({ runs, links }: { runs: Run[]; links: boolean }) => (
 const quotationOf = (view: ManuscriptView, id: string) => (Object.hasOwn(view.quotations, id) ? view.quotations[id] : undefined);
 
 /** A quotation as the report gives it, or, when it is broken, a marker that says so in its place. */
-function QuotationLink({ view, id, open }: { view: ManuscriptView; id: string; open: string }) {
+function QuotationLink({ view, id, open, inNote }: { view: ManuscriptView; id: string; open: string; inNote?: boolean }) {
   const quotation = quotationOf(view, id);
   const href = manuscriptHref({ kind: "quotation", id });
   const highlighted = quotation?.view.state === "highlighted";
+  // The printed note ends each quotation with a period unless it already ends a sentence (`quotedInNote`).
+  const period = inNote && !/[.?!]$/.test(quotation?.text ?? "") ? "." : "";
   return (
     <a href={href} className={highlighted ? "stemma-quotation" : "stemma-quotation stemma-broken"} data-quotation={id} aria-current={open === href ? "true" : undefined}>
       {quotation?.text === undefined
         ? <>[Broken quotation <Text value={id} />: {quotation ? STATES[quotation.view.state] : "not in the view"}]</>
-        : <>“<Runs runs={quotationRuns(quotation.text, quotation.italic)} links={false} />”{highlighted ? null : <> [not highlighted: {STATES[quotation.view.state]}]</>}</>}
+        : <>“<Runs runs={quotationRuns(quotation.text, quotation.italic)} links={false} />{period}”{highlighted ? null : <> [not highlighted: {STATES[quotation.view.state]}]</>}</>}
     </a>
   );
 }
@@ -97,7 +99,7 @@ function Reading({ view, open }: { view: ManuscriptView; open: string }) {
                     const href = manuscriptHref({ kind: "citation", note: note.number, index: i });
                     return (
                       <Fragment key={i}>
-                        {citation.quotations.map((id, n) => <Fragment key={n}><QuotationLink view={view} id={id} open={open} />{" "}</Fragment>)}
+                        {citation.quotations.map((id, n) => <Fragment key={n}><QuotationLink view={view} id={id} open={open} inNote />{" "}</Fragment>)}
                         <a href={href} className="stemma-citation" data-citation={`${note.number}/${i}`} aria-current={open === href ? "true" : undefined}>{citationWords(citation, false)}</a>{" "}
                       </Fragment>
                     );
@@ -234,12 +236,14 @@ function PaneBody({ view, route, getView }: { view: ManuscriptView; route: Exclu
 }
 
 /** The open source, beside the text, or over its lower part on a narrow screen. Give it a key of its route. */
-function Pane({ view, route, getView }: { view: ManuscriptView; route: Exclude<ManuscriptRoute, { kind: "text" }>; getView: GetSourceView }) {
+function Pane({ view, route, getView, from }: { view: ManuscriptView; route: Exclude<ManuscriptRoute, { kind: "text" }>; getView: GetSourceView; from: { current: Element | null } }) {
   const box = useRef<HTMLElement>(null);
   useEffect(() => {
     box.current?.focus({ preventScroll: true });
     // What was clicked stays in sight above a pane that lies over the text.
-    const clicked = document.querySelector<HTMLElement>(".stemma-reading [aria-current]");
+    // One quotation has a copy in the text and in its note, so measure the one that was clicked.
+    const used = from.current?.isConnected && from.current.getAttribute("href") === manuscriptHref(route) ? from.current : null;
+    const clicked = used ?? document.querySelector(".stemma-reading [aria-current]");
     const over = box.current?.parentElement;
     if (clicked && over && getComputedStyle(over).position === "fixed" && clicked.getBoundingClientRect().bottom > over.getBoundingClientRect().top) {
       window.scrollBy(0, clicked.getBoundingClientRect().top - 16);
@@ -263,9 +267,10 @@ function Pane({ view, route, getView }: { view: ManuscriptView; route: Exclude<M
 
 export function Manuscript({ view, route, getView }: { view: ManuscriptView; route: ManuscriptRoute; getView: GetSourceView }) {
   const open = manuscriptHref(route);
+  const from = useRef<Element | null>(null);
   return (
     <div className={route.kind === "text" ? "stemma-manuscript" : "stemma-manuscript stemma-open"}>
-      <main className="stemma-reading">
+      <main className="stemma-reading" onClickCapture={(event) => { from.current = (event.target as Element).closest("a"); }}>
         <p role="note" className="stemma-statement">
           <strong>This is the manuscript as the export read it, not the printed PDF.</strong>{" "}
           {view.inputs ? <>It is <code><Text value={view.inputs.template} /></code> and <code>{view.inputs.directory}/report.json</code>, assembled again with the project’s records and citation style; <code>report.md</code>, <code>report.pdf</code> and other report directories are not read. </> : null}
@@ -275,7 +280,7 @@ export function Manuscript({ view, route, getView }: { view: ManuscriptView; rou
         {view.problems.length === 0 ? null : <ul role="note" className="stemma-broken">{view.problems.map((p, i) => <li key={i}><Text value={p} /></li>)}</ul>}
         <Reading view={view} open={open} />
       </main>
-      {route.kind === "text" ? null : <Pane key={open} view={view} route={route} getView={getView} />}
+      {route.kind === "text" ? null : <Pane key={open} view={view} route={route} getView={getView} from={from} />}
     </div>
   );
 }

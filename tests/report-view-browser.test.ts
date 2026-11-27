@@ -199,6 +199,26 @@ describe.skipIf(!browser)("the worked example's report in the page", () => {
     expect(seen).toEqual(quiet);
   }, 60_000);
 
+  test("a note's quotation ends as the printed note does, and stays in sight when it is the copy clicked", async () => {
+    const { page, seen } = await offline(path, { width: 390, height: 800 });
+    await control(page, "Manuscript").click();
+    // The first paragraph of a note holds its cited quotations; a comment quotes as running text.
+    const copies = page.locator(".stemma-notes > li > p:first-child a.stemma-quotation");
+    for (const text of await copies.allInnerTexts()) expect(text).toMatch(/[.?!]”$/);
+    const copy = copies.nth(40);
+    await copy.scrollIntoViewIfNeeded();
+    await copy.click();
+    await pane(page).locator("mark").first().waitFor();
+    const id = (await copy.getAttribute("data-quotation"))!;
+    const at = await page.evaluate((quotation) => ({
+      clicked: document.querySelector(`.stemma-notes > li > p:first-child a[data-quotation="${quotation}"]`)!.getBoundingClientRect().top,
+      pane: document.querySelector(".stemma-pane")!.getBoundingClientRect().top,
+    }), id);
+    expect(at.clicked).toBeGreaterThanOrEqual(0);
+    expect(at.clicked).toBeLessThan(at.pane);
+    expect(seen).toEqual(quiet);
+  }, 60_000);
+
   test("axe-core reports no violation in the manuscript with a source open", async () => {
     const { page } = await offline(path);
     for (const route of ["#/manuscript/quotation/D37-crater", `#/manuscript/source/${view.bibliography[0]!.source}`]) {
