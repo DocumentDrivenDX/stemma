@@ -7,6 +7,8 @@
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
 #   ./scripts/dev.sh docs          regenerate website/generated/ (needs browsers)
 #   ./scripts/dev.sh docs-check    fail if website/generated/ is stale
+#   ./scripts/dev.sh record-example <store>  rerun the worked example's runs that
+#                                  need its private copy, into website/recorded/
 #   ./scripts/dev.sh site          build the website into website/dist/
 #   ./scripts/dev.sh preview       build the website and serve it on 127.0.0.1
 #   ./scripts/dev.sh browsers      fetch the pinned headless Chromium into .tools/
@@ -46,9 +48,10 @@ case "${1:-check}" in
   publish-plugin) shift; run scripts/build.ts >/dev/null && run scripts/publish-plugin.ts "$@" ;;
   docs) run website/generate.ts ;;
   docs-check) run website/generate.ts --check ;;
+  record-example) shift; run website/record-example.ts "$@" ;;
   site) run website/build.ts ;;
   preview) run website/build.ts && run website/preview.ts ;;
   browsers) mkdir -p .tools/tmp && TMPDIR="$root/.tools/tmp" run --bun node_modules/.bin/playwright install --only-shell chromium ;;
   e2e) run website/build.ts && run --bun node_modules/.bin/playwright test --config website/playwright.config.ts ;;
-  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
+  *) echo "usage: $0 check|build|demo|plugin-check|docs|docs-check|record-example|site|preview|browsers|e2e|publish-plugin" >&2; exit 2 ;;
 esac

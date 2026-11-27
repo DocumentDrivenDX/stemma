@@ -1,11 +1,12 @@
 // The committed website content must match what the current code prints, and no
 // tracked website file may hold a path from the machine that made it.
 import { describe, expect, test } from "bun:test";
-import { appendFileSync, cpSync, readFileSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { GENERATED, LOCAL_PATH, normalise, staleness } from "../website/generate.ts";
 import { colorTokens, contrast, measured, PAIRS } from "../website/lib/contrast.ts";
+import { RECORDED, recordExample } from "../website/record-example.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
 /** Website files git tracks or would add. */
@@ -50,6 +51,22 @@ describe("generated website content", () => {
     const sample = ["", "Users", "someone", "book"].join("/");
     expect(() => normalise(`saved to ${sample}`, [])).toThrow("local path");
     expect(normalise(`saved to ${sample}`, [[sample, "$DEMO"]])).toBe("saved to $DEMO");
+  });
+});
+
+describe("recorded runs of the worked example", () => {
+  const store = join(ROOT, "examples/.sources/store");
+  test.skipIf(!existsSync(store))("match a fresh run (skipped where the private copy is absent)", async () => {
+    for (const [path, text] of await recordExample(store)) expect(readFileSync(join(RECORDED, path), "utf8")).toBe(text);
+  }, 60_000);
+
+  test("show what the site says they show", () => {
+    const withCopy = readFileSync(join(RECORDED, "example-with-copy.txt"), "utf8");
+    expect(withCopy).toContain("OPEN FINDINGS: 0 problem(s), 0 could not be checked");
+    expect(withCopy).toContain("deny-|ing");
+    const trial = readFileSync(join(RECORDED, "example-trial.txt"), "utf8");
+    expect(trial).toContain("OPEN FINDINGS: 2 problem(s)");
+    expect(trial).toContain("found on printed page 88; the citation gives 412");
   });
 });
 
