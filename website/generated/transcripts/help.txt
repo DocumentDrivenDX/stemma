@@ -40,6 +40,10 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   excerpt --source <id> --pages <printed pages> | --passage <id> | --citation <id> | --quotation <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
+  unreviewed list
+             records whose review mark does not apply, with their passages; writes nothing
+  reviewed <id@sha256>... --actor person:<name>
+             record that the author said they reviewed these, as listed; a mark is not proof
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
   graph export --audience author [--page] [--out <dir>]

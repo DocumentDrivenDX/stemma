@@ -25,7 +25,7 @@ export interface Excerpt {
 }
 
 /** A token that appears nowhere in the data, so that nothing in the data can mark where it starts or ends. */
-function boundaryFor(data: string): string {
+export function boundaryFor(data: string): string {
   let boundary = sha256(data).slice(0, 16);
   while (data.includes(boundary)) boundary = sha256(boundary).slice(0, 16);
   return boundary;

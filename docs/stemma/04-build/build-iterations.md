@@ -7,7 +7,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | # | Iteration | Specs | Needs | State |
 |---|---|---|---|---|
 | 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Takeover session; the manuscript reader is on main, checks do not use it yet |
-| 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | Open |
+| 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | On main; an author's own edit still lapses a review mark (FR-23) |
 | 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover session; import codecs on main (0.0.15), no commands, no export after edits or across formats |
 | 4 | Citation formatter | ADR-005 | — | On main |
 | 5 | Basic PDF build | FR-83, 39, 35 | 1, 4 | Report build on main; draft, camera-ready and reviewer builds not |

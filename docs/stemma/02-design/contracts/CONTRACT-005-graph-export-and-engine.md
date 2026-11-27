@@ -401,15 +401,16 @@ has `report/report.json`, that file and the template it names (L); one that is
 missing or cannot be read counts as `unreadable`; pages show its first 12 characters. `graph status` compares it, so a
 manuscript edit makes an export stale.
 
-**States as built.** `unreviewed` (a cited claim or source that the check report
-counts as unreviewed or not admitted, and any record whose review mark does not
-apply, CONTRACT-001 G), `retired_link` (a reference to a retired record),
+**States as built.** `unreviewed` (a record that the check report counts as
+unreviewed or not admitted: a cited claim, its attestations and evidence notes,
+or a cited source; and any record carrying a review mark that does not apply,
+CONTRACT-001 G and CONTRACT-002 B1), `retired_link` (a reference to a retired record),
 `annotated`, and `open_finding`. The last two come only from checks whose inputs
 the data identity covers and that read no tool version or saved lookup:
 `record.valid`, `source.held`, `source.pages`, `source.labels`,
 `source.footnotes`, `source.changed`, `cite.key`, `bib.uncited`,
-`quote.present`, `quote.page`, `locator.extent`, and `number.present`. The
-manifest names the checks left out. `support_missing`, `support_stale`, and
+`quote.present`, `quote.page`, `locator.extent`, `number.present`, and
+`claim.complete`. The manifest names the checks left out. `support_missing`, `support_stale`, and
 `support_unsupported` are not computed; the manifest and page say so, and a
 record with no state is not shown to be clear.
 

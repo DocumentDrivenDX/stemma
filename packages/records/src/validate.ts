@@ -12,7 +12,7 @@ export type ProblemCode =
   | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
   | "number_not_integer" | "bad_size" | "bad_original" | "bad_page_label" | "bad_part" | "model_verification"
-  | "response_digest_mismatch" | "bad_address" | "bad_binding" | FormatProblem | PageProblem;
+  | "response_digest_mismatch" | "bad_address" | "bad_binding" | "note_without_passage" | FormatProblem | PageProblem;
 
 export interface Problem {
   reason: "record_invalid" | "record_misplaced" | "reference_dangling" | "unknown_field";
@@ -153,6 +153,11 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
     if (anchor.length === 0 || anchor.some((a) => !isObject(a) || !(Number(a.end) > Number(a.start)) || Number(a.start) < 0)) {
       problems.push(invalid("bad_address", "/anchor"));
     }
+  }
+  // CONTRACT-001 G. A comment is a remark of its writer's own and needs no passage.
+  if (record.kind === "note" && (record.type === "extract" || record.type === "paraphrase")
+    && (record.passages === undefined || (Array.isArray(record.passages) && record.passages.length === 0))) {
+    problems.push(invalid("note_without_passage", "/passages"));
   }
   if (record.kind === "citation" && isObject(record.sentence)) {
     const { text, sha256: stated } = record.sentence;

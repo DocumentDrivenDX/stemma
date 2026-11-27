@@ -85,6 +85,10 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     summary: "Lists the passages, notes, claims and citations that rest on a source file or source since retired, on page text that has changed since a passage was captured, or on a passage captured before the source's details changed.",
     limits: "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded; a citation written in a manuscript with no record is not compared with retired files, and the report says so. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
   },
+  "claim.complete": {
+    summary: "Each claim record must have a confidence level, a reason, and a note behind it, linked through an attestation.",
+    limits: "It counts what is there. It does not show that the note supports the claim, that the reason is good or that the confidence is right, and the note's stance does not matter. It reads claim records only, not manuscript files.",
+  },
   "coordinate.stray": {
     summary: "Warns about written map coordinates in project files, without repeating the value.",
     limits: "Recognizes only geo: addresses, degrees with N, S, E and W, and comma-separated decimal pairs with at least three decimal places. It cannot tell whether a site is restricted.",
