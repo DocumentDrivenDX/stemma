@@ -66,7 +66,14 @@ export function parseAttributes(text: string): Record<string, string> {
 }
 
 /** Lines that are empty at either edge are layout, not content. */
-export const trimLines = (text: string): string => text.replace(/^(?:[ \t]*\n)+/, "").replace(/(?:\n[ \t]*)+$/, "");
+export const trimLines = (text: string): string => {
+  const trimmed = text.replace(/^(?:[ \t]*\n)+/, "");
+  // Read from the end: a pattern anchored there is tried at every line of every part.
+  let start = trimmed.length;
+  while (start > 0 && " \t\n".includes(trimmed[start - 1]!)) start--;
+  const first = trimmed.indexOf("\n", start);
+  return first < 0 ? trimmed : trimmed.slice(0, first);
+};
 
 /** Parses a body into blocks. `from` is the line number of the body's first line. */
 export function parseBlocks(body: string, from = 1): { blocks: Block[]; problems: Located[] } {
