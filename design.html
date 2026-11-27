@@ -41,9 +41,9 @@
 </div></section>
 <section class="band"><div class="band-head"><h2>Type</h2></div><div class="band-body">
 <p>Three families under the SIL Open Font License, served from this site: Source Serif 4 for headings, Inter for text, JetBrains Mono for command output and identifiers. Source Serif 4 also sets quoted words, at its optical sizes and with its own italic. Their licence texts are published beside the font files: <a href="fonts/LICENSE-source-serif-4.txt">Source Serif 4</a>, <a href="fonts/LICENSE-inter.txt">Inter</a>, <a href="fonts/LICENSE-jetbrains-mono.txt">JetBrains Mono</a>. Only Latin and extended Latin are bundled; other scripts fall back to system fonts.</p>
-<p class="specimen-display">A line of descent to a stored source</p>
+<p class="specimen-display">A line of descent back to each source</p>
 <p class="specimen-quote">Some fields were abandoned by their holders.</p>
-<p>A citation rests on a source record and a stored copy.</p>
+<p>A citation rests on a source record and the text of the source.</p>
 <p class="specimen-mono">src-demo0harbour01 &nbsp; cite.key &nbsp; 0O 1lI</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Spacing and shape</h2></div><div class="band-body">
@@ -53,7 +53,7 @@
 <h3>Page layout</h3>
 <p>A page opens with its title. On wide screens each section's heading sits in the margin and stays in view while the section is read; on narrow screens it sits above the text. Running text keeps a short line; transcripts and entries may use the whole column.</p>
 <h3>Drawings</h3>
-<p>The <a href="how.html#loop">research cycle</a>, the <a href="how.html#rounds">demo's rounds of checking</a>, <a href="how.html#places">where material lives</a> and the <a href="darwin.html#pages">example's page map</a> are drawn with HTML and lines, so the words in each drawing are its text.</p>
+<p>The <a href="how.html#loop">research cycle</a>, the <a href="how.html#rounds">demo's rounds of checking</a>, <a href="how.html#places">where material lives</a> and the <a href="darwin.html#pages">example's page numbers</a> are drawn with HTML and lines, so the words in each drawing are its text.</p>
 <h3>Line of descent</h3>
 <p>The drawing on the <a href="index.html#descent">first page</a> is a nested list of records with lines drawn between them, so its text is the drawing. As in the mark, the filled node is the one the rest descend from. Its caption says where it came from.</p>
 <h3>Status label</h3>
@@ -70,11 +70,11 @@ Full report: $PROJECTS/clean/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
 <h3>Finding</h3>
 <p>Fixed order: outcome and check, what is wrong, why it matters, what to do, evidence. The example is filled from a real JSON report.</p>
-<article class="finding" aria-label="record.valid unverifiable">
-<p class="finding-id"><span class="status status-unverifiable">unverifiable</span> <code>record.valid</code> <code>record_unreadable</code></p>
-<p class="message">A file cannot be read as a record, so nothing in it was checked.</p>
-<dl><div><dt>Why it matters</dt><dd>Every other check reads these files. A broken record can hide a citation problem or create a false one.</dd></div><div><dt>What to do</dt><dd>Open the named file and repair it (look for merge-conflict markers, a repeated key or a missing bracket), or restore it from git. Stemma does not guess its content.</dd></div></dl>
-<ul class="evidence" aria-label="Evidence"><li>records/agents/agt-fixture0broken001.json</li><li>file: records/agents/agt-fixture0broken001.json</li><li>problem: duplicate_key</li></ul>
+<article class="finding" aria-label="meta.resolver unverifiable">
+<p class="finding-id"><span class="status status-unverifiable">unverifiable</span> <code>meta.resolver</code> <code>no_lookup</code></p>
+<p class="message">The source's details have not been compared with any catalogue: no lookup is saved.</p>
+<dl><div><dt>Why it matters</dt><dd>A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.</dd></div><div><dt>What to do</dt><dd>Give the source's upstream record an identifier to look up, or run `resolve &lt;source id&gt; --via crossref|internet_archive --identifier &lt;value&gt;`. Some works are in neither catalogue.</dd></div></dl>
+<ul class="evidence" aria-label="Evidence"><li>src-fixture0harbour01</li><li>source file: records/sources/src-fixture0harbour01.json</li><li>key: hartwell1998</li></ul>
 </article>
 <h3>Figure</h3>
 <p>A screenshot or drawing has alternative text, a caption that says how it was made, and the same content available as text. A rendered page is never presented as a terminal window or as a Stemma screen.</p>

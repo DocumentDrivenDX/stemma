@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="description" content="Create academically rigorous research reports and books with Claude. Stemma checks citations against your own stored copies. Pre-release.">
+<meta name="description" content="Create academically rigorous research reports and books with Claude. Stemma checks citations and quotations against the sources in your project. Pre-release.">
 <title>Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
@@ -19,62 +19,63 @@
 </header>
 <main id="main" tabindex="-1" class="shell page">
 <div class="opening opening-home"><h1>Create academically rigorous research reports and books</h1>
-<p class="lead">Research and write with Claude. The Stemma plugin keeps your sources in order, checks your citations against your own copies of them, and explains what it finds in plain language.</p>
+<p class="lead">Research and write with Claude. The Stemma plugin keeps your sources in your project, checks your citations and quotations against them, and explains what it finds in plain language.</p>
 <p class="actions"><a class="button button-primary" href="install.html">Get started</a> <a class="button" href="how.html">See how it works</a> <span class="stage">Pre-release</span></p></div>
 <section class="band"><div class="band-head"><h2>Why rigor takes more</h2></div><div class="band-body">
 <p class="statement">An AI assistant can produce a reference that does not exist, give a real title the wrong author, cite a page the work does not have, or invent a quotation.</p>
-<p>Checking all of that by hand can cost the time the assistant saved. With Stemma, the comparing that a computer can do reliably is done for you, against your own copies. The report also tells you what it did not check, so you know where to look yourself.</p>
+<p>Checking all of that by hand can cost the time the assistant saved. With Stemma, the comparing that a computer can do reliably is done for you, against your own sources. The report also tells you what it could not check, so you know where to look yourself.</p>
 </div></section>
 <section class="spread" aria-labelledby="cycle">
 <h2 id="cycle">Research in rounds</h2>
 <p>Research is rarely finished in one pass. You find another source, get a better scan, or rewrite a sentence. Stemma fits that loop.</p>
 <figure class="cycle">
-<ol aria-label="The research cycle"><li><h3>Gather</h3><p class="who">You and Claude</p><p>Choose a work. Claude writes down what it is and where each detail came from.</p></li><li><h3>Keep and read</h3><p class="who">Claude and scripts</p><p>Your copy goes into a private store. Its text is read page by page, and page numbers are proposed for review.</p></li><li><h3>Write and cite</h3><p class="who">You and Claude</p><p>Research and write. Each citation is recorded with its sentence, page and any quotation.</p></li><li><h3>Check</h3><p class="who">Scripts</p><p>The records are compared with your copies. Every finding comes with its evidence and a suggestion.</p></li><li><h3>Decide</h3><p class="who">You</p><p>Look at the page, then fix, replace or leave it. Nothing waits for you.</p></li></ol>
+<ol aria-label="The research cycle"><li><h3>Gather</h3><p class="who">You and Claude</p><p>Choose a work. Claude writes down what it is and where each detail came from.</p></li><li><h3>Capture and read</h3><p class="who">Claude and scripts</p><p>Your copy becomes text files in your project, page by page. Page numbers are proposed for review.</p></li><li><h3>Write and cite</h3><p class="who">You and Claude</p><p>Research and write. Each citation is recorded with its sentence, page and any quotation.</p></li><li><h3>Check</h3><p class="who">Scripts</p><p>The records are compared with your sources. Every finding comes with its evidence and a suggestion.</p></li><li><h3>Decide</h3><p class="who">You</p><p>Look at the page, then fix, replace or leave it. Nothing waits for you.</p></li></ol>
 <p class="cycle-return">Then go round again: a new source, a better scan, a corrected sentence. Check as often as you like.</p>
 </figure>
 <p><a href="how.html">How a round works, step by step</a></p>
 </section>
 <section class="spread" aria-labelledby="descent">
 <h2 id="descent">Every citation has a family tree</h2>
-<p>Scholars draw a <em>stemma codicum</em> to show which copy of a manuscript comes from which. Stemma does something similar for your work: each citation leads back to a record of the source, and from there to the copy you hold.</p>
+<p>Scholars draw a <em>stemma codicum</em> to show which copy of a manuscript comes from which. Stemma does something similar for your work: each citation leads back to the words and page it came from, to the text of the source in your project, and to the original that text was made from.</p>
 <figure class="descent">
 <div class="descent-head"><p class="descent-title"><cite>The Structure and Distribution of Coral Reefs</cite></p>
 <p>Charles Darwin, 1842. The source record.</p><p class="record"><code>src-darwinreefs1842</code></p></div>
 <ul class="descent-tree" aria-label="What descends from the source record">
-<li><div class="held"><p class="descent-kind">Stored copy</p><p>A PDF, kept privately</p><p class="record"><code>cap-7sskba1cqwz7975wsc1v</code></p></div>
-<ul><li><p class="descent-kind">Its text</p><p>Unverified character recognition</p><p class="record"><code>ext-kb8hzwcvz40x3yyaxnkt</code></p></li></ul></li>
+<li><div class="held"><p class="descent-kind">The original</p><p>A PDF, known by its fingerprint and not published here</p><p class="record"><code>ups-kbcb4f2s3c2qjwbvf9f9</code></p></div>
+<ul><li><p class="descent-kind">Its source files</p><p>258 pages of unverified character recognition</p><p class="record"><code>txt-bm6whwjm6vv9ce26mgbr</code></p></li></ul></li>
 <li><p class="descent-kind">Cited at page 2</p><blockquote><p>I have invariably used in this volume the term</p></blockquote><p class="record"><code>cit-darwinreefs0003</code></p></li>
 <li><p class="descent-kind">Cited at page 88</p><blockquote><p>The theory most generally received on the formation of atolls, is that they are based on submarine craters</p></blockquote><p class="record"><code>cit-darwinreefs0001</code></p></li>
 <li><p class="descent-kind">Cited at page 89</p><blockquote><p>this view inapplicable to the greater number of atolls</p></blockquote><p class="record"><code>cit-darwinreefs0002</code></p></li>
 <li><p class="descent-kind">Cited at page 89</p><blockquote><p>I am far from denying that a reef like a perfectly characterized atoll might not be formed</p></blockquote><p class="record"><code>cit-darwinreefs0004</code></p></li>
 </ul>
-<figcaption>This site's drawing of the record files in the <a href="darwin.html">worked example</a>; it is not a Stemma screen. An AI model compared the quotations with images of the pages; no person has confirmed them.</figcaption>
+<figcaption>This site's drawing of the files in the <a href="darwin.html">worked example</a>; it is not a Stemma screen. A script copied the quotations from passages an AI model chose, and the model compared them with images of the pages; no person has confirmed them.</figcaption>
 </figure>
 </section>
 <section class="band"><div class="band-head"><h2>What gets checked</h2></div><div class="band-body">
-<dl class="entries"><div><dt>Your sources</dt><dd>Do you have a copy of each work you cite, and is its text still the same? If you replace a copy, you see what relied on the old one.</dd></div><div><dt>Your quotations</dt><dd>Are the words in your copy's text? If something close is there instead, you see both side by side.</dd></div><div><dt>Your page numbers</dt><dd>Is each page you cite actually in the work, or among the pages numbered in your copy?</dd></div><div><dt>Your references</dt><dd>Does each citation point to one source? Is each work you list actually cited? Are the project files in order? You are also warned about map coordinates written into them.</dd></div></dl>
+<dl class="entries"><div><dt>Your sources</dt><dd>Is each work you cite in your project, with its text complete and unchanged? If you replace one, you see what relied on the old one.</dd></div><div><dt>Your quotations</dt><dd>Are the words in your source's text, on the page you cite? If something close is there instead, you see both side by side.</dd></div><div><dt>Your page numbers</dt><dd>Is each page you cite actually in the work, and do its printed page numbers run on sensibly?</dd></div><div><dt>Your source details</dt><dd>Do authors, titles and dates agree with the title page and with saved library catalogue records? Where they differ, you see both.</dd></div><div><dt>Your references</dt><dd>Does each citation point to one source? Is each work you list actually cited? Is a figure you attribute to a source in its text? Are the project files in order? You are also warned about map coordinates written into them.</dd></div></dl>
 <p><a href="checks.html">Each check, and what passing it does not tell you</a></p>
 </div></section>
 <section class="band"><div class="band-head"><h2>When a quotation differs</h2></div><div class="band-body">
-<p>In our made-up demo book, one citation quotes <q>All fields were abandoned by their holders.</q> The source's text begins with a different word. Stemma shows you both, so you can look at the page and decide.</p>
-<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run of the demo: one finding of two, exactly as the tool printed it. All names and sources are invented. When you use Stemma, Claude explains findings like this to you.</figcaption><pre tabindex="0">2. <span class="v-bad">PROBLEM</span>: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+<p>In our made-up demo book, one typed citation quotes <q>All fields were abandoned by their holders.</q> The source's text begins with a different word. Stemma shows you both, so you can look at the page and decide.</p>
+<figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run of the demo: one finding of five, exactly as the tool printed it. All names and sources are invented. When you use Stemma, Claude explains findings like this to you.</figcaption><pre tabindex="0">5. <span class="v-bad">PROBLEM</span>: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
    Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
-   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
    - cit-demo0quote0002
        citation file: records/citations/cit-demo0quote0002.json
        key: levy1911
        cited text: All fields were abandoned by their holders.
        match: near
        profile: quote-fold/0
-       stored text: Some fields were abandoned by their holders.
-       extraction file: records/extractions/ext-random0002.json
-       found on: printed page 2 (file index 2)
+       source passage: Some fields were abandoned by their holders.
+       source text: sources/levy1911/source.md
+       found on: printed page 2 (index 2)
+       address: txt-random0002/2:main:0-44
        text method: text_layer, quality unassessed</pre></figure>
 <p><a href="examples.html#demo">The whole demo, step by step</a></p>
 </div></section>
 <section class="band"><div class="band-head"><h2>What stays yours</h2></div><div class="band-body">
-<p>Judgment stays with you. A pass only means that your record agrees with the text taken from your copy, and that text can be wrong, especially when a computer read it from a scan. No check tells you that a source supports your argument.</p>
-<p>Stemma does not check authors, titles or dates against a library catalogue or your copies, or whether a figure you quote appears in the source. It does not read your manuscript files; it checks the citations that have been recorded. Nothing ever stops you from writing.</p>
+<p>Judgment stays with you. A pass only means that your record agrees with the text made from your source, and that text can be wrong, especially when a computer read it from a scan. No check tells you that a source supports your argument.</p>
+<p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It does not read your manuscript files; it checks the citations that have been recorded. Nothing ever stops you from writing.</p>
 </div></section>
 <section class="band"><div class="band-head"><h2>Part of a family</h2></div><div class="band-body">
 <p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it.</p>

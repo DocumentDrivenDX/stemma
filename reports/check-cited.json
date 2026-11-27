@@ -2,127 +2,14 @@
   "body": {
     "changed": [],
     "inputs": {
-      "blobs": [],
       "corpus_sha256": "42974ec440081b6f7ed8d7634f76094ab3778a4a67defbd6c45affe1e3be3897",
       "manuscript": [],
-      "profiles": []
+      "profiles": [],
+      "research": []
     },
     "label": "open_findings",
     "mode": "work",
-    "not_run": [
-      {
-        "check": "build.uncommitted",
-        "reason": "input_absent"
-      },
-      {
-        "check": "changelog.missing",
-        "reason": "input_absent"
-      },
-      {
-        "check": "cite.format",
-        "reason": "input_absent"
-      },
-      {
-        "check": "cite.unlinked",
-        "reason": "input_absent"
-      },
-      {
-        "check": "claim.complete",
-        "reason": "input_absent"
-      },
-      {
-        "check": "claim.inactive",
-        "reason": "input_absent"
-      },
-      {
-        "check": "construct.complete",
-        "reason": "input_absent"
-      },
-      {
-        "check": "construct.credit",
-        "reason": "input_absent"
-      },
-      {
-        "check": "draft.marked",
-        "reason": "input_absent"
-      },
-      {
-        "check": "id.resolves",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.alt",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.credit",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.font",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.metadata",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.permission",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.placement",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.resolution",
-        "reason": "input_absent"
-      },
-      {
-        "check": "image.vector",
-        "reason": "input_absent"
-      },
-      {
-        "check": "locator.extent",
-        "reason": "input_absent"
-      },
-      {
-        "check": "meta.resolver",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "meta.source",
-        "reason": "input_absent"
-      },
-      {
-        "check": "number.present",
-        "reason": "not_implemented"
-      },
-      {
-        "check": "package.leak",
-        "reason": "input_absent"
-      },
-      {
-        "check": "quote.present",
-        "reason": "input_absent"
-      },
-      {
-        "check": "quote.self",
-        "reason": "input_absent"
-      },
-      {
-        "check": "restricted.leak",
-        "reason": "input_absent"
-      },
-      {
-        "check": "support.current",
-        "reason": "input_absent"
-      },
-      {
-        "check": "takeover.removal",
-        "reason": "input_absent"
-      }
-    ],
+    "not_run": [],
     "redaction": "none",
     "results": [
       {
@@ -276,6 +163,41 @@
       },
       {
         "annotations": [],
+        "check": "meta.resolver",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "source_file",
+            "value": "records/sources/src-fixture0harbour01.json"
+          },
+          {
+            "class": "metadata",
+            "name": "key",
+            "value": "hartwell1998"
+          }
+        ],
+        "finding_key": "b0dacef924e996263f91847efe05109797a0eddcc2bf7fd16903ef9aa0d84821",
+        "fixes": [
+          "resolve"
+        ],
+        "item": {
+          "content_sha256": "68d57bc342eff21750daa51f3bab0a68e6ae1d17ecaad162054cf2054fe752c2",
+          "record": "src-fixture0harbour01"
+        },
+        "message": "The source's details have not been compared with any catalogue: no lookup is saved.",
+        "open": true,
+        "outcome": "unverifiable",
+        "reason_code": "no_lookup",
+        "rules": [],
+        "source": "src-fixture0harbour01",
+        "subject": "src-fixture0harbour01",
+        "suggestions": [
+          "Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."
+        ],
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation."
+      },
+      {
+        "annotations": [],
         "check": "record.valid",
         "evidence": [
           {
@@ -405,17 +327,17 @@
         ],
         "finding_key": "895b2a0166db30671baab84bc98c6605db838c137a79e16455de3770a7635299",
         "fixes": [
-          "add_copy",
+          "capture_source",
           "remove_citation"
         ],
         "item": {
           "content_sha256": "ef727f0a8ba832a8b68e81893791d02f2ce8e755393c0bfd54ce0dfb4ab3fcab",
           "record": "cit-fixture0good00001"
         },
-        "message": "A cited source has no stored copy, so this citation is unchecked.",
+        "message": "A cited source has no source file in the project, so this citation is unchecked.",
         "open": true,
         "outcome": "fail",
-        "reason_code": "no_copy",
+        "reason_code": "no_source_file",
         "rules": [],
         "sentence": {
           "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
@@ -424,29 +346,32 @@
         "source": "src-fixture0harbour01",
         "subject": "cit-fixture0good00001",
         "suggestions": [
-          "Add your copy (`source add <file> --source <id>`). For a book you hold only on paper, add a scan and attach its text. Writing can carry on meanwhile."
+          "Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile."
         ],
-        "why": "Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked."
+        "why": "Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked."
       }
     ],
     "scope": "all",
     "summary": {
       "confirmed": 0,
-      "could_not_check": 0,
+      "could_not_check": 1,
       "dismissed": 0,
       "fail": 1,
-      "not_implemented": 2,
-      "open": 1,
+      "not_implemented": 0,
+      "open": 2,
       "pass": 11,
       "unreviewed": 0,
-      "unverifiable": 0
+      "unverifiable": 1
     },
     "tools": {
       "bun": "1.4.5",
+      "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.3"
+      "stemma": "0.0.4",
+      "stemma-convert": "1"
     },
-    "unreviewed": []
+    "unreviewed": [],
+    "verification": []
   },
   "run": {
     "started": "(removed)",
