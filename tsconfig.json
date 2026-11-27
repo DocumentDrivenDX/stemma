@@ -26,5 +26,5 @@
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["packages/*/src", "scripts", "tests", "website/*.ts", "website/lib", "website/e2e"]
+  "include": ["packages/*/src", "packages/explorer/build.ts", "scripts", "tests", "website/*.ts", "website/lib", "website/e2e"]
 }

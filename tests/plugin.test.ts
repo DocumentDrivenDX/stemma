@@ -128,6 +128,16 @@ describe("what is released", () => {
     expect(readFileSync(join(plugin, "dist/stemma.js"), "utf8")).toContain("WorkerMessageHandler");
   });
 
+  test("beside it go the explorer page template and the licenses of the code in the page", () => {
+    const template = readFileSync(join(plugin, "dist/explorer.template.html"), "utf8");
+    for (const mark of ["__STEMMA_BANNER_JSON__", "__STEMMA_MODULE_JSON__", "__STEMMA_GRAPH_JSON__"]) expect(template.split(mark)).toHaveLength(2);
+    expect(readdirSync(join(plugin, "dist/explorer-licenses")).sort()).toEqual([
+      "arras-ui.md", "graphql.txt", "react-dom.txt", "react.txt", "scheduler.txt", "tailwindcss.txt", "tanstack-query-core.txt", "tanstack-react-query.txt",
+    ]);
+    // A page an author passes on carries the licenses with it.
+    expect(template).toContain("=== graphql.txt ===");
+  });
+
   test("no built command line is tracked in this repository", () => {
     const tracked = Bun.spawnSync(["git", "ls-files", "-z"], { cwd: ROOT }).stdout.toString().split("\0");
     expect(tracked.filter((f) => f.startsWith("dist/") || f.endsWith("stemma.js"))).toEqual([]);

@@ -1,8 +1,9 @@
 // Bundles the command line to dist/stemma.js and assembles the release tree
 // dist/release/ that the organization marketplace publishes. dist/ is not committed.
-import { cpSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { isBuiltin } from "node:module";
 import { join } from "node:path";
+import { buildTemplate, explorerLicenses } from "../packages/explorer/build.ts";
 
 const root = join(import.meta.dir, "..");
 
@@ -24,6 +25,14 @@ export function unresolvedImports(bundle: string): string[] {
   return imports.map((i) => i.path).filter((path) => !isBuiltin(path) && !path.startsWith("bun:"));
 }
 
+/** The explorer page template, which the command line finds beside itself, with the licenses of the code in it. */
+export async function writeExplorer(outdir: string): Promise<void> {
+  writeFileSync(join(outdir, "explorer.template.html"), await buildTemplate());
+  const licenses = join(outdir, "explorer-licenses");
+  mkdirSync(licenses, { recursive: true });
+  for (const [name, text] of Object.entries(explorerLicenses())) writeFileSync(join(licenses, name), text);
+}
+
 export async function bundle(outdir: string): Promise<string> {
   const built = await Bun.build({
     entrypoints: [join(root, "packages/cli/src/main.ts")],
@@ -34,6 +43,7 @@ export async function bundle(outdir: string): Promise<string> {
   const left = unresolvedImports(readFileSync(path, "utf8"));
   if (left.length > 0) throw new Error(`unresolved imports in the bundle: ${left.join(", ")}`);
   copyPdfData(outdir);
+  await writeExplorer(outdir);
   return path;
 }
 
@@ -46,6 +56,8 @@ if (import.meta.main) {
   mkdirSync(join(release, "dist"));
   cpSync(built, join(release, "dist/stemma.js"));
   cpSync(join(dist, "pdfjs"), join(release, "dist/pdfjs"), { recursive: true });
+  cpSync(join(dist, "explorer.template.html"), join(release, "dist/explorer.template.html"));
+  cpSync(join(dist, "explorer-licenses"), join(release, "dist/explorer-licenses"), { recursive: true });
   cpSync(join(root, "skills"), join(release, "skills"), { recursive: true });
   // The launcher is the only script the plugin ships.
   mkdirSync(join(release, "scripts"));

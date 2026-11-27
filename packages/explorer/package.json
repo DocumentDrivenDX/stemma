@@ -1,0 +1,6 @@
+{
+  "name": "@stemma/explorer",
+  "private": true,
+  "type": "module",
+  "exports": "./build.ts"
+}

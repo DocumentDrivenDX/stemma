@@ -38,6 +38,9 @@
         "@stemma/records": "workspace:*",
       },
     },
+    "packages/explorer": {
+      "name": "@stemma/explorer",
+    },
     "packages/extract": {
       "name": "@stemma/extract",
     },
@@ -137,6 +140,8 @@
     "@stemma/cli": ["@stemma/cli@workspace:packages/cli"],
 
     "@stemma/core": ["@stemma/core@workspace:packages/core"],
+
+    "@stemma/explorer": ["@stemma/explorer@workspace:packages/explorer"],
 
     "@stemma/extract": ["@stemma/extract@workspace:packages/extract"],
 

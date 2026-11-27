@@ -1,0 +1,6 @@
+/* Tailwind for Stemma's own parts, without its reset and under a prefix, so that
+   the arras styles are as arras made them. */
+@import "tailwindcss/theme.css" layer(theme) prefix(st);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(st) source(none);
+@source "./Banner.tsx";
+@source "./host.tsx";
