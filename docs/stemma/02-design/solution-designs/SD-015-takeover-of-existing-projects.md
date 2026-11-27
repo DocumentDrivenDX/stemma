@@ -69,9 +69,10 @@ tests passing on invented files and `./scripts/dev.sh check` passing.
 | P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-117-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
 | P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the file comparison of CONTRACT-003 I for both formats; the batch field for kept-hyphen words and, here or in step 5 if that comes later, the quotation rule of BR-1535 | US-117-AC1, AC10, AC11, AC13 to AC16 through the command |
 
-Steps 4 and 5 include endnotes: the manuscript reader, which today refuses
-`[^en-…]`, reads them as it reads footnotes, the writer writes them, and every
-check over the copy reads them (FR-96). The basic PDF prints them (SD-008).
+Steps 4 and 5 include endnotes (FR-96). The manuscript reader reads `[^en-…]`
+as it reads footnotes, keeping each note's kind, and the checks that read the
+copy read both. The writer, which is not built, writes them, and the basic PDF,
+which is not built, prints them (SD-008).
 
 After P4, run the developer report script on PDF manuscripts the author supplies,
 privately; commit only counts and invented reproductions. Every producer stays
