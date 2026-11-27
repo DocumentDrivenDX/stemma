@@ -125,8 +125,7 @@
   .drawing-scroll { overflow-x: auto; }
   /* Said only where a drawing is wider than its plate. */
   .scroll-hint { display: none; margin-bottom: var(--stm-space-2); font: italic 400 0.9375rem/1.4 var(--stm-font-serif); color: var(--arras-color-text-muted); }
-  @media (max-width: 35.99rem) { .scrolls .scroll-hint { display: block; } }
-  @media (max-width: 49.99rem) { .scrolls-flow .scroll-hint { display: block; } }
+  @media (max-width: 49.99rem) { .scrolls .scroll-hint { display: block; } }
   /* The renderer's outermost group is dashed, and children would inherit it. */
   .lini :is(g, rect, path, line, polygon) { stroke-dasharray: none; }
   .lini .lini-block { fill: none; stroke: none; }
@@ -165,8 +164,8 @@
   .tiles h3 { font-size: 1.125rem; margin-bottom: var(--stm-space-2); }
 
   /* A short row of large figures, each read from records or a run. */
-  .numbers { display: flex; flex-wrap: wrap; gap: var(--stm-space-4) 1.5rem; }
-  .numbers > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; flex: 0 1 8rem; min-width: 4.5rem; }
+  .numbers { display: flex; flex-wrap: wrap; gap: var(--stm-space-4) 1.25rem; }
+  .numbers > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; flex: 0 1 6rem; min-width: 4rem; }
   .numbers dt { font-size: 0.8125rem; line-height: 1.4; color: var(--arras-color-text-muted); }
   .numbers dd { font: 400 2.75rem/1.1 var(--stm-font-serif); font-optical-sizing: auto; }
 

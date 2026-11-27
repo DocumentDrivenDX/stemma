@@ -47,7 +47,7 @@ const legend = (d: Diagram) => (d.edges.some((e) => e.opposing) ? LEGEND : "");
 /** A drawing in a numbered plate. `caption` is trusted HTML and says what the drawing was made from. */
 export function figure(d: Diagram, caption: string, classes = ""): string {
   const scrolls = files(d).length === 1;
-  const kind = scrolls ? ` scrolls scrolls-${d.layout.kind}` : "";
+  const kind = scrolls ? " scrolls" : "";
   const hint = scrolls ? `<p class="scroll-hint">Scroll the drawing sideways to see all of it. The list holds the same.</p>\n` : "";
   return `<figure class="plate diagram diagram-${d.name}${kind}${classes ? ` ${classes}` : ""}">\n${hint}${drawing(d)}\n<figcaption>${caption}</figcaption>${legend(d)}\n</figure>`;
 }

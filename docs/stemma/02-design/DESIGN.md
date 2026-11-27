@@ -424,7 +424,7 @@ not by the site build, the command line, the plugin bundle, or any other test.
 | Text equivalent | A visible list directly with the figure, made from the same definition, holding the same items, links and relation words. It is never folded away or hidden from sight. The site build fails if a box's label is missing from the drawing |
 | Caption | Says that it is this site's drawing, what it was made from, and, for an example's records, that no person has reviewed them when that is so |
 | Layout | Boxes on a grid, or left to right with few boxes per column. Left-to-right chains of many boxes and top-to-bottom chains taller than the screen are not used |
-| Narrow screens | A grid drawing has a second, one-column layout shown below 36rem. A drawing that has no readable one-column layout keeps its size inside a scrolling region that can be reached by keyboard and is named, with the text equivalent after it |
+| Narrow screens | A grid drawing has a second, one-column layout shown below 36rem. A drawing that has no readable one-column layout keeps its size inside a scrolling region that can be reached by keyboard and is named, with a line saying that it scrolls and the text equivalent after it |
 | Legibility | At 320 CSS pixels the smallest text in any drawing that is shown renders at 11.5 pixels or more. A browser test measures it |
 | Labels | At most 26 characters, since the renderer does not wrap them. A longer label fails the run |
 | Encoding | Encoding for graphs and maps applies. Boxes and lines use text and strong-line tokens; no stance has a color of its own. An opposing link is dashed with a bar end. The thesis box has a double border. A legend is given where more than one line style appears |

@@ -56,7 +56,7 @@ export async function renderDiagrams(): Promise<Map<string, string>> {
         drawn.set(`${name}.svg`, await draw(diagram, undefined, 0, name, server.url.href));
       } else {
         drawn.set(`${name}.svg`, await draw(diagram, layout.order, layout.columns, name, server.url.href));
-        if (layout.narrow) drawn.set(`${name}-narrow.svg`, await draw(diagram, layout.narrow, 1, `${name}-narrow`, server.url.href));
+        drawn.set(`${name}-narrow.svg`, await draw(diagram, layout.narrow, 1, `${name}-narrow`, server.url.href));
       }
     }
     return drawn;

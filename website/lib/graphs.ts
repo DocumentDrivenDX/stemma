@@ -38,11 +38,11 @@ export interface Diagram {
   /** The drawing's description for a screen reader. */
   desc: string;
   /**
-   * A grid with its reading order, with a one-column order for narrow screens
-   * where that reads well; or a flow from left to right. Without a one-column
-   * layout, a drawing keeps its size in a scrolling region on narrow screens.
+   * A grid with its reading order and a one-column order for narrow screens; or
+   * a flow from left to right, which has no readable one-column layout and so
+   * keeps its size in a scrolling region on narrow screens.
    */
-  layout: { kind: "grid"; columns: number; order: string[]; narrow?: string[] } | { kind: "flow" };
+  layout: { kind: "grid"; columns: number; order: string[]; narrow: string[] } | { kind: "flow" };
   nodes: DiagramNode[];
   edges: DiagramEdge[];
   /** The text equivalent: the same items, links and relation words. */
@@ -83,7 +83,8 @@ function pairs(name: string, title: string, what: string, rows: { left: DiagramN
   return {
     name, title,
     desc: `${rows.length} ${what}. Each box on the left leads to the box beside it on the right.`,
-    layout: { kind: "grid", columns: 2, order: ids },
+    // In one column, only the two boxes of a pair are joined, so each pair still reads as one.
+    layout: { kind: "grid", columns: 2, order: ids, narrow: ids },
     nodes,
     edges: rows.map((_, i) => ({ from: `l${i}`, to: `r${i}` })),
     text: { label: `${rows.length} ${what}`, ordered: false, entries: rows.map((r) => ({ term: `${r.left} → ${r.right}`, says: r.says, ...(r.checks ? { checks: r.checks } : {}) })) },
@@ -221,4 +222,4 @@ export const DIAGRAMS: (() => Diagram)[] = [chain, compare, locators, reportBuil
 
 /** The files each diagram is drawn into, under website/generated/diagrams/. */
 export const files = (d: Diagram): string[] =>
-  (d.layout.kind === "grid" && d.layout.narrow ? [`${d.name}.svg`, `${d.name}-narrow.svg`] : [`${d.name}.svg`]);
+  (d.layout.kind === "grid" ? [`${d.name}.svg`, `${d.name}-narrow.svg`] : [`${d.name}.svg`]);
