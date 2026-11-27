@@ -32,6 +32,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | Next after 11 |
 | 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Requested; needs the manuscript reader and citation formatter on main |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Requested; measuring |
+| 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand |
 
 ## Iteration 24: see a citation inline with its source
 
@@ -104,6 +105,31 @@ exports hundreds of entries.
 - Where arras itself imposes a limit, take the change to arras. No private fork.
 - A synthetic large project is part of the tests, with measured export time,
   size, load time and search time.
+## Iteration 27: import DOCX and PDF manuscripts
+
+Requirement from the product owner: real book manuscripts in DOCX and in PDF can
+be imported. The Word reader is on main but no command uses it. FEAT-015 puts
+PDF-only manuscript intake out of scope; this requirement reverses that.
+
+- Specify first: change FEAT-015, FR-71, SD-015 and CONTRACT-003 for PDF
+  manuscripts.
+- One command takes a DOCX or PDF manuscript, in one file or several, to the
+  Stemma copy with its references, quotations and claims, unverified (with
+  iterations 6 and 7), and the skill drives it. Originals are never changed.
+- Both formats give the same neutral document, so matching, records and the
+  copy do not depend on the format.
+- PDF: recover body text, headings, tables, footnotes, endnotes, reference
+  lists, page labels and comments. Handle columns, running heads, line-end
+  hyphens and paragraphs split across pages. Whatever cannot be recovered with
+  certainty is reported, never guessed or silently dropped. Reuse the PDF
+  reader in `packages/extract` where it fits.
+- A PDF with no text layer is reported. Recognition (OCR) of a scanned
+  manuscript is a separate decision.
+- Keep each imported sentence's position in its original file, so the manuscript
+  browser (iteration 25) can show it there.
+- Tests use invented manuscripts. Acceptance also runs on the product owner's
+  real manuscripts, read where they are; nothing from them enters the
+  repository.
 
 ## Not completable by an agent alone
 
