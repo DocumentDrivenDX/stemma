@@ -19,7 +19,7 @@ ddx:
 **Contract ID**: CONTRACT-002
 **Type**: CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90
+**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93
 
 ## Purpose
 
@@ -101,12 +101,12 @@ absent (exit 4 if it cannot) and then runs
 | `excerpt (--passage <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text (G) | M1 |
 | `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
 | `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced source file or a record the author rejects. The files stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
-| `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close> …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding | M1 |
+| `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close\|restore_text> [--repeats] …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding. `bind` also takes a source the author names for an author-date item that has no suitable candidate, including a `year_parenthesis` item, for which it writes the citation. `restore_text` puts an occurrence that is not a citation back as the text found and retires its record; it causes no `takeover.removal` finding. Binding a reference-list item also moves every citation linked to that entry to the chosen source, and retires a provisional source nothing else uses, taking it off `bibliography_include`. `--repeats` applies one `bind` or `close` to every open item in an exact-repeat group (CONTRACT-003 F7) as one staged write, with one `round_choice` and recheck for each item; if any item cannot take it, nothing is written and that item is named. `rounds status` also counts `year_parenthesis` items and lists them on request | M1 |
 | `review import <comment file>` | Import reviewer comments (CONTRACT-005) | M3 |
 | `support list` / `support prepare <claim id> --passage <passage id>` / `support record --input <file>` | List needed verdicts as claim and passage pairs; emit the input bundle for one pair; validate and save a verdict (H) | M1 |
 | `annotate --finding <key> --effect explain\|dismiss --reason <text>` / `annotate list` | Save an annotation (F), or list annotations and whether each applies | M1 |
 | `import <file> --kind <csl-json\|biblatex\|ris> [--again]` / `export --kind <…> --out <file> [--batch <import id>] [--policy report\|strict]` | CONTRACT-003; `--again` imports bytes already imported; `--batch` exports one import batch | M1 |
-| `takeover <docx> [--library <file>…] [--again]` | CONTRACT-003 Word intake; `--again` reruns on bytes already taken over, keeping every author choice and edit | M1 |
+| `takeover <docx> [--library <file>…] [--again]` | CONTRACT-003 Word intake of one file; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit | M1 |
 | `index rebuild` / `index status` / `index dump` | Manage the derived index | M1 |
 | `research list` | List the Markdown files under `research/` by path (code-point order), each with the date its name starts with and its first level-one heading outside fenced code, both when present; a heading is cut at 200 characters, and one matching a coordinate form is not shown. Writes nothing and reports no finding; exit 0. JSON: `content_is` and `notes[]` (`path`, `date?`, `title?`, `problem?`: `cannot_read` or `title_withheld`) | M1 |
 | `research record --input <file>` / `research corpus <query>` / `research admit <id>` / `research reject <id>` / `research coverage` | Save a search and its candidates; search source files offline; record the author's decision, as `source admit` or `reject` does; coverage is P1 | M2 |
@@ -325,7 +325,10 @@ is a Stemma defect. No result requires a person's review, approval, or dismissal
 for a project to be checked clean, except that a printed page jump the checks
 cannot account for stays open until the copy or its page map changes or the
 author dismisses it. Reports group findings so that one cause is shown once with
-the items it affects.
+the items it affects. Each group shows its count and a next step; for example,
+every citation of one source with no source file is one group. Grouping is
+presentation: `body.results[]` keeps one result for each subject, and no
+outcome, count, or label changes (FR-93).
 
 **Recorded details.** A person MAY record, in a current `source_details` review
 (CONTRACT-001 G), what a title page shows. Where it covers every field a
@@ -384,6 +387,12 @@ read manuscript files that are present, no citation record stands in for them:
 `not_implemented`. `cite.key` is `unverifiable` (`source_unreadable`) when a key
 matches no source and some source record cannot be read; `bib.uncited`
 likewise (`citation_unreadable`) for unread citation records (assumptions).
+
+**Checks over a taken-over copy.** A version that provides `takeover` MUST read
+the Stemma copy: after takeover, `cite.key`, `source.held`, `quote.present`,
+`quote.page`, `locator.extent`, `number.present`, and `bib.uncited` run from it,
+and none is left `not_implemented` or `manuscript_not_read` because manuscript
+files are present (FR-73, FR-92). A citation with key `?` fails `cite.key`.
 
 **Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
 URI; degrees with a degree sign and a latitude then a longitude hemisphere

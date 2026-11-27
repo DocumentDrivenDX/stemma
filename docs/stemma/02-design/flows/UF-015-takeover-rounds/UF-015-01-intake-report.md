@@ -9,12 +9,14 @@ ddx:
     - UF-015
     - US-099
     - US-100
+    - US-113
+    - US-114
     - stemma.design-system
 ---
 
 # UF-015-01-intake-report: Intake Report Turn
 
-**User flow**: [[UF-015]] view `intake report turn` | **Stories**: [[US-099]], [[US-100]]
+**User flow**: [[UF-015]] view `intake report turn` | **Stories**: [[US-099]], [[US-100]], [[US-113]], [[US-114]]
 
 ## Scope and Fidelity
 
@@ -33,6 +35,11 @@ ddx:
 [Counts]         Notes read; citations created, bound, ambiguous, unclassified;
                  claims and quotations; reference-list entries. All in
                  effect, unverified and unreviewed.
+[Author-date]    Lists found, entries read and unread; bracketed years
+                 examined: linked, unresolved by reason, left unlinked by
+                 reason. Linked does not mean verified
+[Grouped]        Each cause once: count, places, next step; exact repeats of
+                 a reference entry as one group
 [Not read]       Tracked changes (view read), comments, text boxes, fields,
                  lost styling kinds, unconverted blocks, each with position
 [Disagreements]  Embedded data against visible text or library; duplicates.
@@ -48,6 +55,8 @@ ddx:
 |---|---|---|---|---|
 | Run line | feedback | Completion and the unchanged originals | all | US-099-AC1 |
 | Counts | content | Report counts. "Bound" means a deterministic rule found one candidate, not that it is right | all | US-101-AC5 |
+| Author-date | content | The three states add up to the number examined. Left-unlinked items are listed on request, possible narrative citations first; the turn says they are not findings and do not affect the label | all | US-113-AC8 |
+| Grouped | content | A group opens to its items; nothing is hidden. Nothing was merged | all | US-114-AC1, US-114-AC3, US-114-AC6 |
 | Not read | content | Nothing is dropped silently; long lists are paged with a total. Each kind says why it matters and what the author can do (FR-74) | all | US-099-AC4 |
 | Support level | content | An input with no real-file tests is called untested | all | US-099-AC3 |
 | Next | content | A recovered reference with no source file is reported as unchecked, and that finding cannot be dismissed. The turn says why (its quotations and pages cannot be checked) and how to close it (add the source). Unreviewed counts do not change the label | all | US-101-AC7 |
@@ -115,4 +124,4 @@ stateDiagram-v2
 ## Open Questions
 
 - Which producing tools and versions the pilot covers is open in FEAT-015: product owner with the pilot author.
-- No file saved by a real tool has been tested; the German "a.a.O." and author-date forms were missed by a prototype.
+- No file saved by a real tool has been tested; the German "a.a.O." and author-date forms were missed by a prototype. The author-date rules are untested.

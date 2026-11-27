@@ -353,7 +353,10 @@ resuming needs no saved state. A `round_choice` names its action, what it
 replaced, the affected claims, and the recheck results observed when it was
 made. A stored recheck is history; current outcomes are always recomputed.
 `remove` retires the citation and keeps the record. The latest choice by
-`chosen.at` applies.
+`chosen.at` applies. A `year_parenthesis` item records brackets that
+intake left unlinked; it asks for nothing, so it is counted and listed but is
+not remaining work. A `round_choice` with action `restore_text` records that an
+occurrence read as a citation is not one.
 
 **Review comments.** A `review_comment` is untrusted text from outside the
 project. It changes no claim. `claim_sha256` shows which claim text the

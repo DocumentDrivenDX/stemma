@@ -2279,7 +2279,8 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "unclassified_note",
     "unread_content",
     "duplicate_candidate",
-    "original_changed"
+    "original_changed",
+    "year_parenthesis"
    ]
   },
   "reason": {
@@ -2349,7 +2350,8 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
     "repoint",
     "replace",
     "bind",
-    "close"
+    "close",
+    "restore_text"
    ]
   },
   "citation": {
