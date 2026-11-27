@@ -3977,7 +3977,8 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
    "type": "string",
    "required": true,
    "values": [
-    "page_numbers"
+    "page_numbers",
+    "alternative_text"
    ]
   },
   "url": {

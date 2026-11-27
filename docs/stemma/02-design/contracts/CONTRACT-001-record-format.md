@@ -242,8 +242,10 @@ Language) 1.0.2 variable names and MUST be unique in their list. Names are in
 CONTRACT-007; its parts are never records of their own. An `upstream` record
 states where one original came from: `url` when it was fetched (absent for a
 file the author supplied), `retrieved_at` and `retrieved_by`, its `sha256`,
-`size`, and `media_type`, its `identifiers`, auxiliary files used in conversion
-(such as page-number data), and the `lookups` to make for its source. Where a
+`size`, and `media_type`, its `identifiers`, the auxiliary files retrieved with
+it (`page_numbers` data, which conversion may compare with, and a library's
+`alternative_text`, which is recorded and not converted), and the `lookups` to
+make for its source. Where a
 source has upstream records, each of its source files' originals MUST match one
 of them by hash (checked by `source.original`).
 
