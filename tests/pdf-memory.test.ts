@@ -5,10 +5,9 @@ import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { constants, deflateRawSync, deflateSync } from "node:zlib";
 import { LIMITS } from "@stemma/core";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { readInOwnProcess } from "../packages/cli/src/pdf-reading.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary } from "./helpers.ts";
 import { rawPdf, stream } from "./highlight-pdf.ts";
 import { makePdf } from "./pdf.ts";
 
@@ -26,22 +25,33 @@ function unpacksLarge(mib: number): Uint8Array {
   return rawPdf({ content: "", objects: [], contents: stream("/Filter [/FlateDecode /FlateDecode]", deflateSync(inner, { level: 9 }).toString("latin1")) });
 }
 
-const LIMIT_SAID = "needed more than the limit of 4 GiB of memory";
+const LIMIT_SAID = "needed more than the limit of 0.5 GiB of memory";
 const worker = [process.execPath, ...ISOLATION_FLAGS, join(import.meta.dir, "../packages/cli/src/highlight-worker.ts")];
 const limits = { pages: LIMITS.parts, text_bytes: LIMITS.text_bytes, milliseconds: 60_000 };
 
 let cli = "";
 /** The same build with a bound no reading fits in, to meet the bound from every command with a small file. */
 let tight = "";
+/**
+ * The same build with a bound of 0.5 GiB, which a few KB unpack past as they do
+ * past the shipped 4 GiB, in an eighth of the memory and time.
+ */
+let bounded = "";
+/** The shipped build's one statement of the bound. */
+let shippedBound: string[] = [];
 beforeAll(async () => {
-  cli = await bundle(join(temporary(), "dist"));
-  const copy = join(temporary(), "dist");
-  cpSync(dirname(cli), copy, { recursive: true });
-  tight = join(copy, "stemma.js");
-  const built = readFileSync(tight, "utf8");
+  cli = await builtCli(join(temporary(), "dist"));
   const bound = /pdf_memory_bytes: [^,\n]+/g;
-  expect(built.match(bound)).toHaveLength(1);
-  writeFileSync(tight, built.replace(bound, `pdf_memory_bytes: ${32 * 1048576}`));
+  shippedBound = readFileSync(cli, "utf8").match(bound) ?? [];
+  const rebound = (bytes: number) => {
+    const copy = join(temporary(), "dist");
+    cpSync(dirname(cli), copy, { recursive: true });
+    const path = join(copy, "stemma.js");
+    writeFileSync(path, readFileSync(path, "utf8").replace(bound, `pdf_memory_bytes: ${bytes}`));
+    return path;
+  };
+  tight = rebound(32 * 1048576);
+  bounded = rebound(512 * 1048576);
 });
 
 function run(bin: string, args: string[]) {
@@ -87,12 +97,17 @@ describe("the reading process", () => {
 });
 
 describe("every command that reads a PDF is bounded, writes nothing, and exits 5", () => {
-  test("a file of a few KB, at the real bound", () => {
+  test("a file of a few KB, at a bound the build is given; the shipped bound is the contract's 4 GiB", () => {
+    // The bound shipped is the contract's 4 GiB, stated once, and said so.
+    expect(LIMITS.pdf_memory_bytes).toBe(4 * 1073741824);
+    expect(shippedBound).toEqual(["pdf_memory_bytes: 4 * 1024 * 1024 * 1024"]);
+    expect(run(cli, ["doctor"]).out).toContain("Reading a PDF is stopped past 4 GiB of memory.");
+    // Met with the build bound at 0.5 GiB, which the same few KB unpack past.
     const made = book();
     const bomb = join(made.base, "unpacks.pdf");
     writeFileSync(bomb, unpacksLarge(512));
     const before = everything(made.project);
-    const done = run(cli, ["source", "convert", bomb, "--source", made.source, ...AUTHOR, ...CAPTURED, "--project", made.project, "--format", "json"]);
+    const done = run(bounded, ["source", "convert", bomb, "--source", made.source, ...AUTHOR, ...CAPTURED, "--project", made.project, "--format", "json"]);
     expect(done.code).toBe(5);
     // With --format json the error is the one document on standard output.
     const { error } = JSON.parse(done.out);

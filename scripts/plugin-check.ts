@@ -7,7 +7,7 @@
 //   ./scripts/dev.sh plugin-check
 // Setup fetches the pinned Bun from the npm registry. STEMMA_BUN_ARCHIVE may
 // name a local copy of that archive instead.
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { TAGS, type TagPair } from "../packages/core/src/browse-proof.ts";
@@ -16,7 +16,7 @@ import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { createHighlighter } from "../packages/server/src/highlighter.ts";
 import { makePdf } from "../tests/pdf.ts";
 import { endMcp, McpHost, stubOpener } from "../tests/mcp-run.ts";
-import { removeTemporaries } from "../tests/helpers.ts";
+import { copyExample, removeTemporaries } from "../tests/helpers.ts";
 
 const root = join(import.meta.dir, "..");
 const release = join(root, "dist/release");
@@ -162,7 +162,7 @@ run([...launcher, "graph", "status", "--project", reading]);
 // launch file as a browser would be sent it.
 async function checkBrowse(): Promise<void> {
   const served = join(base, "served");
-  cpSync(join(root, "examples/coral-reefs"), served, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
+  copyExample(served);
   // An invented PDF captured as an original, in a folder outside the project that browse is told of.
   const kept = join(base, "kept-originals");
   mkdirSync(kept);
@@ -324,3 +324,5 @@ opened in a browser here), and serves the worked example on 127.0.0.1 from the s
 (the served page is not opened in a browser here either, so no original is drawn here). The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);
+// The profile holds a whole install and its Bun. A failed run keeps it to look at.
+rmSync(base, { recursive: true, force: true });

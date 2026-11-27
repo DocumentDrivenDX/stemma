@@ -6,9 +6,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { CheckReport } from "@stemma/core";
 import { removeFromPieces, removeStamps, stampSpans } from "@stemma/extract";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary } from "./helpers.ts";
 import { makePdf } from "./pdf.ts";
 
 const V4 = [192, 0, 2, 77].join(".");
@@ -58,7 +57,7 @@ describe("download stamp rules", () => {
 describe("download stamps in a captured source", () => {
   let cli = "";
   beforeAll(async () => {
-    cli = await bundle(join(temporary(), "dist"));
+    cli = await builtCli(join(temporary(), "dist"));
   });
   const base = temporary();
   const project = join(base, "book");

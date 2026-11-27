@@ -6,13 +6,12 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type CheckReport, planResolution, readLookup } from "@stemma/core";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary } from "./helpers.ts";
 
 let cli = "";
 beforeAll(async () => {
-  cli = await bundle(join(temporary(), "dist"));
+  cli = await builtCli(join(temporary(), "dist"));
 });
 
 const AUTHOR = ["--actor", "person:author"];

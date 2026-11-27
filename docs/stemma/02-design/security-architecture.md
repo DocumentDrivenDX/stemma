@@ -103,7 +103,7 @@ Verification names the SEC criterion that tests the control.
 | TM-I-018 | Launch file in a private directory; nothing in arguments or output | `server`, `cli` | SEC-035 |
 | TM-D-010, TM-E-008 | CONTRACT-005 M rules 1, 10, 12; fixed routes | `server` | SEC-036 |
 | TM-I-019, TM-D-011 | CONTRACT-005 M, "Originals": recorded digests only, named places, no links, hashed bytes sent, size and number bounds | `server` | SEC-038 |
-| TM-T-015, TM-D-013 | CONTRACT-005 M, "Highlighting on originals": strict text equality of the re-read page, positions and visibility from drawing operators with unknown drawing, symbol fonts, and annotations over the words refused, a separate process bounded in time and memory, a pixel check that only removes | `server`, `extract`, `explorer` | SEC-043 |
+| TM-T-015, TM-D-013 | CONTRACT-005 M, "Highlighting on originals": strict text equality of the re-read page, positions and visibility from drawing operators with unknown drawing, symbol fonts, and annotations over the words refused, a separate process bounded in time and memory, a pixel check that only removes; estimates on scans are a separate, labelled answer made in the same process under the same bounds ("Estimates on scans") | `server`, `extract`, `explorer` | SEC-043 |
 | TM-E-009, TM-D-011 | CONTRACT-005 M, "Originals": canvas only, pinned pdf.js with nothing that runs or links, worker loaded with the page, unchanged policy, bounds. No process sandbox | `explorer` | SEC-039 |
 
 TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.

@@ -1,9 +1,23 @@
+import { dlopen, FFIType } from "bun:ffi";
 import { cpSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { crc32, deflateRawSync } from "node:zlib";
 
 export const ROOT = join(import.meta.dir, "..");
+
+/**
+ * The promise's value, or undefined after `ms`. The timer is cleared either way:
+ * one left waiting keeps a script such as plugin-check running until it fires.
+ */
+export async function within<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([promise, new Promise<undefined>((resolve) => (timer = setTimeout(resolve, ms, undefined)))]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 const made: string[] = [];
 /** Removes every temporary directory made so far; tests/cleanup.ts calls it. */
@@ -15,6 +29,54 @@ export function temporary(): string {
   const dir = mkdtempSync(join(tmpdir(), "stemma-test-"));
   made.push(dir);
   return dir;
+}
+
+/**
+ * clonefile(2), which copies a whole directory tree on APFS in one call, sharing
+ * the blocks until either copy is written. Undefined where it is not there.
+ */
+const clonefile = (() => {
+  if (process.platform !== "darwin") return undefined;
+  try {
+    const lib = dlopen("/usr/lib/libSystem.B.dylib", { clonefile: { args: [FFIType.cstring, FFIType.cstring, FFIType.u32], returns: FFIType.i32 } });
+    return (from: string, to: string): boolean => lib.symbols.clonefile(Buffer.from(`${from}\0`), Buffer.from(`${to}\0`), 0) === 0;
+  } catch {
+    return undefined;
+  }
+})();
+
+/**
+ * A copy of the directory `from` at `to` (which must not exist), without the
+ * paths in `leave`, relative to `from`. It is a copy-on-write clone where the
+ * file system makes one, and an ordinary copy elsewhere; either way the files
+ * are the copy's own.
+ */
+export function copyTree(from: string, to: string, leave: string[] = []): string {
+  if (clonefile?.(from, to)) {
+    for (const path of leave) rmSync(join(to, path), { recursive: true, force: true });
+    return to;
+  }
+  const left = new Set(leave.map((path) => join(from, path)));
+  cpSync(from, to, { recursive: true, filter: (path) => !left.has(path) });
+  return to;
+}
+
+/** The worked example, as a copy of its own, without what a run of Stemma makes in it. */
+export const copyExample = (to: string, leave = [".stemma", "build", "report/build", "report/report.pdf"]): string =>
+  copyTree(join(ROOT, "examples/coral-reefs"), to, leave);
+
+/**
+ * The command line as built for the tests. `./scripts/dev.sh check` builds dist/
+ * just before the tests and names it in STEMMA_TEST_DIST, so that every test file
+ * uses that one build; run any other way, a file builds its own into `to`. Either
+ * way it is the build as shipped. No test changes it: one that needs a changed
+ * build changes a copy.
+ */
+export async function builtCli(to = join(temporary(), "dist")): Promise<string> {
+  const given = process.env.STEMMA_TEST_DIST;
+  if (given) return join(given, "stemma.js");
+  const { bundle } = await import("../scripts/build.ts");
+  return bundle(to);
 }
 
 export function fixture(name: string, parent = temporary()): string {

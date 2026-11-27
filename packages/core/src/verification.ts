@@ -2,7 +2,7 @@
 // A run or a review binds to the text digest of each page it looked at, so it
 // goes stale exactly when that text changes. None of this blocks anything.
 import {
-  type Corpus, idOf, isObject, type JsonObject, type LoadedFile, type LoadedText, sha256, streamsOf, textDigest,
+  type Corpus, idOf, isObject, type JsonObject, type LoadedFile, type LoadedText, madeOnce, sha256, streamsOf, textDigest,
 } from "@stemma/records";
 import { activeWhere } from "./corpus-index.ts";
 
@@ -20,7 +20,7 @@ export const reconversions = (corpus: Corpus, text: string): LoadedFile[] =>
  * though the words now read the same.
  */
 export const comparedDigest = (method: string, blocks: Parameters<typeof streamsOf>[0]): string =>
-  method === "reconversion" ? sha256(`${textDigest(blocks)}\n${asConverted(blocks)}`) : textDigest(blocks);
+  method === "reconversion" ? madeOnce(blocks, "reconversion digest", () => sha256(`${textDigest(blocks)}\n${asConverted(blocks)}`)) : textDigest(blocks);
 
 /** Whether a run still describes the text, made with the tools this version has. */
 export function currentRun(run: JsonObject, text: LoadedText, tools: Record<string, string>): boolean {

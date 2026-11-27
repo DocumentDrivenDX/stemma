@@ -17,6 +17,8 @@ import { ProcessGone } from "./process.ts";
 import type { Prove, Session, Signed } from "./session.ts";
 import type { Answer, Verdict } from "./snapshots.ts";
 
+/** Reasons that mean no page was read at all, and that asking again will not change by itself. */
+const UNREAD = new Set(["not_held", "changed", "too_large", "page_count", "unreadable"]);
 export const HOST = "127.0.0.1";
 export const LIMITS = { headerBytes: 16 * 1024, bodyBytes: 64 * 1024, requestMs: 10_000, connections: 64 };
 export const REQUEST_HEADER = "x-stemma-request";
@@ -276,9 +278,14 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     const answered = (made: Highlight): Answer => ({ status: 200, body: JSON.stringify({ data_identity: verdict.data_identity, result: made }) });
     if ("highlight" in result) return answered(result.highlight);
     const { target } = result;
-    if (target.size > originalLimits.bytes) return answered(noHighlight("too_large"));
-    if (!options.highlighter) return answered(noHighlight("failed"));
-    return answered(await options.highlighter.place(target, async () => {
+    // Where no highlight can be placed whatever the page shows, the page is read only for an estimate.
+    // So where it cannot be read at all, that stays the reason.
+    const kept = (made: Highlight): Highlight => (
+      target.refused && made.state === "none" && UNREAD.has(made.reason) ? noHighlight(target.refused) : made
+    );
+    if (target.size > originalLimits.bytes) return answered(kept(noHighlight("too_large")));
+    if (!options.highlighter) return answered(kept(noHighlight("failed")));
+    const placed = await options.highlighter.place(target, async () => {
       // The original read for this counts among those held at once.
       const release = await hold();
       if (response.destroyed || !options.originals) {
@@ -294,7 +301,9 @@ export async function listen(options: ListenOptions): Promise<Listening> {
         release();
         throw error;
       }
-    }, () => response.destroyed));
+    }, () => response.destroyed);
+    // `failed` here may be a passing fault, so it is told as it is.
+    return answered(kept(placed));
   }
 
   /** The answer to a call that was accepted. */

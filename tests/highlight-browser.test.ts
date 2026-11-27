@@ -203,14 +203,53 @@ describe.skipIf(!browser)("US-123 the quoted words marked on the original", () =
     }
   }, 180_000);
 
-  test("US-123-AC2, AC4 and AC5: the page says why nothing is marked, for a scan's recognition layer, covered words, other text, and a page image", async () => {
+  test("US-123-AC8: an estimate on a scan looks unlike a highlight and says in words that it is one; one over blank paper is not shown", async () => {
+    // A picture of dim, tinted paper over the whole page, with strokes where its words would be printed, and invisible text over them.
+    const paper = stream("/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /ASCIIHexDecode", "c3b48c>");
+    const ink = Array.from({ length: 65 }, (_, i) => `${40 + i * 6} 699 2.5 13 re f`).join(" ");
+    const words = "A scanned page of an invented book.";
+    const scanned = (marks: string) => rawPdf({ content: `q 600 0 0 800 0 0 cm /Im Do Q\n${marks}\nBT 3 Tr ET\n${line(words)}`, resources: "/XObject << /Im 6 0 R >>", objects: [paper] });
+    for (const [expected, bytes] of [["estimate", scanned(ink)], ["pixels_disagree", scanned("")]] as const) {
+      const it = await opened(await project(bytes, "scanned page"), [folderOf({ "a.pdf": bytes })]);
+      try {
+        await it.go(`#/explore/stemma/Passage/${PASSAGES.one.id}`);
+        expect(await settled(it.page)).toBe(expected);
+        // Never the mark or the words of a highlight.
+        expect(await it.page.locator(".stemma-box").count()).toBe(0);
+        const caption = await figure(it.page).locator("figcaption").innerText();
+        expect(caption).not.toContain("Highlighted on the original");
+        if (expected === "estimate") {
+          expect(caption).toContain("Approximate highlight: an estimated place on a page read as a scan.");
+          expect(caption).toContain("text that is not seen on the page");
+          expect(caption).toContain("It is not a check of the quotation");
+          const mark = figure(it.page).locator(".stemma-estimate");
+          expect(await mark.count()).toBe(1);
+          // A dashed line around the words and no tint over them.
+          expect(await mark.evaluate((e) => [getComputedStyle(e).outlineStyle, getComputedStyle(e).backgroundColor])).toEqual(["dashed", "rgba(0, 0, 0, 0)"]);
+          expect(await figure(it.page).locator("canvas").getAttribute("aria-label")).toContain("dashed boxes estimating where the quoted words are");
+          expect((await new AxeBuilder({ page: it.page }).include(".stemma-source").analyze()).violations).toEqual([]);
+          if (process.env.STEMMA_SCREENSHOT) await it.page.screenshot({ path: process.env.STEMMA_SCREENSHOT });
+        } else {
+          expect(caption).toContain("The original is not highlighted.");
+          expect(await it.page.locator(".stemma-estimate").count()).toBe(0);
+        }
+        expect(it.wrong).toEqual([]);
+      } finally {
+        await it.context.close();
+        await it.run.stop();
+      }
+    }
+  }, 180_000);
+
+  test("US-123-AC2, AC4 and AC5: the page says why nothing is marked, for invisible text that is no scan's, covered words, other text, and a page image", async () => {
     const picture = stream("/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8 /Filter /ASCIIHexDecode", "f0>");
     const words = "A scanned page of an invented book.";
-    const scan = rawPdf({ content: `q 600 0 0 800 0 0 cm /Im Do Q\nBT 3 Tr ET\n${line(words)}`, resources: "/XObject << /Im 6 0 R >>", objects: [picture] });
+    // Invisible text over a picture of a part of the page only.
+    const unseen = rawPdf({ content: `q 560 0 0 60 20 680 cm /Im Do Q\nBT 3 Tr ET\n${line(words)}`, resources: "/XObject << /Im 6 0 R >>", objects: [picture] });
     const covered = rawPdf({ content: `${line(words)}\n90 690 80 30 re f` });
     const other = await pageText(rawPdf({ content: line(words) }));
     const cases = [
-      ["recognition_layer", scan, undefined, "The only positions are those of an invisible text layer over an image"],
+      ["recognition_layer", unseen, undefined, "on a page that is not read as a scan"],
       ["covered", covered, undefined, "Something else is painted over or under quoted words"],
       ["text_differs", rawPdf({ content: line(words.replace("book", "tome")) }), other, "not exactly the source text’s page"],
     ] as const;
@@ -256,12 +295,14 @@ describe.skipIf(!browser)("US-123 the quoted words marked on the original", () =
       ["pixels_disagree", {}],
       ["failed", { page: 2 }],
       ["failed", { sha256: "0".repeat(64) }],
+      // More boxes of the whole page than could be looked at one by one in any time: refused at once.
+      ["pixels_disagree", { boxes: Array.from({ length: 500 }, () => ({ left: 0, top: 0, width: 1, height: 1 })) }],
     ] as const;
     for (const [expected, change] of answers) {
       const session = createSession(() => {});
       const server = await listen({
         assets, session, check: async () => verdict, originals: createOriginals(dir, [folderOf({ "a.pdf": FULL })]),
-        highlighter: { place: async (target) => ({ state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count, boxes: [nowhere], ...change }), close: () => {} },
+        highlighter: { place: async (target) => ({ state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count, boxes: [nowhere], ...change as object }), close: () => {} },
       });
       const it = await visit(`${server.address}#code=${session.code}`);
       try {

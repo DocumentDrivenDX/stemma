@@ -8,7 +8,7 @@ import {
   InvalidInput, LIMITS, planAnnotation, planRetire, prepareRecord, renderReport, researchIndex, runChecks, validateFiles, dependants,
 } from "@stemma/core";
 import { Unconvertible } from "@stemma/extract";
-import { canonical, type Corpus, KINDS, loadCorpus } from "@stemma/records";
+import { canonical, type Corpus, KINDS } from "@stemma/records";
 import {
   AlreadyInitialized, initProject, ProjectBusy, projectRelative, randomToken, readProject, StaleInput, UnsafePath, UnsupportedFile, writeProjectFile,
 } from "@stemma/workspace";
@@ -312,7 +312,8 @@ function check(options: Options): number {
   if (options.changed && options.all) throw usageError("Use --changed or --all, not both.");
   const started = new Date();
   const root = requireProject(options);
-  const { body, errors } = runChecks(loadCorpus(readProject(openProject(root))), tools());
+  // openCorpus says why a project cannot be read, before anything is checked.
+  const { body, errors } = runChecks(openCorpus(root), tools());
   const report: CheckReport = {
     schema: "stemma.check-report/0",
     body,
@@ -332,12 +333,6 @@ function check(options: Options): number {
   // The report is written, but part of the manuscript could not be read (CONTRACT-006, Error Semantics).
   if (body.results.some((r) => r.check === "record.valid" && r.outcome === "unverifiable" && r.open && r.reason_code?.startsWith("manuscript_"))) return 3;
   return body.label === "checked_clean" ? 0 : 1;
-}
-
-/** Reports a project that cannot be read before anything is checked. */
-function openProject(root: string): string {
-  openCorpus(root);
-  return root;
 }
 
 function dispatch(command: string, rest: string[], options: Options): number | Promise<number> {

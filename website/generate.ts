@@ -136,17 +136,16 @@ export async function generateText(): Promise<Map<string, string>> {
     const cli = await bundle(join(work, "plugin/dist"));
     const plugin = join(work, "plugin");
 
-    // The demo builds first (scripts/dev.sh does that) and makes its own directory under TMPDIR.
+    // The demo runs the command line bundled above, so that nothing here writes dist/,
+    // which other checks and tests may be using. It makes its own directory under TMPDIR.
     const demoTmp = join(work, "demo-tmp");
     mkdirSync(demoTmp);
-    const builder = run([join(ROOT, "scripts/build.ts")], ROOT);
-    if (builder.code !== 0) throw new Error(builder.err);
-    const demo = run([join(ROOT, "scripts/demo.ts")], ROOT, { ...process.env, TMPDIR: demoTmp });
+    const demo = run([join(ROOT, "scripts/demo.ts")], ROOT, { ...process.env, TMPDIR: demoTmp, STEMMA_DEMO_PLUGIN: plugin });
     if (demo.code !== 0) throw new Error(`demo failed\n${demo.out}${demo.err}`);
     const made = readdirSync(demoTmp).filter((n) => n.startsWith("stemma-demo-"));
     if (made.length !== 1) throw new Error("the demo directory was not found");
     const demoText = stableIds(normalise(demo.out, [
-      ...both(join(demoTmp, made[0]!), "$DEMO"), ...both(join(ROOT, "dist/release"), "<plugin root>"),
+      ...both(join(demoTmp, made[0]!), "$DEMO"), ...both(plugin, "<plugin root>"),
     ])).replace(/^DEMO=\$DEMO$/m, "DEMO is a fresh temporary directory");
     files.set("transcripts/demo.txt", demoText);
 
@@ -197,12 +196,13 @@ const walk = (dir: string, prefix = ""): string[] =>
     : [];
 
 /**
- * What is wrong with the committed content. PNG bytes differ between machines'
- * font rendering, so a screenshot is current when the page it was captured from
- * is unchanged and the file is the one that capture wrote. No browser is needed.
+ * What in `directory` differs from what the current code makes; `fresh` is that,
+ * if it was made already. PNG bytes differ between machines' font rendering, so a
+ * screenshot is current when the page it was captured from is unchanged and the
+ * file is the one that capture wrote. No browser is needed.
  */
-export async function staleness(directory = GENERATED): Promise<string[]> {
-  const fresh = await generateText();
+export async function staleness(directory = GENERATED, fresh?: Map<string, string>): Promise<string[]> {
+  fresh ??= await generateText();
   const problems: string[] = [];
   for (const [path, text] of fresh) {
     const file = join(directory, path);

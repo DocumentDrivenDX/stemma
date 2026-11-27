@@ -480,15 +480,14 @@ makes nothing stale. Commands enforce the tag form; `record.valid` does not yet.
   to public.
 - A project MUST NOT hold a restricted exact value, or a hash derived from one,
   in any tracked or derived file.
-- **Whole-corpus digest exception (proposed; pending the product owner).** The
+- **Whole-corpus digest exception.** The
   corpus digest (E) and the data identity (CONTRACT-005 J) are computed over
   every record file. When a record wrongly holds a restricted exact value, both
   are therefore hashes derived from it, and check reports, exports, and explorer
   pages write them. The value cannot be read from them, but someone who has
-  every other input could test a guessed value against one. The proposal is to
-  except these two digests from the rule above, so that stale output can still
-  be detected, and to excuse no other digest. Until the product owner decides,
-  tools write them; a graph export warns `restricted_in_project`.
+  every other input could test a guessed value against one. These two digests are
+  excepted from the rule above, so that stale output can still be detected. No
+  other digest is excepted. A graph export warns `restricted_in_project`.
 - The restricted store is a directory outside the project tree, chosen by the
   `--restricted-dir` option, then `STEMMA_RESTRICTED_DIR`, then a per-user
   configuration directory keyed by `project_id`. A path inside the project MUST

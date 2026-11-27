@@ -2,11 +2,10 @@
 // project's passage and source records. The committed output must be what the
 // command gives now, from a copy that holds nothing but the committed files.
 import { beforeAll, describe, expect, test } from "bun:test";
-import { cpSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
-import { bundle } from "../scripts/build.ts";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { builtCli, copyExample, ROOT, temporary } from "./helpers.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
 const REPORT = join(EXAMPLE, "report");
@@ -17,9 +16,9 @@ const run = (...args: string[]) => Bun.spawnSync([process.execPath, ...ISOLATION
 
 beforeAll(async () => {
   const work = temporary();
-  cli = await bundle(join(work, "plugin/dist"));
+  cli = await builtCli(join(work, "plugin/dist"));
   copy = join(work, "coral-reefs");
-  cpSync(EXAMPLE, copy, { recursive: true, filter: (path) => !/^(\.stemma|build|report\/build|report\/report\.pdf)(\/|$)/.test(relative(EXAMPLE, path)) });
+  copyExample(copy);
 }, 120_000);
 
 describe("the worked example's research report", () => {

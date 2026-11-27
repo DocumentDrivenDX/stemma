@@ -64,7 +64,7 @@ record alone (CONTRACT-007 C). Where it is not established, no page is shown.
 
 The product owner requires that clicking a reference opens the source material
 with the text highlighted. CONTRACT-005 M, "Highlighting on originals", states
-the rules. The decision is that a wrong box is worse than none.
+the rules. The decision is that a wrong highlight is worse than none.
 
 - **The server, not the page, places boxes,** from the bytes whose digest it has
   checked, and only where the page it reads again has exactly the text of the
@@ -80,12 +80,18 @@ the rules. The decision is that a wrong box is worse than none.
   The reading of them is Stemma's own code over pdf.js's list, held to account by
   the cross-check with the text content and by tests that compare boxes with
   rendered pixels. Anything it does not know refuses the page.
-- **No boxes on scans with a recognition layer.** Their positions are a
-  recognition engine's estimates over an image, which nothing here can check
+- **No highlights on scans; labelled estimates instead.** A recognition layer's
+  positions are an engine's estimates over an image, which nothing here can check
   against the image. This is the common case for scanned books: on the worked
-  example, 12 of its 14 originals are such scans, so their pages are shown with no
-  box. Reconsider only with a check that ties each box to the image, or if the
-  product owner accepts boxes labelled as a recognition layer's estimates.
+  example, 12 of its 14 originals are such scans. The product owner decided that
+  scanned pages should show approximate highlights where possible, by a
+  mechanism to be refined over time. So an estimate is a third answer, apart
+  from a highlight and from none, with its own look and words, and it names how
+  it was derived. It loosens nothing a highlight is held to. One module holds
+  the estimating, and takes only glyphs with their places, the recorded offsets'
+  glyphs where known, and the quoted words; another method is added there as
+  another name. No recognition engine or dependency is added, so a scan with no
+  text layer stays unmarked.
 - **No page rendering in the server.** Comparing rendered pixels with and without
   the quoted words would prove visibility better, but needs a canvas in the
   server, which means a native module the plugin does not ship.

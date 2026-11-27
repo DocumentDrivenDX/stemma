@@ -39,8 +39,14 @@ test("without headless Chromium, the check's last word is that the explorer page
     const done = Bun.spawnSync([process.execPath, join(ROOT, "scripts/browser-note.ts")], { cwd: ROOT, env });
     return [done.exitCode, done.stdout.toString()];
   };
-  expect(note(temporary())).toEqual([0, expect.stringMatching(/^NOT TESTED IN A BROWSER: the explorer page\./)]);
-  if (browser) expect(note(process.env.PLAYWRIGHT_BROWSERS_PATH)).toEqual([0, ""]);
+  // A copy without the PostgreSQL example's text says that too, on a line before this one.
+  const [code, said] = note(temporary()) as [number, string];
+  expect([code, said.trimEnd().split("\n").at(-1)]).toEqual([0, expect.stringMatching(/^NOT TESTED IN A BROWSER: the explorer page\./)]);
+  if (browser) {
+    const [code, said] = note(process.env.PLAYWRIGHT_BROWSERS_PATH) as [number, string];
+    expect(code).toBe(0);
+    expect(said).not.toContain("NOT TESTED IN A BROWSER");
+  }
   const script = readFileSync(join(ROOT, "scripts/dev.sh"), "utf8");
   const check = script.slice(script.indexOf("\n  check)"), script.indexOf("\n  build)"));
   expect(check.indexOf("run scripts/browser-note.ts")).toBeGreaterThan(check.indexOf("run test ./tests"));

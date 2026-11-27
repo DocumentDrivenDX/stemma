@@ -2,13 +2,12 @@
 // no originals: what is held, that its citations are what their passages copied,
 // and that it checks clean.
 import { beforeAll, describe, expect, test } from "bun:test";
-import { cpSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
 import type { CheckReport } from "@stemma/core";
 import { stampSpans } from "@stemma/extract";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { builtCli, copyExample, ROOT, temporary } from "./helpers.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
 // A report written from the example is a work of its own, not part of the project.
@@ -23,9 +22,9 @@ let report: CheckReport;
 let code = 0;
 beforeAll(async () => {
   const work = temporary();
-  const cli = await bundle(join(work, "plugin/dist"));
+  const cli = await builtCli(join(work, "plugin/dist"));
   const clone = join(work, "coral-reefs");
-  cpSync(EXAMPLE, clone, { recursive: true, filter: (path) => !OUTSIDE.has(relative(EXAMPLE, path)) });
+  copyExample(clone, [...OUTSIDE]);
   const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, "check", "--all", "--format", "json", "--project", clone],
     { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
   code = done.exitCode;

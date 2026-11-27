@@ -63,6 +63,45 @@ export interface Formatted {
 
 const markdown = (s: string): string => s.replaceAll(ITALIC_OPEN, "*").replaceAll(ITALIC_CLOSE, "*");
 const hasPrivate = (v: unknown): boolean => /[]/.test(JSON.stringify(v));
+// While compiling a style, the processor looks up each macro it expands by
+// walking the whole parsed style, which made that walk most of the time taken
+// to format anything. The macros it holds do not change while it compiles, so
+// they are listed once for each parsed style and looked up by name.
+type StyleNode = { name?: string; attrs?: Record<string, string>; children?: unknown[] };
+type NodeSearch = (this: unknown, node: StyleNode, name: string, nameValue?: string, found?: StyleNode[]) => StyleNode[];
+const xml = (CSL as unknown as { XmlJSON: { prototype: { getNodesByName: NodeSearch; dataObj?: StyleNode } } }).XmlJSON.prototype;
+const walk = xml.getNodesByName;
+const macros = new WeakMap<StyleNode, Map<string, StyleNode[]>>();
+xml.getNodesByName = function (node, name, nameValue, found) {
+  if (name !== "macro" || !nameValue || found || node !== (this as { dataObj?: StyleNode }).dataObj) return walk.call(this, node, name, nameValue, found);
+  let byName = macros.get(node);
+  if (!byName) {
+    byName = new Map();
+    for (const macro of walk.call(this, node, name)) {
+      const own = macro.attrs?.name ?? "";
+      byName.set(own, [...(byName.get(own) ?? []), macro]);
+    }
+    macros.set(node, byName);
+  }
+  return [...(byName.get(nameValue) ?? [])];
+};
+
+// Each node of the style is given its formatting attributes in a fixed order,
+// which the processor found by enumerating the keys of the array that lists the
+// order, a third of the time taken to compile the style. The same attributes are
+// taken in the same order by walking the array itself.
+const processor = CSL as unknown as { FORMAT_KEY_SEQUENCE: string[]; setDecorations: (state: unknown, attributes: Record<string, unknown>) => [string, unknown][] };
+processor.setDecorations = (_state, attributes) => {
+  const ret: [string, unknown][] = [];
+  for (const key of processor.FORMAT_KEY_SEQUENCE) {
+    if (attributes[key]) {
+      ret.push([key, attributes[key]]);
+      delete attributes[key];
+    }
+  }
+  return ret;
+};
+
 const engineFor = (items: Record<string, CslItem>) => {
   const engine = new CSL.Engine({ retrieveLocale: () => locale, retrieveItem: (id: string) => items[id] }, style, "en-US", true);
   engine.setOutputFormat("stemma");
@@ -85,20 +124,18 @@ const formatOne = (engine: ReturnType<typeof engineFor>, id: string, note: numbe
  * publisher is kept for that one).
  */
 function letterDescriber(corpus: Corpus): (record: JsonObject) => { full: string; short: string } {
-  // Compiling the style is the costly step, so one engine for each form serves
-  // every letter, emptied before each so that no letter affects another.
-  const maker = () => {
-    const items: Record<string, CslItem> = {};
-    let engine: ReturnType<typeof engineFor> | undefined;
-    return (item: CslItem) => {
-      items[item.id] = item;
-      engine ??= engineFor(items);
-      engine.updateItems([]);
-      return engine;
-    };
+  // Compiling the style is the costly step, so one engine serves both forms of
+  // every letter, emptied before each so that no form or letter affects another.
+  const items: Record<string, CslItem> = {};
+  let made: ReturnType<typeof engineFor> | undefined;
+  const engineWith = (item: CslItem) => {
+    items[item.id] = item;
+    made ??= engineFor(items);
+    made.updateItems([]);
+    return made;
   };
-  const fullEngine = maker();
-  const shortEngine = maker();
+  const fullEngine = engineWith;
+  const shortEngine = engineWith;
   const described = new Map<string, { full: string; short: string }>();
   return (record) => {
     const own = cslItem(corpus, record);

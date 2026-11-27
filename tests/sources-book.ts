@@ -4,16 +4,15 @@ import { beforeAll, expect } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { CheckReport, Result } from "@stemma/core";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary } from "./helpers.ts";
 import { makePdf } from "./pdf.ts";
 
 let cli = "";
 /** Each test file that runs the command line calls this once, at its top level. */
 export function bundleCli(): void {
   beforeAll(async () => {
-    cli = await bundle(join(temporary(), "dist"));
+    cli = await builtCli(join(temporary(), "dist"));
   });
 }
 

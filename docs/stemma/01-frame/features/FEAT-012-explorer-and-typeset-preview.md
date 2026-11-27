@@ -231,7 +231,12 @@ I). A Stemma copy of a manuscript (CONTRACT-006 A to H) is not browsed yet.
   finds its text equal to the source text's page and finds the words' glyphs drawn
   visibly where the boxes lie (CONTRACT-005 M). The page must say that the boxes
   are positions from the PDF's text layer. In any doubt, a scan with a
-  recognition layer included, it must mark nothing and say why.
+  recognition layer included, it must highlight nothing and say why. On a scanned
+  page with invisible recognition text it must instead show an approximate place
+  where it can estimate one: drawn unlike a highlight, labelled in words as
+  estimated, and never presented as a check that the page says the words. A weak
+  or ambiguous place, and a scan with no text layer, must stay unmarked with the
+  reason (CONTRACT-005 M, "Estimates on scans").
 - SRV-10. Wherever the served explorer shows a source view (the record panel, and
   a manuscript quotation, note citation, and bibliography entry), it must show the
   page of the original beside the highlighted text, from the PDF or page image
@@ -347,7 +352,8 @@ N/A — requirement verification covers this feature.
 ## Out of Scope
 
 - Argument and geographic map content (FEAT-013).
-- Marking a page image, or a scan whose only text is a recognition layer.
+- Marking a page image or a scan with no text layer, and recognizing text in
+  either.
 - Searching source page text, manuscript files, or research notes.
 - Browsing a Stemma copy of a manuscript, and clicking inside a PDF.
 - Print output, watermarks, and build reports (FEAT-007, FEAT-008).

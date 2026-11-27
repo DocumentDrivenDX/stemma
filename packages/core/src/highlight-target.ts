@@ -52,7 +52,11 @@ export function partPageText(blocks: Block[], stream: StreamName): { text: strin
 const SPLIT_AT_END = /[-­‐‑¬][^\S\n]*$/u;
 const SPLIT_INSIDE = /[-­‐‑¬][^\S\n]*\n/u;
 
-export type TargetRanges = { text_sha256: string; ranges: [number, number][] } | { refused: "hyphen_split" | "unsupported_text" | "no_segment" };
+export type TargetRanges =
+  | { text_sha256: string; ranges: [number, number][] }
+  /** No highlight can be placed. What is known of the place is kept for an estimate on a scan. */
+  | { refused: "hyphen_split"; text_sha256: string; ranges: [number, number][] }
+  | { refused: "unsupported_text" | "no_segment" };
 
 /**
  * The text of the part with this index, and where in it the stretch of its
@@ -76,7 +80,6 @@ export function targetRanges(view: TextView, index: number, stream: StreamName, 
     || (SPLIT_AT_END.test(quoted) && /^[^\S\n]*(\n|$)/u.test(rest))
     // It begins with the second half, on this page or from the page before.
     || (startsLine && (/\n/.test(before) ? SPLIT_INSIDE.test(before.slice(before.lastIndexOf("\n", before.lastIndexOf("\n") - 1) + 1)) : earlier !== undefined && SPLIT_AT_END.test(earlier)));
-  if (split) return { refused: "hyphen_split" };
   const ranges: [number, number][] = [];
   for (let unit = from; unit < to; unit++) {
     const place = made.at[unit]!;
@@ -86,7 +89,8 @@ export function targetRanges(view: TextView, index: number, stream: StreamName, 
     if (last && /^\s*$/u.test(made.text.slice(last[1], place))) last[1] = place + 1;
     else ranges.push([place, place + 1]);
   }
-  return ranges.length > 0 ? { text_sha256: sha256(made.text), ranges } : { refused: "no_segment" };
+  if (ranges.length === 0) return { refused: "no_segment" };
+  return { ...(split ? { refused: "hyphen_split" as const } : {}), text_sha256: sha256(made.text), ranges };
 }
 
 /** By passage and part index. */

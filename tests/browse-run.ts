@@ -4,13 +4,12 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { bundle } from "../scripts/build.ts";
 import { newNonce, requestMac, responseProof } from "./browse-http.ts";
-import { temporary } from "./helpers.ts";
+import { builtCli, temporary, within } from "./helpers.ts";
 
 let built: Promise<string> | undefined;
 /** The command line as it is shipped, built once for the test file. */
-export const shipped = (): Promise<string> => (built ??= bundle(temporary()));
+export const shipped = (): Promise<string> => (built ??= builtCli());
 
 const live = new Set<Run>();
 export async function endRuns(): Promise<void> {
@@ -70,7 +69,7 @@ export class Run {
   }
 
   async ended(ms = 15_000): Promise<number> {
-    const code = await Promise.race([this.child.exited, Bun.sleep(ms).then(() => undefined)]);
+    const code = await within(this.child.exited, ms);
     if (code === undefined) throw new Error(`still running after ${ms} ms.\nstdout: ${this.stdout}\nstderr: ${this.stderr}`);
     await this.drained;
     return code;

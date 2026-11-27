@@ -3,17 +3,16 @@
 // example, opened from a local file.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type Browser, chromium } from "@playwright/test";
 import { canonical } from "@stemma/records";
-import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { builtCli, copyExample, ROOT, temporary } from "./helpers.ts";
 
 let built = "";
 beforeAll(async () => {
-  built = await bundle(temporary());
+  built = await builtCli(temporary());
 }, 60_000);
 
 /** git with no configuration from the caller. */
@@ -239,8 +238,10 @@ describe("graph export", () => {
   });
 
   test("a built copy without its page template says so and writes nothing", async () => {
-    const copy = temporary();
-    const script = await bundle(copy);
+    // A copy of the build made for these tests.
+    const copy = join(temporary(), "dist");
+    cpSync(dirname(built), copy, { recursive: true });
+    const script = join(copy, "stemma.js");
     rmSync(join(copy, "explorer.template.html"));
     const dir = project();
     const done = cli(["graph", "export", "--audience", "author", "--page", "--project", dir], script);
@@ -267,7 +268,7 @@ afterAll(async () => browser?.close());
 describe.skipIf(!browser)("the worked example's page, as the built command line makes it", () => {
   test("US-094-AC2, AC3 offline: search, open a record, follow a link and its reverse, go back, with no request", async () => {
     const dir = join(temporary(), "coral-reefs");
-    cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (path) => !path.endsWith("/build") });
+    copyExample(dir, ["build", "report/build"]);
     const done = cli(["graph", "export", "--audience", "author", "--page", "--project", dir]);
     expect([done.code, done.err]).toEqual([0, ""]);
     const identity = /Data identity ([0-9a-f]{12})/.exec(done.out)![1]!;

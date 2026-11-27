@@ -125,8 +125,10 @@ PDFs and page images stay out of the repository.
   through the page it opens. Where you tell it which folder holds your originals,
   it shows the original PDF page or page image beside the highlighted text. On a
   PDF with real text, it also marks the quoted words on the page where it can
-  tell exactly where they lie. Scanned books and page images are shown unmarked,
-  as is any page in doubt, and the page says why.
+  tell exactly where they lie. On a scanned PDF with recognized text hidden in
+  it, it shows an approximate place, drawn differently and labelled as an
+  estimate; it does not check what the page says. Page images, scans with no
+  text, and doubtful places are left unmarked, and the page says why.
 - Lets Claude search your records, read a citation or passage in its source, and
   open your browser at one when you ask to see it. These tools only read the
   project your session is open in. Excerpts they give go to the model, marked as
