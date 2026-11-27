@@ -160,8 +160,8 @@ documents. Authors who use Stemma do not need it.
 To install HELIX in Claude Code, from a terminal:
 
 ```sh
-claude plugin marketplace add https://github.com/DocumentDrivenDX/helix
-claude plugin install helix@helix --scope user
+claude plugin marketplace add DocumentDrivenDX/plugins
+claude plugin install helix@documentdrivendx --scope user
 ```
 
 Then, in a session in this repository, use `/helix` to frame, design, evolve, or
