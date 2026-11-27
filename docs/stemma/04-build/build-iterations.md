@@ -67,11 +67,21 @@ possible and falls back to the text snapshots in the repository.
   beside the highlighted snapshot text, and never guess a region.
 - Never highlight text whose anchor no longer matches. A citation with no
   recorded quotation or page opens the source and highlights nothing.
-- To design first: how a page opened from a local file reaches large originals
-  (embedded, files beside the page, or a local server) without breaking the
-  no-network rule (BRW-03) or the no-backend rule (BRW-02, ADR-008). A change
-  to either rule is the product owner's decision. Fetching a remote original
+- Decided by the product owner: the browser may run a server on localhost and
+  expose itself as an MCP (Model Context Protocol) server. The server reaches
+  the originals; the agent uses the MCP side, for example to open the browser at
+  a citation (iteration 24 uses the same operations). Fetching a remote original
   stays a separate action the author asks for.
+- Record the decision first: an ADR, and changes to ADR-008, BRW-02, BRW-03,
+  FEAT-012's scope and CONTRACT-005, which say no backend and no network
+  request. Assumption to confirm: the single offline file remains for reviewer
+  packages (FR-46), with the text snapshot fallback.
+- Server rules to design and test: listen on the loopback address only; refuse
+  other Host and Origin values (DNS rebinding); require a per-run secret; read
+  only; serve only the project's files and originals matched by digest, never a
+  path taken from a request; make no outbound request.
+- To test: how the supported hosts start the MCP server from the plugin, which
+  ships one bundled command line, and how long the localhost server lives.
 - Originals stay out of reviewer exports unless the rights rules allow them.
 
 ## Not completable by an agent alone
