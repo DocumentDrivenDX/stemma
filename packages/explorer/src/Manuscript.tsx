@@ -97,7 +97,7 @@ function Reading({ view, open }: { view: ManuscriptView; open: string }) {
                     const href = manuscriptHref({ kind: "citation", note: note.number, index: i });
                     return (
                       <Fragment key={i}>
-                        {citation.quotations.map((id) => <Fragment key={id}><QuotationLink view={view} id={id} open={open} />{" "}</Fragment>)}
+                        {citation.quotations.map((id, n) => <Fragment key={n}><QuotationLink view={view} id={id} open={open} />{" "}</Fragment>)}
                         <a href={href} className="stemma-citation" data-citation={`${note.number}/${i}`} aria-current={open === href ? "true" : undefined}>{citationWords(citation, false)}</a>{" "}
                       </Fragment>
                     );
@@ -178,9 +178,9 @@ function EntryPane({ view, entry }: { view: ManuscriptView; entry: ManuscriptEnt
             <li key={`${place.note}/${place.citation}`} className="st:my-1">
               <PaneLink to={{ kind: "citation", note: place.note, index: place.citation }}>Note {place.note}: {citationWords(citation, false)}</PaneLink>
               {citation.source === undefined || citation.source === entry.source ? null : <> Cites <CitedWork view={view} id={citation.source} />, printed in this work.</>}
-              {citation.quotations.map((id) => {
+              {citation.quotations.map((id, n) => {
                 const text = quotationOf(view, id)?.text;
-                return <p key={id} className="st:text-slate-600">{text === undefined ? <>Broken quotation <Text value={id} /></> : <>“<Runs runs={quotationRuns(text, quotationOf(view, id)!.italic)} links={false} />”</>}</p>;
+                return <p key={n} className="st:text-slate-600">{text === undefined ? <>Broken quotation <Text value={id} /></> : <>“<Runs runs={quotationRuns(text, quotationOf(view, id)!.italic)} links={false} />”</>}</p>;
               })}
             </li>
           );
@@ -216,7 +216,7 @@ function PaneBody({ view, route, getView }: { view: ManuscriptView; route: Exclu
       <>
         <p><strong>Note {route.note}:</strong> {citationWords(citation, true)}</p>
         {citation.source === undefined ? <p role="note">No source is linked to this citation.</p> : <p><strong>Cited source:</strong> <CitedWork view={view} id={citation.source} /></p>}
-        {citation.quotations.map((id) => <QuotationSource key={id} view={view} id={id} getView={getView} />)}
+        {citation.quotations.map((id, n) => <QuotationSource key={n} view={view} id={id} getView={getView} />)}
         {listed(citation.entry) ? entryLink(citation.entry!) : null}
       </>
     );
