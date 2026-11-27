@@ -18,7 +18,7 @@
   "quotation": "its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.",
   "schema": "stemma.record/0",
   "sentence": {
-    "sha256": "789f84a0b1983ab3bda90870e2120e1903aa1731a152c62e0fc77d2b4bd3faf2",
-    "text": "Pavlo says of PostgreSQL’s method of keeping row versions that “its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.”"
+    "sha256": "85552953e15748830f4924cc443dc4acf557bfb7a16b195fa5c2e91e20152844",
+    "text": "Pavlo and Zhang say of PostgreSQL’s method of keeping row versions that “its MVCC implementation is the worst among the other widely used relational DBMSs, including MySQL, Oracle, and Microsoft SQL Server.”"
   }
 }

@@ -18,7 +18,7 @@
   "quotation": "write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.",
   "schema": "stemma.record/0",
   "sentence": {
-    "sha256": "69cce84ccf807277aeafc2d763a2ba7f6f6de616c9a57dd1811adcd82ce756e2",
-    "text": "He also writes of dead versions that “write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.”"
+    "sha256": "2f66a68d152888ec5fe143f7d9ee0c87f89053bc4a85f8cd392b97250140d930",
+    "text": "They also write of dead versions that “write-heavy workloads can cause them to accumulate faster than the vacuum can catch up, resulting in continuous database growth.”"
   }
 }
