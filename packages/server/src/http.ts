@@ -7,6 +7,7 @@
 // whose headers or body arrive too slowly.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { refusal } from "./answers.ts";
+import { ProcessGone } from "./process.ts";
 import type { Session } from "./session.ts";
 import type { Answer, Verdict } from "./snapshots.ts";
 
@@ -163,7 +164,9 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     }
     try {
       return answer(response, await verdict.process.ask(SNAPSHOT_CALLS[url]!, body));
-    } catch {
+    } catch (error) {
+      // Only a process that has ended is a reason to wait; anything else would have the page wait for ever.
+      if (!(error instanceof ProcessGone)) throw error;
       return answer(response, STALE("The data this call needed is gone. Stemma is reading the project again."));
     }
   }

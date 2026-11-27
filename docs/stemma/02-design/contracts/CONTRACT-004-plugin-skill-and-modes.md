@@ -76,7 +76,7 @@ the request's wording. When two modes fit, the agent asks.
 | `draft` | Drafting from the ledger with profiles | M2 | `plan bundle`, `excerpt`, `activity record`, `check` |
 | `voice` | Extend or amend profiles | M2 | `voice record`, `voice compare` |
 | `verify` | Scripted checks, comparisons, reviews, claim support, and explaining findings | M1 | `check`, `coverage`, `review …`, `source verify`, `resolve`, `support …`, `annotate`, `unreviewed list`, `reviewed` |
-| `build` | Draft and camera-ready builds, and the explorer and maps | Basic draft and basic camera-ready M1; full camera-ready M2; explorer M3 | `build …`, `disclosure`, `graph export`, `graph status` |
+| `build` | Draft and camera-ready builds, and the explorer and maps | Basic draft and basic camera-ready M1; full camera-ready M2; explorer M3 | `build …`, `disclosure`, `browse`, `graph export`, `graph status` |
 | `audit` | Rival readings, then citation repair | M2 | `audit record`, `check` |
 | `review` | Reviewer package and imported reviewer comments | M3 | `build reviewer`, `scan release`, `review import` |
 
@@ -155,7 +155,14 @@ The skill MUST instruct the agent to:
     never present it as a Stemma requirement. A recognition tool the author runs
     on their own pages falls under item 11.
 
-Items 3 to 15 are instructions. Stemma does not enforce them against an agent
+16. When the author asks to browse, run `browse` as a background command, and
+    stop it when they have finished. Never read or search for its launch file,
+    never open that file or the address in a browser or tool the agent controls,
+    and never put the code or secret in a command, file, or message, so that
+    neither reaches the conversation (CONTRACT-005 M). Say that only the
+    author's computer can reach it and that it is not a way to share.
+
+Items 3 to 16 are instructions. Stemma does not enforce them against an agent
 with ordinary file access, and user-facing text MUST NOT say it does.
 
 ### D. Runtime discovery

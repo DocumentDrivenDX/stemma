@@ -10,8 +10,9 @@ description: |
   capture quotations with their pages; record the citations in a manuscript;
   check citations, quotations, pages, metadata, identifiers, records, or the
   project and explain what is open; compare or review source text; show what a
-  source says on a page; browse and search the records in an offline page; or
-  find out which sources are missing, damaged, or changed.
+  source says on a page; browse and search the records, served on the author's
+  own computer or as an offline page; or find out which sources are missing,
+  damaged, or changed.
 argument-hint: "[intent or scope]"
 ---
 
@@ -226,6 +227,7 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `excerpt --citation <id>`, `excerpt --quotation <id>` | Show a citation, or a quotation of `report/report.json`, marked in its source page's text, within the same limits |
 | `research list` | List research notes under `research/` by path, with date and first heading |
+| `browse [--no-open] [--idle-minutes <n>]` | Serve the explorer to the author's browser on this computer until stopped. Run it only as a background command (see Browsing the records) |
 | `graph export --audience author --page` / `graph status` | Make one offline page for browsing and searching the records; say whether an export is current |
 | `annotate --finding <finding key> --effect explain\|dismiss --reason <text> --actor <kind>:<name>` | Save a note on one finding; an explanation leaves it open, and only a person dismisses. The key is in `.stemma/reports/check.json` |
 | `retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Retire a record or source file; the files stay, and what rested on it is listed |
@@ -239,9 +241,64 @@ given. Write temporary input files outside the project.
 
 ## Browsing the records
 
-When the author asks to see, browse or search their evidence, run `graph export
---audience author --page`, then tell them to open the `explorer.html` it names,
-with the data identity it prints. The page shows the same one.
+When the author asks to see, browse or search their evidence, start `browse` for
+them. It serves their whole project to a browser on their own computer, opens
+that browser, shows every source view however large the project, and follows
+their edits. Use the offline page instead (below) when they want a file to keep
+or give to someone, or when your host cannot run a background command.
+
+### Served on their computer (`browse`)
+
+1. Start it with your host's background command facility, so that it keeps
+   running after your reply and you can stop it later. Do not run it in the
+   foreground, and do not detach it with `&` or `nohup`:
+   `sh "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh" "${CLAUDE_PLUGIN_DATA}" browse --project <absolute project path>`
+2. Wait until its output says "without use", then read the output. A large
+   project takes longer to read; do not start a second one meanwhile.
+3. Tell the author it is open in their browser, with the data identity. If the
+   output says only to open a file, or they see no page, give them the file's
+   path from the output so that they open it themselves. It works once, within
+   10 minutes.
+4. When they have finished, or before starting another, stop the background
+   command. It also stops by itself after 60 minutes with no page open. Never
+   leave one running that you were not asked to keep.
+
+The page is guarded by a secret that you must never hold, because whatever you
+read is kept in this conversation:
+
+- Never read, print, copy, move or search for the launch file the output names,
+  or list or search the temporary directory for it, even to check or debug it.
+- Never open that file, or the address, in a browser or tool that you control,
+  and never take a screenshot of the author's browser to check the page. Ask
+  them what they see.
+- Never add the code or secret to a command, a file, or a message, and if the
+  author pastes one, do not repeat it: stop the command and start it again.
+- If their page says the tab has no access or the link was used, or the server
+  has stopped, stop the command if it still runs and start it again. If the link
+  was used before they opened it, say so: something else on their computer read
+  it first.
+
+What to tell them, once:
+
+- Only this computer can reach it, and only through the page it opened. It is
+  not a way to share the project, and another computer cannot open it. A program
+  running under their own account could, as it can already read their files.
+- It holds passage text, source page text, the report's text when there is one,
+  and other record contents.
+- After records, sources or manuscript files change, the page says so, shows
+  nothing from before, and then loads the new data. If the project cannot be
+  read, it says why; use `check` to explain it. It writes nothing in the
+  project.
+- Pass on the warnings the command prints. Exit code 3 means the project could
+  not be read and nothing was served.
+- It searches within the same limits as the offline page (below), and opens no
+  original.
+
+### As an offline page (`graph export`)
+
+Run `graph export --audience author --page`, then tell them to open the
+`explorer.html` it names, with the data identity it prints. The page shows the
+same one.
 
 - The page works offline and never changes by itself. After records, sources or
   manuscript files change, export again and tell the author to reload;

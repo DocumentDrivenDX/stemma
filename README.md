@@ -104,6 +104,10 @@ PDFs and page images stay out of the repository.
   of the checks; it does not yet show the state of claim support. The page holds
   your records' text, passages included, so anyone you give it to can read them.
   It is not a reviewer copy.
+- Serves the same explorer from your own computer, when you ask to browse: your
+  assistant starts it and your browser opens. Every source opens, however large
+  the project, and the page follows your edits. Only your computer can reach it,
+  through the page it opens.
 - Explains every finding: what is wrong, the evidence, why it matters, and what
   to do. Nothing is blocked. A project is called checked clean only when nothing
   is open, and a report lists any applicable check it could not run.

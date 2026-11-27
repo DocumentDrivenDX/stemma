@@ -5,7 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { readFileSync, statSync, existsSync } from "node:fs";
 import { networkInterfaces, platform } from "node:os";
 import { dirname, join } from "node:path";
-import { createSession, LAUNCH_NAME, LIMITS, listen, type Listening, openerCommand, type Session, type Verdict, writeLaunchFile } from "@stemma/server";
+import { createSession, LAUNCH_NAME, LIMITS, listen, type Listening, openerCommand, ProcessGone, type Session, type Verdict, writeLaunchFile } from "@stemma/server";
 import { raw, request } from "./browse-http.ts";
 import { ROOT, temporary } from "./helpers.ts";
 
@@ -372,6 +372,21 @@ describe("rule 10: bounds on size, time and connections", () => {
 });
 
 describe("status and a snapshot that is not current", () => {
+  test("a snapshot process that ended gives index_stale; any other failure to answer is a 500 that says nothing of it", async () => {
+    for (const [thrown, expected] of [[new ProcessGone(), [503, "index_stale"]], [new Error("PRIVATE detail /Users/someone"), [500, "internal_error"]]] as const) {
+      const one = createSession();
+      const to = await listen({ assets: ASSETS, session: one, check: async () => ({ ...verdict, process: { ...(verdict as Extract<Verdict, { state: "current" }>).process, ask: () => Promise.reject(thrown) } }) as Verdict });
+      const key = one.exchange(one.code)!;
+      try {
+        const got = await raw(to.port, [request("POST", "/api/query", headers({}, to, key), "{}")]);
+        expect([got.status, (JSON.parse(got.body) as { error: { code: string } }).error.code]).toEqual([...expected]);
+        expect(got.body).not.toContain("PRIVATE");
+      } finally {
+        await to.close();
+      }
+    }
+  });
+
   test("a call is refused with index_stale, and status says why, unless the snapshot is current", async () => {
     for (const [given, status] of [[{ state: "rebuilding" }, { state: "rebuilding" }], [{ state: "failed", message: "why" }, { state: "failed", message: "why" }]] as const) {
       const one = createSession();
