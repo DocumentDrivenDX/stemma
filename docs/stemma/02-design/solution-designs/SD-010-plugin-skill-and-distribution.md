@@ -77,7 +77,11 @@ commits and pushes nothing. Publishing is the owner's push of a release tag
 `v<version>`: a GitHub Actions workflow (`.github/workflows/publish.yml`) checks
 that the tag names the manifest's version, builds, runs that command, and
 commits and pushes `plugins/stemma` with a short-lived token of a GitHub App
-installed only on the marketplace repository. It runs no tests and no check waits on it. An author
+installed only on the marketplace repository. It runs no tests and no check waits on it.
+Each release tag has a GitHub release: the workflow creates one when the tag has
+none, even if publishing fails, and publishing a release on GitHub for a new tag
+creates the tag. A release therefore does not show that the version reached the
+marketplace; the workflow run does. Deleting a tag or a release leaves the other. An author
 installs with `claude plugin marketplace add DocumentDrivenDX/plugins` and
 `claude plugin install stemma@documentdrivendx`.
 

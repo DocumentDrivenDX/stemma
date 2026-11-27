@@ -1,3 +1,6 @@
+# Every release tag gets a GitHub release. A release published from the GitHub
+# page for a new tag creates that tag, which starts this workflow too.
+#
 # Publishes the plugin to the DocumentDrivenDX/plugins marketplace when a
 # release tag v<version> is pushed (SD-010). It checks no pull request or branch
 # and nothing waits on it (ADR-007).
@@ -16,6 +19,22 @@ concurrency:
   group: publish-plugin
   cancel-in-progress: false
 jobs:
+  # Its own job, so a tag has its release even when publishing fails.
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Create the tag's release if it has none
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME exists."
+          else
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
+              --verify-tag --title "$GITHUB_REF_NAME" --generate-notes
+          fi
   publish:
     runs-on: ubuntu-24.04
     steps:
