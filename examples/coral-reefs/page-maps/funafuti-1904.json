@@ -1,5 +1,12 @@
 [
   {
+    "evidence": "author_statement",
+    "first_index": 14,
+    "first_label": "vii",
+    "last_index": 14,
+    "style": "roman_lower"
+  },
+  {
     "evidence": "page_image",
     "first_index": 19,
     "first_label": "xii",

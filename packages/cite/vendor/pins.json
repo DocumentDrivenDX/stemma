@@ -1,0 +1,36 @@
+{
+  "citeproc": {
+    "package": "citeproc",
+    "version": "2.4.63",
+    "processor_version_reported": "1.4.61",
+    "integrity": "sha512-68F95Bp4UbgZU/DBUGQn0qV3HDZLCdI9+Bb2ByrTaNJDL5VEm9LqaiNaxljsvoaExSLEXe1/r6n2Z06SCzW3/Q==",
+    "registry": "https://registry.npmjs.org/citeproc/-/citeproc-2.4.63.tgz",
+    "license": "package.json declares CPAL-1.0 OR AGPL-1.0; its LICENSE notice says CPAL version 1 or later, or AGPL version 3 or later. Stemma distributes it under CPAL-1.0.",
+    "license_files": [
+      "licenses/citeproc-js-LICENSE",
+      "licenses/CPAL-1.0.txt"
+    ]
+  },
+  "style": {
+    "file": "chicago-notes-bibliography.csl",
+    "title": "Chicago Manual of Style 18th edition (notes and bibliography)",
+    "edition": "18",
+    "repository": "https://github.com/citation-style-language/styles",
+    "commit": "1aaf551f864d50e875a617b4faf2bf5da30f3f15",
+    "sha256": "4b6be4bceaf8f3c31b49331c9f9e38c977f666d6ab80e19a2ac8482c7511abeb",
+    "license": "CC-BY-SA-3.0",
+    "license_files": [
+      "licenses/CC-BY-SA-3.0.txt"
+    ]
+  },
+  "locale": {
+    "file": "locales-en-US.xml",
+    "repository": "https://github.com/citation-style-language/locales",
+    "commit": "938c09c164a60b3cfeabe61089f1bf4c3ea6a4ed",
+    "sha256": "ac864c7c21166b4390d82c31792cdc509400727fa0060b43d8aa17e07f9cb079",
+    "license": "CC-BY-SA-3.0",
+    "license_files": [
+      "licenses/CC-BY-SA-3.0.txt"
+    ]
+  }
+}
