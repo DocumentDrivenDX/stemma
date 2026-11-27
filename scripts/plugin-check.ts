@@ -16,7 +16,7 @@ import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { createHighlighter } from "../packages/server/src/highlighter.ts";
 import { makePdf } from "../tests/pdf.ts";
 import { endMcp, McpHost, stubOpener } from "../tests/mcp-run.ts";
-import { removeTemporaries } from "../tests/helpers.ts";
+import { copyExample, removeTemporaries } from "../tests/helpers.ts";
 
 const root = join(import.meta.dir, "..");
 const release = join(root, "dist/release");
@@ -162,7 +162,7 @@ run([...launcher, "graph", "status", "--project", reading]);
 // launch file as a browser would be sent it.
 async function checkBrowse(): Promise<void> {
   const served = join(base, "served");
-  cpSync(join(root, "examples/coral-reefs"), served, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
+  copyExample(served);
   // An invented PDF captured as an original, in a folder outside the project that browse is told of.
   const kept = join(base, "kept-originals");
   mkdirSync(kept);
