@@ -55,11 +55,13 @@ sensitivity on found exactly the substrings that a scan found for words of 3 or
 more code points, in Latin, Greek, Arabic, Japanese, and Thai test text. It
 finds nothing for 1 or 2 code points, which short words and much Chinese and
 Japanese need, and it fails on a text holding a NUL, so a scan would be needed
-beside it. Over the 79,020 entries of a synthetic project of 5,000 sources
-(35 million characters of search text, one macOS machine), a scan with ranking in
-TypeScript took 5 to 40 ms a search and nothing to build. SQLite took 1.5 s and
-82 MB more to build its index, under 1 ms to find a rare word, and 40 to 250 ms
-when thousands of entries had to be counted and ranked. So there is no index:
+beside it. In the spike, over the 79,020 entries of a synthetic project of 5,000
+sources (35 million characters, every value of each entry joined, which is more
+than is searched; one macOS machine), a scan with ranking in TypeScript took 5 to
+40 ms a search and had nothing to build. SQLite with an external-content trigram
+index took 1.5 s and 82 MB more, and, counting and ranking in SQL, up to 250 ms a
+search; a bare lookup of a rarer word took under 1 ms (2.6 s to build that
+second form), but a broad search is not a bare lookup. So there is no index:
 nothing derived is written to disk or can be stale. This is not the FEAT-011
 engine, and it would be reconsidered for a project many times that size.
 
