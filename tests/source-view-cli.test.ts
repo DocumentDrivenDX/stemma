@@ -149,8 +149,17 @@ describe("excerpt of a citation", () => {
     const before = book.run("excerpt", "--citation", citation);
     expect(before.out).toContain("no file with this digest is held in the project or its cache.");
     expect(book.json("excerpt", "--citation", citation).json.held).toEqual({ [sha]: false });
+    // Whether a machine holds the original is no part of the export, which stays the same bytes.
+    const out = join(book.base, "export");
+    const exported = () => {
+      expect(book.run("graph", "export", "--audience", "author", "--out", out).code).toBeLessThan(2);
+      return readFileSync(join(out, "stemma.sourceviews.json"), "utf8");
+    };
+    const without = exported();
+    expect(without).toContain(sha);
     mkdirSync(join(book.project, ".stemma/originals"), { recursive: true });
     cpSync(original, join(book.project, ".stemma/originals", sha));
+    expect(exported()).toBe(without);
     const after = book.run("excerpt", "--citation", citation);
     expect(after.out).toContain("a file with this digest is held in the project or its cache.");
     expect(after.out).not.toContain(book.project);

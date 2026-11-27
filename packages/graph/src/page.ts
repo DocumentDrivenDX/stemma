@@ -3,7 +3,7 @@
 
 /** The places in the template, by the name of what goes there. */
 export const PLACEHOLDERS: Record<string, string> = {
-  banner: "__STEMMA_BANNER_JSON__", stemma: "__STEMMA_MODULE_JSON__", graph: "__STEMMA_GRAPH_JSON__",
+  banner: "__STEMMA_BANNER_JSON__", stemma: "__STEMMA_MODULE_JSON__", graph: "__STEMMA_GRAPH_JSON__", sourceviews: "__STEMMA_SOURCEVIEWS_JSON__",
 };
 
 export function fillPage(template: string, data: Record<string, string>): string {

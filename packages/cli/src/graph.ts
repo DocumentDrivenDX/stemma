@@ -78,15 +78,16 @@ export async function graphExport(options: Options): Promise<number> {
   // be made again, and never reads as current, since their digests differ.
   writeOutputFiles(out, [...made.files].sort((a, b) => Number(b.name === MANIFEST) - Number(a.name === MANIFEST)));
   const { manifest } = made;
-  // Something is open when the graph leaves out, or cannot follow, what it should show.
-  const open = manifest.warnings.some((w) => w.code !== "large_graph");
+  // Something is open when the graph leaves out, or cannot follow, what it should show,
+  // or a warning needs the author's eye. A size limit reached is not.
+  const open = manifest.warnings.some((w) => w.code !== "large_graph" && w.code !== "source_views_cut");
   const lines = [
     `Exported the author graph to ${out}`,
     `Data identity ${manifest.data_identity.slice(0, 12)}${options.page ? " (the page shows the same)" : ""}`,
     `Entries: ${manifest.counts.entities}. Links: ${manifest.counts.links}. Left out: ${total(manifest.omissions)} items and ${total(manifest.dropped_links)} links, each listed by type and reason in ${MANIFEST}.`,
     `States shown where they apply: ${manifest.states.computed.join(", ")}. Not computed: ${manifest.states.not_computed.join(", ")}. A record with no state has not been shown to be clear.`,
     ...manifest.warnings.map((w) => `WARNING ${w.code}: ${w.message}${w.records.length > 0 ? ` ${w.code === "records_left_out" ? "Files" : "Records"}: ${w.records.slice(0, 20).join(", ")}${w.records.length > 20 ? ` and ${w.records.length - 20} more, all listed in ${MANIFEST}` : ""}.` : ""}`),
-    "These files hold passage text and other record contents: anyone who is given them can read all of it.",
+    "These files hold passage text, the text of the source pages that passages lie on, and other record contents: anyone who is given them can read all of it.",
     options.page ? `Open ${join(out, PAGE)} in a browser. After records change, export again and reload.` : "No page was made; add --page for explorer.html.",
   ];
   emit(options, { out, ...(options.page ? { page: join(out, PAGE) } : {}), manifest }, `${lines.join("\n")}\n`);

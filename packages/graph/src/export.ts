@@ -6,12 +6,16 @@ import { compareCodePoints, type Corpus, corpusDigest, isObject, type LoadedFile
 import { graphDocument, jsonText, MODULE_NAME, moduleDocument, VIEW_VERSION } from "./module.ts";
 import { fillPage } from "./page.ts";
 import { project, type Projection, type Warning } from "./project.ts";
+import { sourceViewsFile, type SourceViewsFile } from "./sourceviews.ts";
 
 export const ARRAS_VERSION = "0.8.1";
 export const EXPORT_SCHEMA = "stemma.graph-export/0";
 export const MANIFEST = "stemma.export.json";
 export const PAGE = "explorer.html";
-export const FILES = { module: "stemma.umf.json", graph: "stemma.graph.json", config: "arras-static.json", states: "stemma.states.json" } as const;
+export const FILES = {
+  module: "stemma.umf.json", graph: "stemma.graph.json", config: "arras-static.json", states: "stemma.states.json",
+  sourceviews: "stemma.sourceviews.json",
+} as const;
 /** The largest graph arras states support for. Beyond it an export is written with a warning. */
 export const MEASURED = { entities: 1024, bytes: 7_900_000 };
 
@@ -77,12 +81,15 @@ export interface Export {
   manifest: Manifest;
   projection: Projection;
   states: RecordStates;
+  sourceViews: SourceViewsFile["views"];
 }
 
 export interface ExportRequest {
   version: string;
   /** The built page template. When given, the export holds explorer.html. */
   template?: string;
+  /** The size cap of the source views; the default is CONTRACT-005 K's. */
+  sourceViewsCap?: number;
 }
 
 export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
@@ -90,6 +97,8 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
   if (blockers.length > 0) throw new UnreadableProject(blockers);
   const states = recordStates(corpus);
   const projection = project(corpus, states);
+  const sources = sourceViewsFile(corpus, projection, request.sourceViewsCap);
+  const omissions = [...projection.omissions, ...sources.omissions].sort((a, b) => compareCodePoints(`${a.type}\0${a.reason}`, `${b.type}\0${b.reason}`));
   const moduleText = jsonText(moduleDocument(projection));
   const graphText = jsonText(graphDocument(projection));
   const exportedKeys = new Set(projection.entities.map((e) => e.key));
@@ -101,9 +110,10 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
       name: FILES.states,
       text: jsonText({ schema: "stemma.states/0", records: Object.fromEntries([...states.records].filter(([id]) => exportedKeys.has(id))) }),
     },
+    { name: FILES.sourceviews, text: sources.text },
   ];
   const bytes = Buffer.byteLength(moduleText) + Buffer.byteLength(graphText);
-  const warnings = [...projection.warnings];
+  const warnings = [...projection.warnings, ...sources.warnings];
   if (projection.entities.length > MEASURED.entities || bytes > MEASURED.bytes) {
     warnings.push({
       code: "large_graph",
@@ -120,7 +130,7 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
       entities: projection.entities.length, links: projection.links.length,
       by_type: Object.fromEntries(projection.types.map((t) => [t, projection.entities.filter((e) => e.type === t).length])),
     },
-    omissions: projection.omissions, dropped_links: projection.dropped,
+    omissions, dropped_links: projection.dropped,
     states: { computed: states.computed, not_computed: states.not_computed, checks: states.checks, checks_left_out: states.checks_left_out },
     warnings,
   };
@@ -128,13 +138,13 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
     const named = corpus.settings.data?.project_id;
     const project_id = typeof named === "string" ? named : "";
     const banner: BannerData = { ...shared, project_id, module_sha256: sha256(moduleText), graph_sha256: sha256(graphText) };
-    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText }) });
+    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText, sourceviews: sources.text }) });
   }
   const manifest: Manifest = {
     schema: EXPORT_SCHEMA, scope: "all", ...shared,
     files: Object.fromEntries(files.map((f) => [f.name, sha256(f.text)])),
   };
-  return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states };
+  return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states, sourceViews: sources.views };
 }
 
 /**

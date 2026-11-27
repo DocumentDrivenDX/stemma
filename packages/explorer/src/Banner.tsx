@@ -32,7 +32,8 @@ export function Banner({ data }: { data: BannerData }) {
           <p>
             This page shows the records as they were when exported. It does not update: after an edit, export again and reload. A time
             that the browser below shows is when this page was opened, not when the data was exported. After a rebuild, compare the data
-            identity with the one the export printed. Anyone who has this file can read everything in it, passage text included.
+            identity with the one the export printed. Anyone who has this file can read everything in it, passage text and the text of
+            the source pages that passages lie on included.
           </p>
           <p>
             States shown where they apply: {data.states.computed.join(", ")}. The states open_finding and annotated come only from these

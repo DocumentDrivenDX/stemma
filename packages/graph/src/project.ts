@@ -112,7 +112,7 @@ export interface Count { type: string; reason: string; count: number }
 export interface DroppedLink { relationship: string; reason: string; count: number }
 
 export interface Warning {
-  code: "restricted_in_project" | "records_left_out" | "broken_references" | "large_graph";
+  code: "restricted_in_project" | "records_left_out" | "broken_references" | "large_graph" | "source_views_cut" | "coordinates_in_views";
   message: string;
   /** Record IDs; for `records_left_out`, file paths. */
   records: string[];
@@ -470,9 +470,6 @@ export function project(corpus: Corpus, states: RecordStates): Projection {
   const links = [...found.values()].sort((a, b) =>
     order.get(a.relationship)! - order.get(b.relationship)! || compareCodePoints(a.source, b.source) || compareCodePoints(a.target, b.target));
 
-  for (const [reason, count] of [["page_text", corpus.partFiles.length]] as const) {
-    if (count > 0) walker.omitted.add("SourceText", reason, count);
-  }
   for (const [type, count] of [["Manuscript", corpus.manuscript.length], ["ResearchNote", corpus.research.length], ["StandingRules", corpus.rules ? 1 : 0]] as const) {
     if (count > 0) walker.omitted.add(type, "not_exported", count);
   }

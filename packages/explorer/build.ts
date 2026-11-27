@@ -92,6 +92,7 @@ export async function buildTemplate(): Promise<string> {
     data("stemma-banner", PLACEHOLDERS.banner!),
     data("stemma-module", PLACEHOLDERS.stemma!),
     data("stemma-graph", PLACEHOLDERS.graph!),
+    data("stemma-sourceviews", PLACEHOLDERS.sourceviews!),
     `<script type="module">${script}</script>`,
     `<script type="text/plain" id="stemma-licenses">${scriptText(licenses)}</script>`,
     "</body>",
