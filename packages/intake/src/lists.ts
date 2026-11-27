@@ -7,7 +7,7 @@ import { isCapitalWord, isConnector, isInitials, isName, isParticle, MONTHS, SEN
 
 export type Layout = "after_authors" | "near_end";
 export type UnreadReason = "no_year" | "authors" | "year_place" | "repeated_author" | "several_entries";
-export type EntryFlag = "line_break" | "several_entries" | "continuation";
+export type EntryFlag = "line_break" | "several_entries" | "continuation" | "bracketed_note";
 
 export interface Authors {
   /** Family names in order. A whole name is the only element. */
@@ -18,6 +18,8 @@ export interface Authors {
   alias?: string;
   /** The entry says `et al.` or `and others`. */
   cutShort: boolean;
+  /** The first author's given names as running text may cite them: whole, or without the initials that end them. */
+  firstGiven?: string[];
 }
 
 export type EntryReading =
@@ -55,9 +57,12 @@ const withoutEditorMarks = (text: string): string => text
   .replace(/,\s*(?:eds?|editors?|Hrsg)\b\.?(?=\s*(?:[,.(:"“‘']|\d|$))/g, "")
   .replace(/(?<=[\p{L}.])\s+eds?\.(?=\s*(?:[,(:"“‘']|\d|$))/gu, "");
 
+/** Initials as some styles print them, with or without full stops: `J.`, `JK`, `J.-P.` */
+const BARE_INITIALS = /^(?:\p{Lu}\.?-?){1,3}$/u;
+
 const initialsOnly = (given: string): boolean => {
   const parts = words(given);
-  return parts.length > 0 && parts.every((w) => /^(?:\p{Lu}\.?-?){1,3}$/u.test(w));
+  return parts.length > 0 && parts.every((w) => BARE_INITIALS.test(w));
 };
 
 /** Given names: full names then initials, or initials alone; particles may close them. */
@@ -79,26 +84,6 @@ const isFamily = (family: string): boolean => {
     !SENTENCE_WORDS.has(fold(parts[0]!));
 };
 
-/** `Given Family` or `I. Family`: the family name, and whether initials show it to be a person. */
-function naturalOrder(segment: string): { family: string; initials: boolean } | undefined {
-  const parts = words(segment);
-  let from = parts.length - 1;
-  if (from < 1 || !isCapitalWord(parts[from]!)) return undefined;
-  while (from > 0 && isParticle(parts[from - 1]!)) from--;
-  const given = parts.slice(0, from);
-  if (given.length === 0 || !isGiven(given.join(" "))) return undefined;
-  return { family: parts.slice(from).join(" "), initials: given.some(isInitials) };
-}
-
-function wholeName(text: string): boolean {
-  const parts = words(text);
-  if (parts.length === 0 || parts.length > 14 || parts.some(isInitials)) return false;
-  if (SENTENCE_WORDS.has(fold(parts[0]!)) || !isCapitalWord(parts.at(-1)!) && !isParticle(parts[0]!)) return false;
-  return parts.every((w, i) => isCapitalWord(w) || isParticle(w) || (i > 0 && (isConnector(w) || w === "and" || w === "&")));
-}
-
-const ABBREVIATED = /^(\p{Lu}[\p{Lu}&.-]*\p{Lu}\.?)\s+\(([^()]+)\)$/u;
-
 /** One given name after initials, as in `I. Given`. */
 const initialsThenGiven = (given: string): boolean => {
   const parts = words(given);
@@ -106,19 +91,75 @@ const initialsThenGiven = (given: string): boolean => {
   return parts.length > 1 && parts.slice(0, -1).every(isInitials) && isCapitalWord(last) && !SENTENCE_WORDS.has(fold(last));
 };
 
+/** Words that join two authors, and so are no given name after initials. */
+const JOINERS = new Set(("and with und et plus och og in the of for on").split(" "));
+
+interface Natural {
+  family: string;
+  /** Initials show it to be a person: `I. Family`, or `Given I. Family`. */
+  initials: boolean;
+  /** Two or more written-out words stand before the last, so the family name may be longer. */
+  unsureFamily: boolean;
+}
+
+/** `Given Family`, `I. Family`, or `I. Given Family`. */
+function naturalOrder(segment: string): Natural | undefined {
+  const parts = words(segment);
+  let from = parts.length - 1;
+  if (from < 1 || !isCapitalWord(parts[from]!)) return undefined;
+  while (from > 0 && isParticle(parts[from - 1]!)) from--;
+  const given = parts.slice(0, from);
+  if (given.length === 0) return undefined;
+  const family = parts.slice(from).join(" ");
+  if (isGiven(given.join(" "))) {
+    const unsureFamily = given.length > 1 && given.slice(-2).every((w) => !isInitials(w));
+    return { family, initials: given.some(isInitials), unsureFamily };
+  }
+  // `I. Given Family` has the shape of a title more often than `I. Family` does, so its initials show nothing alone.
+  // `y` joins the two parts of one surname.
+  if (!initialsThenGiven(given.join(" ")) || JOINERS.has(fold(given.at(-1)!)) || /^y\s/.test(family)) return undefined;
+  return { family, initials: false, unsureFamily: false };
+}
+
+/** Words that only the full name after an abbreviation may hold between its words. */
+const EXPANSION_WORDS = new Set(["in", "at", "to"]);
+
+function wholeName(text: string, expansion = false): boolean {
+  const parts = words(text);
+  if (parts.length === 0 || parts.length > 14 || parts.some(isInitials)) return false;
+  if (SENTENCE_WORDS.has(fold(parts[0]!)) || !isCapitalWord(parts.at(-1)!) && !isParticle(parts[0]!)) return false;
+  return parts.every((w, i) => isCapitalWord(w) || isParticle(w) || (i > 0 && (isConnector(w) || w === "and" || w === "&")) ||
+    (expansion && i > 0 && i < parts.length - 1 && EXPANSION_WORDS.has(w)));
+}
+
+/** The given names a citation in running text may write before the family name. */
+function citableGiven(given: string): string[] {
+  const parts = words(given);
+  const writtenOut = (all: string[]) => all.some((w) => !BARE_INITIALS.test(w));
+  // A particle that closes the given names may belong to the family name.
+  if (isParticle(parts.at(-1)!) || !writtenOut(parts)) return [];
+  let end = parts.length;
+  while (end > 0 && isInitials(parts[end - 1]!)) end--;
+  const short = parts.slice(0, end);
+  return end < parts.length && writtenOut(short) ? [parts.join(" "), short.join(" ")] : [parts.join(" ")];
+}
+
+const ABBREVIATED = /^(\p{Lu}[\p{Lu}&.-]*\p{Lu}\.?)\s+\(([^()]+)\)$/u;
+
 const CUT_SHORT = /,?\s*(?<![\p{L}])(?:et al\.?|and others)$/u;
 
 /**
  * All of `text` read as a list of authors, or nothing. `beforeYear` says the year
  * follows this text directly, so no title can be part of it, and allows two more forms.
+ * `anySplit` reads a later family name of unknown length, only to tell that an entry is there.
  */
-function parseAuthors(text: string, beforeYear = false): Authors | undefined {
+function parseAuthors(text: string, beforeYear = false, anySplit = false): Authors | undefined {
   let rest = text.trim();
   const cutShort = CUT_SHORT.test(rest);
   if (cutShort) rest = rest.replace(CUT_SHORT, "");
   if (/(?<![\p{L}])(?:with|et al)(?![\p{L}])/u.test(rest)) return undefined;
   const [, short, full] = ABBREVIATED.exec(rest) ?? [];
-  if (short && full && words(full).length > 1 && wholeName(full)) {
+  if (short && full && words(full).length > 1 && wholeName(full, true)) {
     return { authors: [short], whole: true, alias: words(full).join(" "), cutShort };
   }
   if (!rest.includes(",") && !words(rest).some(isInitials)) {
@@ -145,30 +186,32 @@ function parseAuthors(text: string, beforeYear = false): Authors | undefined {
     // Two capitalized words after a comma may be a title. Only initials, `and`
     // here or later in the series, or `et al.` before the year show that they name a person.
     if (!natural || !(natural.initials || (beforeYear && cutShort) || separators.slice(i - 1).some(joins))) return undefined;
+    if (natural.unsureFamily && !anySplit) return undefined;
     authors.push(natural.family);
   }
-  return { authors, whole: false, cutShort };
+  const firstGiven = citableGiven(given);
+  return { authors, whole: false, cutShort, ...(firstGiven.length > 0 ? { firstGiven } : {}) };
 }
 
 /** The text before a year form, read as authors. */
-function authorsBefore(text: string): Authors | undefined {
+function authorsBefore(text: string, anySplit = false): Authors | undefined {
   let before = withoutEditorMarks(text).replace(/[\s([,:;]+$/u, "");
   const last = words(before).at(-1) ?? "";
   if (last.endsWith(".") && !isInitials(last) && !/(?:et al|Jr|Sr)\.$/.test(before)) before = before.slice(0, -1);
-  return parseAuthors(before, true);
+  return parseAuthors(before, true, anySplit);
 }
 
 const rangeFollows = (text: string, year: YearForm): boolean => /^\s*[-‐‑–—/]\s*(?:\d|present)/.test(text.slice(year.end));
 
-function yearAfterAuthors(text: string): EntryReading | undefined {
+function yearAfterAuthors(text: string, anySplit = false): EntryReading | undefined {
   const year = yearForms(text)[0];
   if (!year || year.start === 0 || rangeFollows(text, year)) return undefined;
-  const authors = authorsBefore(text.slice(0, year.start));
+  const authors = authorsBefore(text.slice(0, year.start), anySplit);
   return authors ? { status: "read", ...authors, year: year.year, suffix: year.suffix, layout: "after_authors" } : undefined;
 }
 
 /** What may not follow the authors: a joining word, in English or another language, or a second author after any punctuation. */
-const ANOTHER_AUTHOR = /^[\s.,;:/…‐‑‒–—([-]*(?:(?:and|with|in collaboration|und|u|et|y|e|en|och|og|plus)(?![\p{L}‐-])|[&+|·]|\p{Lu}[\p{L}'’‐‑-]+,\s*\p{Lu}\.|(?:\p{Lu}\.[\s-]*)+\p{Lu}[\p{L}'’‐‑-]+\s*[,.;)])/iu;
+const ANOTHER_AUTHOR = /^[\s.,;:/…‐‑‒–—([-]*(?:(?:and|with|in collaboration|und|u|et|y|e|en|och|og|plus)(?![\p{L}‐-])|[&+|·]|\p{Lu}[\p{L}'’‐‑-]+,\s*\p{Lu}\.|(?:\p{Lu}\.[\s-]*)+(?:\p{Lu}[\p{L}'’‐‑-]+\s+)?\p{Lu}[\p{L}'’‐‑-]+\s*[,.;)])/iu;
 
 /** Where the authors end in an entry whose year is not after them, and who they are. */
 function leadingAuthors(text: string): { authors: Authors; end: number } | undefined {
@@ -247,7 +290,7 @@ function holdsAnotherEntry(text: string): boolean {
     // The full stop of an initial ends no sentence.
     if (!m[0].includes("\n") && /(?<![\p{L}])\p{Lu}\.$/u.test(text.slice(0, m.index + 1))) continue;
     const rest = text.slice(m.index + m[0].length);
-    const reading = yearAfterAuthors(rest);
+    const reading = yearAfterAuthors(rest, true);
     if (reading?.status === "read" && !reading.whole && /^[^,]+,\s*(?:\p{Lu}\.|\p{Lu}\p{Ll})/u.test(rest)) return true;
   }
   return false;
@@ -278,6 +321,9 @@ const addsToEntry = (text: string): boolean => {
   const plain = text.replace(/(?:https?:\/\/|www\.|doi:\s*)\S+/giu, "");
   return yearForms(plain).length > 0 || /(?<![\p{L}])\p{Lu}\./u.test(plain);
 };
+
+/** Square brackets with words in them, other than a note of when something was read online. */
+const BRACKETED_NOTE = /\[(?!\s*(?:(?:last\s+)?accessed|retrieved)(?!\p{L}))[^[\]]*\p{L}[^[\]]*\]/iu;
 
 const isStart = (text: string): boolean => /^(?:references|bibliography)$/i.test(text.trim());
 
@@ -316,6 +362,7 @@ export function readReferenceLists(document: Document): ReferenceList[] {
     if (paragraph.text.trim().includes("\n")) flags.push("line_break");
     if (reading.status === "unread" && reading.why === "several_entries") flags.push("several_entries");
     if (reading.status === "unread" && previous && continues(paragraph.text)) flags.push("continuation");
+    if (BRACKETED_NOTE.test(paragraph.text)) flags.push("bracketed_note");
     let couldBe = paragraph.text;
     // A wrapped line that adds a name or a year is read with the line before it.
     if (flags.includes("continuation") && addsToEntry(paragraph.text)) couldBe = `${previous!.asFound} ${paragraph.text}`;
