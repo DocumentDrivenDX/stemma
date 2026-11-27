@@ -102,7 +102,7 @@ LOC-04 (FR-98, FR-6, P0, M1). Fetching again, only when the author asks, must tr
 
 HLD-01 (FR-104, P0, M1). A source whose records and manifest are held and whose text is not must be reported as *source text not held here*, once for the source, with what rests on it. What needs the text must be reported as could not be checked: never as passing, and the absence never as damage. A check of whether a built report is current that needs the text must answer that it cannot tell. **Not built.**
 
-HLD-02 (FR-104, FR-87, P0, M1). A part that is present and does not match its digest must still be reported as damage. **Not built** as a distinction from text not held.
+HLD-02 (FR-104, FR-87, P0, M1). A source with only some parts missing, or with a part that does not match its digest, must still be reported as damaged. **Not built** as a distinction from text not held.
 
 HLD-03 (FR-104, FR-98, P0, M1). When the author asks, one command must fetch the original from a recorded location, or read one the author supplies, convert it with the recorded settings, and write the missing text only where it matches the manifest's part digests. **Not built.**
 
@@ -244,8 +244,6 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 - Open: what quality values does TXT-02 record beyond the stated levels, and does low quality change a check result?
 
 - Evidence for FR-99 to FR-104 is one worked example made by a model, [PostgreSQL for web applications](../../../../examples/postgres-web-apps/README.md), and one conversion of an invented HTML page for FR-102. No user has asked for them. FR-98 is the product owner's requirement.
-- Open: how does a record name a private location without a local path or secret, and how is it resolved on the author's computer? SEC-013 refuses private network addresses, so a private copy served from one cannot be fetched today. Design owner.
-- Open: how is text that is not held told from text that was lost by damage? Design owner.
 - Open: which repository hosts and local repositories can REP-01 capture from? Design owner.
 
 ## Dependencies
