@@ -107,7 +107,9 @@ PDFs and page images stay out of the repository.
 - Serves the same explorer from your own computer, when you ask to browse: your
   assistant starts it and your browser opens. Every source opens, however large
   the project, and the page follows your edits. Only your computer can reach it,
-  through the page it opens.
+  through the page it opens. Where you tell it which folder holds your originals,
+  it shows the original PDF page or page image beside the highlighted text. The
+  text is highlighted; the original is not.
 - Explains every finding: what is wrong, the evidence, why it matters, and what
   to do. Nothing is blocked. A project is called checked clean only when nothing
   is open, and a report lists any applicable check it could not run.

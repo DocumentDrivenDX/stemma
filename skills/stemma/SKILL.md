@@ -227,7 +227,7 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `excerpt --citation <id>`, `excerpt --quotation <id>` | Show a citation, or a quotation of `report/report.json`, marked in its source page's text, within the same limits |
 | `research list` | List research notes under `research/` by path, with date and first heading |
-| `browse [--no-open] [--idle-minutes <n>]` | Serve the explorer to the author's browser on this computer until stopped. Run it only as a background command (see Browsing the records) |
+| `browse [--no-open] [--idle-minutes <n>] [--originals <path>]...` | Serve the explorer to the author's browser on this computer until stopped. Run it only as a background command (see Browsing the records) |
 | `graph export --audience author --page` / `graph status` | Make one offline page for browsing and searching the records; say whether an export is current |
 | `annotate --finding <finding key> --effect explain\|dismiss --reason <text> --actor <kind>:<name>` | Save a note on one finding; an explanation leaves it open, and only a person dismisses. The key is in `.stemma/reports/check.json` |
 | `retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Retire a record or source file; the files stay, and what rested on it is listed |
@@ -252,7 +252,10 @@ or give to someone, or when your host cannot run a background command.
 1. Start it with your host's background command facility, so that it keeps
    running after your reply and you can stop it later. Do not run it in the
    foreground, and do not detach it with `&` or `nohup`:
-   `sh "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh" "${CLAUDE_PLUGIN_DATA}" browse --project <absolute project path>`
+   `sh "${CLAUDE_PLUGIN_ROOT}/scripts/stemma.sh" "${CLAUDE_PLUGIN_DATA}" browse --project <absolute project path> --originals <folder>`
+   Give `--originals` for each folder or file that holds their original PDFs and
+   page images, so that the original pages can be shown (see below). Leave it out
+   when none is known.
 2. Wait until its output says "without use", then read the output. A large
    project takes longer to read; do not start a second one meanwhile.
 3. Tell the author it is open in their browser, with the data identity. If the
@@ -303,7 +306,41 @@ What to tell them, once:
   many there are, and pages through all of them. The record browser's own search
   box lists only the best 200 and says when there are more. Neither searches
   source page text beyond what passages quote, the manuscript or research notes.
-- It opens no original.
+- Beside the highlighted text it shows the original: that page of the PDF, or
+  the page image. Only the converted text is highlighted. **The original is not
+  marked**: never say that the words are highlighted on the original, and never
+  take a page shown beside the text as proof that the text is right. Looking at
+  the page is the author's check.
+
+**Showing originals.** The project holds no originals, so the page can show one
+only from `.stemma/originals/` in the project or from a place named with
+`--originals` (relative names are taken from the project). A file is used only
+when its size and SHA-256 are those the source file records, whatever its name.
+Symbolic links are not followed, so name the real folder; pass on any
+`originals_place` warning.
+
+- Find out where their originals are before you start: ask, or use what they
+  have told you or an ingest plan of theirs names. Do not search their computer
+  for them, and name the narrowest folder that holds them. Never copy originals
+  into the project to make them show, and never fetch one for this: `browse`
+  fetches nothing, a recorded web address included. If they want a file fetched,
+  that is `ingest --fetch`, run only when they ask.
+- When the page says why an original is not shown, ask them to read you the
+  reason, then act on it:
+  - **Not held**: no file with the recorded digest is where it looks. Ask where
+    the file is, stop `browse`, and start it again with that `--originals`.
+    `excerpt` says whether a copy is in the project or its cache.
+  - **Digest mismatch**: a file there differs from the one that was converted,
+    perhaps downloaded again, annotated or re-saved. Find the unchanged file; do
+    not alter records to match another one.
+  - **No page mapping**: the record does not establish which page this is, as
+    after a transcription. Nothing can be shown, and you must not guess a page
+    or edit the record to get one.
+  - **Unsupported type** (EPUB, DOCX, HTML, text, TIFF), **A physical
+    original**, or **Too large** (over 256 MiB): they open the original
+    themselves; the text stays in the page.
+- An original shows everything the file holds, including what conversion left
+  out, such as a download stamp with a name.
 
 ### As an offline page (`graph export`)
 
@@ -338,6 +375,7 @@ same one.
   verification.
 - There is no reviewer export yet. Never offer the author's page as one: it is
   not filtered for another reader.
+- It cannot show originals; `browse` can.
 - A search lists at most 50 matches, with no next page. Other records are reached
   through their type lists and links. `browse` has no such limit.
 

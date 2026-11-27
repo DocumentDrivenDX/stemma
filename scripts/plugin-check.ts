@@ -11,7 +11,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, 
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { TAGS, type TagPair } from "../packages/core/src/browse-proof.ts";
-import { provedPost } from "../packages/explorer/src/proof.ts";
+import { provedBytes, provedPost } from "../packages/explorer/src/proof.ts";
 import { MARKETPLACE, PLUGIN_SOURCE, publishInto } from "./publish-plugin.ts";
 import { makePdf } from "../tests/pdf.ts";
 
@@ -141,7 +141,13 @@ run([...launcher, "graph", "status", "--project", reading]);
 async function checkBrowse(): Promise<void> {
   const served = join(base, "served");
   cpSync(join(root, "examples/coral-reefs"), served, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  const command = [...launcher, "browse", "--no-open", "--format", "json", "--project", served];
+  // An invented PDF captured as an original, in a folder outside the project that browse is told of.
+  const kept = join(base, "kept-originals");
+  mkdirSync(kept);
+  const scan = join(kept, "invented-scan.pdf");
+  writeFileSync(scan, makePdf({ pages: [["An invented harbour page."]] }));
+  run([...launcher, "source", "convert", scan, "--project", served, "--actor", "software:plugin-check", "--acquired-at", "2026-01-05T09:00:00Z"]);
+  const command = [...launcher, "browse", "--no-open", "--format", "json", "--project", served, "--originals", kept];
   console.log(`\n$ ${command.join(" ").replaceAll(base, "$CHECK")}`);
   const child = Bun.spawn(command, { cwd: base, env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
   // Ended here too if the check stops part way, so that nothing is left running.
@@ -183,6 +189,24 @@ async function checkBrowse(): Promise<void> {
   const passage = (Object.values(manuscript.quotations)[0] as any).view.passages[0].passage as string;
   const view = (await post("/api/source-view", { id: passage }, secret)).json.result;
   if (view?.state !== "highlighted") fail("the installed copy gave no highlighted source view");
+  // An original and everything the page draws it with, from the installed copy (US-121-AC7).
+  const digest = sha(scan);
+  const binary = async (path: string, body: unknown) => await provedBytes(send, secret, TAGS.call, path, JSON.stringify(body)) ?? fail(`the answer to ${path} proved nothing`);
+  const original = await binary("/original", { sha256: digest });
+  if (original.status !== 200 || new Bun.CryptoHasher("sha256").update(original.bytes).digest("hex") !== digest) fail("the installed copy did not give the recorded original from the named folder");
+  const [text] = readdirSync(join(served, "sources")).filter((name) => readFileSync(join(served, "sources", name, "source.md"), "utf8").includes(digest))
+    .map((name) => /"id": "(txt-[a-z0-9]+)"/.exec(readFileSync(join(served, "sources", name, "source.md"), "utf8"))![1]!);
+  if ((await post("/api/original-page", { text, index: 0 }, secret)).json.result?.page !== 1) fail("the installed copy did not say which page of the original the text's page is");
+  for (const name of ["cmaps/UniJIS-UCS2-H.bcmap", "standard_fonts/LiberationSans-Regular.ttf"]) {
+    if ((await binary("/pdfjs-data", { name })).status !== 200) fail(`the installed copy did not give the PDF library's ${name}`);
+  }
+  for (const script of ["pdf-worker.js", "pdfjs/pdf.worker.min.js", "pdfjs/openjpeg_nowasm_fallback.js", "pdfjs/jbig2_nowasm_fallback.js"]) {
+    const got = await fetch(`${origin}/${script}`);
+    if (got.status !== 200 || (await got.text()).length < 100) fail(`the installed copy did not serve /${script}`);
+  }
+  for (const licence of ["pdfjs-dist.txt", "core-js.txt", "openjpeg.txt", "pdfjs-openjpeg.txt", "jbig2.txt", "pdfjs-jbig2.txt"]) {
+    if (!existsSync(join(installed, "dist/explorer-licenses", licence))) fail(`the installed plugin lacks dist/explorer-licenses/${licence}`);
+  }
   child.kill("SIGINT");
   const exit = await child.exited;
   clearTimeout(deadline);
@@ -193,7 +217,7 @@ async function checkBrowse(): Promise<void> {
   if (said.includes(secret) || said.includes(code)) fail("the secret or the code was printed");
   if (!said.includes("The one-time link was opened at ")) fail("the command did not say that the link was opened");
   if (Bun.spawnSync(["ps", "-A", "-o", "command="]).stdout.toString().includes(join(installed, "dist/browse-worker.js"))) fail("the process holding the data was left running");
-  console.log(`[exit ${exit}] served the page, a search, the manuscript and a highlighted source view; the code worked once; neither it nor the secret was printed.`);
+  console.log(`[exit ${exit}] served the page, a search, the manuscript, a highlighted source view, an invented original from a named folder and the PDF library's parts; the code worked once; neither it nor the secret was printed.`);
 }
 await checkBrowse();
 
@@ -225,6 +249,6 @@ launcher fetches the pinned Bun into the plugin data directory and runs the inst
 command line, which reads the text of a synthetic PDF with the packaged library data and
 no native module, and formats Chicago notes and a bibliography with the bundled citeproc-js, and makes the explorer page from the shipped template (the page is not
 opened in a browser here), and serves the worked example on 127.0.0.1 from the shipped served page and its own child process
-(the served page is not opened in a browser here either). The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
+(the served page is not opened in a browser here either, so no original is drawn here). The warnings the PDF library printed are shown above as they came. Not checked here: installation from GitHub, the desktop
 app, whether a live session loads and follows the skill (that needs a model), Windows
 and Linux, and network-denied operation after setup.`);
