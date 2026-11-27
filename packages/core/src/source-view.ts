@@ -202,7 +202,8 @@ export class SourceViews {
     return target && !isRetired(target.data!) ? String(relation!.target) : undefined;
   }
 
-  private work(id: string): ViewWork {
+  /** How a view names a source and the work it is part of. */
+  work(id: string): ViewWork {
     const container = this.containerOf(id);
     return { ...this.name(id), ...(container ? { part_of: this.name(container) } : {}) };
   }

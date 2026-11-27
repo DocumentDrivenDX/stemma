@@ -1,9 +1,10 @@
 // `graph export` and `graph status` as pure functions (CONTRACT-005 B, C, J).
 // The same record and manuscript bytes and the same exporter version give the
 // same bytes: no export holds a time, a user, a machine path or a git revision.
-import { type RecordStates, recordStates } from "@stemma/core";
+import { type ManuscriptView, type RecordStates, recordStates } from "@stemma/core";
 import { compareCodePoints, type Corpus, corpusDigest, isObject, type LoadedFile, SEARCH_FOLD_VERSION, sha256 } from "@stemma/records";
 import { graphDocument, jsonText, MODULE_NAME, moduleDocument, VIEW_VERSION } from "./module.ts";
+import { type ManuscriptPort, manuscriptFile, manuscriptOf, quotedPassages } from "./manuscript.ts";
 import { fillPage } from "./page.ts";
 import { project, type Projection, type Warning } from "./project.ts";
 import { sourceViewsFile, type SourceViewsFile } from "./sourceviews.ts";
@@ -14,7 +15,7 @@ export const MANIFEST = "stemma.export.json";
 export const PAGE = "explorer.html";
 export const FILES = {
   module: "stemma.umf.json", graph: "stemma.graph.json", config: "arras-static.json", states: "stemma.states.json",
-  sourceviews: "stemma.sourceviews.json",
+  sourceviews: "stemma.sourceviews.json", manuscript: "stemma.manuscript.json",
 } as const;
 /** The largest graph arras states support for. Beyond it an export is written with a warning. */
 export const MEASURED = { entities: 1024, bytes: 7_900_000 };
@@ -24,10 +25,12 @@ export interface DataIdentity { corpus_digest: string; data_identity: string }
 /**
  * The identity of what an export shows (CONTRACT-005 J): SHA-256 of the corpus
  * digest and then each manuscript file's digest, one a line, in digest order.
+ * The report's list and template are manuscript files too.
  */
 export function dataIdentity(corpus: Corpus): DataIdentity {
   const corpus_digest = corpusDigest(corpus);
-  const manuscript = corpus.manuscript.map((f) => (f.bytes ? sha256(f.bytes) : "unreadable")).sort(compareCodePoints);
+  const report = corpus.report ? [corpus.report.spec, corpus.report.template ?? { path: "" }] : [];
+  const manuscript = [...corpus.manuscript, ...report].map((f) => (f.bytes ? sha256(f.bytes) : "unreadable")).sort(compareCodePoints);
   return { corpus_digest, data_identity: sha256([corpus_digest, ...manuscript].map((d) => `${d}\n`).join("")) };
 }
 
@@ -82,6 +85,7 @@ export interface Export {
   projection: Projection;
   states: RecordStates;
   sourceViews: SourceViewsFile["views"];
+  manuscript: ManuscriptView;
 }
 
 export interface ExportRequest {
@@ -90,6 +94,10 @@ export interface ExportRequest {
   template?: string;
   /** The size cap of the source views; the default is CONTRACT-005 K's. */
   sourceViewsCap?: number;
+  /** Makes the manuscript view of the project's report; `cli` takes it from `publish`. */
+  manuscript?: ManuscriptPort;
+  /** The size cap of the manuscript view; the default is CONTRACT-005 L's. */
+  manuscriptCap?: number;
 }
 
 export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
@@ -97,7 +105,9 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
   if (blockers.length > 0) throw new UnreadableProject(blockers);
   const states = recordStates(corpus);
   const projection = project(corpus, states);
-  const sources = sourceViewsFile(corpus, projection, request.sourceViewsCap);
+  const made = manuscriptOf(corpus, projection, request.manuscript);
+  const sources = sourceViewsFile(corpus, projection, request.sourceViewsCap, quotedPassages(made));
+  const manuscript = manuscriptFile(made, sources.views, request.manuscriptCap);
   const omissions = [...projection.omissions, ...sources.omissions].sort((a, b) => compareCodePoints(`${a.type}\0${a.reason}`, `${b.type}\0${b.reason}`));
   const moduleText = jsonText(moduleDocument(projection));
   const graphText = jsonText(graphDocument(projection));
@@ -111,9 +121,10 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
       text: jsonText({ schema: "stemma.states/0", records: Object.fromEntries([...states.records].filter(([id]) => exportedKeys.has(id))) }),
     },
     { name: FILES.sourceviews, text: sources.text },
+    { name: FILES.manuscript, text: manuscript.text },
   ];
   const bytes = Buffer.byteLength(moduleText) + Buffer.byteLength(graphText);
-  const warnings = [...projection.warnings, ...sources.warnings];
+  const warnings = [...projection.warnings, ...sources.warnings, ...manuscript.warnings];
   if (projection.entities.length > MEASURED.entities || bytes > MEASURED.bytes) {
     warnings.push({
       code: "large_graph",
@@ -138,13 +149,13 @@ export function exportGraph(corpus: Corpus, request: ExportRequest): Export {
     const named = corpus.settings.data?.project_id;
     const project_id = typeof named === "string" ? named : "";
     const banner: BannerData = { ...shared, project_id, module_sha256: sha256(moduleText), graph_sha256: sha256(graphText) };
-    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText, sourceviews: sources.text }) });
+    files.push({ name: PAGE, text: fillPage(request.template, { banner: jsonText(banner), [MODULE_NAME]: moduleText, graph: graphText, sourceviews: sources.text, manuscript: manuscript.text }) });
   }
   const manifest: Manifest = {
     schema: EXPORT_SCHEMA, scope: "all", ...shared,
     files: Object.fromEntries(files.map((f) => [f.name, sha256(f.text)])),
   };
-  return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states, sourceViews: sources.views };
+  return { files: [...files, { name: MANIFEST, text: jsonText(manifest) }], manifest, projection, states, sourceViews: sources.views, manuscript: manuscript.view };
 }
 
 /**

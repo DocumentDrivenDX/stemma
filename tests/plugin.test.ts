@@ -131,7 +131,7 @@ describe("what is released", () => {
 
   test("beside it go the explorer page template and the licenses of the code in the page", () => {
     const template = readFileSync(join(plugin, "dist/explorer.template.html"), "utf8");
-    for (const mark of ["__STEMMA_BANNER_JSON__", "__STEMMA_MODULE_JSON__", "__STEMMA_GRAPH_JSON__"]) expect(template.split(mark)).toHaveLength(2);
+    for (const mark of ["__STEMMA_BANNER_JSON__", "__STEMMA_MODULE_JSON__", "__STEMMA_GRAPH_JSON__", "__STEMMA_SOURCEVIEWS_JSON__", "__STEMMA_MANUSCRIPT_JSON__"]) expect(template.split(mark)).toHaveLength(2);
     expect(readdirSync(join(plugin, "dist/explorer-licenses")).sort()).toEqual([
       "arras-ui.md", "graphql.txt", "react-dom.txt", "react.txt", "scheduler.txt", "tailwindcss.txt", "tanstack-query-core.txt", "tanstack-react-query.txt",
     ]);

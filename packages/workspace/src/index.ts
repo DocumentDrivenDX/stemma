@@ -95,6 +95,45 @@ function repositoryFiles(root: string): string[] {
   return git.status === 0 ? [...new Set(git.stdout.split("\0").filter(Boolean))] : walk(root);
 }
 
+const kind = (path: string): "directory" | "file" | "other" | "missing" => {
+  try {
+    const stat = lstatSync(path);
+    return stat.isDirectory() ? "directory" : stat.isFile() ? "file" : "other";
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    return code === "ENOENT" || code === "ENOTDIR" ? "missing" : "other";
+  }
+};
+
+/**
+ * The assembled report in `report/` (CONTRACT-005 L): report.json and the
+ * template it names. Nothing is read through a link, or from outside `report/`,
+ * since an export puts this text into a page the author may pass on.
+ */
+function readReport(root: string): ProjectContent["report"] {
+  const path = "report/report.json";
+  const directory = kind(join(root, "report"));
+  // A link in place of the directory is looked through only to say that a report is there.
+  if (directory === "missing" || !existsSync(join(root, path))) return undefined;
+  if (directory !== "directory") return { spec: { path }, problem: "report is not a plain directory, so nothing in it is read." };
+  const spec = sourceFile(root, path);
+  if (!spec.bytes) return { spec };
+  let name: unknown;
+  try {
+    name = (JSON.parse(new TextDecoder().decode(spec.bytes)) as { manuscript?: unknown } | null)?.manuscript;
+  } catch {
+    return { spec };
+  }
+  if (typeof name !== "string" || name === "") return { spec };
+  const parts = name.split("/");
+  if (name.includes("\\") || name.includes("\0") || /^[A-Za-z]:/.test(name) || parts.some((p) => p === "" || p === "." || p === "..")) {
+    return { spec, problem: "The template that report.json names is not a file path inside report/, so it is not read." };
+  }
+  const inside = parts.slice(0, -1).every((_, i) => kind(join(root, "report", ...parts.slice(0, i + 1))) === "directory");
+  const template = `report/${name}`;
+  return { spec, template: inside ? sourceFile(root, template) : { path: template } };
+}
+
 export function readProject(root: string): ProjectContent {
   const content: ProjectContent = {
     settings: sourceFile(root, "stemma.json"),
@@ -106,6 +145,8 @@ export function readProject(root: string): ProjectContent {
     binaries: () => repositoryFiles(root).filter((path) => !/^(records|sources)\//.test(path) && isBinary(join(root, path))).sort(),
   };
   if (existsSync(join(root, "rules.md"))) content.rules = sourceFile(root, "rules.md");
+  const report = readReport(root);
+  if (report) content.report = report;
   return content;
 }
 

@@ -35,7 +35,7 @@ function proseOf(view: SourceView): string[] {
 
 const bytesOf = (view: SourceView): number => Buffer.byteLength(jsonText({ views: { [view.id]: view } }));
 
-export function sourceViewsFile(corpus: Corpus, projection: Projection, cap = SOURCE_VIEWS_CAP): SourceViewsFile {
+export function sourceViewsFile(corpus: Corpus, projection: Projection, cap = SOURCE_VIEWS_CAP, quoted: ReadonlySet<string> = new Set()): SourceViewsFile {
   const make = new SourceViews(corpus);
   const idsOf = (type: string) => projection.entities.filter((e) => e.type === type).map((e) => e.key).sort(compareCodePoints);
   let retired = 0;
@@ -47,8 +47,8 @@ export function sourceViewsFile(corpus: Corpus, projection: Projection, cap = SO
   const citations = idsOf("Citation").map((id) => make.view({ kind: "citation", id })).filter(kept);
   const passages = idsOf("Passage").map((id) => make.view({ kind: "passage", id })).filter(kept);
 
-  // Those a highlighted citation points to come first, so that the cap takes them last.
-  const cited = new Set(citations.filter((v) => v.state === "highlighted").flatMap((v) => v.passages.map((p) => p.passage)));
+  // Those a highlighted citation or report quotation points to come first, so that the cap takes them last.
+  const cited = new Set([...quoted, ...citations.filter((v) => v.state === "highlighted").flatMap((v) => v.passages.map((p) => p.passage))]);
   const views: Record<string, SourceView> = Object.fromEntries(citations.map((v) => [v.id, v]));
   const parts = new Set<string>();
   const trimmed = new Set<string>();

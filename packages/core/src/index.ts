@@ -27,3 +27,4 @@ export * from "./research.ts";
 export * from "./enrich.ts";
 export * from "./states.ts";
 export * from "./source-view.ts";
+export * from "./manuscript-view.ts";

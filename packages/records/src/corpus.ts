@@ -13,6 +13,15 @@ export interface SourceFile {
   bytes?: Uint8Array;
 }
 
+/** `report/report.json` and the template it names, as read without following a link. */
+export interface ReportInput {
+  spec: SourceFile;
+  /** Absent when report.json names no template that may be read. */
+  template?: SourceFile;
+  /** Why the report cannot be read, when it is for more than a file's own bytes. */
+  problem?: string;
+}
+
 export interface LoadedFile {
   path: string;
   bytes?: Uint8Array;
@@ -79,6 +88,8 @@ export interface ProjectContent {
   manuscript: SourceFile[];
   /** Every file under research/: the author's and the assistant's research notes. */
   research: SourceFile[];
+  /** The assembled report that `graph export` shows (CONTRACT-005 L). */
+  report?: ReportInput;
   /** Paths of the binary files that the project's repository holds or would take in. Finding them reads every file, so only a check asks. */
   binaries?: () => string[];
 }
@@ -121,6 +132,8 @@ export interface Corpus {
   byId: Map<string, LoadedFile>;
   rules?: SourceFile;
   manuscript: SourceFile[];
+  /** The assembled report, when the project has one. Not part of the corpus digest. */
+  report?: ReportInput;
   /** Notes, not records or evidence: outside the corpus digest. */
   research: SourceFile[];
   /** Binary files in the repository, by path. A project holds none. */
@@ -337,6 +350,7 @@ export function loadCorpus(content: ProjectContent): Corpus {
   const texts = new Map(found.texts.flatMap((t) => (idOf(t.manifest) ? [[idOf(t.manifest)!, t] as const] : [])));
   const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript, research: content.research, binaries: content.binaries ?? (() => []) };
   if (content.rules) corpus.rules = content.rules;
+  if (content.report) corpus.report = content.report;
   return corpus;
 }
 

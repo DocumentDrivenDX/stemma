@@ -217,12 +217,13 @@ describe("record text that looks like markup", () => {
   });
 
   test("goes into the page as it is, once, whatever it says", () => {
-    const template = "<a>__STEMMA_BANNER_JSON__</a><b>__STEMMA_MODULE_JSON__</b><c>__STEMMA_GRAPH_JSON__</c><d>__STEMMA_SOURCEVIEWS_JSON__</d>";
+    const template = "<a>__STEMMA_BANNER_JSON__</a><b>__STEMMA_MODULE_JSON__</b><c>__STEMMA_GRAPH_JSON__</c><d>__STEMMA_SOURCEVIEWS_JSON__</d><e>__STEMMA_MANUSCRIPT_JSON__</e>";
     const graph = file(out, "stemma.graph.json");
     const sourceviews = file(out, "stemma.sourceviews.json");
-    const page = fillPage(template, { banner: "{}", stemma: "{}", graph, sourceviews });
-    expect(page).toBe(`<a>{}</a><b>{}</b><c>${graph}</c><d>${sourceviews}</d>`);
-    expect(() => fillPage(template, { banner: "<", stemma: "{}", graph, sourceviews })).toThrow("unescaped");
+    const manuscript = file(out, "stemma.manuscript.json");
+    const page = fillPage(template, { banner: "{}", stemma: "{}", graph, sourceviews, manuscript });
+    expect(page).toBe(`<a>{}</a><b>{}</b><c>${graph}</c><d>${sourceviews}</d><e>${manuscript}</e>`);
+    expect(() => fillPage(template, { banner: "<", stemma: "{}", graph, sourceviews, manuscript })).toThrow("unescaped");
     expect(() => fillPage("__STEMMA_GRAPH_JSON__", { banner: "{}", stemma: "{}", graph })).toThrow("lacks");
   });
 });
@@ -231,7 +232,7 @@ describe("the page holds what it was given and the explorer, and nothing else", 
   const claim = (id: string, words: string) => ({ ...base(id, "claim"), text: words, role: "claim", review: { state: "unreviewed" } });
   const kept = claim("clm-filteredkept001", "KEPT-WORDS");
   const filtered = claim("clm-filteredgone001", "FILTERED-WORDS");
-  const template = "<t>__STEMMA_BANNER_JSON__|__STEMMA_MODULE_JSON__|__STEMMA_GRAPH_JSON__|__STEMMA_SOURCEVIEWS_JSON__</t>";
+  const template = "<t>__STEMMA_BANNER_JSON__|__STEMMA_MODULE_JSON__|__STEMMA_GRAPH_JSON__|__STEMMA_SOURCEVIEWS_JSON__|__STEMMA_MANUSCRIPT_JSON__</t>";
   const page = (records: object[]) => {
     const out = exportGraph(loadCorpus(project(records)), { version: VERSION, template });
     return { out, text: file(out, "explorer.html") };
@@ -242,9 +243,9 @@ describe("the page holds what it was given and the explorer, and nothing else", 
     const { out, text: made } = page([kept]);
     expect(made).toContain("KEPT-WORDS");
     for (const value of ["FILTERED-WORDS", filtered.id]) expect(made).not.toContain(value);
-    // Take the three exported files out of the page: the banner and the template are all that is left.
+    // Take the four exported files out of the page: the banner and the template are all that is left.
     const rest = made.replace(file(out, "stemma.umf.json"), () => "__STEMMA_MODULE_JSON__").replace(file(out, "stemma.graph.json"), () => "__STEMMA_GRAPH_JSON__")
-      .replace(file(out, "stemma.sourceviews.json"), () => "__STEMMA_SOURCEVIEWS_JSON__");
+      .replace(file(out, "stemma.sourceviews.json"), () => "__STEMMA_SOURCEVIEWS_JSON__").replace(file(out, "stemma.manuscript.json"), () => "__STEMMA_MANUSCRIPT_JSON__");
     const banner = /^<t>([^|]*)\|/.exec(rest)![1]!;
     expect(rest).toBe(template.replace("__STEMMA_BANNER_JSON__", () => banner));
     expect(Object.keys(JSON.parse(banner)).sort()).toEqual([

@@ -112,7 +112,8 @@ export interface Count { type: string; reason: string; count: number }
 export interface DroppedLink { relationship: string; reason: string; count: number }
 
 export interface Warning {
-  code: "restricted_in_project" | "records_left_out" | "broken_references" | "large_graph" | "source_views_cut" | "coordinates_in_views";
+  code: "restricted_in_project" | "records_left_out" | "broken_references" | "large_graph" | "source_views_cut" | "coordinates_in_views"
+    | "manuscript_unavailable" | "manuscript_incomplete" | "coordinates_in_manuscript";
   message: string;
   /** Record IDs; for `records_left_out`, file paths. */
   records: string[];

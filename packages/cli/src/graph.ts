@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 import {
   dataIdentity, type Export, exportBlockers, exportGraph, ExportMappingError, exportOwnFiles, exportStaleness, FILES, MANIFEST, PAGE,
 } from "@stemma/graph";
+import { manuscriptView } from "@stemma/publish";
 import { checkOutputDirectory, outputExists, readOutputFile, RefusedOutput, removeOutputFile, writeOutputFiles } from "@stemma/workspace";
 import { CommandError, emit, openCorpus, type Options, requireProject, usageError, VERSION } from "./context.ts";
 
@@ -36,6 +37,13 @@ const outputOf = (root: string, options: Options): string => resolve(root, optio
 
 const total = (list: { count: number }[]) => list.reduce((n, one) => n + one.count, 0);
 
+function manuscriptLines({ manuscript }: Export): string[] {
+  if (manuscript.state !== "read") return [];
+  const quotations = Object.values(manuscript.quotations);
+  const shown = quotations.filter((q) => q.view.state === "highlighted").length;
+  return [`Manuscript: ${manuscript.inputs!.template} and report/report.json, as read now: ${manuscript.notes.length} notes; ${shown} of ${quotations.length} quotations open highlighted in their source.`];
+}
+
 export async function graphExport(options: Options): Promise<number> {
   if (options.chapter !== undefined) throw new CommandError(2, "not_implemented", "`graph export --chapter` is not implemented in this version. Nothing was done.");
   audienceOf(options);
@@ -49,7 +57,12 @@ export async function graphExport(options: Options): Promise<number> {
   const template = options.page ? await pageTemplate() : undefined;
   let made: Export;
   try {
-    made = exportGraph(corpus, { version: VERSION, ...(template === undefined ? {} : { template }) });
+    // `graph` does not import `publish`: the report builder reaches it here.
+    const include = corpus.settings.data?.bibliography_include;
+    made = exportGraph(corpus, {
+      version: VERSION, ...(template === undefined ? {} : { template }),
+      manuscript: (exported) => manuscriptView(corpus, Array.isArray(include) ? include.map(String) : [], exported),
+    });
   } catch (error) {
     if (error instanceof ExportMappingError) {
       throw new CommandError(70, "export_mapping_error", `The records could not be put into a graph, which is a Stemma defect. Nothing was written. ${error.message}`);
@@ -87,7 +100,8 @@ export async function graphExport(options: Options): Promise<number> {
     `Entries: ${manifest.counts.entities}. Links: ${manifest.counts.links}. Left out: ${total(manifest.omissions)} items and ${total(manifest.dropped_links)} links, each listed by type and reason in ${MANIFEST}.`,
     `States shown where they apply: ${manifest.states.computed.join(", ")}. Not computed: ${manifest.states.not_computed.join(", ")}. A record with no state has not been shown to be clear.`,
     ...manifest.warnings.map((w) => `WARNING ${w.code}: ${w.message}${w.records.length > 0 ? ` ${w.code === "records_left_out" ? "Files" : "Records"}: ${w.records.slice(0, 20).join(", ")}${w.records.length > 20 ? ` and ${w.records.length - 20} more, all listed in ${MANIFEST}` : ""}.` : ""}`),
-    "These files hold passage text, the text of the source pages that passages lie on, and other record contents: anyone who is given them can read all of it.",
+    ...manuscriptLines(made),
+    "These files hold passage text, the text of the source pages that passages lie on, and other record contents, and the report's text when there is one: anyone who is given them can read all of it.",
     options.page ? `Open ${join(out, PAGE)} in a browser. After records change, export again and reload.` : "No page was made; add --page for explorer.html.",
   ];
   emit(options, { out, ...(options.page ? { page: join(out, PAGE) } : {}), manifest }, `${lines.join("\n")}\n`);

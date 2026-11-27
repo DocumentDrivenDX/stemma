@@ -94,7 +94,7 @@ describe("graph export", () => {
 
   test("--out never overwrites or removes a file that no export manifest there lists as its own", () => {
     const dir = project();
-    const names = ["explorer.html", "stemma.export.json", "stemma.graph.json", "stemma.umf.json", "arras-static.json", "stemma.states.json", "stemma.sourceviews.json"];
+    const names = ["explorer.html", "stemma.export.json", "stemma.graph.json", "stemma.umf.json", "arras-static.json", "stemma.states.json", "stemma.sourceviews.json", "stemma.manuscript.json"];
     const contents = (out: string) => Object.fromEntries(readdirSync(out).map((name) => [name, readFileSync(join(out, name), "utf8")]));
     for (const [i, name] of names.entries()) {
       const out = join(temporary(), `taken${i}`);
@@ -219,7 +219,7 @@ describe("graph export", () => {
     exportTo(dir, "--page");
     const read = () => Object.fromEntries(readdirSync(out).map((name) => [name, readFileSync(join(out, name), "utf8")]));
     const first = read();
-    expect(Object.keys(first).sort()).toEqual(["arras-static.json", "explorer.html", "stemma.export.json", "stemma.graph.json", "stemma.sourceviews.json", "stemma.states.json", "stemma.umf.json"]);
+    expect(Object.keys(first).sort()).toEqual(["arras-static.json", "explorer.html", "stemma.export.json", "stemma.graph.json", "stemma.manuscript.json", "stemma.sourceviews.json", "stemma.states.json", "stemma.umf.json"]);
     exportTo(dir, "--page");
     expect(read()).toEqual(first);
     exportTo(dir);
