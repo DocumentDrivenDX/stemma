@@ -1,4 +1,4 @@
-#set document(title: "Foundations Out of Sight")
+#set document(title: "Foundations Out of Sight", date: none)
 #set page(paper: "a4", margin: (x: 2.6cm, y: 2.8cm), numbering: "1")
 #set text(font: ("Libertinus Serif", "New Computer Modern"), size: 11pt, lang: "en")
 #set smartquote(enabled: false)

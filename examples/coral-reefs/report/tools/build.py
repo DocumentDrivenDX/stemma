@@ -296,7 +296,7 @@ def typst_text(s):
 def to_typst(body, notes):
     by_number = {n["number"]: n["text"] for n in notes}
     lines = [
-        '#set document(title: "Foundations Out of Sight")',
+        '#set document(title: "Foundations Out of Sight", date: none)',
         '#set page(paper: "a4", margin: (x: 2.6cm, y: 2.8cm), numbering: "1")',
         '#set text(font: ("Libertinus Serif", "New Computer Modern"), size: 11pt, lang: "en")',
         "#set smartquote(enabled: false)",
