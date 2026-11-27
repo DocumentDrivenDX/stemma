@@ -1,6 +1,7 @@
 // What every converter returns, and the builder that divides markup and text
 // into pages (where the source marks them) or sections (CONTRACT-007 I).
 import { type Block, encodeText } from "@stemma/records";
+import type { Removal } from "./stamps.ts";
 
 export interface Identity {
   title?: string; subtitle?: string; contributors?: string[]; issued?: string; edition?: string; publisher?: string;
@@ -18,6 +19,8 @@ export interface ConvertedPart {
   undetermined: string[];
   blocks: Block[];
   note?: string;
+  /** What a rule removed from this part, never the words removed. */
+  removed?: Removal[];
 }
 
 export interface Converted {

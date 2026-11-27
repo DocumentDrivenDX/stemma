@@ -3,7 +3,8 @@
 import { convertDocx } from "./docx.ts";
 import { convertEpub } from "./epub.ts";
 import { convertHtml } from "./html.ts";
-import { type Converted, Unconvertible } from "./model.ts";
+import { type Converted, type ConvertedPart, Unconvertible } from "./model.ts";
+import { removals, removeStamps, type StampRule } from "./stamps.ts";
 import { convertMarkdown, convertText } from "./text.ts";
 
 export { convertPdf, PDF_RULES } from "./pdf-structure.ts";
@@ -17,8 +18,28 @@ const decode = (bytes: Uint8Array): string => {
   }
 };
 
+/** Takes download stamps out of parts made from markup, text or a transcription. */
+export function withoutStamps(converted: Converted): Converted {
+  const parts = converted.parts.map((part): ConvertedPart => {
+    const rules: StampRule[] = [];
+    const blocks = part.blocks.flatMap((b) => {
+      const cleaned = removeStamps(b.content);
+      if (cleaned.rules.length === 0) return [b];
+      rules.push(...cleaned.rules);
+      const content = cleaned.text.replace(/^\s*\n|\n\s*$/g, "");
+      return content.trim() === "" ? [] : [{ ...b, content }];
+    });
+    return rules.length === 0 ? part : { ...part, blocks, removed: removals(rules) };
+  });
+  return { ...converted, parts };
+}
+
 /** Every format but PDF, which needs the page labels chosen first (`convertPdf`). */
 export function convertMarkupOrText(bytes: Uint8Array, mediaType: string): Converted {
+  return withoutStamps(converted(bytes, mediaType));
+}
+
+function converted(bytes: Uint8Array, mediaType: string): Converted {
   switch (mediaType) {
     case "text/plain": return convertText(decode(bytes));
     case "text/markdown": return convertMarkdown(decode(bytes));

@@ -3970,6 +3970,35 @@ export const TYPES: Record<string, Record<string, FieldSpec>> = {
   },
   "note": {
    "type": "string"
+  },
+  "removed": {
+   "type": {
+    "value": "Removal"
+   },
+   "many": true
+  }
+ },
+ "Removal": {
+  "kind": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "download_stamp"
+   ]
+  },
+  "rule": {
+   "type": "string",
+   "required": true,
+   "values": [
+    "annual_reviews",
+    "jstor",
+    "taylor_francis",
+    "wiley"
+   ]
+  },
+  "rules_version": {
+   "type": "string",
+   "required": true
   }
  },
  "AuxiliaryFile": {

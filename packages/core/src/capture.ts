@@ -56,6 +56,7 @@ export interface ConvertedInput {
   parts: {
     index: number; label: { status: string; label?: string; basis?: string }; section?: string; chapter?: string;
     columns: string; undetermined: string[]; blocks: Block[]; note?: string;
+    removed?: { kind: string; rule: string; rules_version: string }[];
   }[];
   identity: object;
   method: string;
@@ -146,6 +147,7 @@ const partFront = (part: ConvertedInput["parts"][number], paged: boolean, method
   method, level: "unassessed", columns: part.columns,
   undetermined: part.undetermined,
   ...(part.note !== undefined ? { note: part.note } : {}),
+  ...(part.removed !== undefined ? { removed: part.removed } : {}),
 });
 
 function directoryFor(corpus: Corpus, wanted: string | undefined, key: unknown, id: string): string {

@@ -4,7 +4,7 @@ import {
   applyPageMap, autoSegments, type ConvertedInput, InvalidInput, LIMITS, parsePageNumbers, type Proposal, proposePageMap, normalizeText,
 } from "@stemma/core";
 import {
-  type Converted, convertMarkupOrText, convertPdf, converterTool, type Label, type PdfText, PdfUnreadable, readPdf, textBlock, Unconvertible,
+  type Converted, convertMarkupOrText, convertPdf, converterTool, type Label, type PdfText, PdfUnreadable, readPdf, textBlock, Unconvertible, withoutStamps,
 } from "@stemma/extract";
 import type { PageSegment } from "@stemma/records";
 
@@ -90,7 +90,7 @@ export function suppliedPages(bytes: Uint8Array, method: "ocr" | "manual", tool?
   const pages = text.split("\f");
   if (pages.length > 1 && !/\S/u.test(pages.at(-1)!)) pages.pop();
   if (!pages.some((p) => /\S/u.test(p))) throw new InvalidInput("There is no machine-readable text: it is empty or only white space.");
-  return {
+  return withoutStamps({
     paged: true, coverage: "all", identity: {}, method, tools: [tool ?? { name: "unknown", version: "unknown" }, converterTool],
     notes: ["The text was supplied; Stemma did not make it and did not compare it with the original."],
     parts: pages.map((page, index) => {
@@ -101,5 +101,5 @@ export function suppliedPages(bytes: Uint8Array, method: "ocr" | "manual", tool?
         blocks: trimmed.trim() ? [textBlock("undetermined", trimmed)] : [],
       };
     }),
-  };
+  });
 }

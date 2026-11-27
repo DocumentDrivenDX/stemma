@@ -7,6 +7,7 @@
 // it is: the plugin ships no native drawing module, and pdf.js says so.
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { type Removal, removals, removeFromPieces } from "./stamps.ts";
 
 /** One piece of text with its place: x and y of its baseline start, its width, and its size. */
 export interface PdfItem { text: string; x: number; y: number; width: number; size: number }
@@ -19,6 +20,8 @@ export interface PdfText {
   /** The same text divided into lines, with the place of each piece. */
   lines: PdfLine[][];
   widths: number[];
+  /** For each page, what was removed from its text as it was read: download stamps. */
+  removed: Removal[][];
   /** What the file states about itself. */
   info: { title?: string; author?: string; producer?: string; creator?: string };
   /** The labels the file itself states for its pages, if it states any. Not proof of printed numbers. */
@@ -78,14 +81,19 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
     const pages: string[] = [];
     const lines: PdfLine[][] = [];
     const widths: number[] = [];
+    const removed: Removal[][] = [];
     let size = 0;
     for (let number = 1; number <= document.numPages; number++) {
       if (Date.now() - started > limits.milliseconds) throw new PdfUnreadable("too_slow");
       const page = await document.getPage(number);
       // Characters are kept as the file maps them: no compatibility folding.
       const content = await page.getTextContent({ disableNormalization: true });
-      const text = content.items
-        .map((item) => ("str" in item ? item.str + (item.hasEOL ? "\n" : "") : ""))
+      // A download stamp goes before anything is worked out from the text.
+      const items = content.items.flatMap((item) => ("str" in item ? [item] : []));
+      const cleaned = removeFromPieces(items.map((item) => ({ text: item.str, after: item.hasEOL ? "\n" : "" })));
+      removed.push(removals(cleaned.rules));
+      const text = items
+        .map((item, i) => cleaned.texts[i]! + (item.hasEOL ? "\n" : ""))
         .join("")
         // A form feed marks a page end in the saved text, so none may come from inside a page.
         .replace(/\f/g, " ")
@@ -94,10 +102,9 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
       if (size > limits.text_bytes) throw new PdfUnreadable("too_much_text");
       pages.push(text);
       const pageLines: PdfLine[] = [{ items: [], text: "" }];
-      for (const item of content.items) {
-        if (!("str" in item)) continue;
+      for (const [i, item] of items.entries()) {
         const line = pageLines.at(-1)!;
-        const piece = item.str.replace(/[\f\0]/g, " ");
+        const piece = cleaned.texts[i]!.replace(/[\f\0]/g, " ");
         line.text += piece;
         if (piece !== "") {
           const [a, b, , d, x, y] = item.transform as number[];
@@ -114,7 +121,7 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
     const info = Object.fromEntries((["Title", "Author", "Producer", "Creator"] as const)
       .flatMap((k) => (typeof stated[k] === "string" && (stated[k] as string).trim() ? [[k.toLowerCase(), (stated[k] as string).trim()]] : [])));
     return {
-      pages, lines, widths, info,
+      pages, lines, widths, removed, info,
       ...(labels ? { embeddedLabels: labels } : {}),
       tool: { name: "pdfjs-dist", version: pdfjs.version },
     };
@@ -129,5 +136,6 @@ export async function readPdf(bytes: Uint8Array, limits: PdfLimits, assets = ass
 }
 
 export * from "./convert.ts";
+export * from "./stamps.ts";
 export * from "./model.ts";
 export { parseTranscription } from "./transcription.ts";

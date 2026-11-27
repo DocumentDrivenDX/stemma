@@ -191,7 +191,8 @@ export function structurePdf(read: PdfText, options: PdfStructureOptions): Conve
       ...(lines.length > 0 && label.label === undefined ? ["folio"] : []),
       ...(lines.length > 0 && columns === "undetermined" ? ["reading-order"] : []),
     ];
-    return { index, label, columns, undetermined: lines.length > 0 ? undetermined : [], blocks, ...(lines.length === 0 ? { note: "The file's text layer holds no text on this page." } : {}) };
+    const removed = read.removed[index] ?? [];
+    return { index, label, columns, undetermined: lines.length > 0 ? undetermined : [], blocks, ...(removed.length > 0 ? { removed } : {}), ...(lines.length === 0 ? { note: "The file's text layer holds no text on this page." } : {}) };
   });
 }
 

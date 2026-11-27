@@ -8,7 +8,7 @@ import {
   type OriginalTie, parsePageMap, planComparison, planLabel, planResolution, planReview, planSeal, planSourceText, printable,
   PROPOSAL, type Proposal, readLookup, renderCoverage, type Resolver, RESOLVERS, resolverFor, type ReviewRequest, normalizeText, SourceTexts,
 } from "@stemma/core";
-import { PDFJS_VERSION, CONVERTER_VERSION, parseTranscription, Unconvertible } from "@stemma/extract";
+import { PDFJS_VERSION, CONVERTER_VERSION, parseTranscription, removeStamps, Unconvertible, withoutStamps } from "@stemma/extract";
 import { canonical, type Corpus, idOf, isObject, isRetired, type JsonObject, parseJson } from "@stemma/records";
 import {
   FetchRefused, fetchBytes, IMAGE_TYPES, type Original, randomToken, readOriginal, writeProjectFile, writeSourceDirectory,
@@ -135,7 +135,7 @@ export async function convertAndWrite(request: ConvertRequest) {
     if (method !== "ocr" && method !== "manual") throw usageError("A supplied text needs --method ocr (a recognition tool made it) or --method manual (a person typed it).");
     if (method === "ocr" && !tool) throw usageError("Name the recognition tool that made the text: --tool and --tool-version.");
     try {
-      converted = transcription ? parseTranscription(new TextDecoder().decode(transcription), method) : suppliedPages(layer!, method, tool);
+      converted = transcription ? withoutStamps(parseTranscription(new TextDecoder().decode(transcription), method)) : suppliedPages(layer!, method, tool);
     } catch (error) {
       if (error instanceof Unconvertible) throw new InvalidInput(`${error.message} No source file was written.`);
       throw error;
@@ -303,7 +303,8 @@ export function sourceCompare(options: Options, id: string | undefined): number 
   const root = requireProject(options);
   const corpus = openCorpus(root);
   const bytes = namedFile(root, options.with, LIMITS.text_bytes)!;
-  const pages = normalizeText(new TextDecoder().decode(bytes)).split("\f");
+  // A comparison records differing words, so a download stamp goes first.
+  const pages = normalizeText(new TextDecoder().decode(bytes)).split("\f").map((page) => removeStamps(page).text);
   if (pages.length > 1 && !/\S/u.test(pages.at(-1)!)) pages.pop();
   const text = corpus.texts.get(id);
   if (!text) throw new InvalidInput(`No readable source file has the ID ${id}.`);

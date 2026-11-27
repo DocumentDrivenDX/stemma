@@ -131,6 +131,7 @@ A part's front matter is a `SourcePage` value of the UMF schema:
 | `columns` | `1`, `2`, or `undetermined` |
 | `undetermined` | Structural elements not determined in this part: any of `paragraphs`, `headings`, `footnotes`, `block-quotes`, `tables`, `captions`, `figures`, `running-heads`, `folio`, `reading-order` |
 | `note` | Free text about this part's extraction |
+| `removed` | What a rule of this contract removed from this part: for each, its `kind` (`download_stamp`), the `rule`, and the `rules_version`. The removed words are recorded nowhere |
 
 No label is ever worked out from a page's position, and no page number is ever
 given to a source that has no pages.
@@ -256,6 +257,27 @@ raised marker that occurs once in the body and a smaller line at the foot of the
 same page begin with the same marker, and `heading` only to a short line set at least 1.2 times
 the body size. Everything else stays `undetermined`.
 
+**Download stamps.** A library or publisher may add to the copy it serves a
+line saying who downloaded it, from which network address, and when. That line is
+no part of the work and is data about a person. Every converter, and every
+reading of text to be compared or transcribed, MUST remove it and MUST record
+the removal in the part's `removed`, never the words removed. A stamp is
+recognized only by a rule that matches its whole form, so that the work's own
+words are not taken for one. Rules version 1:
+
+| Rule | Form it matches |
+|---|---|
+| `annual_reviews` | "Downloaded from" an annualreviews.org address, then a reader or institution, "IP:" with a network address, and "On:" with a date and time |
+| `jstor` | "This content downloaded from" a network address "on" a date and time with its zone, with the line about terms that may follow it |
+| `taylor_francis` | "Downloaded by [" a name "] at" a time and a date |
+| `wiley` | "Downloaded from" an onlinelibrary.wiley.com address "by" a name, "Wiley Online Library on" a date in brackets, and the terms sentence's opening |
+
+The rules are applied to a PDF's text as it is read, before lines, page labels,
+and structure are worked out, so that converting the original again gives the
+same text. The original is unchanged, and its digest still ties the source file
+to it. A stamp in a form no rule matches is not removed: the author or an agent
+who sees one reports it before the source file is published.
+
 For markup, elements with roles that carry no stated meaning stay as paragraphs.
 Images become `figure` blocks holding their alternative text, or a statement
 that none is given. Scripts, styles, and external references are never run or
@@ -351,6 +373,7 @@ note is in the notes stream, and the running head in the furniture stream.
 |---|---|---|
 | Format, round trip, escaping, streams | Tests over synthetic sources on one macOS system | Right-to-left and complex scripts; very large works; other systems |
 | Converters | Tests over synthetic PDF, DOCX, HTML, EPUB, Markdown, and Gutenberg-style text; the worked example converts real PDFs on one system | Real Gutenberg, EPUB, and DOCX files from the range of tools |
+| Download stamps | Tests over invented stamps in each of the four forms; one real `annual_reviews` stamp | The other three forms in real files; any other form, which is left in place |
 | Determinism | Repeat conversions compared byte for byte on one system | Across systems and runtime versions |
 
 ## Schema Basis

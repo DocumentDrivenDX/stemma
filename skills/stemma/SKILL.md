@@ -129,6 +129,12 @@ Originals are never committed: they are tied by hash, or described with where
 they are held. Tell the author once that anyone who can read the repository can
 read its sources, so publishing it publishes them.
 
+Repositories and publishers sometimes stamp the copy they serve with who
+downloaded it: a name, a network address, a time. Conversion removes the forms
+it knows and records the removal on the page. If you see any other line of that
+kind in source text, or a reader's name, address or email added to a copy, tell
+the author before anything is published, without repeating the value.
+
 A plan for `ingest` is JSON: `{"captures": [{"source": "<source id>", "file":
 "<path from the plan>", "url": "<address>", "retrieved_at": "<time>",
 "version": "…", "identifiers": [{"scheme": "doi", "value": "…"}], "lookups":
