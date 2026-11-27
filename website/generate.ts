@@ -18,7 +18,7 @@ export const GENERATED = join(ROOT, "website/generated");
 /** What each check covers, and what it does not. */
 const NOTES: Record<string, { summary: string; limits: string }> = {
   "record.valid": {
-    summary: "Reads stemma.json, every record file and the rule headings in rules.md.",
+    summary: "Reads stemma.json, every record file and the rule headings in rules.md, and reports chapter files it cannot read and citation or claim IDs in them that name no record.",
     limits: "For some record kinds, rules beyond the record shape are not checked. A report says so when such a record is present.",
   },
   "project.binary": {
@@ -26,16 +26,16 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     limits: "A file that git ignores is not read. A file already removed stays in git history, which this does not read.",
   },
   "cite.key": {
-    summary: "Each citation record's key must name exactly one source record.",
-    limits: "Reads citation records only, not manuscript files. It does not show that a source supports a sentence.",
+    summary: "The key of each citation in the manuscript files, or in a project without them of each citation record, must name exactly one source record.",
+    limits: "It reads manuscript files only in Stemma's marked-up Markdown. It does not show that a source supports a sentence.",
   },
   "bib.uncited": {
-    summary: "Each source listed in bibliography_include must be cited by a citation record.",
-    limits: "It does not read manuscript files. For a project that has them, it reports that it could not check.",
+    summary: "Each source listed in bibliography_include must be cited in the manuscript files, or in a project without them by a citation record.",
+    limits: "When a chapter file cannot be read and no other cites the source, it reports that it could not check.",
   },
   "source.held": {
     summary: "Each cited source must have source files in the project that hold text and are not damaged.",
-    limits: "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+    limits: "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence.",
   },
   "source.pages": {
     summary: "Each source file's manifest and its page or section files must agree: none missing, extra, out of order, unreadable or edited without being sealed, and as many pages as the original has.",
@@ -54,8 +54,8 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
     limits: "It reads the recorded comparison: it does not open the original. A conversion that agrees repeats any mistake already in the original's text layer.",
   },
   "quote.present": {
-    summary: "Each quotation held by a citation record must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
-    limits: "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. It does not read manuscript files.",
+    summary: "Each quotation in the manuscript files, or in a project without them held by a citation record, must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
+    limits: "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. In a manuscript it knows only marked quotations, block quotations and double quotation marks; one it cannot give to a single citation is reported as not checked.",
   },
   "quote.page": {
     summary: "Where a citation gives a quotation and a locator, the quoted words must be on that page, or in that chapter or paragraph.",
@@ -63,7 +63,7 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
   },
   "locator.extent": {
     summary: "A citation's page or other locator must fall inside the extent recorded on the source or, for pages, folios, chapters and paragraphs, inside what the source files hold.",
-    limits: "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part. It reads citation records only.",
+    limits: "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part.",
   },
   "number.present": {
     summary: "A figure in a sentence that cites one source must be in that source's text.",
@@ -83,7 +83,7 @@ const NOTES: Record<string, { summary: string; limits: string }> = {
   },
   "source.changed": {
     summary: "Lists the passages, notes, claims and citations that rest on a source file or source since retired, on page text that has changed since a passage was captured, or on a passage captured before the source's details changed.",
-    limits: "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
+    limits: "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded; a citation written in a manuscript with no record is not compared with retired files, and the report says so. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
   },
   "coordinate.stray": {
     summary: "Warns about written map coordinates in project files, without repeating the value.",

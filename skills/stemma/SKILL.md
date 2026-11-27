@@ -520,9 +520,13 @@ asks, and carry on in the file. Nothing else in Stemma uses it.
 - Editors can change quotations and citations in the doc or Word file. Never
   repair or retype one yourself; show the author each such change in the diff,
   and capture new evidence by passage address as usual.
-- After edits land, update the affected records and run `check`. Say that
-  `check` reads the records and source files, not the manuscript text, so a
-  quotation or citation changed only in the manuscript is not detected.
+- After edits land, run `check`. When `manuscript/` holds `.md` chapter files,
+  it reads citations, quotations, locators and figures as written there, and the
+  citation records' own key, quotation and locator are history. A chapter it
+  cannot read in Stemma's markup is reported with its line, and `check` exits 3;
+  say that nothing in that file was checked. A manuscript kept anywhere else, or
+  as a Word file, is not read: update the records, and say that a change made only
+  there is not detected.
 
 ## Checking and verification
 

@@ -105,7 +105,8 @@ describe("SEC-014 a working directory's bunfig.toml and .env", () => {
 test("module boundaries: records, core and graph touch no filesystem, process, network, or adapter", () => {
   const forbidden: Record<string, RegExp> = {
     records: /from "(node:(?!crypto)|bun:|@stemma\/)|\bBun\./,
-    core: /from "(node:|bun:|@stemma\/(?!records))|\bBun\./,
+    manuscript: /from "(node:|bun:|@stemma\/(?!records))|\bBun\./,
+    core: /from "(node:|bun:|@stemma\/(?!records|manuscript))|\bBun\./,
     workspace: /from "(bun:|@stemma\/cli)/,
     graph: /from "(node:|bun:|@stemma\/(?!records|core))|\bBun\./,
   };

@@ -52,8 +52,8 @@ reader steps P1 to P5 are below.
 | 1 | Word reader | FR-71 | Reading built (CONTRACT-003 F); embedded reference data detected, not decoded; no command uses it; no real saved file tested |
 | 2 | Reference-list reader | FR-92 (ADC-01, ADC-02) | Built over a neutral document; some real entries go unread (CONTRACT-003, Proof Status) |
 | 3 | Author-date recognition and linking | FR-92 (ADC-03 to ADC-08) | Built over a neutral document; some real citations are missed (CONTRACT-003, Proof Status) |
-| 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Designed; not built |
-| 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | Designed; no version reads the copy yet |
+| 4 | Stemma copy and its reader | FR-35, FR-73 (CPY-01) | Reader built; nothing writes the copy |
+| 5 | Checks that read the copy | FR-73, FR-92 (CPY-02) | `check` reads the copy (CONTRACT-002 C, "Reading the manuscript"); tested on invented text. No takeover writes a copy yet |
 | 6 | Usable first report | FR-93 | Designed here; usability unmeasured |
 
 ### PDF reader build plan (FR-95)

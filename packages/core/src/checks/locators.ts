@@ -7,8 +7,7 @@ import { SourceTexts } from "../matching/texts.ts";
 import { manifestsUnread } from "./held.ts";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
-import { hasManuscript, resolveCitations } from "./bibliography.ts";
-import { itemOf, subjectOf } from "./records.ts";
+import { cited } from "./cited.ts";
 
 type Style = "arabic" | "roman_lower" | "roman_upper";
 export interface Numbered { style: Style; value: number }
@@ -189,30 +188,24 @@ export function judgeLocator(texts: SourceTexts, source: JsonObject, locator: Js
   return { ...overall(wheres, "outside_page_map"), evidence };
 }
 
-export const locatorCitations = (corpus: Corpus) =>
-  hasManuscript(corpus) ? [] : resolveCitations(corpus).filter(({ citation }) => isObject(citation.data!.locator));
-
 export function locatorResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
-  return locatorCitations(corpus).flatMap(({ citation, key, matches }) => {
-    if (matches.length !== 1) return [];
-    const data = citation.data!;
-    const locator = data.locator as JsonObject;
+  return cited(corpus).uses.flatMap((use) => {
+    const { key, matches, locator } = use;
+    if (!locator || matches.length !== 1) return [];
     const source = matches[0]!;
     const verdict = judgeLocator(texts, source.data!, locator);
-    const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-      ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
     const shown = typeof locator.end === "string" ? `${String(locator.value)} to ${locator.end}` : String(locator.value);
     return [result({
       check: "locator.extent", outcome: verdict.outcome, ...(verdict.reason ? { reason: verdict.reason } : {}),
-      subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#locator`, source: idOf(source)!,
+      subject: use.subject, locus: `${use.locus}#locator`, source: idOf(source)!,
       evidence: [
-        { name: "citation_file", class: "location", value: citation.path },
+        ...use.where,
         meta("key", key ?? String(source.data!.citation_key ?? idOf(source))),
         { name: "locator", class: "manuscript", value: `${String(locator.label)} ${shown}` },
         { name: "source_file", class: "location", value: source.path },
         ...verdict.evidence,
       ],
-      item: itemOf(citation), ...(sentence ? { sentence } : {}),
+      ...(use.item ? { item: use.item } : {}), ...(use.sentence ? { sentence: use.sentence } : {}),
     })];
   });
 }

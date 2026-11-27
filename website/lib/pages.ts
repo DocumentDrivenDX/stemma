@@ -108,7 +108,7 @@ ${band("When a quotation differs", `<p>In our made-up demo book, one typed citat
 ${transcript(demoFinding("3. PROBLEM: A quotation"), "<strong>Transcript</strong> of a real run of the demo: one finding of three, exactly as the tool printed it. All names and sources are invented. When you use Stemma, Claude explains findings like this to you.")}
 <p><a href="examples.html#demo">The whole demo, step by step</a></p>`)}
 ${band("What stays yours", `<p>Judgment stays with you. A pass only means that your record agrees with the text made from your source, and that text can be wrong, especially when a computer read it from a scan. No check tells you that a source supports your argument.</p>
-<p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It does not read your manuscript files; it checks the citations that have been recorded. Nothing ever stops you from writing.</p>`)}
+<p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It checks the citations in manuscript files written in Stemma's marked-up Markdown, or else the citations that have been recorded; it does not check a Word file. Nothing ever stops you from writing.</p>`)}
 ${band("Part of a family", `<p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. The project plans its own work with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>; you do not need it.</p>`)}`;
 }
 
@@ -260,9 +260,9 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
   { id: "id.resolves", question: "Does each identifier lead to the right work?", looks: "A DOI or library identifier should have a saved catalogue record naming the same work.",
     limit: "It compares titles. Some kinds of identifier cannot be looked up." },
   { id: "cite.key", question: "Which source does this citation mean?", looks: "The short label in each citation must match exactly one source.",
-    limit: "It reads recorded citations, not your manuscript, and does not show that the source supports your sentence." },
+    limit: "It reads your manuscript only in Stemma's marked-up Markdown, and does not show that the source supports your sentence." },
   { id: "bib.uncited", question: "Is every listed work cited?", looks: "A work you have listed for the bibliography should be cited somewhere.",
-    limit: "It cannot tell when your project has manuscript files, because it does not read them. It says so." },
+    limit: "If a chapter file cannot be read, it may not be able to tell, and says so." },
   { id: "source.changed", question: "Did something you relied on change?", looks: "Lists passages, citations and other work that rest on a source you have replaced or set aside, or on text that has changed.",
     limit: "It cannot record that you have looked again, so an item stays listed." },
   { id: "record.valid", question: "Are the project files in order?", looks: "Reads the settings, every record, every source file and the headings of your standing rules.",
@@ -293,7 +293,8 @@ ${band("The checks", built.join("\n"), { id: "checks", aside: contents("Checks o
 ${band("What is not checked", `<p>A report runs the checks that apply to what is in your project. These are left to you:</p>
 <ul class="plain-list"><li>Whether the text made from a source matches the pictures of its pages, unless a person compares them.</li>
 <li>Figures written as words, and whether a figure in a source means what your sentence says.</li>
-<li>Anything in your manuscript files, which Stemma does not read.</li></ul>
+<li>Manuscripts in Word or another form. Only files in Stemma's marked-up Markdown are read.</li>
+<li>In those files, what your own words say, apart from figures, and quotations marked in other ways than double quotation marks, block quotations or Stemma's own mark.</li></ul>
 <p>No check tells you whether a source supports your argument, or whether you chose the right source.</p>`, { id: "not-checked" })}`;
 }
 

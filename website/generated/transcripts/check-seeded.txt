@@ -60,7 +60,7 @@ Checked the whole project: 16 result(s) passed.
        field: /tittle
        problem: the field is not part of the record format
 
-9. PROBLEM: A record points at a record that is missing or is of the wrong kind.  [record.valid]
+9. PROBLEM: A record or a chapter file names a record that is missing or is of the wrong kind.  [record.valid]
    Why it matters: The link between your evidence and its source is broken, so anything relying on it cannot be traced.
    What to do: Point the reference at the right record, or remove it.
    - stemma.json

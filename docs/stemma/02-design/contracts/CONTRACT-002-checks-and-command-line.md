@@ -218,10 +218,10 @@ support record is present and resolved", never as verification of support.
 **`source.held`** (assumptions). It emits one result for each citation record
 that names exactly one source (a key naming none is `cite.key`'s finding). It
 passes only when the source has a non-retired source file with text and none of
-its non-retired source files is damaged. While `manuscript/` holds files this
-version cannot read, it is `not_implemented`. A pass says nothing about whether
-the text is a faithful reading of the original; its evidence states the method
-and the review coverage.
+its non-retired source files is damaged. With a manuscript, it emits one result
+for each citation item there instead (see "Reading the manuscript"). A pass says
+nothing about whether the text is a faithful reading of the original; its
+evidence states the method and the review coverage.
 
 **Structure checks.** `source.pages` emits a result for every non-retired source
 file, `source.labels` for every paged one with a labelled page, and
@@ -309,9 +309,7 @@ not those the passage was selected under, except that details only added since,
 as the record's `changes` show, are not reported (FR-94). It emits one result for each non-retired note, claim, passage, or
 citation that reaches a source or source file. Reason codes are
 `depends_on_retired`, `text_changed`, `source_details_changed`, and
-`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed. While `manuscript/` holds files
-this version cannot read, citations are left out and the check is also
-`not_implemented`.
+`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed.
 
 **`locator.extent`** (assumptions beyond SD-007 BR-715). It emits one result for
 each citation record with a locator that names exactly one source. A value is a
@@ -328,8 +326,7 @@ no matching extent or map, is `no_extent`. A range that runs backwards, mixes
 styles, or abbreviates its end, and forms such as `41ff.`, are
 `unparsable_locator`. A partial source file's labels cover only its pages, and
 the finding says so. `quote.present`, `quote.page`, and `locator.extent` emit
-nothing for a citation whose key names no single source (`cite.key` reports it),
-and are `not_implemented` while manuscript files are present.
+nothing for a citation whose key names no single source (`cite.key` reports it).
 
 **Every result that did not pass is explained.** Each `fail` or `unverifiable`
 result MUST say in plain language what is wrong or was not covered, show its
@@ -392,22 +389,88 @@ like any finding (assumption). CRLF line endings from a checkout alone do not
 make a file non-canonical. An unreadable or newer-version file is
 `unverifiable`.
 
-**Citation items without a manuscript reader.** The manuscript is authoritative
-(CONTRACT-006 D). When `manuscript/` holds no `.md` file, `cite.key` and
+**Citation items without a manuscript.** A project **has a manuscript** when
+`manuscript/` holds at least one `.md` file. Without one, `cite.key` and
 `bib.uncited` read the non-retired `citation` records; a record's `key`, or its
 `source` when it has no key, names the source. With no citation record either,
-each listed entry is `unverifiable` (`no_manuscript`). While a version cannot
-read manuscript files that are present, no citation record stands in for them:
-`bib.uncited` is `unverifiable` (`manuscript_not_read`) and `cite.key` is
-`not_implemented`. `cite.key` is `unverifiable` (`source_unreadable`) when a key
-matches no source and some source record cannot be read; `bib.uncited`
-likewise (`citation_unreadable`) for unread citation records (assumptions).
+each listed entry is `unverifiable` (`no_manuscript`). `cite.key` is
+`unverifiable` (`source_unreadable`) when a key matches no source and some
+source record cannot be read; `bib.uncited` likewise (`citation_unreadable`) for
+unread citation records (assumptions).
+
+**Reading the manuscript.** With a manuscript, `cite.key`, `source.held`,
+`quote.present`, `quote.page`, `locator.extent`, `number.present`,
+`bib.uncited`, and `source.changed` read it through the one reader of
+CONTRACT-006 D. The manuscript says what is cited, quoted, and located now. A
+citation record's `key`, `sentence`, `quotation`, and `locator` are then history:
+none is checked, and a record that no occurrence names is not a citation.
+`quote.present` still compares passages and note extracts, and a passage a
+citation record names still counts as used. `body.inputs.manuscript` lists every
+file under `manuscript/` with its digest, and `body.inputs.profiles` names
+`sentence-split/0` when a chapter was read.
+
+The rules below fill what CONTRACT-006 leaves open (assumptions).
+
+- **Subject and place.** A result about an occurrence has as `subject` the
+  citation record ID it carries, or else the chapter file's path. Its evidence
+  names the file, line, and column, and the citing sentence. A subject holds no
+  line number, so that an edit elsewhere does not change the finding key.
+- **Locus.** The CONTRACT-006 D locus. Where one chapter holds the same sentence
+  twice, the ordinal counts equal citations through both, so that no two share a
+  key. A quotation's result adds the quotation's digest and its ordinal among
+  equal ones, so that changed words are a new finding.
+- **Annotations** bind the citing sentence and, where one is named, the source
+  (F), never the citation record.
+- **Quotations.** `quote.present` emits one result for each quotation whose
+  citation names exactly one source, and `unverifiable`
+  (`unattributed_quotation`) for one that cannot be attributed. For one
+  attributed to a key that names no single source it emits nothing (`cite.key`
+  reports it). A double quotation mark with no partner is `unverifiable`
+  (`unpaired_quote_mark`), one result for each line that holds one, because what
+  it quotes was not read. `quote.page` reads each attributed quotation whose
+  citation has a page, folio, chapter, or paragraph locator.
+- **Keys.** A citation with key `?` fails `cite.key` (`key_unbound`) and shows the
+  text found at takeover when its record holds it. No other check reads it.
+- **Figures.** `number.present` reads each sentence that has a citation, apart
+  from its quotations and locators, and apart from the sentences of a block
+  quotation, whose figures are quoted words. Citations that name one source count
+  once. A sentence that cites more than one source is `several_citations` for
+  each source.
+- **Bibliography.** An entry is cited when a citation item names it. When it is
+  not found cited and a chapter file could not be read, `bib.uncited` is
+  `unverifiable` (`manuscript_unreadable`).
+- **What a citation rests on.** `source.changed` follows the source the key names
+  (a retired source that held the key, when none in effect does) and the claims
+  of the claim spans around the citation. For an occurrence with a record, it
+  also follows the record's `passage` while that passage belongs to a source the
+  key names; otherwise the retired source files rule above applies from the
+  record's creation. An occurrence with no record has no time from which to apply
+  that rule. When its source has a retired source file and nothing else changed,
+  the result is `unverifiable` (`retired_text_not_followed`) as coverage; the
+  quotation, page, and locator checks still read the current text.
+- **Files that cannot be read.** `record.valid` reports each chapter file the
+  reader refuses as `unverifiable` with the reader's code
+  (`manuscript_unsupported`, `manuscript_syntax`, or `manuscript_duplicate_id`),
+  its line and column, and no manuscript text. No other check reads that file;
+  the other files are still checked. `check` writes its report and exits 3
+  (CONTRACT-006, Error Semantics). A file under `manuscript/` that is not a
+  `.md` file is a coverage result (`manuscript_file_unread`).
+- **References.** `record.valid` fails (`reference_dangling`) for a citation `id`
+  or claim span ID that names no record of that kind. A record that cannot be
+  read has its own finding.
+- **Unreviewed items** are those the manuscript's citations and claim spans
+  reach.
+
+`claim.inactive`, `cite.unlinked`, `draft.marked`, and `quote.self` are not
+built and stay `not_implemented` where they apply. The report does not yet list
+the `.not-quote` passages (CONTRACT-006 C), and `validate` reads record files
+only.
 
 **Checks over a taken-over copy.** A version that provides `takeover` MUST read
 the Stemma copy: after takeover, `cite.key`, `source.held`, `quote.present`,
 `quote.page`, `locator.extent`, `number.present`, and `bib.uncited` run from it,
-and none is left `not_implemented` or `manuscript_not_read` because manuscript
-files are present (FR-73, FR-92). A citation with key `?` fails `cite.key`.
+and none is left `not_implemented` or unread because manuscript files are present
+(FR-73, FR-92). A citation with key `?` fails `cite.key`.
 
 **Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
 URI; degrees with a degree sign and a latitude then a longitude hemisphere

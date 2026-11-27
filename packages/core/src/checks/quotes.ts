@@ -4,13 +4,14 @@
 // and a citation made from a passage still says what the passage says.
 // quote.page: the words are on the cited pages, or in the cited chapter or
 // paragraph. A match against recognized text shows agreement with that text only.
-import { canonical, type Corpus, idOf, isObject, type JsonObject, type LoadedFile } from "@stemma/records";
+import { canonical, type Corpus, idOf, isObject, type JsonObject, type LoadedFile, sha256 } from "@stemma/records";
 import { result } from "../findings.ts";
 import { type Closest, findClosest, findQuotation, FOLD_WORDS, type Found, QUOTE_PROFILE, renderQuotation, type Span, type Within } from "../matching/quote-fold.ts";
 import { paragraphNumbers, placeOf, SourceTexts, type StreamName, type TextView } from "../matching/texts.ts";
 import { addressText, textAt } from "../passages.ts";
 import type { Evidence, Result } from "../report.ts";
-import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
+import { active, hasManuscript } from "./bibliography.ts";
+import { cited, manuscriptOf, positionOf, type QuotedUse, type Unattributed } from "./cited.ts";
 import { citedPages, locatorParts, numberOf } from "./locators.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
@@ -129,39 +130,59 @@ function usedPassages(corpus: Corpus): LoadedFile[] {
   return active(corpus, "passage").filter((p) => used.has(idOf(p)!));
 }
 
-/** Citation records that hold a quotation count only while no manuscript file is authoritative. */
-export const quotationCitations = (corpus: Corpus) =>
-  hasManuscript(corpus) ? [] : resolveCitations(corpus).filter(({ citation }) => typeof citation.data!.quotation === "string");
+/** A quoted-looking span whose citation cannot be told (CONTRACT-006 D). */
+const unattributed = (found: Unattributed): Result => result({
+  check: CHECK, outcome: "unverifiable", reason: "unattributed_quotation", subject: found.subject, locus: `${found.locus}#quotation`,
+  evidence: [...found.where, { name: "cited_text", class: "manuscript", value: found.text }],
+  ...(found.sentence ? { sentence: found.sentence } : {}),
+});
 
-export const quotationSubjects = (corpus: Corpus): number =>
-  quotationCitations(corpus).length + active(corpus, "passage").length + active(corpus, "note").filter((n) => n.data!.type === "extract").length;
-
-const sentenceOf = (data: JsonObject) => isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-  ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
+/** A mark with no partner hides what it quotes. One result for each line that holds one. */
+function unpairedResults(corpus: Corpus): Result[] {
+  if (!hasManuscript(corpus)) return [];
+  const files = new Map(corpus.manuscript.map((f) => [f.path, f]));
+  return manuscriptOf(corpus).chapters.flatMap((chapter) => {
+    if (chapter.unpairedQuoteMarks.length === 0) return [];
+    const lines = new TextDecoder().decode(files.get(chapter.path)!.bytes).replace(/\r\n/g, "\n").split("\n");
+    const byLine = new Map<number, number>();
+    for (const mark of chapter.unpairedQuoteMarks) if (!byLine.has(mark.line)) byLine.set(mark.line, mark.column);
+    const seen = new Map<string, number>();
+    return [...byLine].sort(([a], [b]) => a - b).map(([line, column]) => {
+      // The line's own digest, so that a note on this finding does not outlast its words.
+      const digest = sha256(lines[line - 1] ?? "");
+      const n = seen.get(digest) ?? 0;
+      seen.set(digest, n + 1);
+      return result({
+        check: CHECK, outcome: "unverifiable", reason: "unpaired_quote_mark", subject: chapter.path,
+        locus: `${chapter.id}#unpaired#${digest}#${n}`, evidence: [positionOf(chapter.path, { line, column })],
+      });
+    });
+  });
+}
 
 export function quoteResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   const results: Result[] = [];
 
-  for (const { citation, key, matches } of quotationCitations(corpus)) {
+  for (const { use, text: quotation, locus } of cited(corpus).quoted) {
+    const { key, matches } = use;
     // A key that names no single source is cite.key's finding.
     if (matches.length !== 1) continue;
     const source = idOf(matches[0]!)!;
-    const data = citation.data!;
-    const quotation = data.quotation as string;
     const { views, unusable } = texts.of(source);
-    const departed = departures(corpus, data);
+    // A record's quotation and locator are history once the manuscript says what is quoted.
+    const departed = use.written ? undefined : departures(corpus, use.record!.data!);
     const verdict: Verdict = departed
       ? { outcome: "fail", reason: "citation_differs", evidence: departed }
       : compareQuotation(quotation, searchesOf(views), unusable);
-    const sentence = sentenceOf(data);
     results.push(result({
       check: CHECK, outcome: verdict.outcome, ...("reason" in verdict ? { reason: verdict.reason } : {}),
-      subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#quotation`, source,
-      evidence: [at("citation_file", citation.path), meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
+      subject: use.subject, locus: `${locus}#quotation`, source,
+      evidence: [...use.where, meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
         { name: "cited_text", class: "manuscript", value: quotation }, ...verdict.evidence],
-      item: itemOf(citation), ...(sentence ? { sentence } : {}),
+      ...(use.item ? { item: use.item } : {}), ...(use.sentence ? { sentence: use.sentence } : {}),
     }));
   }
+  results.push(...cited(corpus).unattributed.map(unattributed), ...unpairedResults(corpus));
 
   const record = (file: LoadedFile, verdict: Verdict, cited: string, locus: string) => {
     results.push(result({
@@ -253,33 +274,36 @@ function citedLabels(locator: JsonObject): string[] | undefined {
   });
 }
 
-export const pageQuotations = (corpus: Corpus) => quotationCitations(corpus)
-  .filter(({ citation }) => isObject(citation.data!.locator) && ["page", "folio", "chapter", "paragraph"].includes(String(citation.data!.locator.label)));
+const PAGE_TERMS = ["page", "folio", "chapter", "paragraph"];
+
+const pageQuotations = (corpus: Corpus): QuotedUse[] =>
+  cited(corpus).quoted.filter(({ use }) => PAGE_TERMS.includes(String(use.locator?.label)));
 
 export function quotePageResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
-  return pageQuotations(corpus).flatMap(({ citation, key, matches }) => {
+  return pageQuotations(corpus).flatMap(({ use, text, locus }) => {
+    const { key, matches } = use;
     if (matches.length !== 1) return [];
     const source = idOf(matches[0]!)!;
-    const data = citation.data!;
-    const locator = data.locator as JsonObject;
-    const cited = citedLabels(locator);
-    const found = occurrences(texts.of(source).views, data.quotation as string);
+    const locator = use.locator!;
+    const named = citedLabels(locator);
+    const found = occurrences(texts.of(source).views, text);
     // Words that are not found are quote.present's finding; an unreadable locator is locator.extent's.
-    if (!cited || found.length === 0) return [];
-    const judged = found.map((o) => ({ o, where: whereIs(o, String(locator.label), cited) }));
+    if (!named || found.length === 0) return [];
+    const judged = found.map((o) => ({ o, where: whereIs(o, String(locator.label), named) }));
     const best = (["covered", "partly", "elsewhere", "unknown"] as const).find((w) => judged.some((j) => j.where === w))!;
     const shown = judged.filter((j) => j.where === best).slice(0, 5);
-    const sentence = sentenceOf(data);
     const outcome = best === "covered" ? "pass" : best === "unknown" ? "unverifiable" : "fail";
     const reason = best === "partly" ? "partly_on_page" : best === "elsewhere" ? "wrong_page" : best === "unknown" ? "place_unknown" : undefined;
     return [result({
-      check: "quote.page", outcome, ...(reason ? { reason } : {}), subject: subjectOf(citation), locus: `${idOf(citation) ?? citation.path}#page`, source,
+      check: "quote.page", outcome, ...(reason ? { reason } : {}), subject: use.subject, locus: `${locus}#page`, source,
       evidence: [
-        at("citation_file", citation.path), meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
+        ...use.where, meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)),
+        // A chapter can hold several quotations under one citation, so each is shown.
+        ...(use.written ? [{ name: "cited_text", class: "manuscript" as const, value: text }] : []),
         { name: "locator", class: "manuscript", value: `${String(locator.label)} ${String(locator.value)}` },
         ...shown.flatMap((j) => place(j.o, j.o.start, j.o.end).slice(0, 3)),
       ],
-      item: itemOf(citation), ...(sentence ? { sentence } : {}),
+      ...(use.item ? { item: use.item } : {}), ...(use.sentence ? { sentence: use.sentence } : {}),
     })];
   });
 }
