@@ -5,7 +5,7 @@
 import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PAGES, render } from "./lib/pages.ts";
-import { FONTS, fontFaces, fontFile, SUBSETS } from "./lib/screens.ts";
+import { siteFonts } from "./lib/fonts.ts";
 
 const ROOT = join(import.meta.dir, "..");
 const OUT = join(import.meta.dir, "dist");
@@ -20,14 +20,12 @@ const tailwind = Bun.spawnSync([
 ], { cwd: ROOT });
 if (tailwind.exitCode !== 0) throw new Error(tailwind.stderr.toString());
 const styles = await Bun.file(join(OUT, "tailwind.css")).text();
-writeFileSync(join(OUT, "site.css"), `${fontFaces("fonts/")}\n${styles}`);
+const fonts = siteFonts("fonts/");
+writeFileSync(join(OUT, "site.css"), `${fonts.css}\n${styles}`);
 rmSync(join(OUT, "tailwind.css"));
 
-for (const font of FONTS) {
-  const from = join(ROOT, "node_modules/@fontsource-variable", font.pkg);
-  for (const subset of SUBSETS) cpSync(join(from, "files", fontFile(font.pkg, subset)), join(OUT, "fonts", fontFile(font.pkg, subset)));
-  cpSync(join(from, "LICENSE"), join(OUT, "fonts", `LICENSE-${font.pkg}.txt`));
-}
+for (const { pkg, file } of fonts.files) cpSync(join(ROOT, "node_modules/@fontsource-variable", pkg, "files", file), join(OUT, "fonts", file));
+for (const pkg of new Set(fonts.files.map((f) => f.pkg))) cpSync(join(ROOT, "node_modules/@fontsource-variable", pkg, "LICENSE"), join(OUT, "fonts", `LICENSE-${pkg}.txt`));
 cpSync(join(import.meta.dir, "src/mark.svg"), join(OUT, "mark.svg"));
 cpSync(join(import.meta.dir, "generated/screenshots"), join(OUT, "screenshots"), { recursive: true, filter: (path) => !path.endsWith(".json") });
 cpSync(join(import.meta.dir, "generated/reports"), join(OUT, "reports"), { recursive: true });

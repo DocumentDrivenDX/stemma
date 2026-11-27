@@ -14,8 +14,8 @@ kind: product
 
 ## Summary
 
-Stemma is a Claude plugin for academic researchers who write books with AI
-assistance. The plugin is the product: its command line, and later its graph
+Stemma is a Claude plugin that helps academic researchers create academically
+rigorous research reports and books with AI assistance. The plugin is the product: its command line, and later its graph
 engine and explorer, exist to support it, and installing the plugin is the only
 installation a person does. It keeps a project's sources, passages, notes, claims, research
 constructs, methodology, and places as an evidence graph in plain files. It
@@ -106,7 +106,7 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
    explained in plain language, in the report of every build.
 2. Keep the author in control of interpretation, structure, and disclosure.
 3. Keep one source of truth from sources through notes, claims, and chapters to
-   a typeset book.
+   a typeset report or book.
 4. Let an author start from a new project or from an existing manuscript.
 5. Serve users with different levels of AI experience and different fields.
 
@@ -132,7 +132,7 @@ bibliography takes manual library look-ups. Scholars who lack that discipline ei
 - Proving that no record was altered. An agent or person who can edit the
   project files can change review marks, annotations, and support verdicts. Scripted checks are
   recomputed at build; model verdicts are not.
-- Preventing a book with open findings from being published. The report and its
+- Preventing a report or book with open findings from being published. The report and its
   label are the control.
 - Proving that every assertion was checked. Text with no claim and no citation
   is not checked.
@@ -163,7 +163,9 @@ Deferred items are tracked in `docs/stemma/parking-lot.md`.
 ## Users and Scope
 
 Personas differ in comfort with AI and in field. The first version is designed
-around the AI-fluent author. Defaults for other personas add guidance.
+around the AI-fluent author. Defaults for other personas add guidance. Authors
+write research reports and books. The personas are described through books; that
+their needs also hold for research reports is an untested assumption.
 
 ### Primary Persona: Idris, the AI-fluent humanist
 
@@ -246,7 +248,7 @@ disclosure, which accepts comments tied to claims.
 | Hear rival readings from a separate pass with fresh context | high | Unpublished input | medium | assumed |
 | Trace every change and correction | high | Unpublished input | medium | assumed |
 | Work without an external reference manager | high | Product decision | high | validated |
-| Typeset a camera-ready book from the same files | high | Product decision | high | validated |
+| Typeset a camera-ready report or book from the same files | high | Product decision | high | validated |
 | Disclose AI use accurately and cheaply | high | Kansa (2026); unpublished input | medium | validated |
 | Include sources in multiple languages with fair coverage | medium | Unpublished input | medium | assumed |
 | Respect permissions on unpublished data and community knowledge | medium | Kansa (2026); unpublished input | medium | assumed |
@@ -344,7 +346,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 
 - **FR-20** (P0, M1) — A reading note anchors each extract or paraphrase to a source and a locator, and the extract matches the source text. A passage keeps a stable address and the digests of the pages or sections it lies in, so an output can be tied exactly to it.
 - **FR-21** (P0, M1) — A claim-ledger entry links a claim to one or more notes, with a confidence level and the reason the sources support it.
-- **FR-22** (P0, M2) — A construct register holds each concept the book uses, with its definition and the chapters that use it. A construct taken from a source names that source. The author's own construct is marked as the author's and requires a definition. Author-stated constructs from FR-60 are entries in the same register. Scripts check references to constructs. The agent advises on inconsistent use of a construct or of the methodology; that advice is not a finding.
+- **FR-22** (P0, M2) — A construct register holds each concept the work uses, with its definition and the chapters that use it. A construct taken from a source names that source. The author's own construct is marked as the author's and requires a definition. Author-stated constructs from FR-60 are entries in the same register. Scripts check references to constructs. The agent advises on inconsistent use of a construct or of the methodology; that advice is not a finding.
 - **FR-23** (P0, M1) — Notes, claims, and constructs that the assistant proposes take effect at once, marked unreviewed. The author reviews or corrects them whenever they like, one at a time or in batches, and every report shows what is unreviewed. The author's own edits keep a reviewed item reviewed; a change made by the AI marks it unreviewed again. A review mark records what the author said and is not proof of who wrote it.
 - **FR-80** (P0, M2) — The claim ledger records whether a linked note supports or opposes a claim, and records relations between claims, including support, objection, and rival reading, and which claim is the thesis.
 
@@ -367,7 +369,7 @@ Each requirement carries its priority and, for P0, its delivery step.
     saved catalogue lookup;
   - identifier such as a DOI that does not resolve or resolves to a different
     work;
-  - a quotation that duplicates the book's own argument;
+  - a quotation that duplicates the work's own argument;
   - a figure or statistic attributed to a source that does not contain it,
     where the text can be matched;
   - a construct credited to someone other than its registered originator.
@@ -707,8 +709,8 @@ Windows, desktop apps, and files saved by real tools are untested.
 | citeproc-js output misses some Chicago note forms | Medium | Medium | Approve an example set against the manual and report unsupported forms |
 | Support verdicts are wrong or vary between runs | Medium | High | Record inputs and verdicts, report every unsupported or partly supported finding, and measure against seeded overstated claims |
 | A manuscript sentence is strengthened while its recorded claim is unchanged, and the support record stays current | Medium | High | State the limit; the record judges the claim, not the printed sentence |
-| A removed reference leaves a claim with no source in a finished book | Medium | High | Report every such claim in each check report |
-| A book or package with open findings is produced and sent, because nothing blocks a build | High | High | Label every output; explain findings; state open and unreviewed counts in the disclosure; no block, by owner decision |
+| A removed reference leaves a claim with no source in a finished report or book | Medium | High | Report every such claim in each check report |
+| A report, book, or package with open findings is produced and sent, because nothing blocks a build | High | High | Label every output; explain findings; state open and unreviewed counts in the disclosure; no block, by owner decision |
 | Findings are so many or unclear that the author ignores the report | High | High | Treat unexplained or noisy findings as defects; group by cause; measure in the pilot |
 | Unreviewed AI-proposed claims and constructs are used and read as the author's, including in an output labelled checked clean, since the label reflects checks only | High | High | Mark and count them in reports, record views, and the disclosure, beside the label |
 | The agent reads exact restricted coordinates and they reach its model or new text | Medium | High | Read only when a task needs them; never write them into tracked files or outputs; the scan only warns |
@@ -737,10 +739,16 @@ Windows, desktop apps, and files saved by real tools are untested.
   product owner: `pdfjs-dist`, pinned (SD-002).
 - [ ] How long may a "short matching excerpt" of a copyrighted source be in a
   reviewer package? Blocks use of the allowance in FR-46; product owner.
-- [ ] Must the book's own thesis claim reach a note, or is it exempt from the
+- [ ] Must the work's own thesis claim reach a note, or is it exempt from the
   completeness check of FR-21? Affects the checked-clean label; product owner.
 - [ ] Is a command-line or administrator install acceptable for ChatGPT desktop?
   Blocks FR-77; product owner after a hands-on test.
+- [ ] Which typesetting requirements apply to a research report? FR-35 to
+  FR-38, FR-57, and FR-83 were written for books: front and back matter, an
+  index, trim sizes, and a manuscript arranged in chapters. Requirements that
+  name chapters (such as FR-22, FR-24, and FR-43) need the matching answer for a
+  report's structure. Until answered, they promise nothing specific for reports;
+  product owner.
 
 ## Success Criteria
 

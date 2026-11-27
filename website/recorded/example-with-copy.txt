@@ -1,0 +1,19 @@
+$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $STORE
+OPEN FINDINGS: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 39 result(s) passed.
+
+For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs/.stemma/reports/check.json
+[exit 1]

@@ -1,11 +1,12 @@
 // The page list, kept apart from the page bodies so that the browser tests,
 // which may run under a different loader, can read it on its own.
 export const PAGES = [
-  { file: "index.html", nav: "What Stemma is", title: "Stemma", description: "A Claude plugin: scripted citation checks and plain reports for scholarly books. Pre-release." },
-  { file: "principles.html", nav: "Principles", title: "Principles", description: "How Stemma decides between two reasonable options." },
-  { file: "install.html", nav: "Install and ask", title: "Install and ask Claude", description: "Install the Stemma plugin, then ask Claude in plain words." },
-  { file: "checks.html", nav: "Checks", title: "Checks reference", description: "What each check looks at and what a pass does not show." },
-  { file: "examples.html", nav: "Examples", title: "Examples", description: "Real command output from the demo and test fixtures." },
-  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "One real source, four quoted citations, and what Stemma can and cannot check." },
+  { file: "index.html", nav: "What Stemma is", title: "Stemma", description: "Create academically rigorous research reports and books with Claude. Stemma checks citations against your own stored copies. Pre-release." },
+  { file: "how.html", nav: "How it works", title: "How it works", description: "The research cycle with Stemma, step by step, and where your material lives." },
+  { file: "install.html", nav: "Get started", title: "Get started", description: "Install the Stemma plugin, then ask Claude in plain words." },
+  { file: "checks.html", nav: "Checks", title: "What gets checked", description: "What each check looks at and what passing it does not tell you." },
+  { file: "darwin.html", nav: "Worked example", title: "Worked example: Darwin and coral reefs", description: "A real book from 1842, followed from its title page to four checked quotations." },
+  { file: "examples.html", nav: "Examples", title: "Examples", description: "Stemma at work on a made-up book, from real runs of the tool." },
+  { file: "principles.html", nav: "Principles", title: "Principles", description: "What Stemma does when two reasonable choices pull apart." },
   { file: "design.html", nav: "Design", title: "Design language", description: "Identity, voice, color, type, components and accessibility." },
 ] as const;

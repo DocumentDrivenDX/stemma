@@ -35,7 +35,9 @@ Chromium has been used. Flows: [[UF-007]], [[UF-012]], [[UF-013]],
   keeps clear space of a quarter of its width, and is not used below 16 pixels.
 - **Character**: a careful report. No mascot, seal, check mark, shadow, gradient,
   or animation. Identity comes from the mark, serif headings, and the wording.
-  Stemma sets no brand color.
+  On the microsite it also comes from the habits of a scholarly edition: a margin
+  beside the text, ruled entries, and a stemma drawn from real records. Stemma
+  sets no brand color.
 - **Voice**: plain, specific, and short. Say what is wrong, show the evidence,
   say why it matters, suggest what to do. Say what was not checked. Mark planned
   work "not built", never "coming soon". Never praise the author's text or
@@ -253,8 +255,11 @@ captured command-line pages bundle their fonts, so that they look alike across
 machines and request nothing from another host: Source Serif 4 (headings), Inter
 (text), and JetBrains Mono (output and IDs), from pinned `@fontsource-variable`
 5.3.0 packages under the SIL Open Font License 1.1, with licence texts published
-beside the files. Only the Latin and extended Latin upright files are bundled;
-italics are synthesized by the browser.
+beside the files. Only the Latin and extended Latin subsets are bundled. The
+microsite takes Source Serif 4 with its optical size axis, upright and italic;
+it also sets the lead paragraph and quoted words. The captured command-line pages
+use the weight-axis upright files. Inter and JetBrains Mono are upright only, so
+the browser synthesizes any italic of theirs.
 
 ### Report components
 
@@ -264,6 +269,9 @@ italics are synthesized by the browser.
 | Report excerpt | A figure whose caption says what the text is (commands to type, or a transcript of a real run) and what was replaced. Monospace, no ligatures, long lines wrap, reachable by keyboard. Color only repeats the report's own words |
 | Finding | Outcome, check ID and reason code; what is wrong; why it matters; what to do; evidence. Filled from a JSON report. A drawing of a report entry is labeled as such and is not presented as a Stemma screen |
 | Figure | A screenshot has alternative text, a caption saying how it was made, and the same content available as text. A captured page of command output says "Rendered page, not a terminal window" in the image and in its caption |
+| Line of descent | A drawing of record files as a stemma: a nested list with lines between its items, so the text is the drawing. As in the mark, the filled node is the one the rest descend from; each node also has a text label naming its kind. Filled from the records when the site is built, and captioned as this site's drawing. Side by side from 62rem, an indented tree below |
+| Explanatory drawings | The research cycle, the demo's successive checks, where material is kept, and the example's page map. HTML with CSS lines, so the words are the drawing. Counts and page ranges are read from runs and record files. The cycle's steps are the order of work, not stages that block one another |
+| Folded detail | A native `details` element whose summary says what is inside. No script |
 | Unbuilt behaviour | The microsite presents and demonstrates what works, from real output. It carries no roadmap, planned-work, or in-progress content, and shows or claims nothing that does not work |
 
 ### Styling: Tailwind with arras styles
@@ -296,7 +304,28 @@ single offline page's content security policy accepts the bundled stylesheet.
 
 ## Microsite
 
-The microsite presents the plugin. The one installation it may describe is
+The microsite presents the plugin. Its home page leads with what the author is
+after, creating academically rigorous research reports and books, and presents
+the checks as how Stemma serves that: the problem, how the author works, what
+each recorded citation rests on, what is checked, and what stays the author's
+judgment. It claims for Stemma only what works.
+
+Its voice is approachable and nontechnical, for an author rather than a
+programmer: everyday words, "you" for the reader, a term explained where it is
+first needed, and check IDs shown small, beside a plain question. What the tool
+prints is never reworded: it follows a plain introduction, usually folded in a
+`details` element. Where the site simplifies a source (the checks, the
+principles), the build fails if the two lists of items differ. It cannot tell
+whether the plain wording still says no more than the source; a person checks
+that. The design page speaks to maintainers and may be technical.
+
+Coverage is complete for what works: the research cycle and one round of it in
+detail, where material is kept and what may reach a model, every check with what
+a pass does not show, what is not checked, and the worked example from the source
+record to a run with the private copy, deliberate mistakes, and a run without
+it.
+
+The one installation it may describe is
 installing the plugin; it states install commands only once they have been shown
 to work against the published marketplace. It gives no runtime, command-line, or
 build instructions.
@@ -306,17 +335,29 @@ a Bun script (`./scripts/dev.sh site`). That is lighter than the family's Hugo
 sites, which add Hugo, Go modules, and a theme, while the one-page family home
 page has no generator to reuse. It follows the tokens, voice, and components
 above. Its navigation is a list of page links that wraps on narrow screens; the
-Menu button rule applies to the explorer only. Dark follows the system setting or
+Menu button rule applies to the explorer only. Its layout, apart from the size
+classes above, which describe the product interfaces: a page opens with its
+title; each section is ruled off; from 56rem a section's heading sits in a margin
+column and stays in view while the section is read, with any list of links within
+the page beneath it. Running text keeps a short line. Findings, requests, and
+citations are entries with a label column, not wide tables; tables are kept for
+short comparable values. Dark follows the system setting or
 `data-appearance`; the site has no switch of its own.
 
 Command transcripts, JSON reports, the check list, and screenshots under
 `website/generated/` come from real runs (`./scripts/dev.sh docs`) of the demo and
 the test fixtures. The local test run fails when they are stale or when a website
-file holds a local path. A screenshot counts as current when the page it was
+file holds a local path. The worked example's runs that need its private copy are
+under `website/recorded/` (`./scripts/dev.sh record-example <store>`). A test
+compares them with a fresh run only where the store is present, and is skipped
+elsewhere; the site says they cannot be rebuilt without the copy. A screenshot counts as current when the page it was
 captured from is unchanged; its pixels are not compared between machines.
 Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,
 off-site requests, links, light and dark, 320 and 375 pixel widths, keyboard
-focus, and axe-core. The site is not deployed.
+focus, and axe-core. The site is published by hand at
+<https://documentdrivendx.github.io/stemma/>: the built `website/dist/` and an
+empty `.nojekyll` are committed to the `gh-pages` branch, in a commit that names
+the source commit.
 
 ## Non-Goals
 

@@ -1,0 +1,49 @@
+$ stemma check --all --project $PROJECTS/coral-reefs-trial --store-dir $STORE
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 37 result(s) passed.
+
+1. PROBLEM: A cited page is outside the printed pages mapped in your stored copy.  [locator.extent]
+   Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
+   What to do: Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one).
+   - cit-darwinreefs0001
+       citation file: records/citations/cit-darwinreefs0001.json
+       key: darwin1842
+       locator: page 412
+       source file: records/sources/src-darwinreefs1842.json
+       extent: printed pages 2-214 (mapped in your stored copy)
+       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
+       pages without a label: 45 page(s) of the stored file
+
+2. PROBLEM: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-darwinreefs0002
+       citation file: records/citations/cit-darwinreefs0002.json
+       key: darwin1842
+       cited text: this view inapplicable to the smaller number of atolls
+       match: near
+       profile: quote-fold/0
+       stored text: this view ⏎ inapplicable to the greater number of atolls
+       extraction file: records/extractions/ext-kb8hzwcvz40x3yyaxnkt.json
+       found on: printed page 89 (file index 106)
+       text method: ocr, quality unassessed
+
+For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-darwinreefs0004: deny-|ing
+
+For information, not a finding: these quotations are in the source, but not on the page the citation gives.
+The quotation check does not test the cited page. Check the page number.
+   - cit-darwinreefs0001: found on printed page 88; the citation gives 412
+
+NOT CHECKED: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-darwinreefs1842 (not admitted)
+
+Full report: $PROJECTS/coral-reefs-trial/.stemma/reports/check.json
+[exit 1]

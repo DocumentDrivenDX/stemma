@@ -11,9 +11,10 @@ ddx:
 
 ## Mission Statement
 
-Stemma is a plugin that helps scholars research, write, and typeset books with
-AI, keeping a checkable chain from each original source to each citation and
-supported claim, and explaining what its checks find.
+Stemma helps scholars create academically rigorous research reports and books
+with AI. It is a plugin for researching, writing, and typesetting them that keeps
+a checkable chain from each original source to each citation and supported claim,
+checks citations with scripts, and explains what it finds.
 
 Stemma is first and foremost a Claude plugin. The author asks Claude in plain
 words; the skill, the command line, and later the graph engine, the explorer,
@@ -39,23 +40,25 @@ references from the source files, and assemble the research outputs.
 ## Positioning
 
 For academic researchers who want AI to speed up research and composition but
-cannot accept fabricated or misattributed sources, Stemma is a book research and
-publishing workspace that finds citation problems, explains them honestly, and
+cannot accept fabricated or misattributed sources, Stemma is a research and
+publishing workspace for reports and books that finds citation problems,
+explains them honestly, and
 shows what was checked against which source. Unlike general chat
 assistants, it does not ask the author to trust the model: the model proposes,
 scripts check what they can, and every build says what is still open. Unlike
 gatekeeping tools, it never stops the author from writing or building. Unlike
 reference managers, it covers the path from sources through an evidence graph to
-a typeset book. Unlike one-off prompt libraries, it keeps the rules, records,
-and history with the manuscript.
+a typeset report or book. Unlike one-off prompt libraries, it keeps the rules,
+records, and history with the manuscript.
 
 ## Vision
 
-An author hands a chapter to an AI assistant and gets back faster research and
+An author hands a chapter or report section to an AI assistant and gets back
+faster research and
 fluent prose in their own voice. Every citation either resolves to a record in
 the project and the source's text in the repository or is shown as unchecked.
-Every quotation and footnote is copied from that text by script. A report
-lists, in plain language, which quotations and page locators disagree with the
+Every quotation and footnote is copied from that text by script. A check
+report lists, in plain language, which quotations and page locators disagree with the
 source text, which could not be checked, which claims lack a recorded support
 judgment, and what no one has reviewed yet, each with its evidence and a
 suggested next step. The author can follow any sentence back to its evidence,
@@ -66,8 +69,9 @@ the author chooses.
 AI-written prose is welcome where the author's publisher permits it. Invented
 evidence is not. Stemma is for material that may be sent to a language model.
 
-**North Star**: Every problem Stemma's checks can find in a book is explained in
-its report, and no output with open findings is called checked clean.
+**North Star**: Every problem Stemma's checks can find in a research report or
+book is explained in its check report, and no output with open findings is
+called checked clean.
 
 ## User Experience
 
@@ -83,8 +87,8 @@ found, and the scholar removes the reference and rewrites the sentence. They
 stop for the day and resume later. In the first pilot they can also typeset a
 basic PDF of the chapter, with a report of what is open.
 
-A scholar starting a new book states the thesis, audience, and citation style,
-and may add the theoretical constructs and research methodology then or later.
+A scholar starting a new report or book states the thesis, audience, and
+citation style, and may add the theoretical constructs and research methodology then or later.
 Assistant-found sources are shown as the assistant's finds until the scholar
 decides on them.
 
@@ -99,10 +103,10 @@ reviewer can attach comments to claims and send back a file the scholar imports.
 
 | Attribute | Description |
 |-----------|-------------|
-| Who | Academic researchers writing books or long articles: first in the humanities, then technologists researching technology and scholars in other fields |
+| Who | Academic researchers writing research reports, books, or long articles: first in the humanities, then technologists researching technology and scholars in other fields |
 | Pain | AI produces plausible references that do not exist, wrong authors, wrong page numbers, and invented quotations. Checking by hand costs the time the AI saved |
 | Current Solution | Chat assistants plus manual checking, a reference manager, a word processor, and a separate typesetting step |
-| Why They Switch | Verification is automatic and explains itself, so the author can spend review time where it matters without being stopped, and the same source of truth feeds the typeset book |
+| Why They Switch | Verification is automatic and explains itself, so the author can spend review time where it matters without being stopped, and the same source of truth feeds the typeset report or book |
 
 ## Key Value Propositions
 

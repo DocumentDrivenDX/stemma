@@ -2,24 +2,26 @@
 name: stemma
 description: |
   Stemma skill, the single public entrypoint for researching and writing
-  academic books and papers with a checkable chain from each original source to
-  each citation. Engage on prompts to start a book project; capture a source
-  from a library or the author's own file and convert it to Markdown in the
-  project; read PDF, EPUB, HTML, DOCX, Markdown, Project Gutenberg or plain
-  text and its page numbers or chapters; find and capture quotations with their
-  pages; record citations; check citations, quotations, pages, metadata,
-  identifiers or the project and explain what is open; compare or review source
-  text; show what a source says on a page; or find which sources are missing,
-  damaged or changed.
+  academically rigorous research reports and books with a checkable chain from
+  each original source to each citation. Engage on prompts to start a report or
+  book project; capture a source from a library or the author's own file and
+  convert it to Markdown in the project; read PDF, EPUB, HTML, DOCX, Markdown,
+  Project Gutenberg or plain text and its page numbers or chapters; find and
+  capture quotations with their pages; record the citations in a manuscript;
+  check citations, quotations, pages, metadata, identifiers, records, or the
+  project and explain what is open; compare or review source text; show what a
+  source says on a page; or find out which sources are missing, damaged, or
+  changed.
 argument-hint: "[intent or scope]"
 ---
 
 # Stemma
 
-Stemma keeps an unbroken chain from original source to citation to supported
-thesis: upstream record (hashes) → converted source files (digests, converter
-version) → passage address and digest → citation → claim → sentence in the
-output → footnote. Every link is deterministic and checkable from the author's
+Stemma helps an author create an academically rigorous research report or book.
+It keeps an unbroken chain from original source to citation to supported thesis:
+upstream record (hashes) → converted source files (digests, converter version) →
+passage address and digest → citation → claim → sentence in the output →
+footnote. Every link is deterministic and checkable from the author's
 repository. The only non-deterministic step is writing the thesis support and
 discussion; your job is to build it from verified sources and write it so that a
 person can easily check them.
@@ -36,7 +38,7 @@ or edit a record file.
 2. **Convert and reverify**: `ingest` converts each original to source files,
    compares a fresh conversion with them, makes catalogue lookups, and checks.
    Set up what each check needs (source records, upstream entries, identifiers,
-   titles read from the title page) so that checks run instead of being left
+   the parts that show the title page) so that checks run instead of being left
    unable to check.
 3. **Research**: state a specific, arguable thesis the captured sources might
    support; find the sources and passages that bear on it, contrary evidence
@@ -63,7 +65,7 @@ or edit a record file.
 
 ## The final output reads as scholarship
 
-Paper and book text, and its footnotes, contain only the scholarly work. Never
+The text of a report or book, and its footnotes, contain only the scholarly work. Never
 write into them anything about Stemma, records, checks, what cites what, or
 verification status, and never narrate "the source" ("the source states…").
 Evidence appears through normal citation, quotation, and footnotes: full
