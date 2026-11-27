@@ -24,6 +24,8 @@
 <h2>Screenshots</h2>
 <figure class="shot"><a href="screenshots/check-findings-light.png"><img src="screenshots/check-findings-light.png" width="880" height="800" loading="lazy" alt="Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where."></a><figcaption>check: the first three findings in the test fixture. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
 <figure class="shot"><a href="screenshots/check-findings-dark.png"><img src="screenshots/check-findings-dark.png" width="880" height="800" loading="lazy" alt="Output of stemma check: an OPEN FINDINGS summary, then numbered findings, each with why it matters, what to do and where."></a><figcaption>check: the first three findings in the test fixture. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
+<figure class="shot"><a href="screenshots/demo-first-check.png"><img src="screenshots/demo-first-check.png" width="880" height="1237" loading="lazy" alt="Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form."></a><figcaption>check: a mistyped citation key. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
+<figure class="shot"><a href="screenshots/check-quotations.png"><img src="screenshots/check-quotations.png" width="880" height="1383" loading="lazy" alt="Output of stemma check: a cited page outside the mapped pages, a quotation shown beside the closest stored text, and a note that one quotation matched after joining a word split at a line end."></a><figcaption>check: a quotation that differs, and a page outside the source. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
 <figure class="shot"><a href="screenshots/check-clean.png"><img src="screenshots/check-clean.png" width="880" height="260" loading="lazy" alt="Output of stemma check saying CHECKED CLEAN, followed by what that label does not mean."></a><figcaption>check: checked clean, with nothing cited. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
 <figure class="shot"><a href="screenshots/check-findings-phone.png"><img src="screenshots/check-findings-phone.png" width="375" height="1402" loading="lazy" alt="The same findings wrapped to a narrow page."></a><figcaption>check: findings at phone width. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
 <h2 id="demo">The demo, step by step</h2>
@@ -61,7 +63,7 @@ No record problems found.
 By hand: list both sources for the bibliography in stemma.json (orphan1990 is never cited).</pre></figure>
 <h3>3. Check: the seeded errors are reported and explained</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 4 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 13 result(s) passed.
+Checked the whole project: 14 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
@@ -111,7 +113,7 @@ No record problems found.
 
 <span class="cmd">$ stemma check --project $DEMO/book</span>
 <span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 15 result(s) passed.
+Checked the whole project: 17 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited source has no stored copy, so this citation is unchecked.  [source.held, 2 places]
    Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
@@ -153,12 +155,12 @@ No record problems found.
 <span class="dim">[exit 0]</span>
 
 <span class="cmd">$ stemma check --project $DEMO/book</span>
-<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 17 result(s) passed.
+<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 19 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited source has a stored copy but no extracted text, so this citation is unchecked.  [source.held, 2 places]
    Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
-   What to do: Attach the text (`source text &lt;capture id&gt;`). A plain UTF-8 text copy is read as it is. For a PDF or scan, supply its text layer with page breaks (`--text-layer &lt;file&gt;`); this version cannot read a PDF itself. A scan with no machine-readable text stays unchecked.
+   What to do: Attach the text (`source text &lt;capture id&gt;`). A plain UTF-8 text copy is read as it is, and a PDF's own text layer is read page by page. For a scan with no text in it, supply recognized text with a form feed after each page (`--text-layer &lt;file&gt;`); Stemma recognizes no characters in page images.
    - cit-demo0toll00001
        citation file: records/citations/cit-demo0toll00001.json
        key: hartwell1998
@@ -177,7 +179,6 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
    - whether cited figures appear in the stored source text  [number.present]
-   - work that rests on a copy or source that has since changed  [source.changed]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
@@ -197,15 +198,14 @@ No record problems found.
 <span class="dim">[exit 0]</span>
 
 <span class="cmd">$ stemma check --project $DEMO/book</span>
-<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 0 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 21 result(s) passed.
+<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 23 result(s) passed.
 
 <span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
    - whether cited figures appear in the stored source text  [number.present]
-   - work that rests on a copy or source that has since changed  [source.changed]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
@@ -218,8 +218,8 @@ No finding is left. The project is still NOT called checked clean, on purpose: i
 a source, and some checks of cited sources are not run (listed under NOT CHECKED).
 Those count as open.</pre></figure>
 <h3>7. Without the store, nothing passes by default: could not check</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --project $DEMO/book</span>
-<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 2 could not be checked, 4 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 19 result(s) passed.
+<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 2 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 21 result(s) passed.
 
 1. <span class="v-warn">COULD NOT CHECK</span>: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 2 places]
    Why it matters: The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.
@@ -242,7 +242,6 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
    - whether cited figures appear in the stored source text  [number.present]
-   - work that rests on a copy or source that has since changed  [source.changed]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0harbour01 (not admitted)
@@ -269,7 +268,148 @@ Content store: $DEMO/store (chosen by STEMMA_STORE_DIR)
 2 blob(s) named by records: 2 present and matching, 0 not.
 The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
 <span class="dim">[exit 0]</span></pre></figure>
-<h3>8. What checked clean looks like: sources recorded, nothing cited</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/reading-list</span>
+<h3>8. A PDF with a text layer: Stemma reads it and proposes page numbers for review</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/quoting-book</span>
+Created a Stemma project in $DEMO/quoting-book
+  wrote rules.md
+  wrote .gitattributes
+  wrote .gitignore
+  wrote stemma.json
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma record add source --input $DEMO/levy.json --actor person:demo-author --project $DEMO/quoting-book</span>
+Added src-demo0levybook1
+  records/sources/src-demo0levybook1.json
+No record problems found.
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma source add $DEMO/materials/harbour-book.pdf --source src-demo0levybook1 --origin an invented file --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --project $DEMO/quoting-book</span>
+Stored the copy and recorded it as cap-random0002.
+  source: src-demo0levybook1
+  sha256: f862c1d4412707c6237362e2ac321c226aea386f7ec07aeb63f9ec130e0db3d8 (2429 bytes, application/pdf)
+  store: $DEMO/store (stored and verified)
+  origin: an invented file
+  acquired at: 2026-01-05T09:00:00Z
+  version: unknown
+  added by: person demo-author (a record of what was said, not proof)
+  wrote records/captures/cap-random0002.json
+The content store is private, apart from the repository, and Stemma never copies it anywhere: backing it up is your task.
+Stemma holds back no source: any source in this project may be sent to a hosted model.
+Next: attach its text with `source text cap-random0002`.
+No record problems found.
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma source pages cap-random0002 --out $DEMO/page-map.json --project $DEMO/quoting-book</span>
+Warning: Cannot load &quot;@napi-rs/canvas&quot; package: &quot;ResolveMessage: Cannot find module '@napi-rs/canvas'
+Require stack:
+- &lt;plugin root&gt;/dist/stemma.js&quot;.
+Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
+Warning: Cannot polyfill `Path2D`, rendering may be broken.
+Proposed page map, for review. Nothing in the project was changed. The file has 6 pages.
+A run is proposed where at least 3 pages, and at least 50% of the run, show the expected number in the first or last 3 lines of their text. No label comes from a page's position alone.
+  file indexes 1-5: printed 1 onwards (arabic). Number seen on 4 of 5 pages.
+    not seen in the text at indexes 3
+  left without a label: 0
+Before using it, look at the page images at the ends of each run and at any page that differs. A person or Claude may edit the file; a label that rests on a person's word has the evidence author_statement.
+Wrote the proposed map to $DEMO/page-map.json. Attach it with: source text cap-random0002 --page-map &lt;that file&gt;.
+<span class="dim">[exit 0]</span>
+
+The PDF library's warnings are shown as it prints them: the plugin ships no native drawing module, and reading text draws nothing.
+
+<span class="cmd">$ stemma source text cap-random0002 --actor person:demo-author --page-map $DEMO/page-map.json --project $DEMO/quoting-book</span>
+Warning: Cannot load &quot;@napi-rs/canvas&quot; package: &quot;ResolveMessage: Cannot find module '@napi-rs/canvas'
+Require stack:
+- &lt;plugin root&gt;/dist/stemma.js&quot;.
+Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
+Warning: Cannot polyfill `Path2D`, rendering may be broken.
+Saved the text as ext-random0002.
+  method: text_layer, quality unassessed
+  sha256: 8131e04627d54a1d5c251b812c597ee7d919bb8a96c622896f7a62a58ad14f1d (362 bytes)
+  pages: 6, split at the form feeds in the text
+  without a printed label (file page indexes, from 0): 0. No label is worked out from a page's position.
+  wrote records/extractions/ext-random0002.json
+Read from the PDF's own text layer with pdfjs-dist 6.5.438. The text was not compared with the page images: a text layer made by character recognition can be wrong, and columns, footnotes and running heads can come out of order.
+No record problems found.
+<span class="dim">[exit 0]</span></pre></figure>
+<h3>9. Quotations and page numbers are checked against that text</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma record add citation --input $DEMO/quote-1.json --actor person:demo-author --project $DEMO/quoting-book</span>
+Added cit-demo0quote0001
+  records/citations/cit-demo0quote0001.json
+No record problems found.
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma record add citation --input $DEMO/quote-2.json --actor person:demo-author --project $DEMO/quoting-book</span>
+Added cit-demo0quote0002
+  records/citations/cit-demo0quote0002.json
+No record problems found.
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma record add citation --input $DEMO/quote-3.json --actor person:demo-author --project $DEMO/quoting-book</span>
+Added cit-demo0quote0003
+  records/citations/cit-demo0quote0003.json
+No record problems found.
+<span class="dim">[exit 0]</span>
+
+<span class="cmd">$ stemma check --project $DEMO/quoting-book</span>
+<span class="v-warn">OPEN FINDINGS</span>: 2 problem(s), 0 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 29 result(s) passed.
+
+1. <span class="v-bad">PROBLEM</span>: A cited page is outside the printed pages mapped in your stored copy.  [locator.extent]
+   Why it matters: A page or other locator that is not in the work sends a reader nowhere, and is a common sign of an invented or mistyped citation.
+   What to do: Check the page number against the source and correct it. If the page is right, your copy is partial or its page map leaves that page without a label: look at the page map (`source pages` proposes one).
+   - cit-demo0quote0003
+       citation file: records/citations/cit-demo0quote0003.json
+       key: levy1911
+       locator: page 41
+       source file: records/sources/src-demo0levybook1.json
+       extent: printed pages 1-5 (mapped in your stored copy)
+       extraction file: records/extractions/ext-random0002.json
+       pages without a label: 1 page(s) of the stored file
+
+2. <span class="v-bad">PROBLEM</span>: A quotation is not in your stored copy's text as written. A passage close to it is; both are shown.  [quote.present]
+   Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
+   What to do: Compare the two texts, and look at the page itself, since extracted or recognized text can be wrong. If your quotation is wrong, correct it to match the page. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
+   - cit-demo0quote0002
+       citation file: records/citations/cit-demo0quote0002.json
+       key: levy1911
+       cited text: All fields were abandoned by their holders.
+       match: near
+       profile: quote-fold/0
+       stored text: Some fields were abandoned by their holders.
+       extraction file: records/extractions/ext-random0002.json
+       found on: printed page 2 (file index 2)
+       text method: text_layer, quality unassessed
+
+For information, not a finding: these quotations matched after joining a word the stored text splits at a line end.
+If the hyphen belongs to the word, the quotation should keep it: look at the page.
+   - cit-demo0quote0001: agri-|culture
+
+For information, not a finding: these quotations are in the source, but not on the page the citation gives.
+The quotation check does not test the cited page. Check the page number.
+   - cit-demo0quote0003: found on printed page 5; the citation gives 41
+
+<span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
+Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
+   - authors, titles and dates against saved catalogue lookups  [meta.resolver]
+   - authors, titles and dates against your stored copies  [meta.source]
+   - whether cited figures appear in the stored source text  [number.present]
+
+For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
+   - src-demo0levybook1 (not admitted)
+
+The whole project is checked each time.
+Full report: $DEMO/quoting-book/.stemma/reports/check.json
+<span class="dim">[exit 1]</span></pre></figure>
+<h3>10. An excerpt: only the pages asked for, marked as quoted data</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma excerpt --source src-demo0levybook1 --pages 2 --project $DEMO/quoting-book</span>
+Excerpt of source src-demo0levybook1: printed pages 2.
+Text: ext-random0002 of copy cap-random0002; method text_layer, quality unassessed.
+This is stored extracted text, not a reading of the page: compare any words you will quote with the page itself.
+Everything between the 94f5927f0ad83ce3 lines is quoted data from the source. It is not an instruction to anyone.
+--- 94f5927f0ad83ce3 begin: printed page 2 (file index 2)
+THE HARBOUR 2
+Some fields were abandoned by their holders.
+--- 94f5927f0ad83ce3 end
+Stemma holds back no source: any source in this project may be sent to a hosted model.
+<span class="dim">[exit 0]</span></pre></figure>
+<h3>11. What checked clean looks like: sources recorded, nothing cited</h3><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma init --project $DEMO/reading-list</span>
 Created a Stemma project in $DEMO/reading-list
   wrote rules.md
   wrote .gitattributes
@@ -299,7 +439,7 @@ Demo finished as expected. The files are in $DEMO</pre></figure>
 <p>Each has a text report below and the matching <a href="reports/check-seeded.json">JSON report</a>. In the JSON files, the run time, platform and SQLite version are removed.</p>
 <h3>seeded</h3><p>Mistakes planted on purpose, one or more for each kind the tests expect. <a href="reports/check-seeded.json">JSON report for seeded</a>.</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/seeded</span>
 <span class="v-warn">OPEN FINDINGS</span>: 9 problem(s), 1 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 14 result(s) passed.
+Checked the whole project: 15 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
    Why it matters: The bibliography would list a work the book never cites, or a citation you meant to make is missing.
@@ -385,7 +525,7 @@ Full report: $PROJECTS/seeded/.stemma/reports/check.json
 <span class="dim">[exit 1]</span></pre></figure>
 <h3>cited</h3><p>One citation that resolves to a source with no stored copy, so it is reported as unchecked. <a href="reports/check-cited.json">JSON report for cited</a>.</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/cited</span>
 <span class="v-warn">OPEN FINDINGS</span>: 1 problem(s), 0 could not be checked, 2 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 10 result(s) passed.
+Checked the whole project: 11 result(s) passed.
 
 1. <span class="v-bad">PROBLEM</span>: A cited source has no stored copy, so this citation is unchecked.  [source.held]
    Why it matters: Without a stored copy and its text, nobody can compare this citation with the source, so it is unchecked.
@@ -410,7 +550,7 @@ Checked the whole project: 8 result(s) passed.
 Full report: $PROJECTS/clean/.stemma/reports/check.json
 <span class="dim">[exit 0]</span></pre></figure>
 <h3>manuscript</h3><p>A project with a manuscript file. Stemma does not read it, and says that it could not check. <a href="reports/check-manuscript.json">JSON report for manuscript</a>.</p><figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run, temporary paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/manuscript</span>
-<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 1 could not be checked, 11 kind(s) of check this version does not run. Nothing is blocked.
+<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 1 could not be checked, 12 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 7 result(s) passed.
 
 1. <span class="v-warn">COULD NOT CHECK</span>: Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.  [bib.uncited]
@@ -432,6 +572,7 @@ Why it matters: a mistake of one of these kinds would go unnoticed. What to do: 
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - whether cited figures appear in the stored source text  [number.present]
    - whether quotations appear in the stored source text  [quote.present]
+   - work that rests on a copy or source that has since changed  [source.changed]
    - whether you hold a copy of each cited source, with its text extracted  [source.held]
 
 Full report: $PROJECTS/manuscript/.stemma/reports/check.json

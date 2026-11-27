@@ -115,10 +115,6 @@
         "reason": "input_absent"
       },
       {
-        "check": "source.changed",
-        "reason": "input_absent"
-      },
-      {
         "check": "support.current",
         "reason": "input_absent"
       },
@@ -360,6 +356,35 @@
       },
       {
         "annotations": [],
+        "check": "source.changed",
+        "evidence": [
+          {
+            "class": "location",
+            "name": "citation_file",
+            "value": "records/citations/cit-fixture0good00001.json"
+          }
+        ],
+        "finding_key": "87bb55a7b550f180f95026319da48d3b74a6f05dfaa5533a95723196ebdd708c",
+        "fixes": [],
+        "item": {
+          "content_sha256": "ef727f0a8ba832a8b68e81893791d02f2ce8e755393c0bfd54ce0dfb4ab3fcab",
+          "record": "cit-fixture0good00001"
+        },
+        "message": "Nothing was found by this check here.",
+        "open": false,
+        "outcome": "pass",
+        "rules": [],
+        "sentence": {
+          "sha256": "81dc4ee86bdce308ac76cf2ee95fcbfca2240e09495f4e28ca411fd61ac0b648",
+          "text": "The invented town charged a toll at its harbour."
+        },
+        "source": "src-fixture0harbour01",
+        "subject": "cit-fixture0good00001",
+        "suggestions": [],
+        "why": ""
+      },
+      {
+        "annotations": [],
         "check": "source.held",
         "evidence": [
           {
@@ -412,14 +437,14 @@
       "fail": 1,
       "not_implemented": 2,
       "open": 1,
-      "pass": 10,
+      "pass": 11,
       "unreviewed": 0,
       "unverifiable": 0
     },
     "tools": {
       "bun": "1.4.5",
       "sqlite": "(removed)",
-      "stemma": "0.0.1"
+      "stemma": "0.0.2"
     },
     "unreviewed": []
   },

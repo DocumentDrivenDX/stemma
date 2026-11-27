@@ -129,7 +129,7 @@
       },
       {
         "check": "source.changed",
-        "reason": "input_absent"
+        "reason": "not_implemented"
       },
       {
         "check": "source.held",
@@ -326,7 +326,7 @@
       "could_not_check": 1,
       "dismissed": 0,
       "fail": 0,
-      "not_implemented": 11,
+      "not_implemented": 12,
       "open": 1,
       "pass": 7,
       "unreviewed": 0,
@@ -335,7 +335,7 @@
     "tools": {
       "bun": "1.4.5",
       "sqlite": "(removed)",
-      "stemma": "0.0.1"
+      "stemma": "0.0.2"
     },
     "unreviewed": []
   },

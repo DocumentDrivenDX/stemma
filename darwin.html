@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="description" content="One real source, three citations, and what Stemma can and cannot check.">
+<meta name="description" content="One real source, four quoted citations, and what Stemma can and cannot check.">
 <title>Worked example: Darwin and coral reefs | Stemma</title>
 <link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="site.css">
@@ -19,21 +19,49 @@
 </header>
 <main id="main" tabindex="-1" class="prose mx-auto max-w-4xl px-4 py-8">
 <h1>Worked example: Darwin and coral reefs</h1>
-<p class="lead">One real source and three citations of it, kept as record files in the repository.</p>
-<p class="note">The copy of the book and its text are private and are not published. Only records and digests are. A model read the facts below from images of the stored pages; no person has confirmed them.</p>
+<p class="lead">One real source and four citations of it, each with a short quotation, kept as record files in the repository.</p>
+<p class="note">The copy of the book and its text are private and are not published. Only records and digests are. A model compared the facts and quotations below with images of the stored pages; <strong>no person has confirmed them</strong>.</p>
 <h2>The source</h2>
 <p><cite>The Structure and Distribution of Coral Reefs. Being the First Part of the Geology of the Voyage of the Beagle, under the Command of Capt. Fitzroy, R.N. during the Years 1832 to 1836</cite>. Charles Darwin. London: Smith, Elder and Co., 1842.</p>
 <p>The title and year were read from the image of the title page. The text layer of the same page, from unverified character recognition, gives one of the voyage's years wrongly and does not hold the year of publication.</p>
 <h2>What cites it</h2>
-<p>These sentences are paraphrases written for the example, each compared with the image of the cited page. They quote nothing.</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="Citations"><table><thead><tr><th scope="col">Page</th><th scope="col">Sentence</th></tr></thead><tbody><tr><td>88</td><td>Darwin's fifth chapter sets out a theory of how the different classes of coral reefs formed.</td></tr><tr><td>89</td><td>Darwin calls Chamisso's account of atolls an earlier and better theory than the crater theory, and argues that it still does not apply to most atolls.</td></tr><tr><td>2</td><td>Darwin says that he uses the term atoll throughout the volume as a synonym for lagoon-island.</td></tr></tbody></table></div>
+<p>Each sentence is this example's own wording around a quotation. Each quotation was compared, punctuation included, with the image of the cited page.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Citations"><table><thead><tr><th scope="col">Page</th><th scope="col">Quotation</th><th scope="col">Citing sentence</th></tr></thead><tbody><tr><td>88</td><td>The theory most generally received on the formation of atolls, is that they are based on submarine craters</td><td>Darwin opens his fifth chapter with the received view: “The theory most generally received on the formation of atolls, is that they are based on submarine craters”.</td></tr><tr><td>89</td><td>this view inapplicable to the greater number of atolls</td><td>He calls Chamisso’s account earlier and better than the crater theory, yet finds that a difficulty of the same kind makes “this view inapplicable to the greater number of atolls”.</td></tr><tr><td>2</td><td>I have invariably used in this volume the term</td><td>Of the word atoll he writes, “I have invariably used in this volume the term”, and treats it as a synonym for lagoon-island.</td></tr><tr><td>89</td><td>I am far from denying that a reef like a perfectly characterized atoll might not be formed</td><td>He does not rule the crater rim out altogether: “I am far from denying that a reef like a perfectly characterized atoll might not be formed”.</td></tr></tbody></table></div>
+<h2>Page numbers</h2>
+<p><code>source pages</code> proposed two runs of printed numbers in the scan. The second turned out, on its page images, to be a publisher's list of other books bound at the back, numbered on its own. It was left out of the map: a number printed on a page need not number the work. That is why a proposed page map is reviewed.</p>
+<h2>With the private copy</h2>
+<p>On the maintainer's machine on 2026-11-26, all four citations passed <code>source.held</code>, <code>quote.present</code>, <code>locator.extent</code> and <code>source.changed</code>. One quotation matched only after joining a word split across a line end, which the report points out. That run depends on the private store and is not reproduced here. A match is agreement with recognized text: a correct quotation of another sentence on page 2 was reported as a near match, because the recognized text has a stray space after a quotation mark. Even with nothing open, the project is not called checked clean: its report lists checks of cited sources that were not run.</p>
 <h2>What a check says without the private copy</h2>
-<p>Where the stored copy is not present, Stemma cannot check these citations, and says so. With it, all three citations passed <code>source.held</code> on the maintainer's machine on 2026-11-26; that run depends on the private store and is not reproduced here. Even then the project is not called checked clean: its report lists checks of cited sources that were not run.</p>
+<p>Where the stored copy is not present, Stemma cannot compare the citations or quotations with anything, and says so. The page numbers can still be compared with the page map, which is in the records.</p>
 <figure class="excerpt"><figcaption><strong>Transcript</strong> of a real run with an empty store, paths replaced.</figcaption><pre tabindex="0"><span class="cmd">$ stemma check --all --project $PROJECTS/coral-reefs --store-dir $EMPTY</span>
-<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 3 could not be checked, 5 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 20 result(s) passed.
+<span class="v-warn">OPEN FINDINGS</span>: 0 problem(s), 8 could not be checked, 3 kind(s) of check this version does not run. Nothing is blocked.
+Checked the whole project: 31 result(s) passed.
 
-1. <span class="v-warn">COULD NOT CHECK</span>: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 3 places]
+1. <span class="v-warn">COULD NOT CHECK</span>: A quotation could not be compared: the stored text of its source cannot be used here.  [quote.present, 4 places]
+   Why it matters: Until the quotation can be compared with your copy's text, it is unchecked.
+   What to do: See the source.held finding. Add a copy and attach its text, point `--store-dir` at the store that holds it, or restore it from your backup.
+   - cit-darwinreefs0001
+       citation file: records/citations/cit-darwinreefs0001.json
+       key: darwin1842
+       cited text: The theory most generally received on the formation of atolls, is that they are based on submarine craters
+       profile: quote-fold/0
+   - cit-darwinreefs0002
+       citation file: records/citations/cit-darwinreefs0002.json
+       key: darwin1842
+       cited text: this view inapplicable to the greater number of atolls
+       profile: quote-fold/0
+   - cit-darwinreefs0003
+       citation file: records/citations/cit-darwinreefs0003.json
+       key: darwin1842
+       cited text: I have invariably used in this volume the term
+       profile: quote-fold/0
+   - cit-darwinreefs0004
+       citation file: records/citations/cit-darwinreefs0004.json
+       key: darwin1842
+       cited text: I am far from denying that a reef like a perfectly characterized atoll might not be formed
+       profile: quote-fold/0
+
+2. <span class="v-warn">COULD NOT CHECK</span>: A stored copy could not be checked: its file is not in the content store used here.  [source.held, 4 places]
    Why it matters: The records describe one exact file. A missing or changed file cannot stand for it, so nothing that depends on it can be checked.
    What to do: The content store is private and is not part of the repository. Point `--store-dir` at it, restore the file from your backup, or add the same file again. `store verify` lists every missing digest.
    - cit-darwinreefs0001
@@ -54,14 +82,18 @@ Checked the whole project: 20 result(s) passed.
        source file: records/sources/src-darwinreefs1842.json
        capture file: records/captures/cap-7sskba1cqwz7975wsc1v.json
        copy sha256: 52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9
+   - cit-darwinreefs0004
+       citation file: records/citations/cit-darwinreefs0004.json
+       key: darwin1842
+       source file: records/sources/src-darwinreefs1842.json
+       capture file: records/captures/cap-7sskba1cqwz7975wsc1v.json
+       copy sha256: 52d3689dbc1b8bdf79ef8d8ba4b614b2535eb27d7ee26393bfa92db46b9d47d9
 
 <span class="v-warn">NOT CHECKED</span>: this version does not run these, so the project is not called checked clean.
 Why it matters: a mistake of one of these kinds would go unnoticed. What to do: check them by hand where they matter.
-   - whether cited pages and other locators fall inside the source  [locator.extent]
    - authors, titles and dates against saved catalogue lookups  [meta.resolver]
    - authors, titles and dates against your stored copies  [meta.source]
    - whether cited figures appear in the stored source text  [number.present]
-   - work that rests on a copy or source that has since changed  [source.changed]
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-darwinreefs1842 (not admitted)

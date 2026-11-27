@@ -27,9 +27,10 @@
 <h2>What it does</h2>
 <ul><li>Keeps sources and citations as plain record files in your project.</li>
 <li>Keeps copies of your sources and their text in a private store outside the project, with where and when each came from.</li>
-<li>Checks that each cited source is held with text that still matches, that citation keys resolve, that listed bibliography entries are cited, and that record files are well formed. It warns about coordinates written in project files.</li>
+<li>Reads the text layer of a PDF page by page, and proposes a map of printed page numbers for review.</li>
+<li>Checks that each cited source is held with text that still matches, that quotations are in that text, that cited pages fall inside it, that citation keys resolve, that listed bibliography entries are cited, and that record files are well formed. It lists what rests on a retired copy or source, and warns about coordinates written in project files.</li>
 <li>Explains every finding: what is wrong, the evidence, why it matters and what to do. Nothing is blocked.</li></ul>
-<figure class="shot"><a href="screenshots/demo-first-check.png"><img src="screenshots/demo-first-check.png" width="880" height="1237" loading="lazy" alt="Output of stemma check in the demo: an uncited source, a citation key no source holds, and a file not in canonical form."></a><figcaption>check: a mistyped citation key. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
+<figure class="shot"><a href="screenshots/check-quotations.png"><img src="screenshots/check-quotations.png" width="880" height="1383" loading="lazy" alt="Output of stemma check: a cited page outside the mapped pages, a quotation shown beside the closest stored text, and a note that one quotation matched after joining a word split at a line end."></a><figcaption>check: a quotation that differs, and a page outside the source. Rendered page, not a terminal window. Captured with Playwright from real command output. Select the image to see it full size. The same text is on the <a href="examples.html">Examples</a> page.</figcaption></figure>
 <h2>Part of a family</h2>
 <p>Stemma belongs to <a href="https://documentdrivendx.github.io/">DocumentDrivenDX</a>. Its own documents are specified with <a href="https://github.com/DocumentDrivenDX/helix">HELIX</a>, which authors do not need.</p>
 </main>
