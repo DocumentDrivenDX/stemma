@@ -11,7 +11,7 @@ import { sha256, streamsOf } from "@stemma/records";
 import { answersOf, createHighlighter, createSession, HIGHLIGHT_LIMITS, listen, type LoadedOriginal, type Verdict } from "@stemma/server";
 import { post, redeem } from "./browse-run.ts";
 import { HIGHLIGHT_BOUNDS, locateOnPage } from "../packages/extract/src/pdf-highlight.ts";
-import { NO_HIGHLIGHT, noHighlight, type Highlight, type HighlightTarget } from "../packages/core/src/highlight.ts";
+import { NO_HIGHLIGHT, noHighlight, type Highlight, type HighlightTarget, type NoHighlightReason } from "../packages/core/src/highlight.ts";
 import { line, pageText, placed, type Raw, rawPdf, stream, targetFor } from "./highlight-pdf.ts";
 import { temporary } from "./helpers.ts";
 import { corpusOf, standard } from "./source-view-fixture.ts";
@@ -356,11 +356,12 @@ describe("US-123-AC6 the server's call", () => {
     const target: HighlightTarget = { sha256: "e".repeat(64), size: 5, page: 1, page_count: 1, text_sha256: "0".repeat(64), ranges: [[0, 1]] };
     let verdict: Verdict = { state: "current", data_identity: "d", process: { ask: async (route: string) => ({ status: 200, body: JSON.stringify({ data_identity: "d", result: route === "highlight-target" ? { target } : null }) }) } as never };
     let placedCalls = 0;
+    let read: NoHighlightReason = "covered";
     let closed = 0;
     const session = createSession(() => {});
     const server = await listen({
       assets: { html: "", js: "", css: "" }, session, check: async () => verdict, originals: { read: async () => ({ refused: "original_not_held" }) }, originalLimits: { bytes: 4 },
-      highlighter: { place: async () => (placedCalls++, noHighlight("covered")), close: () => void closed++ },
+      highlighter: { place: async () => (placedCalls++, noHighlight(read)), close: () => void closed++ },
     });
     try {
       const secret = (await redeem(server, session.code)).json.secret as string;
@@ -372,9 +373,17 @@ describe("US-123-AC6 the server's call", () => {
       expect(placedCalls).toBe(0);
       target.size = 3;
       expect((await post(server, "/api/original-highlight", body, secret)).json).toEqual({ data_identity: "d", result: noHighlight("covered") });
+      // A passage no highlight can mark keeps that reason where the page cannot be read at all.
+      target.refused = "hyphen_split";
+      for (const [unread, told] of [["not_held", "hyphen_split"], ["changed", "hyphen_split"], ["page_count", "hyphen_split"], ["unreadable", "hyphen_split"], ["busy", "busy"], ["too_slow", "too_slow"], ["scan_weak_match", "scan_weak_match"]] as const) {
+        read = unread;
+        expect([unread, (await post(server, "/api/original-highlight", body, secret)).json.result]).toEqual([unread, noHighlight(told)]);
+      }
+      target.size = 5;
+      expect((await post(server, "/api/original-highlight", body, secret)).json.result).toEqual(noHighlight("hyphen_split"));
       verdict = { state: "rebuilding" };
       expect((await post(server, "/api/original-highlight", body, secret)).json.error.code).toBe("index_stale");
-      expect(placedCalls).toBe(1);
+      expect(placedCalls).toBe(8);
     } finally {
       await server.close();
     }

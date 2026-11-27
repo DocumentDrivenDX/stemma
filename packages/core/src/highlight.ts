@@ -24,11 +24,14 @@ export const NO_HIGHLIGHT = {
   right_to_left: "A quoted line holds right-to-left text, whose order cannot be tied to places with certainty.",
   ligature: "A quoted word holds a ligature, one shape for several letters.",
   unclear_positions: "The places of the quoted letters cannot be told with certainty: what is drawn does not agree, letter for letter, with the page’s text.",
-  recognition_layer: "The quoted words are invisible text over a picture, on a page that is not read as a scan, since its pictures cover too little of it or too much of its text is seen. So no place is estimated.",
+  recognition_layer: "The quoted words are invisible text over a picture, on a page that is not read as a scan, since solid pictures cover too little of it or too much of its text is seen. So no place is estimated.",
   no_text_layer: "The page of the PDF has no text layer, as a scan that has not been put through character recognition has none. Nothing is recognized in it, so no place can be estimated.",
-  scan_weak_match: "This is a scanned page. The quoted words were not found closely enough in its hidden recognition text to estimate their place.",
-  scan_ambiguous: "This is a scanned page. More than one place in its hidden recognition text matches the quoted words about equally well, and the words around them do not settle which.",
-  scan_short: "This is a scanned page whose hidden recognition text is not the source text, and the quoted words are too short to be found in it with confidence.",
+  scan_weak_match: "This page reads as a scan. The quoted words were not found closely enough in its text that is not seen to estimate their place.",
+  scan_ambiguous: "This page reads as a scan. More than one place in its text that is not seen could be the quoted words, and the words around them do not settle which.",
+  scan_context: "This page reads as a scan. Its text that is not seen has one place like the quoted words, but the words around that place are not those around them in the source text.",
+  scan_differs: "This page reads as a scan. The closest place in its text that is not seen differs from the quoted words in a number or in a word of denial, such as “not”, so it may say something else.",
+  scan_short: "This page reads as a scan. The quoted words are too short to be looked for in its text that is not seen with confidence.",
+  scan_off_page: "This page reads as a scan. Its text that is not seen puts quoted words off the page.",
   invisible_text: "The quoted words are in text that is drawn invisibly.",
   hidden_text: "Quoted words may not be seen where the text layer places them: they are drawn in a light or transparent color, too small, without a shape, clipped, or off the page.",
   covered: "Something else is painted over or under quoted words, such as an image, a line, or a colored area, so they may not be seen there.",
@@ -49,8 +52,8 @@ export type NoHighlightReason = keyof typeof NO_HIGHLIGHT;
 
 /** How each estimate was derived, said to the reader. */
 export const ESTIMATE_METHODS = {
-  ocr_layer_offsets: "The boxes are where the scan’s hidden recognition text puts the passage’s letters. That text, read again, is exactly the source text’s page.",
-  ocr_layer_match: "The scan’s hidden recognition text, read again, differs from the source text’s page, so the quoted words were looked for in it, allowing for some wrong letters, and the boxes are where it puts the one close match.",
+  ocr_layer_offsets: "The boxes are where text that is not seen on the page, as a scan’s recognition text is not, puts the passage’s letters. The page’s text, read again, is exactly the source text’s page.",
+  ocr_layer_match: "The passage’s recorded places could not be used on this page, so the quoted words were looked for in text that is not seen on it, as a scan’s recognition text is not, allowing for some wrong letters. The boxes are where that text puts the place found.",
 } as const;
 
 export type EstimateMethod = keyof typeof ESTIMATE_METHODS;

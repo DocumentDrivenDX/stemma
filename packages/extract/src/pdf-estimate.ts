@@ -16,15 +16,30 @@ export interface LayerRect { left: number; top: number; right: number; bottom: n
 
 /**
  * The thresholds of `ocr_layer_match`. `like` is the least part of the quotation's
- * letters that must agree; `lead` is how much worse, as a part of its length,
- * every other place must be; `around` and `settles` say when the words around the
- * quotation choose between places that are about as good.
+ * letters that must agree. Every place that agrees so far is a rival, and so is a
+ * place that needs more edits than the best by less than `lead` of the
+ * quotation's length. `least` is the fewest letters of surrounding words that
+ * count, on one side; `around` is how far they must agree, and `settles` by how
+ * much more than any rival's.
  */
 export const ESTIMATE_BOUNDS = { like: 0.85, lead: 0.06, least: 20, context: 80, around: 0.7, settles: 0.2, most: 4_000, work: 80_000_000, candidates: 8 };
 
+/**
+ * Stretches of letters that turn a statement round. A place that has not as many
+ * of each as the quotation may say the opposite, however few letters differ.
+ * Counted as stretches of letters, since a recognition layer's word breaks are
+ * not relied on: "no" counts in "not", "nor", and "none", and "nt" in "didn't".
+ */
+const DENIALS = ["no", "never", "neither", "without", "nt"];
+
+/** One glyph of a script written from right to left. */
+export const RIGHT_TO_LEFT = /[֐-ࣿ‏‫‮⁧יִ-﷿ﹰ-ﻼ\u{10800}-\u{10fff}\u{1e800}-\u{1efff}]/u;
+
+type MatchRefusal = Extract<NoHighlightReason, "scan_weak_match" | "scan_ambiguous" | "scan_context" | "scan_differs" | "scan_short" | "too_much">;
+
 export type Estimate =
   | { method: EstimateMethod; rects: LayerRect[] }
-  | { refused: Extract<NoHighlightReason, "scan_weak_match" | "scan_ambiguous" | "scan_short" | "rotated_text" | "too_much"> };
+  | { refused: MatchRefusal | Extract<NoHighlightReason, "rotated_text" | "right_to_left"> };
 
 /**
  * Letters and digits only, in one case, with ligatures and other joined forms
@@ -110,8 +125,14 @@ function alikeAt(wanted: string[], page: string[], side: "before" | "after"): nu
   return Math.max(0, 1 - Math.min(...row) / a.length);
 }
 
+/** What of these letters must be the same in the place as in the quotation: every digit, in order, and each count of denials. */
+function telling(letters: string[]): string {
+  const text = letters.join("");
+  return [letters.filter((c) => /\p{N}/u.test(c)).join(""), ...DENIALS.map((word) => text.split(word).length - 1)].join(" ");
+}
+
 /** The one place on the page whose letters are close enough to the quoted ones, as indexes into `page`. */
-export function findWords(words: HighlightWords, page: string[]): { from: number; to: number } | { refused: "scan_weak_match" | "scan_ambiguous" | "scan_short" | "too_much" } {
+export function findWords(words: HighlightWords, page: string[]): { from: number; to: number } | { refused: MatchRefusal } {
   const wanted = foldLetters(words.quoted);
   if (wanted.length < ESTIMATE_BOUNDS.least) return { refused: "scan_short" };
   if (wanted.length > ESTIMATE_BOUNDS.most || wanted.length * page.length > ESTIMATE_BOUNDS.work) return { refused: "too_much" };
@@ -126,23 +147,30 @@ export function findWords(words: HighlightWords, page: string[]): { from: number
   }
   const best = places[0];
   if (!best || best.edits > most) return { refused: "scan_weak_match" };
-  const close = places.filter((p) => p.edits < best.edits + lead);
-  if (close.length === 1) return best;
-  if (close.length > ESTIMATE_BOUNDS.candidates) return { refused: "scan_ambiguous" };
-  // More than one place is about as good: only the words around them can choose.
+  // Every place that is good enough, however much better another is: the clean one may be another copy of the words.
+  const rivals = places.filter((p) => p.edits <= most || p.edits < best.edits + lead);
+  if (rivals.length > ESTIMATE_BOUNDS.candidates) return { refused: "scan_ambiguous" };
+  // The words around the quotation, on each side where there are enough of them to tell by.
   const before = foldLetters(words.before).slice(-ESTIMATE_BOUNDS.context);
   const after = foldLetters(words.after).slice(0, ESTIMATE_BOUNDS.context);
-  const scored = close.map((place) => {
-    const sides = [
-      ...(before.length >= ESTIMATE_BOUNDS.least ? [{ weight: before.length, like: alikeAt(before, page.slice(0, place.from), "before") }] : []),
-      ...(after.length >= ESTIMATE_BOUNDS.least ? [{ weight: after.length, like: alikeAt(after, page.slice(place.to), "after") }] : []),
-    ];
-    const weight = sides.reduce((sum, s) => sum + s.weight, 0);
-    return { place, like: weight === 0 ? 0 : sides.reduce((sum, s) => sum + s.weight * s.like, 0) / weight };
-  }).sort((a, b) => b.like - a.like);
-  const [first, second] = scored;
-  return first!.like >= ESTIMATE_BOUNDS.around && first!.like - second!.like >= ESTIMATE_BOUNDS.settles && first!.place.edits <= most
-    ? first!.place : { refused: "scan_ambiguous" };
+  const sides = [before, after].map((side) => (side.length >= ESTIMATE_BOUNDS.least ? side.length : 0));
+  const weight = sides[0]! + sides[1]!;
+  let chosen = best;
+  if (weight === 0) {
+    if (rivals.length > 1) return { refused: "scan_ambiguous" };
+  } else {
+    // They must agree around the place taken, one place or many, and choose it clearly among many.
+    const [first, second] = rivals.map((place) => ({
+      place,
+      like: ((sides[0] ? sides[0] * alikeAt(before, page.slice(0, place.from), "before") : 0)
+        + (sides[1] ? sides[1] * alikeAt(after, page.slice(place.to), "after") : 0)) / weight,
+    })).sort((a, b) => b.like - a.like);
+    if (first!.like < ESTIMATE_BOUNDS.around) return { refused: rivals.length > 1 ? "scan_ambiguous" : "scan_context" };
+    if (second && first!.like - second.like < ESTIMATE_BOUNDS.settles) return { refused: "scan_ambiguous" };
+    chosen = first!.place;
+    if (chosen.edits > most) return { refused: "scan_ambiguous" };
+  }
+  return telling(page.slice(chosen.from, chosen.to)) === telling(wanted) ? chosen : { refused: "scan_differs" };
 }
 
 /**
@@ -164,5 +192,9 @@ export function estimatePlace(layer: LayerGlyph[], from: { exact?: LayerGlyph[];
   if (chosen.length === 0) return { refused: "scan_weak_match" };
   // Boxes along lines are only made for words that run across the page as it is shown.
   if (chosen.some((glyph) => !glyph.level)) return { refused: "rotated_text" };
-  return { method, rects: lineRects(chosen) };
+  const rects = lineRects(chosen);
+  // As for a highlight: a quoted line with right-to-left text on it has an order that says little of places.
+  const onQuotedLine = (glyph: LayerGlyph) => rects.some((r) => Math.min(r.bottom, glyph.bottom) - Math.max(r.top, glyph.top) > (glyph.bottom - glyph.top) * 0.5);
+  if (layer.some((glyph) => RIGHT_TO_LEFT.test(glyph.text) && onQuotedLine(glyph))) return { refused: "right_to_left" };
+  return { method, rects };
 }

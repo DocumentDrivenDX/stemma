@@ -7,7 +7,8 @@
 // can remove a mark and never add one. An estimate on a scan looks unlike a
 // highlight and says in words that it is one.
 import { useEffect, useRef, useState } from "react";
-import { ESTIMATE_METHODS, type Highlight, type HighlightBox, noHighlight } from "../../core/src/highlight.ts";
+import { ESTIMATE_METHODS, type Highlight, noHighlight } from "../../core/src/highlight.ts";
+import { drawnIn, markedIn } from "./pixel-check.ts";
 import type { OriginalPage } from "../../core/src/original-pages.ts";
 import type { PageSegment } from "../../core/src/source-view.ts";
 import { CannotDraw, drawImage, type PdfEngine, type PdfPages } from "./pdf-engine.ts";
@@ -49,44 +50,6 @@ type Found = Shown | { reason: Reason; why: string };
 
 /** The files and PDFs kept at once, so that two pages of one original are not asked for twice. */
 const KEPT = 2;
-
-/** Whether each box, as the brightness of its pixels, passes. A box with no pixel does not. */
-function inEveryBox(canvas: HTMLCanvasElement, boxes: HighlightBox[], passes: (brightness: number[]) => boolean): boolean {
-  const context = canvas.getContext("2d");
-  if (!context) return false;
-  return boxes.every((box) => {
-    const left = Math.max(0, Math.floor(box.left * canvas.width));
-    const top = Math.max(0, Math.floor(box.top * canvas.height));
-    const width = Math.min(canvas.width - left, Math.ceil(box.width * canvas.width));
-    const height = Math.min(canvas.height - top, Math.ceil(box.height * canvas.height));
-    if (width < 1 || height < 1) return false;
-    const { data } = context.getImageData(left, top, width, height);
-    return passes(Array.from({ length: width * height }, (_, i) => 0.2126 * data[i * 4]! + 0.7152 * data[i * 4 + 1]! + 0.0722 * data[i * 4 + 2]!));
-  });
-}
-
-const share = (values: number[], holds: (value: number) => boolean): number => values.reduce((n, value) => n + (holds(value) ? 1 : 0), 0) / values.length;
-
-/**
- * Whether the drawing has both dark and light pixels in every box, as words on
- * paper have. A box that has not means that the two readings of the file differ.
- */
-const drawnIn = (canvas: HTMLCanvasElement, boxes: HighlightBox[]): boolean => (
-  inEveryBox(canvas, boxes, (box) => share(box, (b) => b < 175) > 0.01 && share(box, (b) => b > 215) > 0.2)
-);
-
-/**
- * The same for an estimate on a scan, whose paper may be dim or tinted: in every
- * box there are marks much darker than the box's own paper, and paper around
- * them. It removes an estimate that lies on blank paper or a flat patch. It
- * cannot tell which words the marks are.
- */
-const markedIn = (canvas: HTMLCanvasElement, boxes: HighlightBox[]): boolean => (
-  inEveryBox(canvas, boxes, (box) => {
-    const paper = [...box].sort((a, b) => a - b)[Math.floor(box.length * 0.9)]!;
-    return share(box, (b) => b < paper - 60) > 0.02 && share(box, (b) => b > paper - 30) > 0.2;
-  })
-);
 
 export interface OriginalSource {
   find(text: string, index: number): Promise<Found>;
@@ -231,7 +194,7 @@ function Marking({ marked }: { marked: Highlight | undefined }) {
   if (marked.state === "estimate") {
     return (
       <p className="stemma-estimated" data-method={marked.method}>
-        <strong>Approximate highlight: an estimated place on a scanned page.</strong> {ESTIMATE_METHODS[marked.method]} Nothing checks that the dashed boxes lie on the printed words, or that the page says these words. It is not a check of the quotation: read the page. Its file’s SHA-256 is the recorded one.
+        <strong>Approximate highlight: an estimated place on a page read as a scan.</strong> {ESTIMATE_METHODS[marked.method]} Nothing checks that the dashed boxes lie on the printed words, or that the page says these words. It is not a check of the quotation: read the page. Its file’s SHA-256 is the recorded one.
       </p>
     );
   }
@@ -291,7 +254,8 @@ function Drawing({ found, name, passage, index }: { found: Shown; name: string; 
           {/* Laid over the drawing: the drawing itself is never changed. */}
           {boxes.map((box, i) => (
             <div key={i} className={estimated ? "stemma-estimate" : "stemma-box"} aria-hidden="true" style={{ left: percent(box.left), top: percent(box.top), width: percent(box.width), height: percent(box.height) }} />
-          ))}        </div>
+          ))}
+        </div>
       </div>
     </figure>
   );

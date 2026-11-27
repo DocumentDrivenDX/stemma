@@ -17,7 +17,7 @@ import { sha256 } from "@stemma/records";
 import { type Highlight, type HighlightBox, type HighlightTarget, noHighlight, type NoHighlightReason } from "../../core/src/highlight.ts";
 import { assetDirectory } from "./index.ts";
 import { cleanText } from "./model.ts";
-import { estimatePlace, type LayerGlyph, type LayerRect } from "./pdf-estimate.ts";
+import { estimatePlace, type LayerGlyph, type LayerRect, RIGHT_TO_LEFT } from "./pdf-estimate.ts";
 import { type RawItem, readPageItems } from "./pdf-lines.ts";
 
 export const HIGHLIGHT_BOUNDS = { operators: 300_000, glyphs: 100_000, boxes: 500 };
@@ -131,7 +131,23 @@ interface Glyph {
   symbols: boolean;
 }
 
-interface Paint { box: Rect; order: number; white: boolean; image: boolean }
+interface Paint {
+  box: Rect; order: number; white: boolean; image: boolean;
+  /** For an image: what an estimate needs to tell whether it can be a scan's picture of the page. */
+  picture?: Picture;
+}
+
+interface Picture {
+  /** A one-bit shape, painted only where it is set. */
+  stencil: boolean;
+  /** Drawn transparent or blended. */
+  faint: boolean;
+  /** The image as the library holds it, or its name there. */
+  held?: unknown;
+}
+
+/** How the pinned library marks a decoded image that has transparency, as one with a soft, explicit, or colour-key mask has. */
+const WITH_ALPHA = 3;
 
 /**
  * Fonts whose shapes are signs, whatever letters the file's text gives them. The
@@ -249,7 +265,10 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
     state.x = state.lineX += x;
     state.y = state.lineY += y;
   };
-  const image = (order: number) => paints.push({ box: intersection(around(state.ctm, 0, 0, 1, 1), state.clip), order, white: false, image: true });
+  const image = (order: number, stencil: boolean, held?: unknown) => paints.push({
+    box: intersection(around(state.ctm, 0, 0, 1, 1), state.clip), order, white: false, image: true,
+    picture: { stencil, faint: state.fillAlpha < 1 || !state.normalBlend, held },
+  });
 
   const show = (items: any[], order: number) => {
     const { font, size } = state;
@@ -391,8 +410,11 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
         break;
       }
       case "shadingFill": paints.push({ box: state.clip, order, white: false, image: false }); break;
-      case "paintImageXObject": case "paintInlineImageXObject": case "paintImageMaskXObject": case "paintSolidColorImageMask":
-        image(order);
+      case "paintImageXObject": case "paintInlineImageXObject":
+        image(order, false, args?.[0]);
+        break;
+      case "paintImageMaskXObject": case "paintSolidColorImageMask":
+        image(order, true);
         break;
       default:
         throw new Refused("unknown_drawing");
@@ -404,7 +426,6 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
 /** A string's characters as they count here: those of the page's lines that are not white space. */
 const marks = (text: string): string[] => [...cleanText(text.replace(/[\f\0]/g, " "))].filter((c) => !/\s/u.test(c));
 
-const RIGHT_TO_LEFT = /[֐-ࣿ‏‫‮⁧יִ-﷿ﹰ-ﻼ\u{10800}-\u{10fff}\u{1e800}-\u{1efff}]/u;
 /** One glyph that stands for several letters: the presentation ligatures. */
 const LIGATURE = /[ﬀ-ﭏ]/u;
 
@@ -584,25 +605,78 @@ function fractions(viewport: any, rects: LayerRect[]): HighlightBox[] {
   });
 }
 
+/** The part of the page that lies in any of the boxes, counted over the centres of a grid of 200 by 200 cells. */
+function shareOfPage(boxes: Rect[], view: Rect): number {
+  const cells = 200;
+  const wide = cells + 1;
+  // Where each box's cells begin and end, summed afterwards, so that any number of boxes costs little each.
+  const edges = new Int32Array(wide * wide);
+  const cell = (at: number, from: number, to: number) => Math.min(cells, Math.max(0, Math.ceil(((at - from) / (to - from)) * cells - 0.5)));
+  for (const box of boxes) {
+    const [left, right] = [cell(box.x0, view.x0, view.x1), cell(box.x1, view.x0, view.x1)];
+    const [low, high] = [cell(box.y0, view.y0, view.y1), cell(box.y1, view.y0, view.y1)];
+    if (left >= right || low >= high) continue;
+    edges[low * wide + left]!++;
+    edges[low * wide + right]!--;
+    edges[high * wide + left]!--;
+    edges[high * wide + right]!++;
+  }
+  const above = new Int32Array(wide);
+  let held = 0;
+  for (let row = 0; row < cells; row++) {
+    let along = 0;
+    for (let column = 0; column < cells; column++) {
+      above[column]! += edges[row * wide + column]!;
+      along += above[column]!;
+      if (along > 0) held++;
+    }
+  }
+  return held / (cells * cells);
+}
+
+/** Whether the library says that this image lets what is under it through. It says nothing of one it did not decode here. */
+async function seeThrough(page: any, held: unknown): Promise<boolean> {
+  const data = typeof held !== "string" ? held : await new Promise((resolve) => (held.startsWith("g_") ? page.commonObjs : page.objs).get(held, resolve));
+  return (data as { kind?: number } | null | undefined)?.kind === WITH_ALPHA;
+}
+
+/**
+ * The images that can be a scan's picture of its page. One that is drawn
+ * transparent or blended, or that the library says has a mask, as a watermark
+ * may, is none. A one-bit shape counts as a part of the picture, but hides
+ * nothing, since it paints only where it is set.
+ */
+async function pictures(page: any, paints: Paint[]): Promise<(Paint & { solid: boolean })[]> {
+  const known = new Map<unknown, boolean>();
+  const found: (Paint & { solid: boolean })[] = [];
+  for (const paint of paints) {
+    const picture = paint.picture;
+    if (!picture || picture.faint) continue;
+    if (!picture.stencil && !known.has(picture.held)) known.set(picture.held, await seeThrough(page, picture.held));
+    if (picture.stencil || !known.get(picture.held)) found.push({ ...paint, solid: !picture.stencil });
+  }
+  return found;
+}
+
 /**
  * An estimate on a scan, where no highlight was placed for the reason given; or
  * that reason, where the page is not a scan whose text is invisible. Only the
  * invisible text over the page's images is read, so that a visible stamp on a
  * scan, or the words of a page that is not one, are never estimated.
  */
-async function estimate(page: any,target: HighlightTarget, once: PageRead, why: NoHighlightReason): Promise<Highlight> {
+async function estimate(page: any, target: HighlightTarget, once: PageRead, why: NoHighlightReason): Promise<Highlight> {
   // The library reorders such text, so its order here says little.
   if (why === "right_to_left" || why === "page_count") return noHighlight(why);
   const [content, { glyphs, paints }] = [await once.content(), await once.drawing()];
   const view = viewOfPage(page);
-  const images = paints.filter((p) => p.image);
-  // Strips and layers of a scan are added up; one picture beside the text of an ordinary page does not make it a scan.
-  if (images.reduce((sum, p) => sum + area(intersection(p.box, view)), 0) < SCAN.images * area(view)) return noHighlight(why);
+  const images = await pictures(page, paints);
+  // Strips and layers of a scan count together, each part of the page once; a picture beside the text of an ordinary page does not make it a scan.
+  if (shareOfPage(images.map((p) => p.box), view) < SCAN.images) return noHighlight(why);
   if (content.text.trim() === "") return noHighlight("no_text_layer");
 
   const shown = glyphs.filter((g) => !g.space && beginsOnPage(g, view));
-  /** Not seen: drawn invisibly, or drawn before an image that covers it. */
-  const unseen = (g: Glyph) => g.mode === 3 || images.some((p) => p.order > g.order && inside(g.core, p.box, 0.5));
+  /** Not seen: drawn invisibly, or drawn before a solid image that covers it. */
+  const unseen = (g: Glyph) => g.mode === 3 || images.some((p) => p.solid && p.order > g.order && inside(g.core, p.box, 0.5));
   const behind = shown.filter((g) => unseen(g) && images.some((p) => meet(p.box, g.box)));
   if (behind.length === 0 || behind.length < SCAN.unseen * shown.length) return noHighlight(why);
 
@@ -628,9 +702,11 @@ async function estimate(page: any,target: HighlightTarget, once: PageRead, why: 
   const made = estimatePlace([...layer.values()], { ...(exact ? { exact } : {}), ...(target.words ? { words: target.words } : {}) });
   if ("refused" in made) return noHighlight(made.refused);
   if (made.rects.length > HIGHLIGHT_BOUNDS.boxes) return noHighlight("too_much");
-  const boxes = fractions(viewport, made.rects);
-  // A layer that puts words off the page does not lie on the picture of it.
-  if (boxes.some((box) => !(box.width > 0 && box.height > 0))) return noHighlight("scan_weak_match");
+  const boxes = fractions(viewport, made.rects.map((r) => ({
+    left: Math.max(0, r.left), top: Math.max(0, r.top), right: Math.min(viewport.width, r.right), bottom: Math.min(viewport.height, r.bottom),
+  })));
+  // A box partly off the page is cut to it. One with nothing left lies on no part of the picture.
+  if (boxes.some((box) => !(box.width > 0 && box.height > 0))) return noHighlight("scan_off_page");
   return { state: "estimate", method: made.method, sha256: target.sha256, page: target.page, page_count: target.page_count, boxes };
 }
 

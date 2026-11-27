@@ -4,7 +4,8 @@
 // words are invented.
 import { describe, expect, test } from "bun:test";
 import { sha256 } from "@stemma/records";
-import { NO_HIGHLIGHT, type Highlight, type HighlightTarget, type HighlightWords } from "../packages/core/src/highlight.ts";
+import { ESTIMATE_METHODS, NO_HIGHLIGHT, type Highlight, type HighlightTarget, type HighlightWords } from "../packages/core/src/highlight.ts";
+import { type Drawn, drawnIn, markedIn } from "../packages/explorer/src/pixel-check.ts";
 import { estimatePlace, findWords, foldLetters, type LayerGlyph } from "../packages/extract/src/pdf-estimate.ts";
 import { locateOnPage } from "../packages/extract/src/pdf-highlight.ts";
 import { line, pageText, rawPdf, type Raw, stream, targetFor } from "./highlight-pdf.ts";
@@ -59,6 +60,44 @@ describe("US-123-AC9 the words looked for in a scan's text", () => {
     expect(found(words(QUOTE, "quay", "until"), twice)).toBe("scan_ambiguous");
     // A second place that differs by one letter casts the same doubt.
     expect(found(words(QUOTE), `${QUOTE}. And ${QUOTE.replace("tide", "ride")}.`)).toBe("scan_ambiguous");
+  });
+
+  test("a clean copy elsewhere does not beat a garbled place that the words around point to", () => {
+    const quote = "the harbour clerk kept a table of every tide";
+    const asked = words(quote, "", "and the pilots copied it carefully each week");
+    const page = (garbled: string) => `${quote}, and nobody read it. ${garbled} and the pilots copied it carefully each week`;
+    // As reported: the garbled place also reads digits where the quotation has none, so nothing is marked.
+    expect(found(asked, page("tbe harbonr c1erk kept a tab1e of every tide"))).toBe("scan_differs");
+    // Without them it is the place taken, never the clean copy.
+    const layer = page("tbe harbonr clerk kept a tabie of every tide");
+    expect(findWords(asked, letters(layer))).toMatchObject({ from: letters(layer.slice(0, layer.indexOf("tbe"))).length });
+    // And with nothing around it to choose by, a place that is only good enough is as much a rival as the clean one.
+    expect(found(words(quote), layer)).toBe("scan_ambiguous");
+  });
+
+  test("a single place is refused where there is enough around it and it disagrees", () => {
+    const around = ["In the first years, at the stone quay in the north,", "until the long war with the islands began."] as const;
+    const page = `${around[0]} ${QUOTE} ${around[1]}`;
+    expect(found(words(QUOTE, ...around), page)).toBe(letters(QUOTE).join(""));
+    const elsewhere = ["Afterwards, beside the timber wharf to the south,", "while sand and weed were silting up its mouth."] as const;
+    expect(found(words(QUOTE, ...elsewhere), page)).toBe("scan_context");
+    // Too little around it to tell by.
+    expect(found(words(QUOTE, "wharf", "sand"), page)).toBe(letters(QUOTE).join(""));
+  });
+
+  test("a place that differs in a number, or by a word of denial added or dropped, is refused", () => {
+    const dated = "the harbour clerk kept a table of every tide in the year 1874";
+    expect(found(words(dated), `So ${dated}.`)).toBe(letters(dated).join(""));
+    for (const other of [dated.replace("1874", "1847"), dated.replace("1874", "187"), dated.replace("every", "every 2nd")]) {
+      expect([other, found(words(dated), `So ${other}.`)]).toEqual([other, "scan_differs"]);
+    }
+    const did = "the old harbour clerk did keep a careful table of every single tide";
+    for (const other of ["did not keep", "did never keep", "didn't keep", "did in no way keep"]) {
+      const denied = did.replace("did keep", other);
+      expect([other, found(words(did), denied)]).toEqual([other, "scan_differs"]);
+      expect([other, found(words(denied), did)]).toEqual([other, "scan_differs"]);
+      expect([other, found(words(denied), denied)]).toEqual([other, letters(denied).join("")]);
+    }
   });
 });
 
@@ -163,8 +202,111 @@ describe("US-123-AC8 and AC9 estimates on pages of a PDF", () => {
     expect(shown(await located({ content: `BT 3 Tr ET\n${typed}` }, "harbour clerk kept"))).toBe("invisible_text");
     // A little invisible text on a page whose words are mostly seen.
     expect(shown(await located({ ...PICTURE, content: `${typed}\n${small.replace("665", "100")}\nBT 3 Tr ET\n${line("unseen", 120, 14)}` }, "harbour", CORRECTED))).toBe("text_differs");
+    // One picture of a tenth of the page, drawn five times in one place, covers a tenth of it.
+    const tenth = "q 600 0 0 80 0 640 cm /Im Do Q\n".repeat(5);
+    expect(shown(await located({ ...PICTURE, content: `${tenth}BT 3 Tr ET\n${typed}` }, "harbour clerk kept"))).toBe("recognition_layer");
+    // Five different tenths are a half, as the strips of a scan are.
+    const strips = [0, 1, 2, 3, 4].map((i) => `q 600 0 0 80 0 ${i * 80 + 360} cm /Im Do Q`).join("\n");
+    expect(shown(await located({ ...PICTURE, content: `${strips}\nBT 3 Tr ET\n${typed}` }, "harbour clerk kept"))).toStartWith("estimate");
     // Quoted words that are seen, on a page that is otherwise a scan.
     const mixed = scan(`${typed}\n0 Tr ${line("A visible note added to the scan", 40, 14)}`);
     expect(shown(await located(mixed, "visible note added"))).not.toStartWith("estimate");
+  });
+
+  test("a picture that lets the page through, as a watermark does, neither makes a page a scan nor hides its words", async () => {
+    const grey = (more: string, data = "80>") => stream(`/Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8 /Filter /ASCIIHexDecode ${more}`, data);
+    const shape = stream("/Type /XObject /Subtype /Image /Width 1 /Height 1 /ImageMask true /BitsPerComponent 1 /Filter /ASCIIHexDecode", "00>");
+    const resources = "/XObject << /Im 6 0 R >> /ExtGState << /Faint << /ca 0.2 >> /Blend << /BM /Multiply >> >>";
+    const through: [string, Raw, string?][] = [
+      ["soft mask", { resources, objects: [grey("/SMask 7 0 R"), grey("", "20>")], content: "" }],
+      ["explicit mask", { resources, objects: [grey("/Mask 7 0 R"), shape], content: "" }],
+      ["colour-key mask", { resources, objects: [grey("/Mask [128 128]")], content: "" }],
+      ["drawn transparent", { resources, objects: [grey("")], content: "" }, "/Faint gs"],
+      ["drawn blended", { resources, objects: [grey("")], content: "" }, "/Blend gs"],
+    ];
+    for (const [name, raw, state] of through) {
+      const mark = `q ${state ?? ""} 600 0 0 800 0 0 cm /Im Do Q`;
+      // Invisible text with it has no solid picture of a page under it.
+      expect([name, shown(await located({ ...raw, content: `${mark}\nBT 3 Tr ET\n${typed}` }, "harbour clerk kept"))]).toEqual([name, "recognition_layer"]);
+      // A watermark over visible words, or under them, leaves them an ordinary page's.
+      for (const content of [`${typed}\n${mark}`, `${mark}\n${typed}`]) {
+        expect([name, shown(await located({ ...raw, content }, "harbour clerk kept"))]).not.toContain("estimate");
+      }
+    }
+    // A one-bit shape over the whole page can be a scan's picture, and hides no text drawn before it.
+    const bitonal = { resources: "/XObject << /Im 6 0 R >>", objects: [shape] };
+    expect(shown(await located({ ...bitonal, content: `${WHOLE}\nBT 3 Tr ET\n${typed}` }, "harbour clerk kept"))).toBe("estimate ocr_layer_offsets 1");
+    expect(shown(await located({ ...bitonal, content: `${typed}\n${WHOLE}` }, "harbour clerk kept"))).toBe("covered");
+  });
+
+  test("right-to-left text on a quoted line gives no estimate, from the offsets or from a match", async () => {
+    // Helvetica told to give Hebrew letters for A and B.
+    const cmap = "/CIDInit /ProcSet findresource begin 12 dict begin begincmap /CMapName /T def 1 begincodespacerange <00> <FF> endcodespacerange 2 beginbfchar <41> <05D0> <42> <05D1> endbfchar endcmap end end";
+    const hebrew = scan(`${typed}\nBT /H 14 Tf 500 700 Td (AB) Tj ET`, {
+      fonts: "/H 7 0 R",
+      objects: [...PICTURE.objects, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding /ToUnicode 8 0 R >>", stream("", cmap)],
+    });
+    const quoted = "the harbour clerk kept a table of every tide";
+    expect(shown(await located(hebrew, "harbour", { ...CORRECTED, words: words(quoted) }))).toBe("right_to_left");
+    const plainLine = glyph("a", 0, 0);
+    expect(estimatePlace([plainLine, glyph("א", 40, 0)], { exact: [plainLine] })).toEqual({ refused: "right_to_left" });
+    expect(estimatePlace([plainLine, glyph("א", 40, 40)], { exact: [plainLine] })).toMatchObject({ method: "ocr_layer_offsets" });
+  });
+
+  test("words the layer puts off the page have a reason of their own, and no method's words claim a comparison that was not made", async () => {
+    // A letter that reaches onto the page by less than the answer can say, so nothing of its box is left.
+    // A glyph further off meets no picture on the page and is not read at all.
+    const off = scan(line("I", 700, 14, 599.9999999));
+    expect(shown(await located(off, "I"))).toBe("scan_off_page");
+    // One that is partly off is cut to the page.
+    const partly = await located(scan(line("I", 700, 14, 598)), "I");
+    expect(partly.state === "estimate" && partly.boxes[0]!.left + partly.boxes[0]!.width).toBeCloseTo(1, 6);
+    expect(ESTIMATE_METHODS.ocr_layer_match).not.toContain("differs");
+    expect(ESTIMATE_METHODS.ocr_layer_match).toContain("could not be used");
+    // Where the recorded offsets are not known at all, nothing was compared.
+    expect(shown(await located(scan(), "harbour", { refused: "unsupported_text", text_sha256: "", ranges: [], words: words("the harbour clerk kept a table of every tide") }))).toBe("estimate ocr_layer_match 2");
+  });
+});
+
+describe("US-123-AC8 the page's own look under the boxes", () => {
+  /** A drawing of one tone, with a darker tone in every pixel whose place across is a multiple of `every`. */
+  const drawing = (paper: number, ink: number, every: number) => {
+    let reads = 0;
+    const canvas: Drawn = {
+      width: 200, height: 100,
+      getContext: () => ({
+        getImageData: (x, _y, width, height) => {
+          reads++;
+          const data = new Uint8ClampedArray(width * height * 4);
+          for (let i = 0; i < width * height; i++) data.fill((x + (i % width)) % every === 0 ? ink : paper, i * 4, i * 4 + 4);
+          return { data };
+        },
+      }),
+    };
+    return { canvas, reads: () => reads };
+  };
+  const box = { left: 0.1, top: 0.1, width: 0.5, height: 0.2 };
+
+  test("a highlight wants dark and near-white pixels; an estimate, marks much darker than its own paper", () => {
+    for (const [paper, ink, every, highlight, estimate] of [
+      [255, 0, 5, true, true], [180, 20, 5, false, true], [180, 130, 5, false, false], [180, 110, 5, false, true],
+      [240, 240, 5, false, false], [255, 0, 1000, false, false], [255, 0, 1, false, false],
+    ] as const) {
+      const { canvas } = drawing(paper, ink, every);
+      expect([paper, ink, every, drawnIn(canvas, [box]), markedIn(canvas, [box])]).toEqual([paper, ink, every, highlight, estimate]);
+    }
+  });
+
+  test("boxes that together hold many times the page are refused before a pixel is read", () => {
+    const whole = { left: 0, top: 0, width: 1, height: 1 };
+    for (const check of [drawnIn, markedIn]) {
+      const many = drawing(255, 0, 5);
+      expect(check(many.canvas, Array.from({ length: 500 }, () => whole))).toBe(false);
+      expect(many.reads()).toBe(0);
+      // Five hundred lines' worth of boxes are all looked at.
+      const lines = drawing(255, 0, 5);
+      expect(check(lines.canvas, Array.from({ length: 500 }, () => ({ left: 0, top: 0.5, width: 0.5, height: 0.01 })))).toBe(true);
+      expect(lines.reads()).toBe(500);
+    }
   });
 });

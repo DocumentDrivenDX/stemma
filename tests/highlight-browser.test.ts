@@ -219,8 +219,8 @@ describe.skipIf(!browser)("US-123 the quoted words marked on the original", () =
         const caption = await figure(it.page).locator("figcaption").innerText();
         expect(caption).not.toContain("Highlighted on the original");
         if (expected === "estimate") {
-          expect(caption).toContain("Approximate highlight: an estimated place on a scanned page.");
-          expect(caption).toContain("hidden recognition text");
+          expect(caption).toContain("Approximate highlight: an estimated place on a page read as a scan.");
+          expect(caption).toContain("text that is not seen on the page");
           expect(caption).toContain("It is not a check of the quotation");
           const mark = figure(it.page).locator(".stemma-estimate");
           expect(await mark.count()).toBe(1);
@@ -295,12 +295,14 @@ describe.skipIf(!browser)("US-123 the quoted words marked on the original", () =
       ["pixels_disagree", {}],
       ["failed", { page: 2 }],
       ["failed", { sha256: "0".repeat(64) }],
+      // More boxes of the whole page than could be looked at one by one in any time: refused at once.
+      ["pixels_disagree", { boxes: Array.from({ length: 500 }, () => ({ left: 0, top: 0, width: 1, height: 1 })) }],
     ] as const;
     for (const [expected, change] of answers) {
       const session = createSession(() => {});
       const server = await listen({
         assets, session, check: async () => verdict, originals: createOriginals(dir, [folderOf({ "a.pdf": FULL })]),
-        highlighter: { place: async (target) => ({ state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count, boxes: [nowhere], ...change }), close: () => {} },
+        highlighter: { place: async (target) => ({ state: "boxes", sha256: target.sha256, page: target.page, page_count: target.page_count, boxes: [nowhere], ...change as object }), close: () => {} },
       });
       const it = await visit(`${server.address}#code=${session.code}`);
       try {
