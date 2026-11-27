@@ -263,7 +263,11 @@ export function assemble(manuscript: string, resolve: Resolve): Assembly {
 /** Every citation of the report, in note order. */
 export const clustersOf = (notes: AssembledNote[]): Cluster[] => notes.flatMap((n) => n.citations.flatMap((c) => (c.cluster ? [c.cluster] : [])));
 
-export interface Built { files: Record<string, string>; notes: Note[]; words: number; problems: string[] }
+export interface Built {
+  files: Record<string, string>; notes: Note[]; words: number; problems: string[];
+  /** What the outputs were assembled from, which the evidence ledger reads. */
+  assembly: Assembly; quotations: Map<string, Rendered>;
+}
 
 export function buildReport(corpus: Corpus, spec: ReportSpec, manuscript: string, include: string[] = []): Built {
   const texts = new SourceTexts(corpus);
@@ -301,7 +305,7 @@ export function buildReport(corpus: Corpus, spec: ReportSpec, manuscript: string
   const words = (prose.match(/[A-Za-z’'-]+/g) ?? []).length;
   return {
     files: { "report.md": md, "report.typ": toTypst(body, notes), "verification.md": verification(corpus, spec, notes, passages, formatted.items) },
-    notes, words, problems,
+    notes, words, problems, assembly, quotations: passages,
   };
 }
 

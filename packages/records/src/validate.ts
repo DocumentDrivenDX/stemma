@@ -9,7 +9,7 @@ import { type FieldSpec, KIND_TYPES, REFERENCES, TYPES } from "./schema.generate
 export type ProblemCode =
   | "not_an_object" | "missing_field" | "wrong_type" | "not_a_list" | "value_not_allowed" | "bad_time"
   | "bad_digest" | "bad_id" | "unknown_kind" | "bad_citation_key" | "duplicate_citation_key" | "duplicate_id"
-  | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
+  | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "text_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
   | "number_not_integer" | "bad_size" | "bad_original" | "bad_page_label" | "bad_part" | "model_verification"
   | "response_digest_mismatch" | "bad_address" | "bad_binding" | FormatProblem | PageProblem;
@@ -153,6 +153,10 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
     if (anchor.length === 0 || anchor.some((a) => !isObject(a) || !(Number(a.end) > Number(a.start)) || Number(a.start) < 0)) {
       problems.push(invalid("bad_address", "/anchor"));
     }
+  }
+  if (record.kind === "authorship_mark" && typeof record.text === "string" && typeof record.text_sha256 === "string"
+    && record.text_sha256 !== sha256(normalizeSentence(record.text))) {
+    problems.push(invalid("text_digest_mismatch", "/text_sha256"));
   }
   if (record.kind === "citation" && isObject(record.sentence)) {
     const { text, sha256: stated } = record.sentence;

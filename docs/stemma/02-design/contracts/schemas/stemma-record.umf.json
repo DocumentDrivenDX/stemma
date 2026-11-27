@@ -12677,7 +12677,7 @@
           "kind": "scalar",
           "name": "string"
          },
-         "cardinality": "one"
+         "cardinality": "optional"
         },
         "text": {
          "type": {
@@ -12812,7 +12812,7 @@
      "id": "AuthorshipMark.chapter",
      "kind": "field",
      "name": "chapter",
-     "nullability": "required",
+     "nullability": "absent-allowed",
      "extensions": {},
      "cardinality": "one",
      "scalarType": "string"

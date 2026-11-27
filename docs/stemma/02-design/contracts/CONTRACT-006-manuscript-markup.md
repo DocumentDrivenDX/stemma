@@ -304,6 +304,59 @@ page, how it was checked, and every change from the source text; and, for each
 cited work, where its details were read, from the source record's change log. It
 is not part of the publication. `report.typ` escapes all text (G5).
 
+### J. Evidence ledger
+
+`build report` also writes `evidence.json` in the report's directory (FR-96). It
+is deterministic and checked by `--check` like the other outputs. It holds no
+sentence or source text.
+
+| Field | Meaning |
+|---|---|
+| `schema` | `stemma.evidence/0` |
+| `ledger` | `evidence-ledger/1`: the tool-neutral shape of `subjects`, `units`, and `totals`, which another tool can check without knowing the labels |
+| `subjects[]` | `path` (relative to the ledger) and `sha256` of `report.md` and `report.typ` |
+| `inputs` | `sha256` of `report.json` and of the template |
+| `profiles.sentences` | `sentence-split/0` (D) |
+| `covers`, `not_covered[]` | What units are, and what has none |
+| `checks` | `label`, `open`, `open_by_check`, and `not_implemented[]` from one run over the whole project (CONTRACT-002 C). Not tied to single sentences |
+| `quotations[]` | `id`, `source`, `passages[]`, `compared`, `corrections` (`person`, `other` counts), and `stated_check` (the entry has `checked` free text, which is not read) |
+| `units[]` | `id`, `place` (`body`, or `comment` with `note`), `block` (paragraph number from 1), `sentence` (from 1 in its paragraph or comment), `sha256`, `labels`, `chars`, `quotations[]` |
+| `totals` | `units` (their number), `chars` (the sum of each `chars` key), `labels` (for each label name, the number of units with each value) |
+
+A unit is one sentence of a body paragraph or note comment as `report.md` words
+it, with each script-copied quotation in its marks and without note markers. A
+note belongs to the sentence its marker follows. `sha256` is the digest of that
+text normalized as CONTRACT-001 E defines. `id` is `u-`, the first 16 digits of
+the digest, `-`, and the count of equal digests so far. An edit to a sentence
+therefore changes its `id`. `chars` counts code points: `quoted` inside
+script-copied quotations, `wording` the rest except white space and those
+quotations' marks.
+
+| Label | Values |
+|---|---|
+| `wording` | `human_written`, `edited`, `ai_drafted`, or `unrecorded`: from `authorship_mark` records in effect whose `text`, split by the sentence profile, holds a sentence with this digest and whose `text_sha256` is the digest of its normalized `text`. No such mark, or marks that disagree, give `unrecorded`. It describes the words outside script-copied quotations |
+| `declared_by` | Who made those marks (`marked.by.kind`): `person`, `model`, `software`, `mixed` for several kinds, or `none` |
+| `basis` | `quotation` (holds a script-copied quotation), else `cited` (a note of the sentence cites a passage), else `uncited` |
+| `typed_quotation` | `yes` when matched double quotation marks outside script-copied quotations enclose words, else `no`. Single quotation marks are not read |
+| `compared` | Over the unit's quotations, those its notes cite included, the weakest of `flagged`, `none_recorded`, `person`, in that order; `not_applicable` for an `uncited` unit |
+| `support` | `not_judged`, or `not_applicable` for an `uncited` unit. This version reads no support record |
+
+A quotation's `compared` comes from current `text_review` records of its
+passages' source files: a `passage` review naming the passage, or a `whole_page`
+or `quotations` review of the page. Per page, a current review by anyone with
+outcome `disagrees` or `flagged` gives `flagged`; else one by a person with
+`agrees` or `corrected` gives `person`; else `none_recorded`. The quotation
+takes the weakest of its pages. A model's review can only be a flag
+(CONTRACT-001 G), so a comparison a model made and described only in
+`report.json` shows as `none_recorded`, with `stated_check` true. A review says
+what its writer said; it is not proof.
+
+A mark's `chapter` is optional, since a report has no chapter records.
+
+The ledger is a record of what is recorded, not a measure of truth: it gives no
+score, and `uncited` wording may be sound argument while a quoted sentence's
+other words may be wrong.
+
 ## Precedence and Compatibility
 
 - Versioning: `Project.format` covers the markup version; `sentence-split` has

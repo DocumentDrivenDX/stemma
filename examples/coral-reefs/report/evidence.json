@@ -1,0 +1,5096 @@
+{
+ "schema": "stemma.evidence/0",
+ "ledger": "evidence-ledger/1",
+ "subjects": [
+  {
+   "path": "report.md",
+   "sha256": "7ead67dd2326bc5eeb14e4df9a4608f095c98c303be0f73f5ac73a9a66f17d70"
+  },
+  {
+   "path": "report.typ",
+   "sha256": "6190d480ed3ecce31f89027aebaadab59677ac0f8c3086360f2b77bd73c92c4e"
+  }
+ ],
+ "inputs": {
+  "spec_sha256": "217beac51bb4d476f430f64ec6657c81ed5959ea625510602541b43499fc9538",
+  "template_sha256": "87ef37e3d83d00dec9b3b6b84a6e2f6bb424aa716b38e32051d8e407a0a61315"
+ },
+ "profiles": {
+  "sentences": "sentence-split/0"
+ },
+ "covers": "Each sentence of the report's body paragraphs and note comments. It counts what is recorded. It is not a measure of truth and gives no score.",
+ "not_covered": [
+  "headings",
+  "formatted citations and the bibliography",
+  "the quotations that notes give before their citations",
+  "text between single quotation marks, which is not read as a quotation",
+  "whether any source supports any sentence"
+ ],
+ "checks": {
+  "label": "checked_clean",
+  "open": 0,
+  "open_by_check": {},
+  "not_implemented": []
+ },
+ "quotations": [
+  {
+   "id": "L-borings",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-9hwzf099800m4855wwem"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-banks",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-47w1ajgmvn9kaqmx8fbx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-foresaw",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-ag2h3sa70bxth80a5ttk"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-future",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-538my34rpdqf45mhbpnx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-troubled",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-e3ds3rybs43hkxwn4g69"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LY-crater",
+   "source": "src-rd44yd9ctbs143rpe1be",
+   "passages": [
+    "psg-canw74xkt67evynrbyga"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LY-size",
+   "source": "src-rd44yd9ctbs143rpe1be",
+   "passages": [
+    "psg-tw2zk47a1tg47xf3gsqt"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D37-crater",
+   "source": "src-ymdxbsxjmc5fbmq0t4a0",
+   "passages": [
+    "psg-7xbpp4wr458swjbnc8ft"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D37-encircling",
+   "source": "src-ymdxbsxjmc5fbmq0t4a0",
+   "passages": [
+    "psg-zereratr6z5vy49211ky"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D37-number",
+   "source": "src-ymdxbsxjmc5fbmq0t4a0",
+   "passages": [
+    "psg-vgyyxzg2417vbewbvnfc"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D37-keeling",
+   "source": "src-ymdxbsxjmc5fbmq0t4a0",
+   "passages": [
+    "psg-jssxwjvb3hmpxbs1scp8"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-received",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-n5vnt6dcv5j7dftbs1mx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-bow",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-rjd31gmtcebz85akdm73"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-concession",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-680rv3jc6vg6te1rprn7"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-foundation",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-nj95r6y7yva1pv3btp3m"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-improbable",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-c8dd2akwb9tbn8n8y7x5"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-necessity",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-av4b2qskyewfp7d9mh2a",
+    "psg-h8saz1radsba9rwcj8qe"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-chamisso",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-xgr5vsxh24q2q38zeb4k"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-confirm",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-y6bb6jaq3m76wepqjd77"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-section",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-yf0xnz66y1xva04gq9cv"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D89-incredible",
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "passages": [
+    "psg-pyngt84p2y3d4d4kz5my"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D89-compels",
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "passages": [
+    "psg-86n066ny6yg9a06tp69c"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BO-insufficient",
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "passages": [
+    "psg-v82c2g3hs3me51dp7wya"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BO-premature",
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "passages": [
+    "psg-ts428685qm3rrv0rv06r"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "SE-structure",
+   "source": "src-nmf90sqdz27921jbh6j4",
+   "passages": [
+    "psg-b5m8yjye235ggkcjazf8"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "SE-ignore",
+   "source": "src-nmf90sqdz27921jbh6j4",
+   "passages": [
+    "psg-fwncnazk0shh2gvd1dd9"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "SE-blocks",
+   "source": "src-nmf90sqdz27921jbh6j4",
+   "passages": [
+    "psg-34rr2wbf4wpx4nczwzgb"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-object",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-pa462v6k4mhda3nm5bdy"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-improb",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-7atwk4gct89e2ttm80y0",
+    "psg-nqjtx7jr97ts6m57jg58"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-banks",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-20pzd95zrp4s2swbehn8"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-summary",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-mfqkmm105j30z1vw1x2a"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-local",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-6dfab9dqpytadtje46hn"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-free",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-m01wp9bq8h178h2av9t9"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-noproof",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-6srgq4asq4d83xzh7ajb"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-positive",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-hcd97g5sz4bf923wxr3k"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-opposed",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-08v3e16rvy17h8xt3gm6"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-reply",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-5fqyrmabbkpvvybpq55s"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-funafuti",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-wbnw7pb0xre3v6wk7vpq"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-layers",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-aaz9n521ffzn2gf8f6h3"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-boring",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-c9yp9bmnykdtt1azzvdd"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-unknown",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-hf6cwgq2qv04hs7kpfk3"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-facts",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-4k4wmc02dxyzt1fr8sfj"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-near",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-cn2vs2kctdxcxp2z1900"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-david",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-xdqpz8kwjaw10mb124d4"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-pteropod",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-xwa1p33f2rgh96s6zm8c"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-judd",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-9vad2s3jw2bz1vdxhzvj"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-crowns",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-5zkz7sk388hcqn1tak77"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-novertical",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-y2ka85vkr56zp9mqwy84"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-drowned",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-3m2jedrf25ynpz93tztp"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-rising",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-jtvk69k1ks68vxxgs4q7"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-deceptive",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-dyz938qjp5kd5y4jgm6h"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-site",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-ryc8jhebx8tdbk7kqrs0"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-inside",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-vkkc27929xv3vawcbenw"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-abstract",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-n2hmpsg5qay1ryb3wpwe"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-established",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-7ptq1wks0832r0r7thgf"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-features",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-yp3j3wyjmkntgkxvgypw"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-eocene",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-j7qa7hh45cjbbdxg7fwh"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-emergence",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-hgpmb2b1gzjskqrcm47y"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BL-insufficient",
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "passages": [
+    "psg-yhscq05cs48am01d4zvd",
+    "psg-fr7awyps0x963bcm53eh"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BL-complex",
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "passages": [
+    "psg-ahqw1yaq7v5p4c4jr0mv"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BL-retreat",
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "passages": [
+    "psg-67fwktn6v69gkx3bz8ds"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "ST-correct",
+   "source": "src-9y5zh0m86v7n3fkawade",
+   "passages": [
+    "psg-xwpz2w9867f86a99jn3c"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "ST-transient",
+   "source": "src-9y5zh0m86v7n3fkawade",
+   "passages": [
+    "psg-4t5frrk137nq1gtw3mzy"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-bank",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-kcaze8gn9n01awv488rw"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-inapplicable",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-6w9c3mvyb55807zrxh0d"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-bermuda",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-ck8kmdmwq69k4gzzpyg6",
+    "psg-t5vevpdjnwy55mm4hnch"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-asked",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-35qmyd6wr6sw7fq3x86x"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-outer",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-yg02aszyhtbgz07epjp3"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-uncertain",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-j9qej8mb5jwz2rnbh7s2",
+    "psg-pbzvtqs1827v47j0f715"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-semper",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-zq0hwbw6s8mnk6205ghz"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-proofs",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-ynj5287r8fp1m1sx1wfm"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-staff",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-s38kkftmbfc4grd2maq4"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-adhere",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-j5gh2xyd6b3ms3ze6gh2"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-lagoon",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-b7h0yc00ycfftq5f0trm"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-dana",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-r7eeq0ks3w3v141gbrsq"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-platform",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-mgk1dpb9ydjq1ef7ea95"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-guppy",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-ydvwnvrvbzpm4h268bry"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-tortugas",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-zccjt6p5c053x44z9mwg"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-colonize",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-43nq37twrd7gy9rhfajf"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-depth",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-3mmhvs8a34m9q71xwk9g"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-talus",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-f8a0dmg9a5fg26q31p4k"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-david-long",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-nwrtn3146gwz1xcp530b"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-judd-rate",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-894nvgp7dy0nm2pcwpte"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-tests",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-k0m569rgbcg8n5ez7ezj"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-leach",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-452dvn0yqp0a2ybark3p"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-differ",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-e85qy340v7v9sgby7r7t"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BL-tahiti",
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "passages": [
+    "psg-7yrqxs88gqh80etxej78"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-chamisso-view",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-4mzfqfh5dneq2ze8nzvs"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-spaces",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-dqs8ewsk6djcwtkmhkky"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-elevation",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-c59m8ydb0n7kwf0bz9ga"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-questions1",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-5z9zf8kebeqgt245dhjn"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-questions2",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-wj87m68rdq3h3kgg8gm0"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-ancient",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-7dm1a433jp14j3a313h3"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-untenable",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-2dc2pfgqgwksqggh8g0h"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-semper",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-7pkzjk62c6q8nb4e9sgt"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-inapplicable-short",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-sv8vwmgs66xn6bnaf6cr"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-confirm-short",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-qcts2jhdmhdxahn7ajth"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-section-short",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-20x375e4e2mkcemm9wqr"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "SE-blocks-short",
+   "source": "src-nmf90sqdz27921jbh6j4",
+   "passages": [
+    "psg-mzx2ym461sbzsghm855d"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "MU-banks-short",
+   "source": "src-eh71qk5hm5zhpwzcz2v7",
+   "passages": [
+    "psg-vdwt6fv2vkkfetrtx3qb"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-banks-short",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-n27fwt0a07fen8c2f9nd"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DA-positive-short",
+   "source": "src-eepzpt4f02f9tcv2b06n",
+   "passages": [
+    "psg-nb8cc9bvhrv5zjhx65qz"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "DY-rising-short",
+   "source": "src-aap7r89s50h94pgvvzz8",
+   "passages": [
+    "psg-0ezgb2rymxxzwgf4kj7r"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-unknown-short",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-ab6qegrezzvrkndxe2bg"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-layers-short",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-56vt89gtg4m4kb60ks19"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "AG-reefflat",
+   "source": "src-w8s30cm4ecfvt6nmtbr0",
+   "passages": [
+    "psg-xzvm5pq4x1ceqzjr48vy"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-emergence-short",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-ggwjknfrpx3x24cxsyrg"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LS-outer-short",
+   "source": "src-a72ssggbvnakjrgw9dw0",
+   "passages": [
+    "psg-p1tx44t01zhpsxjdd9tx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "BL-complex-short",
+   "source": "src-w4na70p97m1rbc19t6ak",
+   "passages": [
+    "psg-5jtjm4srck4wdjyv0akw"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "LY-elevation",
+   "source": "src-rd44yd9ctbs143rpe1be",
+   "passages": [
+    "psg-0k11d46m4dhcn21bzmfg"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "L-mistake",
+   "source": "src-a04mqd3jch9s39zbmpjp",
+   "passages": [
+    "psg-e0xryhky4cgwj05m0gfg"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-footnote",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-wzzdss88ym2ctyda4bhx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 1
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-farfrom",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-dd2pqda7zqszhhe7z8es"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D42-somesuch",
+   "source": "src-darwinreefs1842",
+   "passages": [
+    "psg-39dj7rr4abacytstekag"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "D89-mnbf",
+   "source": "src-48g9pqaf1748q15bbpqs",
+   "passages": [
+    "psg-ye9gyxqty8hbe954ffcf"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  },
+  {
+   "id": "FU-titlepage",
+   "source": "src-n7pw0cvq9y0d742wr45f",
+   "passages": [
+    "psg-mfetyjmnfydca9313vrx"
+   ],
+   "compared": "none_recorded",
+   "corrections": {
+    "person": 0,
+    "other": 0
+   },
+   "stated_check": true
+  }
+ ],
+ "units": [
+  {
+   "id": "u-2d55131ffd121e4c-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 1,
+   "sha256": "2d55131ffd121e4cb3a76c94d372068b005c6464900ea12bd4ec86175e1171a3",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 158
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e4dfb5363742e81d-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 2,
+   "sha256": "e4dfb5363742e81d94f46afc678ece1df56a2fbfcd00a595871cfde18ff26f6e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 98
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-1cb80b02ae023495-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 3,
+   "sha256": "1cb80b02ae02349558b9b010305ddcddd030550d7131dd688a3323bcf89820a6",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 207
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ae9320572c6ff2c5-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 4,
+   "sha256": "ae9320572c6ff2c5df2ff69e69a068f4c4144eece0d92230519c2043a7f9e506",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 196
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-021546073a88f65d-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 5,
+   "sha256": "021546073a88f65de14846f21ddf48afe827273413f63d13dabbae2d262cec4b",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 152
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-508502d10e9feec2-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 6,
+   "sha256": "508502d10e9feec2854e0cc704234200e3293f52ee770cb60e275622af76fc8a",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 55
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e1e3621e08b23b5b-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 7,
+   "sha256": "e1e3621e08b23b5b27cebcfd9b2fa104734eb70a97a4eb90288042cf7bf19eff",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 124
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-dcce78c66eb23d85-1",
+   "place": "body",
+   "block": 4,
+   "sentence": 8,
+   "sha256": "dcce78c66eb23d85978d4741ce895a324de9d955b8e4c64f4a10cb5b9d0ea725",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 131
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-1cab332b8f81623d-1",
+   "place": "body",
+   "block": 6,
+   "sentence": 1,
+   "sha256": "1cab332b8f81623d51877e2984ad4812b681324dd95b7ad6718df3409f71c372",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 82
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-79ba23753b98f07b-1",
+   "place": "body",
+   "block": 6,
+   "sentence": 2,
+   "sha256": "79ba23753b98f07bc392fb3c3a5683dbab68e8eeeb8135ce21b54607f29f480d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 196,
+    "wording": 19
+   },
+   "quotations": [
+    "L-borings"
+   ]
+  },
+  {
+   "id": "u-6420f6581af825de-1",
+   "place": "body",
+   "block": 6,
+   "sentence": 3,
+   "sha256": "6420f6581af825deed04e5bb9842b6f5de5e0a6ea813da1c71d5db32ef6d9ca1",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 134,
+    "wording": 187
+   },
+   "quotations": [
+    "LS-abstract",
+    "FU-uncertain",
+    "FU-footnote"
+   ]
+  },
+  {
+   "id": "u-e15a564e6a181d62-1",
+   "place": "body",
+   "block": 6,
+   "sentence": 4,
+   "sha256": "e15a564e6a181d62c84b6186fb551f836bdb831df013e79780932f0bc711804e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 164
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b0575de75bd32a24-1",
+   "place": "comment",
+   "note": 2,
+   "block": 6,
+   "sentence": 1,
+   "sha256": "b0575de75bd32a24e3a33c75a22a9775655c1216c5fe42a8761631aa1b7c3f58",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 58
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-1ebf1560f2429a58-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 1,
+   "sha256": "1ebf1560f2429a58f21e053518e8e85dda4386ab8cdd073140bd6c60b29bee11",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 57
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-fd3e926207739868-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 2,
+   "sha256": "fd3e9262077398686cc90a7bcc24fcd47af5e0aac4f1ce75bbaec2ce4f883a75",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 64
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b6e19a01a52d7e3f-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 3,
+   "sha256": "b6e19a01a52d7e3f3acf8c1b0127c2bddcd2a932827481ea4c46d3f2552a4080",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 227
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-6e37ae1ad7eaf5c0-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 4,
+   "sha256": "6e37ae1ad7eaf5c02f3422247ddc0a7bc6a19d0984762e4ce1f0ba684545271a",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 23
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-524e0d6762a01065-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 5,
+   "sha256": "524e0d6762a01065f9cb41716900955793e395014aac8e87344e1c5178f38269",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 210
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-d4795e61b3d2135a-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 6,
+   "sha256": "d4795e61b3d2135ae12e50647e81fb82ef7d282d070c5f5064e1684e3dc32533",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 189
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-28b4f76ad9df1de9-1",
+   "place": "body",
+   "block": 7,
+   "sentence": 7,
+   "sha256": "28b4f76ad9df1de9b3c12952b634e4b151fcb6b1e2f326c444c10cf11eeb5fd9",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 170
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-5733e6a17c23a187-1",
+   "place": "body",
+   "block": 8,
+   "sentence": 1,
+   "sha256": "5733e6a17c23a187529458bd42fcdd72a4374ee88a729e1408fca59460ff8142",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 343
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e7aba8c9c39d770f-1",
+   "place": "body",
+   "block": 8,
+   "sentence": 2,
+   "sha256": "e7aba8c9c39d770fbd59d21056580e736cd9655732154c251008f68beb0b3994",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 104
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-c174feecafb8d850-1",
+   "place": "body",
+   "block": 10,
+   "sentence": 1,
+   "sha256": "c174feecafb8d850ee5cc538fa595520dd8dd057451fb5739c2275589a092741",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 70
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ee73ff7887d495b1-1",
+   "place": "body",
+   "block": 10,
+   "sentence": 2,
+   "sha256": "ee73ff7887d495b19fa6b613050576fbfdace3c5a5e45168830d91cac30e31ca",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 262,
+    "wording": 79
+   },
+   "quotations": [
+    "LY-crater"
+   ]
+  },
+  {
+   "id": "u-c0fd67f6b4ccba51-1",
+   "place": "body",
+   "block": 10,
+   "sentence": 3,
+   "sha256": "c0fd67f6b4ccba51b3e856789c43150c8129c4610a41685e2bef218b9f17c146",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 84
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-522ce6ca2ee8f2fc-1",
+   "place": "body",
+   "block": 10,
+   "sentence": 4,
+   "sha256": "522ce6ca2ee8f2fc784eef05e7cdba85f36e9215412af91d19899a4d8d3bd866",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 134
+   },
+   "quotations": [
+    "LY-size",
+    "LY-elevation"
+   ]
+  },
+  {
+   "id": "u-096bbbefa63459a9-1",
+   "place": "body",
+   "block": 11,
+   "sentence": 1,
+   "sha256": "096bbbefa63459a94fca0406f121a4b06837e64cbae0e3c91db13b83f9cdf7bf",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 137
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-0366cde28922ff2c-1",
+   "place": "body",
+   "block": 11,
+   "sentence": 2,
+   "sha256": "0366cde28922ff2c456a60169896c6a116f357788eb9bca67ac8bcba9dc65538",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 249,
+    "wording": 57
+   },
+   "quotations": [
+    "D37-crater"
+   ]
+  },
+  {
+   "id": "u-4d8c808d9bbf0047-1",
+   "place": "body",
+   "block": 11,
+   "sentence": 3,
+   "sha256": "4d8c808d9bbf00478cedef575ce0210bb72c053451b0700685873c624258784c",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 76
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-786cf201ec1c945c-1",
+   "place": "body",
+   "block": 11,
+   "sentence": 4,
+   "sha256": "786cf201ec1c945cb80e94f73c2aa8ab134b73ec46fa44af0620a91ca1cb120c",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 164,
+    "wording": 31
+   },
+   "quotations": [
+    "D37-encircling"
+   ]
+  },
+  {
+   "id": "u-c6c8466be1ced888-1",
+   "place": "body",
+   "block": 11,
+   "sentence": 5,
+   "sha256": "c6c8466be1ced8880956b1a636f4561fb2380b9ff8fa9ab455ebe240a688fb69",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 133
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-9f4c4a269738c36d-1",
+   "place": "body",
+   "block": 12,
+   "sentence": 1,
+   "sha256": "9f4c4a269738c36d5ddc4127fcd579db044ef3edfc9750a488c079554642befb",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 64
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e7b3d58ba3841f8b-1",
+   "place": "body",
+   "block": 12,
+   "sentence": 2,
+   "sha256": "e7b3d58ba3841f8bf86c7ae0139b7e6e85a5c561d626362c2d99bb8beb662784",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 202,
+    "wording": 55
+   },
+   "quotations": [
+    "D42-received",
+    "D42-bow"
+   ]
+  },
+  {
+   "id": "u-1124dd494b9fc62e-1",
+   "place": "body",
+   "block": 12,
+   "sentence": 3,
+   "sha256": "1124dd494b9fc62e372c52f9850848c095c470c274b01e665d86047e445bac4f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 50
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-6435540ac7826f3e-1",
+   "place": "body",
+   "block": 12,
+   "sentence": 4,
+   "sha256": "6435540ac7826f3e1109a85da053c812f1809ed6f746a9e12518f7df59258759",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 54
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-4a31438a2813ac60-1",
+   "place": "body",
+   "block": 12,
+   "sentence": 5,
+   "sha256": "4a31438a2813ac60c5b400ad09fd9f4f36c7fa87fae390096f6fb6617e98faaf",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 62
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-07b2ebe3225d892f-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 1,
+   "sha256": "07b2ebe3225d892fd2fe84802e40ea0140d09879edfd0db3a7c6371eac722870",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 82
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-2165392cb9e52651-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 2,
+   "sha256": "2165392cb9e526514e38af205952d883fc57693b0482c5501b1d646b27eeefcc",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 268,
+    "wording": 12
+   },
+   "quotations": [
+    "D42-concession",
+    "D89-mnbf"
+   ]
+  },
+  {
+   "id": "u-2953db1f6185f1cc-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 3,
+   "sha256": "2953db1f6185f1cc5963eac258feb5d828763426b49d129de4f407df4c016c75",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 209,
+    "wording": 149
+   },
+   "quotations": [
+    "D42-bank",
+    "D42-chamisso-view"
+   ]
+  },
+  {
+   "id": "u-1ebf2cc5f587df87-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 4,
+   "sha256": "1ebf2cc5f587df87c3bc52ff2aa595399112e5516058a387c398941d2d4773c1",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 25
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-f2139b5a16740d9c-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 5,
+   "sha256": "f2139b5a16740d9cdd64d93f1032ad178a32a1d4559b7e3a3ba0e8d0de3cb370",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 108
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-f49cc941566c7fe1-1",
+   "place": "body",
+   "block": 14,
+   "sentence": 6,
+   "sha256": "f49cc941566c7fe1caf31ebf699aadc8d6bb45a87a5d7b865e097cda120f9952",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 51
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b1f83082f83858fe-1",
+   "place": "comment",
+   "note": 9,
+   "block": 14,
+   "sentence": 1,
+   "sha256": "b1f83082f83858feb0f998ab1b93200ecceca9d22b5a43a35e05403e306369bf",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 19,
+    "wording": 32
+   },
+   "quotations": [
+    "D89-mnbf"
+   ]
+  },
+  {
+   "id": "u-7a855c4984c7d1ea-1",
+   "place": "comment",
+   "note": 9,
+   "block": 14,
+   "sentence": 2,
+   "sha256": "7a855c4984c7d1ea372b5f963da8d24361b7e6070b2a79fa69b8578ce7b4e2d7",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 45,
+    "wording": 120
+   },
+   "quotations": [
+    "D42-farfrom",
+    "D42-somesuch"
+   ]
+  },
+  {
+   "id": "u-0520f0a70f29b9ff-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 1,
+   "sha256": "0520f0a70f29b9ff525be1248a3011e9fb8dae948b6341ce0e9735fa1eafb0ca",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 43
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-2a77f664ff0c16ea-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 2,
+   "sha256": "2a77f664ff0c16ea01529a61023ae551069624196d861d36ecd3000f45edb6e2",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 44,
+    "wording": 98
+   },
+   "quotations": [
+    "D42-inapplicable-short",
+    "D42-inapplicable"
+   ]
+  },
+  {
+   "id": "u-f1eb2f021e1d0ca2-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 3,
+   "sha256": "f1eb2f021e1d0ca2c5bd0b7984eddb588253ce6d5b0f046f5afc30b2ed360e7d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 164,
+    "wording": 37
+   },
+   "quotations": [
+    "D42-foundation"
+   ]
+  },
+  {
+   "id": "u-0f8ecc5e6ad5c8aa-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 4,
+   "sha256": "0f8ecc5e6ad5c8aa86d188aa6cad8361db08b1caa250fa937297236311162260",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 275
+   },
+   "quotations": [
+    "D42-spaces",
+    "D42-improbable",
+    "D42-elevation"
+   ]
+  },
+  {
+   "id": "u-30aff8c5404ad2b3-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 5,
+   "sha256": "30aff8c5404ad2b3fb941b669cdb5a79e158fb3c475cc68fd8f275287d20324e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 136,
+    "wording": 23
+   },
+   "quotations": [
+    "D42-necessity"
+   ]
+  },
+  {
+   "id": "u-71b68f99c627d0d2-1",
+   "place": "body",
+   "block": 15,
+   "sentence": 6,
+   "sha256": "71b68f99c627d0d2b0cfbf59dc2c783dc5f208725450a92e531cf326bb7695fa",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 139,
+    "wording": 56
+   },
+   "quotations": [
+    "D42-chamisso"
+   ]
+  },
+  {
+   "id": "u-5b55085fa3431daf-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 1,
+   "sha256": "5b55085fa3431daf7a3a416831f55098b2db206eaa0c4983fb9d61cea7a6f5bf",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 27
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-d34f232c2c3d55de-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 2,
+   "sha256": "d34f232c2c3d55dececb910ec9e847b83f08a35a41d90d70d0e04e784da9c1f1",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 178,
+    "wording": 90
+   },
+   "quotations": [
+    "D37-number"
+   ]
+  },
+  {
+   "id": "u-64a59993076fb011-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 3,
+   "sha256": "64a59993076fb01137e5b2a10b80246003514adb6f58035fe45f4a2acadc6c41",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 64
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-7be24a87861e7690-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 4,
+   "sha256": "7be24a87861e76903007b17310c1dedfb10bcee8928d0df055b9b85662220971",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 61
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-dbc140cf945b66e2-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 5,
+   "sha256": "dbc140cf945b66e202776e34e9e3b0f393553783a82333508d3415340011654f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 40
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-82fc9191e28dd957-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 6,
+   "sha256": "82fc9191e28dd9573566bc321b318f1ac9d49673ecd2ee7f5fae3de8c7289d9f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 150
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-3fa584c789adc876-1",
+   "place": "body",
+   "block": 16,
+   "sentence": 7,
+   "sha256": "3fa584c789adc876d098bb64dbba853f53d655e322838b75aef0cfbfb9ac6fe9",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 131
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ad5ce101c5285697-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 1,
+   "sha256": "ad5ce101c5285697b3ac7ba25d78d24b612675b217ef95d06a1c25544a835fa5",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 52
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-9d303c28597c051b-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 2,
+   "sha256": "9d303c28597c051b3eea5aec1b1e8b07b85390bd51670da95a692192ad0cd70e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 56
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-a61035b4f14a1ed5-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 3,
+   "sha256": "a61035b4f14a1ed58279346030e542d1787a0980622062c221beab57c8192bf8",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 122,
+    "wording": 269
+   },
+   "quotations": [
+    "D37-keeling"
+   ]
+  },
+  {
+   "id": "u-45326c70ff1cbccd-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 4,
+   "sha256": "45326c70ff1cbccd86bef42e57e43b23b63cd0386961b96658d34f104ce6a4ea",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 32,
+    "wording": 69
+   },
+   "quotations": [
+    "D42-confirm-short",
+    "D42-questions1",
+    "D42-questions2",
+    "D42-confirm"
+   ]
+  },
+  {
+   "id": "u-1d8a7104d0de9c5d-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 5,
+   "sha256": "1d8a7104d0de9c5dbc7757e86b656249cac972d92552666958bc858b24d6c9af",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 93
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-83475447166df04c-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 6,
+   "sha256": "83475447166df04c88e03c268b69ec014ae372d0de03cff6e15f9f9d40d9cc50",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 125
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-96cfc7f5bf066bfa-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 7,
+   "sha256": "96cfc7f5bf066bfa8b156f9fa17b6878e08331b0756a2a1c21cb35ae924b3070",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 65
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e8ff1dd4c0a11747-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 8,
+   "sha256": "e8ff1dd4c0a117476e6948edeb7f97b627dc5e5970fd227254c31f8b7ca0b457",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 106,
+    "wording": 121
+   },
+   "quotations": [
+    "D42-section-short",
+    "D42-section",
+    "D42-ancient"
+   ]
+  },
+  {
+   "id": "u-da69ede08bb911e5-1",
+   "place": "body",
+   "block": 17,
+   "sentence": 9,
+   "sha256": "da69ede08bb911e591a24afd2fd3777f97b38a06aaa3b66a24dad90ccf42f451",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 76
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ef0e6b581c02d614-1",
+   "place": "body",
+   "block": 18,
+   "sentence": 1,
+   "sha256": "ef0e6b581c02d6146c0646af5969e5db9565feeec9bf77a6c75d55112217f21b",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 69
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-6c8eb8942c3d6a6e-1",
+   "place": "body",
+   "block": 18,
+   "sentence": 2,
+   "sha256": "6c8eb8942c3d6a6e29b769937150dde591e7754d55da004fd5c13b7c83525959",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 240,
+    "wording": 87
+   },
+   "quotations": [
+    "D89-incredible",
+    "D89-compels"
+   ]
+  },
+  {
+   "id": "u-331c640c8112ab09-1",
+   "place": "body",
+   "block": 18,
+   "sentence": 3,
+   "sha256": "331c640c8112ab0989f124824b33804ba72d8cb2ef478ec539ad058bbd8d0a0d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 68
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-92f855fb2382415e-1",
+   "place": "body",
+   "block": 20,
+   "sentence": 1,
+   "sha256": "92f855fb2382415edcb633ed0604deddc4b28ffac43073a9386607a50807951c",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 176
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b2d719bdb39ca4de-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 1,
+   "sha256": "b2d719bdb39ca4de221117afe4496746bad23938359de76dc7cae538e4ecb504",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 107
+   },
+   "quotations": [
+    "AG-semper",
+    "AG-untenable",
+    "L-mistake"
+   ]
+  },
+  {
+   "id": "u-a1f1b12f9cc6a091-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 2,
+   "sha256": "a1f1b12f9cc6a091a5889addf10394954f2047833d66af602cbd6a63eebde96f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 180,
+    "wording": 131
+   },
+   "quotations": [
+    "SE-structure",
+    "SE-ignore"
+   ]
+  },
+  {
+   "id": "u-9abc4f472eff7819-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 3,
+   "sha256": "9abc4f472eff7819b7a25d921af14a7102e16c249596510302172c3772bf941c",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 50,
+    "wording": 79
+   },
+   "quotations": [
+    "SE-blocks-short",
+    "SE-blocks"
+   ]
+  },
+  {
+   "id": "u-a6d0c6b4665c1472-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 4,
+   "sha256": "a6d0c6b4665c1472fdee950b72d92f50dca8fc2e340d8a6dadb4ff8bb34fafcf",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 91
+   },
+   "quotations": [
+    "L-proofs"
+   ]
+  },
+  {
+   "id": "u-54772d36634d10fb-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 5,
+   "sha256": "54772d36634d10fbf736e0677e695c1c58020d4f7fa3eded96d786291ae1ee5d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 167,
+    "wording": 98
+   },
+   "quotations": [
+    "L-foresaw",
+    "L-troubled"
+   ]
+  },
+  {
+   "id": "u-a71c87e418fb0936-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 6,
+   "sha256": "a71c87e418fb09361024d0fbb9daaeb8551f2c067e092ca840a54e197739128e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 171,
+    "wording": 72
+   },
+   "quotations": [
+    "L-future",
+    "L-adhere"
+   ]
+  },
+  {
+   "id": "u-4a8235aaf9970fd3-1",
+   "place": "body",
+   "block": 21,
+   "sentence": 7,
+   "sha256": "4a8235aaf9970fd30310376e5d87dffb3b3bc4fb09887743cdea88648baac7a7",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 106
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-2205124eedbd9eab-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 1,
+   "sha256": "2205124eedbd9eab9c3ae679a4710a7559216bebb7cce47451dd02c82fb9b4b6",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 77
+   },
+   "quotations": [
+    "L-staff"
+   ]
+  },
+  {
+   "id": "u-abdbd4933f8a5257-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 2,
+   "sha256": "abdbd4933f8a52571e787dc481d5359f61377ca32a5605dd37f84f7f5e0e7e24",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 176,
+    "wording": 87
+   },
+   "quotations": [
+    "MU-object",
+    "MU-semper"
+   ]
+  },
+  {
+   "id": "u-c8f36ce109bf5b22-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 3,
+   "sha256": "c8f36ce109bf5b2241613b1bb2426cb8c9c2675e30414d23339884289a0faac1",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 135,
+    "wording": 59
+   },
+   "quotations": [
+    "MU-improb"
+   ]
+  },
+  {
+   "id": "u-14d73dc230efa05a-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 4,
+   "sha256": "14d73dc230efa05ac165e44f41af47922fed230f9abb9d144a0404e464f29b08",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 97,
+    "wording": 80
+   },
+   "quotations": [
+    "MU-banks-short",
+    "MU-improb",
+    "MU-banks"
+   ]
+  },
+  {
+   "id": "u-bad69d2333a1b006-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 5,
+   "sha256": "bad69d2333a1b006a577516e98628236251a9094887a2d88887e0e8582d53fc0",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 175
+   },
+   "quotations": [
+    "MU-lagoon",
+    "MU-summary"
+   ]
+  },
+  {
+   "id": "u-2f5485f0ec65e081-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 6,
+   "sha256": "2f5485f0ec65e0819cad1d623c924d35b17e3be63ad70deb4ca03758f031cfa9",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 50
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-834c5fbeb6e8a600-1",
+   "place": "body",
+   "block": 22,
+   "sentence": 7,
+   "sha256": "834c5fbeb6e8a60043bd7484fd67fc1f7dfcf8208b17af8f019b30d4e024e8d9",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 110
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-2cf408548ce2e025-1",
+   "place": "body",
+   "block": 23,
+   "sentence": 1,
+   "sha256": "2cf408548ce2e0251ffeedfde04adb41b1eda2523b02b23409e823de5ed5d0e5",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 24
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-fa8d5d8a64fb78c6-1",
+   "place": "body",
+   "block": 23,
+   "sentence": 2,
+   "sha256": "fa8d5d8a64fb78c68b43f0a05bbdc9f59079527507f0d44bb386427bc8d6e7f2",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 128,
+    "wording": 92
+   },
+   "quotations": [
+    "L-banks-short",
+    "L-banks"
+   ]
+  },
+  {
+   "id": "u-f8739cb42e9d4383-1",
+   "place": "body",
+   "block": 23,
+   "sentence": 3,
+   "sha256": "f8739cb42e9d43837699c797819f082c9f8979f89310871d72b7f615f518db48",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 52
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-6dfb86d797323c96-1",
+   "place": "body",
+   "block": 23,
+   "sentence": 4,
+   "sha256": "6dfb86d797323c960ba98e7c73d0e9b23def478f732e61ecc4c30a0f84dee4d2",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 134
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ccc00f091f3be643-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 1,
+   "sha256": "ccc00f091f3be643d3bde67341be89bbb15779d37b448e0f0846fef895df4011",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 98
+   },
+   "quotations": [
+    "AG-dana"
+   ]
+  },
+  {
+   "id": "u-3aa6ea87a1911f59-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 2,
+   "sha256": "3aa6ea87a1911f5910f9f89c1c215f10584693d81ee64ea9ecc9156d0b3f3a7e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 118,
+    "wording": 87
+   },
+   "quotations": [
+    "DA-local",
+    "DA-guppy"
+   ]
+  },
+  {
+   "id": "u-3450ef08e43c49e8-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 3,
+   "sha256": "3450ef08e43c49e813b25c43f28ddb0527c402a26228b63e1b39cb0f01524cae",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 108,
+    "wording": 34
+   },
+   "quotations": [
+    "DA-free"
+   ]
+  },
+  {
+   "id": "u-d8f844b2ffabc4bc-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 4,
+   "sha256": "d8f844b2ffabc4bca05a2ae4e23bdd192122609cc70c4bb02ccd984543fd612d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 48,
+    "wording": 83
+   },
+   "quotations": [
+    "DA-noproof",
+    "DA-tortugas"
+   ]
+  },
+  {
+   "id": "u-3cab39308439e787-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 5,
+   "sha256": "3cab39308439e78722e66186e0ba99d03338af402f26a04b142a0946e6c53abd",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 97
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-cd885569fc2a8c89-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 6,
+   "sha256": "cd885569fc2a8c89f99d2bbb5f527dcdb1a1c1b8e66b5fb3d06b67ef7ac0cd63",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 55,
+    "wording": 122
+   },
+   "quotations": [
+    "DA-positive-short",
+    "DA-positive"
+   ]
+  },
+  {
+   "id": "u-090decda66bdbfe0-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 7,
+   "sha256": "090decda66bdbfe0edb7250a8960f63bd4ee7911ba4cd2944fcae439b052350d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 86
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-632fe08caf46abe0-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 8,
+   "sha256": "632fe08caf46abe097b3c00654b03e74a2059c80254a00d26d2df8cd2bf27dfa",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 24
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-aef191b3893e0c3e-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 9,
+   "sha256": "aef191b3893e0c3e9fa85e9dbab5fed65a907bb30778f97312355be09307c387",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 47,
+    "wording": 99
+   },
+   "quotations": [
+    "DY-rising-short",
+    "DY-drowned",
+    "DY-rising"
+   ]
+  },
+  {
+   "id": "u-7020b9cb6bd42782-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 10,
+   "sha256": "7020b9cb6bd42782921904d89d6b35c8288bbef54e6550442f1917ccabab3480",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 101
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-752e3d0fa0b6dc24-1",
+   "place": "body",
+   "block": 24,
+   "sentence": 11,
+   "sha256": "752e3d0fa0b6dc24a1ea8a92106cd14e000d7bc326361db8ecf65a9730879d0a",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 75
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-0c39cfa13ac735d1-1",
+   "place": "body",
+   "block": 25,
+   "sentence": 1,
+   "sha256": "0c39cfa13ac735d19c005b1d473ee3c68e38f9dcd17a346c19c00491d5bbf685",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 149,
+    "wording": 81
+   },
+   "quotations": [
+    "AG-opposed"
+   ]
+  },
+  {
+   "id": "u-9b9df4816861c229-1",
+   "place": "body",
+   "block": 25,
+   "sentence": 2,
+   "sha256": "9b9df4816861c22976ff09402445a658e0c1b4e10a41d54b2fed889d543f7a9e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 205,
+    "wording": 182
+   },
+   "quotations": [
+    "AG-reply",
+    "AG-platform"
+   ]
+  },
+  {
+   "id": "u-69d0c4b93e70a3f5-1",
+   "place": "body",
+   "block": 25,
+   "sentence": 3,
+   "sha256": "69d0c4b93e70a3f505d540e1e0916420748c7deed58160a1bb3d70cd1f9ac05e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 105
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-59e598a73db59a37-1",
+   "place": "body",
+   "block": 25,
+   "sentence": 4,
+   "sha256": "59e598a73db59a3776b5273d2d2395d9189519e87ac523fc579de4298cfbded3",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 41,
+    "wording": 75
+   },
+   "quotations": [
+    "AG-unknown-short",
+    "AG-unknown"
+   ]
+  },
+  {
+   "id": "u-6a368c6bfadf5f29-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 1,
+   "sha256": "6a368c6bfadf5f293eff40608ba77781a0519c91b7ae46092927e6c4b325108f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 99
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-64424052864cab83-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 2,
+   "sha256": "64424052864cab83c7c26061e55dcd57434688c04c93b7e3c703db7d69768565",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 100
+   },
+   "quotations": [
+    "DY-depth",
+    "DY-colonize"
+   ]
+  },
+  {
+   "id": "u-e776d29c7447e8fd-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 3,
+   "sha256": "e776d29c7447e8fda27e1c6492f24a69bf2b535547e763f114096ed964e96ab5",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 118,
+    "wording": 14
+   },
+   "quotations": [
+    "DY-crowns"
+   ]
+  },
+  {
+   "id": "u-37a65e00d3ffb509-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 4,
+   "sha256": "37a65e00d3ffb509c5ec250ac8b3450112b4197551205689bddc3bb2dffa5fd6",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 138,
+    "wording": 28
+   },
+   "quotations": [
+    "DY-novertical"
+   ]
+  },
+  {
+   "id": "u-6abb9bc3dce75af8-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 5,
+   "sha256": "6abb9bc3dce75af80f1a284b20786f009b7f1021f5800bd37a427313a588f526",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 133
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-326a782e70874e2a-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 6,
+   "sha256": "326a782e70874e2a4b67e3fe62ef33884cc7b2ce7f0b6af99628967919b446db",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 171,
+    "wording": 43
+   },
+   "quotations": [
+    "DY-deceptive"
+   ]
+  },
+  {
+   "id": "u-5f1f5333da751595-1",
+   "place": "body",
+   "block": 27,
+   "sentence": 1,
+   "sha256": "5f1f5333da751595b6395261e782c33527d064e5f3282d471857d5b84c5df95b",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 65
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-59a93190264c07f2-1",
+   "place": "body",
+   "block": 27,
+   "sentence": 2,
+   "sha256": "59a93190264c07f2eb70b92bb862640f34706f02ed33a12d69911b2c8950120f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 131,
+    "wording": 146
+   },
+   "quotations": [
+    "BO-insufficient",
+    "BO-premature"
+   ]
+  },
+  {
+   "id": "u-7399b9dc0642b7b3-1",
+   "place": "body",
+   "block": 27,
+   "sentence": 3,
+   "sha256": "7399b9dc0642b7b3f3cc6e2a21c610fdf5ec74012cefd4e30c14223d62f5541f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 57
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-883de99378c30bf0-1",
+   "place": "body",
+   "block": 27,
+   "sentence": 4,
+   "sha256": "883de99378c30bf09874ac5e7737a28fbd1887de320d64086fcc6dc530938d22",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 241
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-733f0df1cf5bd922-1",
+   "place": "body",
+   "block": 27,
+   "sentence": 5,
+   "sha256": "733f0df1cf5bd922bf6a65a578db42d37cdd54e296a289891aa32c6889dfe77f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 45
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-72e974144f33a38a-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 1,
+   "sha256": "72e974144f33a38aa4afbfcd5f2c8b797e0acbe54a3e37d1277190dc89de2305",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 39
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-3402898345f7d4c9-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 2,
+   "sha256": "3402898345f7d4c9f3f9b6f5efc1db0556ccd8ed7cf3b5a5f23a90b37c24e85d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 71,
+    "wording": 56
+   },
+   "quotations": [
+    "AG-boring"
+   ]
+  },
+  {
+   "id": "u-a1cbc07e05e22c28-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 3,
+   "sha256": "a1cbc07e05e22c28211a1f180c90cef992bbdf3d0e81990b4c9a96b8e1954798",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 128
+   },
+   "quotations": [
+    "FU-titlepage"
+   ]
+  },
+  {
+   "id": "u-11c9ac3eb112e805-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 4,
+   "sha256": "11c9ac3eb112e805f42fdfc6177d7d8ae84fc6ea4f33689ed03a75c09e5edbcc",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 264,
+    "wording": 51
+   },
+   "quotations": [
+    "FU-uncertain"
+   ]
+  },
+  {
+   "id": "u-fbd5cfd66eb86861-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 5,
+   "sha256": "fbd5cfd66eb86861ba037d62ac2169a26bd4fd796c9978643e8ce91f621288f0",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 159,
+    "wording": 89
+   },
+   "quotations": [
+    "FU-asked"
+   ]
+  },
+  {
+   "id": "u-b4367c0b475b0c20-1",
+   "place": "body",
+   "block": 29,
+   "sentence": 6,
+   "sha256": "b4367c0b475b0c20db9b9057788a525cc9a48cca78a64f373d95b4460c3b670f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 247,
+    "wording": 45
+   },
+   "quotations": [
+    "FU-near"
+   ]
+  },
+  {
+   "id": "u-75899c751b13e144-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 1,
+   "sha256": "75899c751b13e1441ffa51deca9931b8205fd63462cef30c98376043b85cc4db",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 57
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-433ebe5a1ab36bea-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 2,
+   "sha256": "433ebe5a1ab36beae372c32ece672e99bc7f87d616d02e793884f1856670a94f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 83,
+    "wording": 152
+   },
+   "quotations": [
+    "FU-david",
+    "FU-david-long"
+   ]
+  },
+  {
+   "id": "u-589197d92042869a-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 3,
+   "sha256": "589197d92042869a9641ec1d838c286630ae927f740a1843d981efcd16db1b70",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 174
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-6d3e029673718b91-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 4,
+   "sha256": "6d3e029673718b916059c6457de86a814e8755ba40f237a158ab1ed6d40162d3",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 238,
+    "wording": 132
+   },
+   "quotations": [
+    "FU-pteropod",
+    "FU-judd",
+    "FU-judd-rate"
+   ]
+  },
+  {
+   "id": "u-e1a41d06865a382f-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 5,
+   "sha256": "e1a41d06865a382f287210858cf5b1d8e6ceb038391670d8045961fbf8e9bb5d",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 56
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-7bb1376c0f5b3644-1",
+   "place": "body",
+   "block": 30,
+   "sentence": 6,
+   "sha256": "7bb1376c0f5b3644511c97a99659f6c4f00265a8ffc65a53725606e44d1d15b4",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 248,
+    "wording": 172
+   },
+   "quotations": [
+    "FU-facts"
+   ]
+  },
+  {
+   "id": "u-f98e129da3d821b0-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 1,
+   "sha256": "f98e129da3d821b0fa002d323662595fa45f1bfd56aef48b1f6f28380b546e12",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 37
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-74ff35fd63696572-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 2,
+   "sha256": "74ff35fd63696572258e6d37e0fcdc374389611edb638fb745a665f4b1eaf040",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 373,
+    "wording": 139
+   },
+   "quotations": [
+    "AG-funafuti",
+    "AG-layers-short",
+    "AG-reefflat",
+    "AG-layers"
+   ]
+  },
+  {
+   "id": "u-b056f2dc5ebc8bb9-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 3,
+   "sha256": "b056f2dc5ebc8bb92d566d98e536a4a8214ed0a9064aac2233ac73bafd1dfd04",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 67,
+    "wording": 137
+   },
+   "quotations": [
+    "DY-site",
+    "DY-talus"
+   ]
+  },
+  {
+   "id": "u-c9d038c9425c084a-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 4,
+   "sha256": "c9d038c9425c084a355c437d5f4c8181dc3cd9abdd97d821c5d88bb9455fe32f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 66,
+    "wording": 35
+   },
+   "quotations": [
+    "DY-inside",
+    "DY-site"
+   ]
+  },
+  {
+   "id": "u-679cf7af2545edef-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 5,
+   "sha256": "679cf7af2545edef6c2de542a0ce7e837027f174b96eeeff07ad79e92f229934",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 237
+   },
+   "quotations": [
+    "DY-bermuda"
+   ]
+  },
+  {
+   "id": "u-c517a072ecd06ac5-1",
+   "place": "body",
+   "block": 31,
+   "sentence": 6,
+   "sha256": "c517a072ecd06ac537153db53aec4274caf10c8de7f267d628963d1296566673",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 164
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-50fb952ad8c6fdb8-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 1,
+   "sha256": "50fb952ad8c6fdb81ad942733c6ed2b0e6d5c096293266192ce80f800ed7b173",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "cited",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 119
+   },
+   "quotations": [
+    "LS-tests"
+   ]
+  },
+  {
+   "id": "u-86ba471245653fcf-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 2,
+   "sha256": "86ba471245653fcf32cc97e0d4488662054c178ff91018a1b01b38056b49e25e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 171,
+    "wording": 98
+   },
+   "quotations": [
+    "LS-established"
+   ]
+  },
+  {
+   "id": "u-0c81cf691cb01478-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 3,
+   "sha256": "0c81cf691cb01478855772003d8f1807889d986bc1abecefd0b9be8199a1ea15",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 120,
+    "wording": 37
+   },
+   "quotations": [
+    "LS-features"
+   ]
+  },
+  {
+   "id": "u-92b937bdbc253442-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 4,
+   "sha256": "92b937bdbc253442ffd5d7f829b07bd0fd5ed0d35464512d3603a78572363237",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 122,
+    "wording": 94
+   },
+   "quotations": [
+    "LS-eocene"
+   ]
+  },
+  {
+   "id": "u-87a0a2a72389b2d9-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 5,
+   "sha256": "87a0a2a72389b2d94f58c363b56e1faac526e1dbc5a2f5a8d74e7b2bcde09451",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 147
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b0f4491131e7d0a9-1",
+   "place": "body",
+   "block": 33,
+   "sentence": 6,
+   "sha256": "b0f4491131e7d0a9a2cbeec41844f0bed39cad20e01a3197534f956f542ea47b",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 160
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-473e6d5cb99101bc-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 1,
+   "sha256": "473e6d5cb99101bce0519d8efdccb6bfd390e246bf126d798c1c929e2f973698",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 92
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-541d5ed0f42b186b-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 2,
+   "sha256": "541d5ed0f42b186bd7e7b0206eb44d9c33093f6ad9f2aa492aea48009a73abee",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 26
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-a9c95752b193b1ef-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 3,
+   "sha256": "a9c95752b193b1effadc2b77b2d644554eca612e938708ec81c92d393c465f11",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 130
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-f41f3c41091a1a18-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 4,
+   "sha256": "f41f3c41091a1a183705a73ad1b2435acf68303acc5e948e9dcf08862708b085",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 48
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-34876752e7c55560-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 5,
+   "sha256": "34876752e7c555605fe756d67551f4d52cbe7c24a579a39ccf107ab5319dfb0f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 73,
+    "wording": 55
+   },
+   "quotations": [
+    "LS-emergence-short",
+    "LS-leach",
+    "LS-emergence"
+   ]
+  },
+  {
+   "id": "u-f01848da617aa867-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 6,
+   "sha256": "f01848da617aa867e4d7b76bc35d36fcbbc6111277206da1616ab1df711d77ca",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 89,
+    "wording": 96
+   },
+   "quotations": [
+    "LS-outer-short",
+    "LS-differ",
+    "LS-outer"
+   ]
+  },
+  {
+   "id": "u-2e23279e0130d0ac-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 7,
+   "sha256": "2e23279e0130d0ac82e42b2ab88789490ec0b0622ad8c0ccdd492ff458a39649",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 106
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-647bd3413070063c-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 8,
+   "sha256": "647bd3413070063c20f762c8139cdc5393ae1fb2743c1cb1dcc833f5711c10c6",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 55
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-8eac7fd86cc6ea89-1",
+   "place": "body",
+   "block": 34,
+   "sentence": 9,
+   "sha256": "8eac7fd86cc6ea89416d4e35d7151b1ff83400eaf806ffdb10389a4446105822",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 72
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-2c2923fa849381a6-1",
+   "place": "body",
+   "block": 35,
+   "sentence": 1,
+   "sha256": "2c2923fa849381a678d18012fd45adad5b75ba80ceaf07a183fde67411c556a9",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 27
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-32c9760be7afe2a8-1",
+   "place": "body",
+   "block": 35,
+   "sentence": 2,
+   "sha256": "32c9760be7afe2a8ec7b9f0f6471980bb563512a4ad86a4873f3d9dff5f400fc",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 144,
+    "wording": 54
+   },
+   "quotations": [
+    "BL-insufficient"
+   ]
+  },
+  {
+   "id": "u-28867917d3cc2d74-1",
+   "place": "body",
+   "block": 35,
+   "sentence": 3,
+   "sha256": "28867917d3cc2d740ae2a1fc943677cb606fbed738e5fdc9a9452b9a6b42eb40",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 117,
+    "wording": 42
+   },
+   "quotations": [
+    "BL-complex-short",
+    "BL-complex"
+   ]
+  },
+  {
+   "id": "u-211dd5197521337c-1",
+   "place": "body",
+   "block": 35,
+   "sentence": 4,
+   "sha256": "211dd5197521337c3a47cd4c2726ea378159a3d2f0bfc5db6c5a2b259eb1cd5c",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 156,
+    "wording": 148
+   },
+   "quotations": [
+    "BL-retreat",
+    "BL-tahiti"
+   ]
+  },
+  {
+   "id": "u-4156ec5a41932e7c-1",
+   "place": "body",
+   "block": 35,
+   "sentence": 5,
+   "sha256": "4156ec5a41932e7c7b32130d3e819a9af2c9dfc505f64282ed0fd6ff28e5cd2e",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "quotation",
+    "typed_quotation": "no",
+    "compared": "none_recorded",
+    "support": "not_judged"
+   },
+   "chars": {
+    "quoted": 337,
+    "wording": 85
+   },
+   "quotations": [
+    "ST-correct",
+    "ST-transient"
+   ]
+  },
+  {
+   "id": "u-8dac946c6bdb2f42-1",
+   "place": "comment",
+   "note": 75,
+   "block": 35,
+   "sentence": 1,
+   "sha256": "8dac946c6bdb2f4278a78f387bd43caa2bc9d58e8d2cf9e9ca96a574a265689b",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 73
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-8d99b36a38596bb4-1",
+   "place": "body",
+   "block": 37,
+   "sentence": 1,
+   "sha256": "8d99b36a38596bb4e28d5702951427e3cc3e9876d29798b9004abe2cd78bc7d8",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 113
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-c90c077723bd62f1-1",
+   "place": "body",
+   "block": 37,
+   "sentence": 2,
+   "sha256": "c90c077723bd62f1a16c833dadb20fd47481086d1e2747f97ef3b725e47edf90",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 51
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-c5136da0eefae526-1",
+   "place": "body",
+   "block": 37,
+   "sentence": 3,
+   "sha256": "c5136da0eefae526c1ebaeb7f91d4590bf4a5fd2c915ea696e88d5d4238ab1e6",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 150
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-fe1c7b532c4c8ed6-1",
+   "place": "body",
+   "block": 37,
+   "sentence": 4,
+   "sha256": "fe1c7b532c4c8ed6030f99ce308905197d5505255c8c5cc75695ed271c7dd81f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 186
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-27329f2b82c17dda-1",
+   "place": "body",
+   "block": 37,
+   "sentence": 5,
+   "sha256": "27329f2b82c17dda88d8b480622c0270d9550c5225c85cf17b1cc5b87039810f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 137
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-e7f781534640f12f-1",
+   "place": "body",
+   "block": 38,
+   "sentence": 1,
+   "sha256": "e7f781534640f12fff8a1ab0f2fe10978d783c3210187112939f0476f345d643",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 38
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-cfd8609a74010c72-1",
+   "place": "body",
+   "block": 38,
+   "sentence": 2,
+   "sha256": "cfd8609a74010c722b93b9d1f519bef2fdedbfdb5179bc049b0d94071283195f",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 109
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-80f4bb320b4f8d70-1",
+   "place": "body",
+   "block": 38,
+   "sentence": 3,
+   "sha256": "80f4bb320b4f8d70b7504f1c2a19f1a105b8d3b1114c14b9f397643cf5acd1ab",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 150
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-ffc455f0b544c258-1",
+   "place": "body",
+   "block": 38,
+   "sentence": 4,
+   "sha256": "ffc455f0b544c2581203aa7f6f81bb2fa096945ac3e043e3d5112a360b52103a",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 165
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-9ad8e29dddfe0ebd-1",
+   "place": "body",
+   "block": 39,
+   "sentence": 1,
+   "sha256": "9ad8e29dddfe0ebd60a4f1903a31101b6a1059c65cbb2f9c7fc50472fe243e23",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 21
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-abfb7545116c0357-1",
+   "place": "body",
+   "block": 39,
+   "sentence": 2,
+   "sha256": "abfb7545116c0357578763cbbf0f63de894307d930cc1559d8d4ea2b37cc7d07",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 277
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-5e551e66a4c550e0-1",
+   "place": "body",
+   "block": 39,
+   "sentence": 3,
+   "sha256": "5e551e66a4c550e0cb4d323e63cf4b4d592649f3b84641e50a053a7600918daa",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 120
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-01d8b1568995681f-1",
+   "place": "body",
+   "block": 39,
+   "sentence": 4,
+   "sha256": "01d8b1568995681f230b5242c304026ddab5fb461cea80e0496837fcf96e4e16",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 158
+   },
+   "quotations": []
+  }
+ ],
+ "totals": {
+  "units": 166,
+  "chars": {
+   "quoted": 8487,
+   "wording": 16387
+  },
+  "labels": {
+   "wording": {
+    "unrecorded": 166
+   },
+   "declared_by": {
+    "none": 166
+   },
+   "basis": {
+    "uncited": 97,
+    "quotation": 58,
+    "cited": 11
+   },
+   "typed_quotation": {
+    "no": 166
+   },
+   "compared": {
+    "not_applicable": 97,
+    "none_recorded": 69
+   },
+   "support": {
+    "not_applicable": 97,
+    "not_judged": 69
+   }
+  }
+ }
+}

@@ -17,7 +17,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 9. Evolution, audit, and review
-**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79
+**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79, FR-96 (P1)
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -128,6 +128,21 @@ no source files unless the author includes them, and states what it cannot show.
   report must be shortened to the allowed excerpt, with each result still
   visible. This covers the report's sentence fields.
 
+#### Evidence ledger
+
+- **LED-01** (FR-96, P1). A report build must write, beside the report, a ledger
+  of every sentence of the body and of note comments, with the labels of
+  CONTRACT-006 J and totals computed from those sentences.
+- **LED-02** (FR-96, P1). Who wrote a sentence's words must come only from an
+  authorship record that holds that exact sentence, with who recorded it. With
+  no record, or records that disagree, it is `unrecorded`.
+- **LED-03** (FR-96, P1). A quotation copied by script, words typed between
+  quotation marks, a citation with no quotation in the sentence, and a sentence
+  with neither must stay distinct. Support must show as `not_judged` while no
+  support record can be read.
+- **LED-04** (FR-96, P1). The ledger must name every open and unimplemented
+  check, say what it does not cover, and hold no source or sentence text.
+
 #### Reviewer comments
 
 - **COM-01** (FR-79). In the package's offline explorer, a reviewer must be able
@@ -161,6 +176,7 @@ no source files unless the author includes them, and states what it cannot show.
 - [US-068 — List what needs re-review after a change](../user-stories/US-068-list-what-needs-re-review.md)
 - [US-069 — Assess a manuscript from its reviewer package](../user-stories/US-069-assess-a-reviewer-package.md)
 - [US-104 — Return comments tied to claims](../user-stories/US-104-return-comments-on-claims.md)
+- [US-124 — Show what supports each sentence](../user-stories/US-124-show-what-supports-each-sentence.md)
 
 ## Edge Cases and Error Handling
 

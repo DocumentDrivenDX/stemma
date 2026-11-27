@@ -19,7 +19,7 @@ import { doubleQuotes, type Range, splitSentences } from "./sentences.ts";
 
 export * from "./model.ts";
 export { LOCATOR_TERMS } from "./attributes.ts";
-export { SENTENCE_PROFILE, splitSentences } from "./sentences.ts";
+export { doubleQuotes, type Range, SENTENCE_PROFILE, splitSentences } from "./sentences.ts";
 
 const CHAPTER_PATH = /^manuscript\/([^/]+)\.md$/;
 

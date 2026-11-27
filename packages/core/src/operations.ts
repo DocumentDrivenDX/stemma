@@ -58,6 +58,10 @@ export function prepareRecord(request: NewRecord): { id: string; path: string; t
   }
   if (kind === "source") record.admission ??= "candidate";
   if (kind === "source" || kind === "citation") record.intake ??= "parsed";
+  if (kind === "authorship_mark") {
+    record.marked ??= structuredClone(record.created);
+    if (typeof record.text === "string") record.text_sha256 ??= sha256(normalizeSentence(record.text));
+  }
   const sentence = record.sentence;
   if (kind === "citation" && isObject(sentence) && typeof sentence.text === "string" && sentence.sha256 === undefined) {
     sentence.text = normalizeSentence(sentence.text);

@@ -42,7 +42,7 @@ export function isRecordId(kind: string, id: string): boolean {
 
 /** Kinds for which this version checks every CONTRACT-001 rule it knows to apply. */
 export const FULLY_CHECKED_KINDS = new Set([
-  "source", "citation", "agent", "source_text", "upstream", "text_review", "comparison_run", "passage", "resolution", "annotation",
+  "source", "citation", "agent", "source_text", "upstream", "text_review", "comparison_run", "passage", "resolution", "annotation", "authorship_mark",
 ]);
 
 /** The source fields that `SourceBinding.record_sha256` covers (CONTRACT-001 E). */

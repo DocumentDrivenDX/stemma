@@ -323,6 +323,7 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   bad_link_id: "expected 1 to 32 lowercase letters or digits",
   duplicate_name: "the same name appears twice in this list",
   sentence_digest_mismatch: "the sentence digest does not match the sentence text",
+  text_digest_mismatch: "the text digest does not match the text",
   sentence_not_normalized: "the sentence text has extra or unusual white space",
   unknown_field: "the field is not part of the record format",
   wrong_location: "the file name or directory does not match the record",

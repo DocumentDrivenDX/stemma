@@ -8,6 +8,7 @@ export * from "./operations.ts";
 export * from "./capture.ts";
 export * from "./passages.ts";
 export * from "./verification.ts";
+export { activeTexts } from "./checks/structure.ts";
 export * from "./lookups.ts";
 export { SourceTexts, viewOf, placeOf, type TextView } from "./matching/texts.ts";
 export { heldResults, holding } from "./checks/held.ts";

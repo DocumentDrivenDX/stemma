@@ -3,11 +3,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { CITEPROC_VERSION, type CiteItem, formatCitations, LOCALE, STYLE } from "@stemma/cite";
-import { InvalidInput } from "@stemma/core";
-import { buildReport, compileTypst, obtainTypst, ReportError, type ReportSpec, TYPST_VERSION, TypstUnavailable } from "@stemma/publish";
-import { isObject } from "@stemma/records";
+import { InvalidInput, runChecks } from "@stemma/core";
+import { buildReport, compileTypst, evidenceLedger, ledgerWords, obtainTypst, ReportError, type ReportSpec, TYPST_VERSION, TypstUnavailable } from "@stemma/publish";
+import { isObject, sha256 } from "@stemma/records";
 import { projectRelative } from "@stemma/workspace";
-import { CommandError, emit, openCorpus, type Options, requireProject, usageError } from "./context.ts";
+import { CommandError, emit, openCorpus, type Options, requireProject, tools, usageError } from "./context.ts";
 
 const readJson = (path: string, what: string): unknown => {
   try {
@@ -52,14 +52,22 @@ export async function buildReportCommand(options: Options, dir: string | undefin
   const corpus = openCorpus(root);
   const settings = corpus.settings.data!;
   const include = Array.isArray(settings.bibliography_include) ? settings.bibliography_include.map(String) : [];
+  const template = readFileSync(join(base, spec.manuscript), "utf8");
   let built;
   try {
-    built = buildReport(corpus, spec, readFileSync(join(base, spec.manuscript), "utf8"), include);
+    built = buildReport(corpus, spec, template, include);
   } catch (error) {
     if (error instanceof ReportError) throw new CommandError(5, "report_input", `The report was not built: ${error.message}. Nothing was written.`, [rel]);
     throw error;
   }
   const problems = built.problems.map((p) => `cite.format: ${p}`);
+  const ledger = evidenceLedger({
+    corpus, spec, assembly: built.assembly, quotations: built.quotations,
+    outputs: { "report.md": built.files["report.md"]!, "report.typ": built.files["report.typ"]! },
+    inputs: { spec_sha256: sha256(readFileSync(specPath)), template_sha256: sha256(template) },
+    checks: runChecks(corpus, tools()).body,
+  });
+  built.files["evidence.json"] = ledger;
   if (options.check) {
     const stale = Object.entries(built.files).filter(([name, text]) => !existsSync(join(base, name)) || readFileSync(join(base, name), "utf8") !== text).map(([n]) => n);
     if (stale.length > 0) {
@@ -72,7 +80,7 @@ export async function buildReportCommand(options: Options, dir: string | undefin
   for (const [name, text] of Object.entries(built.files)) writeFileSync(join(base, name), text);
   mkdirSync(join(base, "build"), { recursive: true });
   writeFileSync(join(base, "build/notes.json"), `${JSON.stringify({ notes: built.notes }, null, 1)}\n`);
-  const lines = [`Wrote ${Object.keys(built.files).map((n) => `${rel}/${n}`).join(", ")}: ${built.notes.length} notes, about ${built.words} words before the notes.`, ...problems];
+  const lines = [`Wrote ${Object.keys(built.files).map((n) => `${rel}/${n}`).join(", ")}: ${built.notes.length} notes, about ${built.words} words before the notes.`, ledgerWords(ledger), ...problems];
   if (options.pdf) {
     const data = process.env.STEMMA_DATA;
     if (!data) throw new CommandError(4, "no_data_directory", "The plugin's data directory is not known, so the pinned Typst cannot be found or fetched. Run Stemma through its launcher.");
