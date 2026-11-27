@@ -30,7 +30,7 @@ work in progress elsewhere and wait until it reaches `main`.
 | 22 | Places and maps | FR-81, 66 to 68 | 11, 13 | Open after 11, 13 |
 | 23 | Reviewer package and comments | FR-46, 79 | 18, 20, 22 | Held |
 | 24 | A citation shown in its source: agent and graph browser | FEAT-012, FR-61, FR-64 (to be specified) | 11 | On main; originals not opened yet (25) |
-| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report on saved source text on main; originals, local server, MCP and other manuscripts not built |
+| 25 | Manuscript browser: from a reference to the highlighted source | FEAT-012, FR-65 (to be specified) | 24, 1, 4 | Clickable report and local server (`stemma browse`) on main; wider search, originals, MCP, other manuscripts not built |
 | 26 | Large projects: thousands of sources | FEAT-011 (FR-63), FEAT-012 | 11; before 25 | Export faster (5,000 sources: 42 s; memory still over 4 GB); search limits not fixed |
 | 27 | Import DOCX and PDF manuscripts, end to end | FEAT-015, FR-71 to 73 (PDF to be specified) | 1, 6, 7 | Requested; takeover strand; specs on main, no PDF reader built |
 
@@ -190,6 +190,13 @@ Before and after were both run on these projects.
 2. Serve reads and search from a SQLite index through a replacement client in
    the localhost server, which also serves source views on demand.
 3. Take search paging, query limits and exact link totals to arras.
+## Open follow-ups
+
+- `stemma browse`: another local user can fill its connections; the page then
+  treats the server as stopped, ending the session, and its notice names the
+  wrong cause. Retry with backoff, keeping the secret, and stop only on an
+  unproved answer or a sustained outage.
+- The scale test does not catch scans that compare records by identity.
 
 ## Not completable by an agent alone
 
