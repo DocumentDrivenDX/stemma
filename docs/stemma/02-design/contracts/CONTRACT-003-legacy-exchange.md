@@ -195,26 +195,67 @@ form, a lead-in, or an entry layout makes a new profile version.
 
 **Reference lists** (FR-92).
 
-1. A list starts at a paragraph whose whole text, ignoring case, is
-   `References` or `Bibliography`, with or without a heading style. It ends at
-   the next heading of the same or a higher level, or at the end of the file.
-   The report names the paragraph taken as the start.
-2. Each non-empty paragraph in a list is one entry. Its whole text is kept as
-   `as_found`. Where a paragraph may hold more or less than one entry, it is
-   reported.
+1. A list starts at a body paragraph whose whole text, ignoring case and outer
+   spaces, is `References` or `Bibliography`, with or without a heading style.
+   It ends at the next heading of the same or a higher level, at the next such
+   start paragraph, or at the end of the file. A start paragraph with no
+   heading style has no level, so the next heading of any level ends its list.
+   Notes, tables, and captions neither start nor end a list. The report names
+   the paragraph taken as the start.
+2. Each non-empty body paragraph in a list is one entry. Its whole text is kept
+   as `as_found`. A heading of a lower level inside the list is reported as a
+   subheading and is not an entry. Notes, tables, and captions inside the list
+   are not entries and are examined as text. A paragraph that may hold more or
+   less than one entry is reported:
+   - `line_break`: it holds a line break;
+   - `several_entries`: after a line break or a sentence end, the rest reads as
+     another entry that begins `Family, Given` and has the year after the
+     authors. Such a paragraph is **unread**;
+   - `continuation`: it is unread, follows another entry, and begins with a
+     digit, punctuation, or a lower-case word that does not begin a name.
 3. The profile reads authors' family names in order, the year, and any
    one-letter year suffix, in two layouts: the year directly after the authors,
-   and the year near the end of the entry. A corporate author is one whole
-   name. An entry whose authors or year cannot be read is **unread**.
+   and the year near the end of the entry. An entry whose authors or year cannot
+   be read is **unread**. When in doubt it is unread, because an entry read with
+   too few authors could take another work's citations.
+   - **Authors.** A person is `Family, Given`. A later author may also be
+     `Given Family` or `I. Family`. Authors are joined by commas, `and`, or `&`.
+     Editor marks such as `(ed.)` and `eds` are not names. `et al.` or `and
+     others` marks the authors as cut short. A name with no comma and no
+     initials is a corporate author, or a single name, and is one **whole
+     name**. Initials with no comma, and text after `and`, `&`, or `with` that
+     is not a name, leave the entry unread.
+   - **Year after the authors.** All the text before the first year form reads
+     as authors, apart from an opening bracket and punctuation.
+   - **Year near the end.** The authors are read from the start and must end at
+     an opening quotation mark, at a full stop, after initials followed by
+     only a space and a title, or at a comma that no name follows. A whole name
+     ends at a comma only before a quoted title. If anything just past that
+     point could name another author, such as `with`, `and`, `und`, `et`, or a second
+     `Family, I.` after any punctuation, the entry is unread. The year is the last year form that is not in a page
+     range or a web address. It follows a comma, colon, semicolon, full stop,
+     or opening bracket, with at most a day and a month between. Only
+     punctuation, volume, issue, and page details, and a web address or DOI may
+     follow it.
+   - An entry that begins with a repeated-author mark (a long dash, or two or
+     more dashes or underscores) types no author and is unread.
 4. Every entry, read or unread, is carried forward by F11.
-5. A list serves the chapters read from its own file. A file with no list is
-   reported.
+5. A list serves the chapters read from its own file. In a file with one list,
+   it serves all the file's text. In a file with several, each serves the text
+   after the list before it (or the start of the file) and up to its own start,
+   so a list never serves another chapter's citations; text after the last list
+   has no list. A file with no list is reported, and so is one with several.
 
 **What is examined.** Every pair of round brackets that holds a year form, in
 body text, headings, footnotes, endnotes, tables, and captions, outside the
 reference lists. A year form is a number from 1000 to 2099 with an optional
-lower-case suffix letter, or `n.d.`, `forthcoming`, or `in press`. The content
-is split into parts at semicolons.
+lower-case suffix letter, or `n.d.`, `forthcoming`, or `in press`, ignoring
+case. A number that is part of a longer number, such as `12000` or `1,500`, is
+not one. A pair is examined when a year form stands in it outside any pair
+nested inside it. A pair that holds a nested pair is never a citation. A
+bracket with no partner in its paragraph makes no pair; one followed by a year
+form is reported apart from the counts. The content is split into parts at
+semicolons.
 
 **Citation forms.**
 
@@ -226,44 +267,83 @@ is split into parts at semicolons.
 | Lead-in | `cf.`, `see`, `see also`, or `based on` before the names, kept as `prefix` |
 | Page locator | After the year: any page or range after a colon or after `p.` or `pp.`, or after a comma when it is not a year form. Kept as printed, as a `page` locator |
 
+- A **name** is one or more words that begin with a capital letter, or with a
+  letter of a script without capitals. It may hold name particles such as `van`
+  or `de` before or between them, and `of`, `for`, `the`, or `on` between them.
+  A capitalized sentence word such as `In`, `As`, `Compare`, or `Although`
+  does not begin a name in brackets. A month or season is not a name unless
+  some list of the project has it as a family name.
+- A lead-in is read ignoring case.
+- A page is a number, optionally followed by `f` or `ff`, or a lower-case Roman
+  numeral. A range joins two with a hyphen or en dash. Further pages after a
+  comma belong to the same locator, until a year form. The locator leaves out
+  the colon, `p.`, or `pp.`.
+- A range of years is a year joined by a dash or slash to another number or to
+  `present`, where a page is not expected.
+
 Other text in a part, such as another lead-in or a form the table does not
 define, makes the part unrecognized. No citation form takes a range of years as
 its year, so a part that has one in that place is never linked.
 
 **Matching.** A citation is compared with the entries of its own chapter's
 list. Family names compare after folding case, diacritics, and apostrophe and
-hyphen forms. It matches an entry only when:
+hyphen forms. A whole name also matches when it equals all the cited names with
+their joining words, as in `Office of Land and Water 2004`. It matches an entry
+only when:
 
 - without `et al.`, the entry has exactly the named authors, in order;
 - with `et al.`, the entry's first authors are the named ones, in order, and it
   has more authors than are named; and
 - the year and suffix are equal, a missing suffix matching only a missing one.
 
-Exactly one matching read entry links the citation, unless an unread entry's
-text holds the first named family name and the year. In every other case the
-citation is unresolved: no entry (`no_entry`), several (`several_entries`), an
-unread entry that could fit (`unread_entry`), or no list (`no_list`). Matching
+Authors cut short in a list match only an `et al.` citation, and only when
+every cited name is among those the entry shows.
+
+Exactly one matching read entry links the citation, unless another entry could
+be the one meant:
+
+- an unread entry whose text holds the first named family name and the year, as
+  whole words, whatever suffix either has;
+- an unread entry with a repeated-author mark, read with the text of the nearest
+  earlier entry that has none;
+- an unread `continuation` paragraph; one that holds a year or an author's
+  initials, outside a web address, is read together with the paragraph before
+  it; or
+- another entry with the same year and suffix whose whole name has the first
+  cited name as one of its words.
+
+In every other case the citation is unresolved: no entry (`no_entry`), several
+(`several_entries`), an entry that could fit (`unread_entry`), or no list
+(`no_list`), the first of `no_list`, `several_entries`, `unread_entry`, and
+`no_entry` that applies. Matching
 entries in other lists or in a library are listed as candidates and never
 linked. Model judgment never links.
 
 A linked citation takes the source its entry is bound to under F11. A narrative
 form is a citation form when its names match an entry as above. It is also one,
-and unresolved, when it uses `et al.` or when a name in it is a family name in
-some list of the project. Other words before the brackets leave them
-unlinked.
+and unresolved, when it uses `et al.` or when a name in it, or the last word of
+one, is a family name in some list of the project. Other words before the
+brackets leave them unlinked. The names are all the names, with their joining
+words and commas, that stand directly before the brackets, with only spaces
+between. A comma joins names only in a series that ends in `and` or `&`.
+Capitalized sentence words that begin the first name are dropped. No other word
+or name is dropped to find a match, so `Brel and Corso (2001)` never matches an
+entry for Corso alone.
 
 **Account.** Each examined pair of brackets ends in exactly one state:
 
 | State | When | Output |
 |---|---|---|
-| Linked or unresolved | Every part is a citation form | One `citation` record per item. An unresolved item has key `?` and an `ambiguous_reference` item with its reason and candidates |
+| Linked | Every part is a citation form and every item links | One `citation` record per item |
+| Unresolved | Every part is a citation form and any item does not link | One `citation` record per item. An unresolved item has key `?` and an `ambiguous_reference` item with its reason and candidates |
 | Left unlinked | Any part is not a citation form | A `year_parenthesis` item with its position, text, and one reason code |
 
 Reason codes for left unlinked, the first that applies: `in_table` (until the
 markup carries citations in tables), `year_range` (a range of dates, with no
-part holding names, such as `(1516–1850)` or `(c. 1600–1850)`),
-`no_author_form` (every part is year forms only, with no readable narrative
-names), `mixed_parts` (some parts are
+part holding names, that is, a capitalized word, such as `(1516–1850)` or
+`(c. 1600–1850)`),
+`no_author_form` (every part is year forms and locators only, with no readable
+narrative names), `mixed_parts` (some parts are
 citation forms and some are not; the item lists how each part was read), and
 `unrecognized_form`. A `no_author_form` item that follows a capitalized word is
 marked as a possible narrative citation and listed first.
@@ -328,7 +408,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
-| Author-date profile (H) | A throwaway script, not Stemma, on one private set of drafts: matching only the first family name and first year against each file's list, it found exactly one entry for most parts it could read as author and year. It missed entries with the year near the end | Whether any match was correct; the rules in H; narrative and other forms; list detection |
+| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year | Whether the rules read real lists and citations correctly; any match on real text; list detection in real Word files |
 
 ## Schema Basis
 
