@@ -1,0 +1,7 @@
+{
+  "name": "@stemma/manuscript",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": { "@stemma/records": "workspace:*" }
+}

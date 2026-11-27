@@ -37,6 +37,12 @@
     "packages/extract": {
       "name": "@stemma/extract",
     },
+    "packages/manuscript": {
+      "name": "@stemma/manuscript",
+      "dependencies": {
+        "@stemma/records": "workspace:*",
+      },
+    },
     "packages/records": {
       "name": "@stemma/records",
     },
@@ -124,6 +130,8 @@
     "@stemma/core": ["@stemma/core@workspace:packages/core"],
 
     "@stemma/extract": ["@stemma/extract@workspace:packages/extract"],
+
+    "@stemma/manuscript": ["@stemma/manuscript@workspace:packages/manuscript"],
 
     "@stemma/records": ["@stemma/records@workspace:packages/records"],
 
