@@ -354,7 +354,10 @@ elsewhere; the site says they cannot be rebuilt without the copy. A screenshot c
 captured from is unchanged; its pixels are not compared between machines.
 Playwright tests (`./scripts/dev.sh e2e`) cover navigation, console errors,
 off-site requests, links, light and dark, 320 and 375 pixel widths, keyboard
-focus, and axe-core. The site is not deployed.
+focus, and axe-core. The site is published by hand at
+<https://documentdrivendx.github.io/stemma/>: the built `website/dist/` and an
+empty `.nojekyll` are committed to the `gh-pages` branch, in a commit that names
+the source commit.
 
 ## Non-Goals
 
