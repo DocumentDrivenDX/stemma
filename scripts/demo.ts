@@ -5,7 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");
-const plugin = join(root, "dist/release");
+// website/generate.ts names a build of its own.
+const plugin = process.env.STEMMA_DEMO_PLUGIN ?? join(root, "dist/release");
 const base = mkdtempSync(join(tmpdir(), "stemma-demo-"));
 const book = join(base, "book");
 const materials = join(base, "materials");
