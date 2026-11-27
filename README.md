@@ -42,8 +42,11 @@ claude plugin install stemma@documentdrivendx
 
 That also installs [docsync](https://github.com/DocumentDrivenDX/docsync), which
 Stemma uses when you want to edit a manuscript with others in a Claude Doc. If an
-update leaves Claude saying that docsync is not installed, run the second command
-again.
+update leaves Claude saying that docsync is not installed, install it by name:
+
+```sh
+claude plugin install docsync@documentdrivendx
+```
 
 On first use Claude fetches a pinned copy of the Bun runtime, checks it against a
 digest shipped in the plugin, and keeps it in the plugin's own data directory. It

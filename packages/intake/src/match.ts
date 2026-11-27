@@ -112,7 +112,7 @@ interface YearItem { year: string; suffix: string; locator?: string; marker?: st
 function withoutMarkers(part: string): { body: string; marker?: string } {
   let body = part;
   for (;;) {
-    const found = /(?<=\S)\s+\[([^[\]]*)\]\s*$/.exec(body);
+    const found = /(?<=[^\s,])(?:\s*,)?\s+\[([^[\]]*)\]\s*$/.exec(body);
     if (!found || !/\p{L}/u.test(found[1]!) || yearForms(found[1]!).length > 0) break;
     body = body.slice(0, found.index);
   }

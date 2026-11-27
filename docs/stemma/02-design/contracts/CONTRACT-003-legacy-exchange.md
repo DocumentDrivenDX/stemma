@@ -282,7 +282,8 @@ semicolons.
 - A lead-in is read ignoring case.
 - A **working marker** is text in square brackets at the end of a part, set off
   by a space, with at least one letter, no year form, and no square bracket
-  inside, as in `(Adair 2017, 12 [CHECK])`. Markers do not stop a part from
+  inside, as in `(Adair 2017, 12 [CHECK])`. One comma may come before that
+  space, as in `(Adair 2017, [CHECK])`; it is kept with the marker. Markers do not stop a part from
   being a citation form. Those at the end of a part, one or several, are kept
   exactly as typed with its last item, as its `suffix` (CONTRACT-006 F). Their
   words are not read. A marker changes no state, and a link says nothing about
@@ -426,7 +427,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
-| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules, before working markers were added, on one private set of older drafts: most bracketed years linked, and hand checks of a sample of links found none wrong | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; the working-marker rule on real text; Word reading and list detection beyond that one set |
+| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis
 

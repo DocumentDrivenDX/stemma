@@ -301,6 +301,16 @@ describe("US-113-AC2: working markers", () => {
     expect(items("Corso (2001: 7 [CHECK]) wrote.")).toEqual([["linked", "2001", "7", "[CHECK]"]]);
   });
 
+  test("one comma before a marker is kept with it, as typed", () => {
+    expect(items("(Adair 2017, [CHECK THE PAGE])")).toEqual([["linked", "2017", undefined, ", [CHECK THE PAGE]"]]);
+    expect(items("(Adair 2017, 12, [CHECK])")).toEqual([["linked", "2017", "12", ", [CHECK]"]]);
+    expect(items("(Adair 2017: 4 , [A],  [B])")).toEqual([["linked", "2017", "4", ", [A],  [B]"]]);
+    expect(items("(Brel 1999, 2003, [CHECK]; Corso 2001 [NB], [CHECK])")).toEqual([
+      ["linked", "1999", undefined, undefined], ["linked", "2003", undefined, ", [CHECK]"], ["linked", "2001", undefined, "[NB], [CHECK]"],
+    ]);
+    expect(items("Corso (2001, [CHECK]) wrote.")).toEqual([["linked", "2001", undefined, ", [CHECK]"]]);
+  });
+
   test("a marker changes no state: no match stays unresolved", () => {
     expect(items("(Zimmer 2017 [CHECK])")).toEqual([["unresolved", "2017", undefined, "[CHECK]"]]);
     expect(one(LIST, "(Adair et al. 2017 [CHECK])")).toEqual(["(Adair et al. 2017 [CHECK]) => unresolved no_entry"]);
@@ -308,7 +318,9 @@ describe("US-113-AC2: working markers", () => {
 
   test.each([
     "(Adair 2017 [1850])", "(Adair [1850] 2017)", "(Adair 2017 [checked 2024])", "(Adair 2017 [12])", "(Adair 2017[CHECK])",
-    "(Adair [CHECK] 2017)", "(Adair 2017 [CHECK], 12)", "(Adair 2017 [CHECK] and more)", "(Adair 2017 [a [b]])", "(Adair 2017 [CHECK)",
+    "(Adair [CHECK] 2017)", "(Adair 2017 [CHECK], 12)",
+    "(Adair 2017,[CHECK])", "(Adair 2017,, [CHECK])", "(Adair 2017,)", "(Adair 2017, [1850])", "(Adair 2017. [CHECK])",
+    "(Adair 2017 [CHECK] and more)", "(Adair 2017 [a [b]])", "(Adair 2017 [CHECK)",
   ])("other brackets in a part are other text: %s", (text) => {
     expect(one(LIST, text)).toEqual([`${text} => unlinked unrecognized_form`]);
   });
