@@ -5,9 +5,10 @@
 import { describe, expect, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { deflateSync } from "node:zlib";
 import { highlightTargets, partPageText, SourceViews, targetRanges, viewOf } from "@stemma/core";
 import { sha256, streamsOf } from "@stemma/records";
-import { answersOf, createHighlighter, createSession, listen, type LoadedOriginal, type Verdict } from "@stemma/server";
+import { answersOf, createHighlighter, createSession, HIGHLIGHT_LIMITS, listen, type LoadedOriginal, type Verdict } from "@stemma/server";
 import { post, redeem } from "./browse-run.ts";
 import { HIGHLIGHT_BOUNDS, locateOnPage } from "../packages/extract/src/pdf-highlight.ts";
 import { NO_HIGHLIGHT, noHighlight, type Highlight, type HighlightTarget } from "../packages/core/src/highlight.ts";
@@ -215,6 +216,54 @@ describe("US-123-AC4 words that may not be seen where the text layer places them
     expect(await reason({ content: "BT /F1 24 Tf 40 700 Td [(The tide ta) 2000 (ble was kept)] TJ ET" }, "table was kept".slice(0, 2))).not.toBe("boxes");
   });
 
+  test("a symbol or picture font, by its name, whatever the file's text calls its shapes", async () => {
+    for (const name of ["ZapfDingbats", "Symbol", "Wingdings", "ABCDEF+SymbolMT", "Webdings"]) {
+      const raw: Raw = {
+        content: line(WORDS).replace("/F1", "/S"), fonts: "/S 6 0 R",
+        objects: [`<< /Type /Font /Subtype /Type1 /BaseFont /${name} >>`],
+      };
+      // What the library reads as the text of such a font need not hold the words typed.
+      const text = await pageText(rawPdf(raw));
+      expect([name, await reason(raw, text.slice(0, 5).trim())]).toEqual([name, "symbol_font"]);
+    }
+    // Only quoted words are held to this: a sign elsewhere on the page does not matter.
+    const bullet: Raw = { content: `${line(WORDS)}\nBT /S 24 Tf 40 300 Td (l) Tj ET`, fonts: "/S 6 0 R", objects: ["<< /Type /Font /Subtype /Type1 /BaseFont /ZapfDingbats >>"] };
+    expect(await reason(bullet)).toBe("boxes");
+  });
+
+  test("an annotation that may be seen where the words are", async () => {
+    // The words quoted lie from about x 133 to 287, with their baseline at 700.
+    const note = (entries: string, objects: string[] = []): Raw => ({ content: line(WORDS), page: "/Annots [6 0 R]", objects: [`<< /Type /Annot ${entries} >>`, ...objects] });
+    const over = "/Rect [100 680 320 740]";
+    const appearance = stream("/Type /XObject /Subtype /Form /BBox [0 0 10 10]", "0 g 0 0 10 10 re f");
+    const refused: [string, Raw][] = [
+      ["a printed square filled black", note(`/Subtype /Square ${over} /IC [0 0 0] /C [0 0 0] /F 4`)],
+      ["a square with a stored appearance", note(`/Subtype /Square ${over} /AP << /N 7 0 R >>`, [appearance])],
+      ["a stamp", note(`/Subtype /Stamp ${over} /F 4 /AP << /N 7 0 R >>`, [appearance])],
+      ["a reader's highlight with no stored appearance", note(`/Subtype /Highlight ${over} /C [1 1 0] /QuadPoints [100 740 320 740 100 680 320 680]`)],
+      ["a note's icon", note("/Subtype /Text /Rect [150 700 170 720]")],
+      ["a text box", note(`/Subtype /FreeText ${over} /DA (/Helv 12 Tf 0 g) /Contents (other words)`)],
+      ["a form field", note(`/Subtype /Widget /FT /Tx /T (a) ${over}`)],
+      ["a kind that is not known", note(`/Subtype /Invented ${over}`)],
+      ["one shown only in print", note(`/Subtype /Square ${over} /IC [0 0 0] /F 36`)],
+      ["a link with a stored appearance", note(`/Subtype /Link ${over} /AP << /N 7 0 R >>`, [appearance])],
+      ["a link whose lower border runs through the words", note("/Subtype /Link /Rect [100 708 320 760] /C [0 0 0] /Border [0 0 1]")],
+      ["a link with a thick border beside the words", note("/Subtype /Link /Rect [100 650 320 695] /C [0 0 0] /Border [0 0 30]")],
+      ["a link with rounded corners", note(`/Subtype /Link ${over} /C [0 0 0] /Border [40 40 1]`)],
+    ];
+    for (const [name, raw] of refused) expect([name, await reason(raw)]).toEqual([name, "annotation"]);
+    const allowed: [string, Raw][] = [
+      ["a square elsewhere", note("/Subtype /Square /Rect [100 100 320 140] /IC [0 0 0] /F 4")],
+      ["a hidden square", note(`/Subtype /Square ${over} /IC [0 0 0] /F 6`)],
+      ["one shown neither on screen nor in print", note(`/Subtype /Square ${over} /IC [0 0 0] /F 32`)],
+      ["a link with no border", note(`/Subtype /Link ${over} /Border [0 0 0]`)],
+      ["a link with a thin border around the words", note(`/Subtype /Link ${over} /C [1 0 0] /Border [0 0 1]`)],
+      ["a link with no colour for its border", note("/Subtype /Link /Rect [100 708 320 760] /C []")],
+      ["a note's window", note(`/Subtype /Popup ${over}`)],
+    ];
+    for (const [name, raw] of allowed) expect([name, await reason(raw)]).toEqual([name, "boxes"]);
+  });
+
   test("drawing that is not checked: optional content, a transparency group, a soft mask, a Type 3 font", async () => {
     expect(await reason({
       content: `/OC /L BDC\n${line(WORDS)}\nEMC`, resources: "/Properties << /L 6 0 R >>", objects: ["<< /Type /OCG /Name (layer) >>"],
@@ -363,5 +412,57 @@ describe("US-123-AC6 the reading is bounded", () => {
     expect(reasonIn(await createHighlighter(worker(SLOW)).place(target, async () => ({ bytes: Buffer.from("other"), release: () => {} })))).toBe("changed");
     expect(reasonIn(await createHighlighter(worker(SLOW)).place(target, async () => ({ refused: "original_not_held" })))).toBe("not_held");
     expect(reasonIn(await createHighlighter(worker(SLOW)).place(target, load, () => true))).toBe("failed");
+  });
+});
+
+/** A small PDF whose page draws `count` one-bit images, each of which unpacks to 200 MB. */
+function unpacksLarge(count: number): Uint8Array {
+  const side = 40_000;
+  const data = deflateSync(Buffer.alloc((side / 8) * side), { level: 9 }).toString("latin1");
+  return rawPdf({
+    content: `${line(WORDS)}\n${Array.from({ length: count }, (_, i) => `q 5 0 0 5 ${i * 6} 0 cm /Im${i} Do Q`).join("\n")}`,
+    resources: `/XObject << ${Array.from({ length: count }, (_, i) => `/Im${i} ${6 + i} 0 R`).join(" ")} >>`,
+    objects: Array.from({ length: count }, () => stream(`/Type /XObject /Subtype /Image /Width ${side} /Height ${side} /ImageMask true /BitsPerComponent 1 /Filter /FlateDecode`, data)),
+  });
+}
+
+describe("US-123-AC6 the reading's memory is bounded", () => {
+  const worker = [process.execPath, "--no-install", "--no-env-file", "--config=/dev/null", join(import.meta.dir, "../packages/cli/src/highlight-worker.ts")];
+  const read = async (bytes: Uint8Array, memory: number) => {
+    let answer: Highlight | undefined;
+    const child = Bun.spawn(worker, {
+      stdin: "ignore", stdout: "ignore", stderr: "ignore", serialization: "advanced",
+      ipc(reply: Highlight) {
+        answer = reply;
+        child.kill("SIGKILL");
+      },
+    });
+    child.send({ target: targetFor(bytes, WORDS, QUOTE), bytes, memory });
+    await child.exited;
+    // Bytes on macOS; kilobytes where the system's own figure is passed on, as on Linux.
+    const most = Number(child.resourceUsage()!.maxRSS);
+    return { answer, signal: child.signalCode, peak: most < 1e7 ? most * 1024 : most };
+  };
+
+  test("a 3 MB file that would take over 4 GB is ended near the bound, while it unpacks", async () => {
+    const bytes = unpacksLarge(16);
+    expect(bytes.length).toBeLessThan(4e6);
+    const made = await read(bytes, HIGHLIGHT_LIMITS.memory);
+    expect([made.answer, made.signal]).toEqual([undefined, "SIGKILL"]);
+    // Past the bound by what is taken between two looks; unbounded it reaches about 4.3e9.
+    expect(made.peak).toBeGreaterThan(1e8);
+    expect(made.peak).toBeLessThan(HIGHLIGHT_LIMITS.memory + 768 * 1024 * 1024);
+  });
+
+  test("the server's answer is a refusal that says so; within the bound the page is read; with no bound it is not read", async () => {
+    const bytes = Buffer.from(unpacksLarge(4));
+    const target = targetFor(bytes, WORDS, QUOTE);
+    const load = async (): Promise<LoadedOriginal> => ({ bytes, release: () => {} });
+    const refused = await createHighlighter(worker, { memory: 512 * 1024 * 1024 }).place(target, load);
+    expect(refused).toEqual(noHighlight("too_much_memory"));
+    const plainBytes = Buffer.from(rawPdf(plain));
+    const plainLoad = async (): Promise<LoadedOriginal> => ({ bytes: plainBytes, release: () => {} });
+    expect((await createHighlighter(worker).place(targetFor(plainBytes, WORDS, QUOTE), plainLoad)).state).toBe("boxes");
+    expect(await createHighlighter(worker, { memory: 0 }).place(targetFor(plainBytes, WORDS, QUOTE), plainLoad)).toEqual(noHighlight("failed"));
   });
 });

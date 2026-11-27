@@ -103,7 +103,7 @@ Verification names the SEC criterion that tests the control.
 | TM-I-018 | Launch file in a private directory; nothing in arguments or output | `server`, `cli` | SEC-035 |
 | TM-D-010, TM-E-008 | CONTRACT-005 M rules 1, 10, 12; fixed routes | `server` | SEC-036 |
 | TM-I-019, TM-D-011 | CONTRACT-005 M, "Originals": recorded digests only, named places, no links, hashed bytes sent, size and number bounds | `server` | SEC-038 |
-| TM-T-015, TM-D-013 | CONTRACT-005 M, "Highlighting on originals": strict text equality of the re-read page, positions and visibility from drawing operators with unknown drawing refused, a separate bounded process, a pixel check that only removes | `server`, `extract`, `explorer` | SEC-043 |
+| TM-T-015, TM-D-013 | CONTRACT-005 M, "Highlighting on originals": strict text equality of the re-read page, positions and visibility from drawing operators with unknown drawing, symbol fonts, and annotations over the words refused, a separate process bounded in time and memory, a pixel check that only removes | `server`, `extract`, `explorer` | SEC-043 |
 | TM-E-009, TM-D-011 | CONTRACT-005 M, "Originals": canvas only, pinned pdf.js with nothing that runs or links, worker loaded with the page, unchanged policy, bounds. No process sandbox | `explorer` | SEC-039 |
 
 TM-I-008 and TM-I-014 have no preventive control; see Residual Risk.
@@ -240,5 +240,5 @@ the system they ran on; none is required to continue.
 | Local server: refusals for each rule, sockets, outbound connections, code and secret in output, arguments, and files, another program on the port, changed and repeated messages | SEC-034 to SEC-037 | With the server |
 | MCP: quiet starts with and without Bun and a project, hostile arguments and messages, hostile source text, keys searched for in output and files, the lock, and the installed round trip | SEC-040 to SEC-042 | With MCP |
 | Originals: unknown digest, links, swapped, changed, and oversize files, changed answers, and a PDF with script, links, a form, and an attachment | SEC-038, SEC-039 | With originals |
-| Marks on originals: each refusal over invented PDFs, boxes compared with rendered pixels, and a slow or crashing reader | SEC-043 | With marks on originals |
+| Marks on originals: each refusal over invented PDFs, boxes compared with rendered pixels, and a slow, crashing, or memory-hungry reader | SEC-043 | With marks on originals |
 | Release: version and digest check, `bun audit`, secret scan, install digest comparison | SEC-025 to SEC-029 | Each release |

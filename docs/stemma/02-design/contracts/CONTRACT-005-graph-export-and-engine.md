@@ -921,6 +921,28 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   a page with any other, with a transparency group, a soft mask, optional content,
   a Type 3 font, a text clipping mode, or a non-rectangular clipping path that
   reaches a box, gets no box.
+- **Symbol fonts.** No box is given for a quoted glyph of a font whose name holds
+  `Symbol`, `Dingbats`, `Wingdings`, or `Webdings`, in any letter case, whose
+  shapes are signs whatever letters the text layer gives them. The name decides
+  whether or not the file gives the font a `ToUnicode` map: pdf.js does not say
+  whether it did. For the same reason the font descriptor's "symbolic" flag is
+  not used: fonts embedded in part carry it as a rule (25 of 26 fonts in local
+  Typst and browser-made PDFs and fixtures), almost any born-digital page would
+  be refused, and which of them lack a map cannot be told. A font whose name
+  merely holds such a word is refused with the rest.
+- **Annotations.** Neither drawing of the page shows annotations, but other
+  viewers do. So no box is given where a box meets the rectangle of any
+  annotation that may be seen, on screen or in print, with or without a stored
+  appearance, since viewers draw many kinds without one: a shape, a stamp, a
+  note, a text box, a form field, or a reader's own highlight. Only an
+  annotation flagged hidden, or not shown on screen and neither printed nor able
+  to be turned on, is left out. A link, or a note's window, with no stored
+  appearance shows nothing over its area. A link's border is lines: it counts
+  when it has a color and a width and, at a width of 1 or less, its top or bottom
+  line meets the quoted words' middle; when wider, any of its lines may; with
+  rounded corners, its whole rectangle counts. The width is the stated one, also
+  where pdf.js cuts it down. An annotation that pdf.js itself cannot read is not
+  detected.
 - **Unclear geometry.** No box is given for a rotated page; rotated, skewed, or
   mirrored text; vertical text; right-to-left text on a quoted line; a quoted
   ligature (one glyph for several characters); a quotation that joins, begins, or
@@ -940,8 +962,9 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   only remove a highlight.
 - **What the page says.** With boxes, it says that they are positions from the
   PDF's text layer, that the server read the page again, found its text equal to
-  the source text, and found those glyphs drawn there with nothing detected over
-  or under them. Without, it says that the original is not highlighted, and why.
+  the source text, and found glyphs drawn there that the file's text layer names
+  as those letters, with nothing detected over or under them, and that it cannot
+  tell whether the printed shapes are those letters. Without, it says that the original is not highlighted, and why.
   The answer is `state` `boxes` (`sha256`, `page`, `page_count`, and `boxes`,
   each `left`, `top`, `width`, and `height` as fractions of the page as drawn) or
   `none` (`reason` and `why`). `why` holds fixed words, and no path or text from
@@ -951,7 +974,20 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   request, and writes nothing. It is ended when it has answered, and after 20
   seconds. One runs at a time; at most 8 requests wait, and a further one gets
   `none` with `reason` `busy`. A page with more than 300,000 operators or 100,000
-  glyphs, or a highlight of more than 500 boxes, gets no box. The original it
+  glyphs, or a highlight of more than 500 boxes, gets no box. Its memory is
+  bounded: a few megabytes of PDF can unpack to gigabytes in under a second, and
+  pdf.js unpacks them without yielding. A thread of its own, started before the
+  page is read, looks at the process's resident memory every 5 ms and kills the
+  process once it is over 1.5 GiB (1,610,612,736 bytes); without that thread
+  nothing is read. The answer is then `too_much_memory`, as it is when the system
+  kills the process. The peak passes the bound by what is taken between two
+  looks: on one macOS system (Apple silicon), it was 1.75 GiB at most over files
+  of 16 to 64 one-bit images that each unpack to 200 MB and content streams that
+  unpack to 2 GB, where an unbounded reading of 16 images reached 4.0 GiB. An
+  original of 255 MiB with a plain page needed 1.13 GiB. Only resident memory counts, not
+  pages the system has compressed or swapped out. pdf.js's image size limit is
+  not used: it would leave an image out, and one left out could be what covers
+  the words. The original it
   reads counts among the two held at once (rule 13). The server keeps no result.
 - **What this does not show.** That a glyph's outline looks like the character the
   file's text layer gives it: a font can draw one letter and name another, and the
@@ -1347,7 +1383,7 @@ output, and checks that a coordinate seeded in prose is warned about.
 | Maps | Argument and geographic views over synthetic data rendered quickly; a 300-claim map was unreadable without scope | Real data |
 | MCP: how hosts start it (spike, one macOS system, throwaway profiles, a stand-in model API on 127.0.0.1 and no sign-in) | Claude Code 2.1.236 started a probe plugin's server from `plugin.json`, both through `claude mcp list` and at the start of a headless session (`claude -p`), before any tool call: it filled `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}` in the arguments, set `CLAUDE_PROJECT_DIR` to the directory the session was started in (also a subdirectory of a git repository, not its root), used that as the working directory, had made the data directory, offered the tool to the model as `mcp__plugin_probe_probe__status`, and ended the server with SIGINT. A declared plugin dependency was still installed. **Codex CLI 0.150.1** read the same `mcpServers` from `.claude-plugin/plugin.json`, listed the variables unfilled, and in a session started the plain form from the session's directory, with its read-only sandbox: a script planted there under the literal name ran. With the guard, in the same setup, nothing ran, and Claude Code still connected. Anthropic's documentation says that claude.ai chat ignores local MCP servers and that Cowork loads them only for sessions on the author's computer (fetched 2026-11-27) | A tool call made by a real session's model; the desktop app; the interactive terminal; Cowork, claude.ai, ChatGPT desktop; Windows and Linux; how Codex shows the guard's refusal; later releases of any host |
 | MCP server (N) | Local tests on one macOS system (Apple silicon) of the built command: quiet starts with and without a project (no file written, listener, or child process), each tool on the worked example with a stand-in opener, the project unchanged, the code and secret searched for in both outputs, process arguments, the lock, and the kept files, hostile arguments and lines, an invented source whose text gives orders and one that holds a coordinate, one server across two MCP processes and `browse`, endings by closed input, signals, idle time, and a call under way; the shell answers without Bun, and hands over when it appears; the declared command run with unfilled variables from a directory holding planted scripts. In headless Chromium, `open` led to the cited record's page. The install check ran the declared command from the installed copy: Claude Code 2.1.236 connected to it before setup, when it wrote nothing, and after; a test client got status, search, a highlighted source view, and with a stand-in opener an explorer at the record. Once, by hand, a headless Claude Code 2.1.236 session with the installed plugin in a throwaway profile and a stand-in model API connected to the server in 98 ms, offered its five tools to the model as `mcp__plugin_stemma_stemma__<tool>`, and ended it with SIGINT, leaving no process and no change in the data directory | A tool call chosen by a real model; the desktop app; the interactive terminal; the system's real opener from the server; Windows and Linux; a large project through the tools; any outside security review |
-| Marks on originals (M) | Local tests on one macOS system: each refusal over invented one-page PDFs; boxes compared with the pixels headless Chromium draws, over one invented layout with scaling, character and word spacing, narrowed letters, kerning, leading, and a raised run; the worked example's 125 passage segments, 6 marked and looked at by eye | Fonts embedded in the many forms publishers use, beyond the two born-digital originals of the worked example; other browsers and systems; a font whose shapes differ from the letters it names is not detected |
+| Marks on originals (M) | Local tests on one macOS system: each refusal over invented one-page PDFs; the memory bound, with the reader's peak measured, on invented files that unpack to gigabytes (images and content streams); boxes compared with the pixels headless Chromium draws, over one invented layout with scaling, character and word spacing, narrowed letters, kerning, leading, and a raised run; the worked example's 125 passage segments, 6 marked and looked at by eye, measured before the refusals for symbol fonts and annotations and the memory bound | The worked example with those refusals and that bound; the bound on Linux (the tests measure it where they run) and Windows, and under memory pressure; legitimate pages that need more than 1.5 GiB; Fonts embedded in the many forms publishers use, beyond the two born-digital originals of the worked example; other browsers and systems; a font whose shapes differ from the letters it names is not detected |
 | MCP: protocol module (spike) | The official SDKs bundle with no unresolved import: `@modelcontextprotocol/sdk` 1.32.2 installs 92 packages and a minimal tools server bundles to 530 KB; `@modelcontextprotocol/server` 2.4.0 installs 3 and bundles to 805 KB; each bundle holds a `new Function`. Stemma's own module is used (ADR-012) | Another host's protocol behaviour |
 | `GraphStore`, preview data, sentence and map files, engine conformance | Design only; a one-file indexer rebuilt 25,000 synthetic records in about 1 s with a stable dump | All |
 

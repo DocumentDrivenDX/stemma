@@ -101,6 +101,9 @@ All 14 originals are PDFs held in a local cache; nothing was fetched.
   For the segments the report quotes: 6 marked, 91, 22, 1, and 1.
 - The 6 marked segments were looked at in the served page: each box lay on the
   quoted words.
+- Since this measurement, marks are also refused for symbol fonts and under
+  annotations, and the reader's memory is bounded (CONTRACT-005 M). The worked
+  example has not been measured again.
 - Placing marks took 22 ms for the median page and 240 ms for the slowest, in
   one process without the cost of starting one.
 

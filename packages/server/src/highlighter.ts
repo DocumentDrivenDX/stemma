@@ -2,11 +2,13 @@
 // "Highlighting on originals", "Bounds"). A PDF is a file from outside, so each
 // page is read in a process of its own, which gets the bytes and what to look
 // for, no secret, and no listener, and is ended once it answers or takes too
-// long. One runs at a time and few wait. Nothing is kept.
+// long. It ends itself past a bound on its memory. One runs at a time and few
+// wait. Nothing is kept.
 import { createHash } from "node:crypto";
 import { type Highlight, type HighlightTarget, noHighlight } from "../../core/src/highlight.ts";
 
-export const HIGHLIGHT_LIMITS = { ms: 20_000, waiting: 8 };
+/** `memory` is the resident bytes at which the reading process ends itself. */
+export const HIGHLIGHT_LIMITS = { ms: 20_000, waiting: 8, memory: 1536 * 1024 * 1024 };
 
 export type LoadedOriginal = { bytes: Buffer; release(): void } | { refused: "original_not_held" | "original_changed" };
 
@@ -18,7 +20,7 @@ export interface Highlighter {
 }
 
 /** What the process is sent. */
-export interface HighlightWork { target: HighlightTarget; bytes: Uint8Array }
+export interface HighlightWork { target: HighlightTarget; bytes: Uint8Array; memory: number }
 
 export function createHighlighter(command: string[], limits: Partial<typeof HIGHLIGHT_LIMITS> = {}): Highlighter {
   const bounds = { ...HIGHLIGHT_LIMITS, ...limits };
@@ -30,28 +32,34 @@ export function createHighlighter(command: string[], limits: Partial<typeof HIGH
   const read = (work: HighlightWork) => new Promise<Highlight>((resolve) => {
     let answer: Highlight | undefined;
     let late = false;
+    // Whether this side ended it. One killed otherwise was ended by its memory guard, or by the system.
+    let ended = false;
+    const end = () => {
+      ended = true;
+      child.kill("SIGKILL");
+    };
     const child = Bun.spawn(command, {
       // What the PDF library prints could quote the file, so it goes nowhere.
       stdin: "ignore", stdout: "ignore", stderr: "ignore", serialization: "advanced",
       ipc(reply: Highlight) {
         answer = reply;
-        child.kill("SIGKILL");
+        end();
       },
-      onExit() {
+      onExit(done) {
         clearTimeout(timer);
         stop = undefined;
-        resolve(answer ?? noHighlight(late ? "too_slow" : "failed"));
+        resolve(answer ?? noHighlight(late ? "too_slow" : !ended && done.signalCode === "SIGKILL" ? "too_much_memory" : "failed"));
       },
     });
     const timer = setTimeout(() => {
       late = true;
-      child.kill("SIGKILL");
+      end();
     }, bounds.ms);
-    stop = () => child.kill("SIGKILL");
+    stop = end;
     try {
       child.send(work);
     } catch {
-      child.kill("SIGKILL");
+      end();
     }
   });
 
@@ -62,7 +70,7 @@ export function createHighlighter(command: string[], limits: Partial<typeof HIGH
     try {
       // The bytes read for this must be the recorded ones, whoever gave them.
       if (createHash("sha256").update(found.bytes).digest("hex") !== target.sha256) return noHighlight("changed");
-      return closed ? noHighlight("failed") : await read({ target, bytes: found.bytes });
+      return closed ? noHighlight("failed") : await read({ target, bytes: found.bytes, memory: bounds.memory });
     } finally {
       found.release();
     }

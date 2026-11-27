@@ -211,7 +211,7 @@ function Marking({ marked }: { marked: Highlight | undefined }) {
   if (marked.state === "boxes") {
     return (
       <p className="stemma-marked">
-        <strong>Highlighted on the original.</strong> The boxes are positions from the PDF’s text layer. Stemma read this page again, found its text equal to the source text, and found those letters drawn there, with nothing it checks for over or under them. It cannot tell whether the printed shapes are the letters the text layer names, so read them. Its file’s SHA-256 is the recorded one.
+        <strong>Highlighted on the original.</strong> The boxes are positions from the PDF’s text layer. Stemma read this page again, found its text equal to the source text, and found glyphs drawn there that the file’s text layer names as those letters, with nothing it checks for over or under them. It cannot tell whether the printed shapes are those letters, so read them. Its file’s SHA-256 is the recorded one.
       </p>
     );
   }

@@ -84,9 +84,12 @@ Each item states its acceptance criterion.
   not establish.
 - **SEC-043**: The local server places a mark on an original only from bytes whose
   digest it has just checked, read again with the pinned pdf.js, where the page's
-  text equals the source file's part and the quoted glyphs are drawn visibly with
-  nothing detected over or under them; any doubt places none. A PDF is read for
-  this in a separate process with no secret, bounded in time and number.
+  text equals the source file's part and the quoted glyphs are drawn visibly, in
+  no font named as one of symbols, with nothing detected over or under them and
+  no annotation that may be seen there; any doubt places none. A PDF is read for
+  this in a separate process with no secret, bounded in time, number, and memory:
+  it is killed once its resident memory passes 1.5 GiB (CONTRACT-005 M,
+  "Bounds"), and then none is placed.
 - **SEC-040**: The MCP server downloads, writes, listens, reads no project
   file, and starts no lasting process until a tool is called; its launcher never
   fetches the runtime for it; and only protocol messages reach its standard
@@ -272,7 +275,7 @@ controls cover only its instructions and its own commands.
 | SEC-041 | Read-only MCP tools; no key or path in or out | G: CONTRACT-005 N; TM-E-010, TM-I-021, TM-S-010 | High | Hostile arguments, output and file searches, lock tests |
 | SEC-042 | Source text through MCP is marked and bounded | G: CONTRACT-005 N; TM-E-011, TM-I-022 | High | Seeded instructions, hidden characters, coordinates |
 | SEC-039 | Originals drawn inert, after their proof | G: CONTRACT-005 M, ADR-012; TM-E-009, TM-D-011 | High | A PDF with script, links, a form, and an attachment; changed answers; the policy |
-| SEC-043 | A mark on an original only where it can be shown right | G: CONTRACT-005 M; TM-T-015, TM-D-013 | High | Each refusal over invented PDFs; boxes compared with rendered pixels |
+| SEC-043 | A mark on an original only where it can be shown right | G: CONTRACT-005 M; TM-T-015, TM-D-013 | High | Each refusal over invented PDFs; boxes compared with rendered pixels; peak memory on files that unpack to gigabytes |
 
 ## Compliance Requirements
 

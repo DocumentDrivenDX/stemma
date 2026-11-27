@@ -115,9 +115,59 @@ interface Glyph {
   shapedClip: boolean;
   /** Its outline lies about where its width says it does. */
   fits: boolean;
+  /** Its font's name says it is one of symbols or pictures. */
+  symbols: boolean;
 }
 
 interface Paint { box: Rect; order: number; white: boolean; image: boolean }
+
+/**
+ * Fonts whose shapes are signs, whatever letters the file's text gives them. The
+ * library does not say whether a file gave a font its own character map, and
+ * nearly every font a program embeds in part is flagged "symbolic", so only the
+ * name is held against it, character map or not.
+ */
+const SYMBOL_FONT = /symbol|dingbats|wingdings|webdings/i;
+
+/** An annotation, as the library reads it. */
+interface Annotation {
+  subtype?: string;
+  annotationFlags: number;
+  rect: number[];
+  hasAppearance?: boolean;
+  color?: ArrayLike<number> | null;
+  borderStyle?: { width?: number; rawWidth?: number; horizontalCornerRadius?: number; verticalCornerRadius?: number };
+}
+const HIDDEN = 2, PRINT = 4, NO_VIEW = 32, TOGGLE_NO_VIEW = 256;
+
+/**
+ * Whether an annotation may be seen on or near these words in a viewer that shows
+ * annotations. Every kind counts, with or without a stored appearance, since
+ * viewers draw many without one. A link or a note's window with none shows
+ * nothing over its area; a link's border is lines along its edges, and counts
+ * where a thick one, or a line at its top or bottom, meets the words.
+ */
+function annotationOn(note: Annotation, box: Rect, core: Rect): boolean {
+  const flags = note.annotationFlags;
+  if (flags & HIDDEN || (flags & NO_VIEW && !(flags & (PRINT | TOGGLE_NO_VIEW)))) return false;
+  const [ax, ay, bx, by] = note.rect as [number, number, number, number];
+  const rect = { x0: Math.min(ax, bx), y0: Math.min(ay, by), x1: Math.max(ax, bx), y1: Math.max(ay, by) };
+  if (!note.hasAppearance && note.subtype === "Popup") return false;
+  if (!note.hasAppearance && note.subtype === "Link") {
+    const border = note.borderStyle ?? {};
+    if (border.width === 0 || !note.color) return false;
+    // The library cuts a width too large for the link down to 1; another viewer may not, so the stated one counts.
+    const width = Math.max(border.width ?? 1, border.rawWidth ?? 1);
+    // Rounded corners take the lines inside the link's area.
+    if (border.horizontalCornerRadius || border.verticalCornerRadius) return meet(rect, box);
+    if (width > 1) {
+      return meet({ x0: rect.x0 - width, y0: rect.y0 - width, x1: rect.x1 + width, y1: rect.y1 + width }, box)
+        && !inside(core, { x0: rect.x0 + width, y0: rect.y0 + width, x1: rect.x1 - width, y1: rect.y1 - width }, 0);
+    }
+    return [rect.y0, rect.y1].some((y) => meet({ x0: rect.x0, y0: y - width, x1: rect.x1, y1: y + width }, core));
+  }
+  return meet(rect, box);
+}
 
 /** The outline's extent in text sizes, or nothing for a glyph that has none. */
 function outlineOf(page: any, font: any, character: string, DRAW: { moveTo: number; lineTo: number; curveTo: number; quadraticCurveTo: number; closePath: number }): Rect | undefined {
@@ -192,6 +242,9 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
   const show = (items: any[], order: number) => {
     const { font, size } = state;
     if (!font) throw new Refused("unknown_drawing");
+    // Without the name nothing says which font this is.
+    if (typeof font.name !== "string") throw new Refused("unknown_drawing");
+    const symbols = SYMBOL_FONT.test(font.name);
     // Vertical glyphs are placed another way, so nothing on the page could be held against them.
     if (font.vertical) throw new Refused("vertical_text");
     if (size === 0) return;
@@ -220,7 +273,7 @@ async function drawing(pdfjs: any, page: any): Promise<{ glyphs: Glyph[]; paints
         blank: !outline && !glyph.accent && /^\s*$/u.test(String(glyph.unicode ?? "")),
         space: /^\s*$/u.test(String(glyph.unicode ?? "")),
         order, mode: state.mode, fill: state.fill, fillAlpha: state.fillAlpha, normalBlend: state.normalBlend,
-        clip: state.clip, shapedClip: state.shapedClip,
+        clip: state.clip, shapedClip: state.shapedClip, symbols,
         // What the canvas does not paint, or shifts by what the browser measures, does not fit.
         fits: glyph.isInFont !== false && !font.missingFile && !font.remeasure && outline !== undefined && ems > 0 && outline.x0 >= -OUTLINE.before && outline.x1 <= ems + OUTLINE.after
           && outline.y0 >= -OUTLINE.down && outline.y1 <= OUTLINE.up,
@@ -410,6 +463,7 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
     if (item.dir === "ttb") throw new Refused("vertical_text");
     if (item.dir !== "ltr") throw new Refused("right_to_left");
     if (!glyph.upright) throw new Refused("rotated_text");
+    if (glyph.symbols) throw new Refused("symbol_font");
     const characters = marks(glyph.unicode);
     if (characters.length > 1 || LIGATURE.test(glyph.unicode)) throw new Refused("ligature");
     const light = brightness(glyph.fill);
@@ -443,6 +497,8 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
   if (runs.length > HIGHLIGHT_BOUNDS.boxes) throw new Refused("too_much");
 
   const others = glyphs.filter((g) => !wanted.has(g) && !g.blank);
+  // Every one, hidden ones too: what is seen is decided here, not by the library.
+  const annotations = (await page.getAnnotations({ intent: "any" })) as Annotation[];
   for (const [i, run] of runs.entries()) {
     if (!inside(run.box, view, 0.5)) throw new Refused("hidden_text");
     // Shrunk a little, so that paint which only comes near does not count.
@@ -460,6 +516,7 @@ async function place(pdfjs: any, page: any, target: HighlightTarget): Promise<Re
       ? run.glyphs.some((q) => area(intersection(g.box, q.core)) > 0.2 * Math.min(area(g.box), area(q.core)))
       : overlaps(g.fits ? g.core : g.box));
     if (others.some(covers) || runs.some((o, j) => j > i && overlaps(o.core))) throw new Refused("overlapping_text");
+    if (annotations.some((note) => annotationOn(note, run.box, held))) throw new Refused("annotation");
   }
   return runs.map((run) => run.box);
 }
@@ -476,6 +533,8 @@ export async function locateOnPage(bytes: Uint8Array, target: HighlightTarget, a
     data: new Uint8Array(bytes),
     cMapUrl: `${join(assets, "cmaps")}/`, cMapPacked: true, standardFontDataUrl: `${join(assets, "standard_fonts")}/`,
     useSystemFonts: false,
+    // Each font's name.
+    fontExtraProperties: true,
     // As the served page draws: each glyph's outline, which is then to be had here.
     disableFontFace: true,
     enableXfa: false, stopAtErrors: true,
