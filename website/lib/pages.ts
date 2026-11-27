@@ -339,8 +339,8 @@ const PROVENANCE: [string, string][] = [
   ["Title, author, publisher, place and year", "Read from the picture of the title page. The computer-read text of that page does not hold the year of publication, so the check says it could not find it."],
   ["The four quotations", "An AI model chose the passages, and a script copied them. The model then compared each with the picture of its page: PDF pages 19, 105 and 106, counting from 0."],
   ["Where the original came from", "The web address it was downloaded from. The time it was obtained is the downloaded file's own date."],
-  ["The text", "The text already inside the Internet Archive's PDF, made by character recognition that nobody has proofread. For the quotations, only the pages named here were compared with their pictures."],
-  ["The page numbers", "Proposed from the numbers printed on the pages. They agree with the Internet Archive's page-number file and with the numbering inside the PDF wherever those give a number. Pictures of a few pages were looked at."],
+  ["The text", "The text already inside the Internet Archive's PDF, made by character recognition that nobody has proofread."],
+  ["The page numbers", "Proposed from the numbers printed on the pages. They agree with the Internet Archive's page-number file and with the numbering inside the PDF wherever those give a number."],
   ["The other works", "Their titles, names and years were read from pictures of their title pages or first pages."],
 ];
 
