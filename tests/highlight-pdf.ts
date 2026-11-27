@@ -9,6 +9,8 @@ import { sha256 } from "@stemma/records";
 export interface Raw {
   /** The page's content stream. /F1 is Helvetica, not embedded. */
   content: string;
+  /** The whole content stream object instead, such as a compressed one. */
+  contents?: string;
   /** More entries of the page, such as /Rotate. */
   page?: string;
   /** More entries of the page's resources. `FONT` in it is replaced by more fonts. */
@@ -25,7 +27,7 @@ export function rawPdf(raw: Raw): Uint8Array {
     "<< /Type /Catalog /Pages 2 0 R >>",
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 5 0 R ${raw.fonts ?? ""} >> ${raw.resources ?? ""} >> /Contents 4 0 R ${raw.page ?? ""} >>`,
-    stream("", raw.content),
+    raw.contents ?? stream("", raw.content),
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
     ...(raw.objects ?? []),
   ];

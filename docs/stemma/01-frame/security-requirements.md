@@ -166,7 +166,10 @@ controls cover only its instructions and its own commands.
 - **SEC-006**: Hostile Word and library fixtures meet every CONTRACT-003 G rule,
   and `doctor` shows the limits.
 - **SEC-007**: Converters of PDF, EPUB, DOCX, HTML, Markdown, and text cap
-  input size, expanded size, part count, and time. They execute no embedded
+  input size, expanded size, part count, and time. A PDF is also read in a
+  process of its own that is killed once its resident memory passes 4 GiB, and
+  the command then names the file and the limit and writes nothing from it
+  (CONTRACT-002 B, "Reading a PDF"). They execute no embedded
   script, disable library code evaluation, expand no external entity, and fetch
   nothing named inside a file.
 - **SEC-032**: Source text can form no Stemma annotation: a `<` in converted

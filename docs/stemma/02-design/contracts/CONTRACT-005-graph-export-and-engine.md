@@ -990,6 +990,8 @@ doubt draws nothing, and the page says why. The text beside it stays highlighted
   not used: it would leave an image out, and one left out could be what covers
   the words. The original it
   reads counts among the two held at once (rule 13). The server keeps no result.
+  The commands that convert an original read it in the same kind of process,
+  under a bound of their own (CONTRACT-002 B, "Reading a PDF").
 - **What this does not show.** That a glyph's outline looks like the character the
   file's text layer gives it: a font can draw one letter and name another, and the
   text, taken from that layer, then agrees with itself. That nothing in a way of

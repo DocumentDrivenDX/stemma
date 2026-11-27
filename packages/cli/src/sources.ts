@@ -77,7 +77,7 @@ export async function sourcePages(options: Options, file: string | undefined): P
     const text = normalizeText(new TextDecoder().decode(layer ?? original.bytes));
     pages = text.split("\f");
   } else {
-    const read = await readPdfCopy(original.bytes);
+    const read = await readPdfCopy(original.bytes, file);
     [pages, embedded] = [read.pages, read.embeddedLabels];
   }
   const proposal = proposalFor(pages, embedded, namedFile(base, options["page-numbers"], LIMITS.page_map_bytes));
@@ -102,6 +102,8 @@ export interface ConvertRequest {
   root: string;
   corpus: Corpus;
   originals: Original[];
+  /** The first original as the caller named it. */
+  named: string;
   options: Options;
   actor: { kind: "person" | "model" | "software"; name: string };
   identity?: JsonObject;
@@ -153,7 +155,7 @@ export async function convertAndWrite(request: ConvertRequest) {
     if (tool) converted.tools = [tool, ...converted.tools.filter((t) => t.name !== "unknown" && t.name !== tool.name)];
     if (method === "ocr") converted.recognition = options.recognition ?? `${tool!.name} ${tool!.version}`;
     // Whether the supplied pages are all of the original's pages is known only where they can be counted.
-    const count = original?.media_type === "application/pdf" ? (await readPdfCopy(original.bytes)).pages.length : undefined;
+    const count = original?.media_type === "application/pdf" ? (await readPdfCopy(original.bytes, request.named)).pages.length : undefined;
     if (count !== undefined && converted.parts.length === count && !transcription) converted.page_count = count;
     else {
       delete converted.page_count;
@@ -164,7 +166,7 @@ export async function convertAndWrite(request: ConvertRequest) {
     } else if (options["auto-pages"]) throw usageError("--auto-pages reads a file's own text; give a page map for a supplied text.");
   } else {
     if (method === "manual") throw usageError("--method manual describes a supplied text.");
-    const done = await convertOriginal(original!, {
+    const done = await convertOriginal({ ...original!, name: request.named }, {
       recognized: method === "ocr", ...(segments ? { pageMap: segments } : {}), ...(options["auto-pages"] ? { autoPages: true } : {}),
       ...(options["page-numbers"] ? { pageNumbers: namedFile(base, options["page-numbers"], LIMITS.page_map_bytes)! } : {}),
     });
@@ -231,7 +233,7 @@ export async function sourceConvert(given: Options, files: string[]): Promise<nu
   if (!options["acquired-at"] || !TIME.test(options["acquired-at"])) {
     throw usageError("source convert records when you got the original and does not guess it: give --acquired-at, for example 2026-01-05T09:58:00Z.");
   }
-  const { plan, converted, labelled, repeated } = await convertAndWrite({ root, corpus, originals, options, actor });
+  const { plan, converted, labelled, repeated } = await convertAndWrite({ root, corpus, originals, named: files[0] ?? given.image?.[0] ?? "", options, actor });
   if (repeated) {
     emit(options, { source: plan.source, text: plan.text, directory: plan.directory, written: false }, `This conversion is already held as ${plan.text} in ${plan.directory}/. Nothing was written.\n`);
     return 0;
@@ -281,7 +283,7 @@ export function sourceSeal(options: Options, text: string | undefined): number {
 
 /** Converts an original again with a source file's recorded settings and compares each part. */
 export async function reconvert(
-  root: string, corpus: Corpus, id: string, original: Original, actor: ConvertRequest["actor"],
+  root: string, corpus: Corpus, id: string, original: Original & { name: string }, actor: ConvertRequest["actor"],
   /** A current comparison, when one exists: a result that repeats it is not recorded again. */
   standing?: JsonObject,
 ) {
@@ -323,7 +325,7 @@ export async function sourceVerify(options: Options, id: string | undefined): Pr
   const root = requireProject(options);
   const corpus = openCorpus(root);
   const original = readOriginal(resolve(root, options.original), LIMITS.input_bytes);
-  const done = await reconvert(root, corpus, id, original, actor);
+  const done = await reconvert(root, corpus, id, { ...original, name: options.original }, actor);
   if (!done.reconvertible) {
     emit(options, { text: id, original_matches: true, ...done }, "The file is the recorded original: its digest matches. Its text was supplied by a tool or typed, so Stemma cannot make it again; compare it with `source compare` or record a review.\n");
     return 0;

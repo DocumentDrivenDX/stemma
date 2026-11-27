@@ -1,12 +1,14 @@
 // Turns an original into what a source file holds, the same way for a new
 // capture and for a later comparison with the original.
 import {
-  applyPageMap, autoSegments, type ConvertedInput, InvalidInput, LIMITS, parsePageNumbers, type Proposal, proposePageMap, normalizeText,
+  applyPageMap, autoSegments, type ConvertedInput, InvalidInput, LIMITS, parsePageNumbers, type Proposal, proposePageMap, normalizeText, printable,
 } from "@stemma/core";
 import {
-  type Converted, convertMarkupOrText, convertPdf, converterTool, type Label, type PdfText, PdfUnreadable, readPdf, textBlock, Unconvertible, withoutStamps,
+  type Converted, convertMarkupOrText, convertPdf, converterTool, type Label, type PdfText, type PdfUnreadable, textBlock, Unconvertible, withoutStamps,
 } from "@stemma/extract";
 import type { PageSegment } from "@stemma/records";
+import { workerCommand } from "./browse.ts";
+import { readInOwnProcess } from "./pdf-reading.ts";
 
 const PDF_PROBLEMS: Record<PdfUnreadable["problem"], string> = {
   encrypted: "This PDF is encrypted and needs a password, so it was not read.",
@@ -16,13 +18,20 @@ const PDF_PROBLEMS: Record<PdfUnreadable["problem"], string> = {
   too_slow: `Reading this PDF passed the time limit of ${LIMITS.conversion_seconds} seconds, so it was stopped.`,
 };
 
-export async function readPdfCopy(bytes: Uint8Array): Promise<PdfText> {
-  try {
-    return await readPdf(bytes, { pages: LIMITS.parts, text_bytes: LIMITS.text_bytes, milliseconds: LIMITS.conversion_seconds * 1000 });
-  } catch (error) {
-    if (!(error instanceof PdfUnreadable)) throw error;
-    throw new InvalidInput(`${PDF_PROBLEMS[error.problem]}`);
-  }
+const tooMuchMemory = (name: string, bytes: number): string => (
+  `Reading the PDF ${printable(name)} needed more than the limit of ${bytes / 1073741824} GiB of memory, so it was stopped. `
+  + "A PDF can unpack to far more than its own size: this one may be damaged, made to do that, or unusually heavy. "
+  + "If you trust it, save a new copy of it with another program, or split it into smaller files, and use that.");
+
+/** `name` is the file as the caller named it, for what is said when it cannot be read. */
+export async function readPdfCopy(bytes: Uint8Array, name: string): Promise<PdfText> {
+  const memory = LIMITS.pdf_memory_bytes;
+  const reply = await readInOwnProcess(workerCommand("highlight-worker"), {
+    bytes, memory, limits: { pages: LIMITS.parts, text_bytes: LIMITS.text_bytes, milliseconds: LIMITS.conversion_seconds * 1000 },
+  });
+  if ("text" in reply) return reply.text;
+  if ("failed" in reply) throw new Error(reply.failed);
+  throw new InvalidInput(reply.problem === "too_much_memory" ? tooMuchMemory(name, memory) : PDF_PROBLEMS[reply.problem]);
 }
 
 export function proposalFor(pages: string[], embedded?: string[], pageNumbers?: Uint8Array): Proposal {
@@ -55,10 +64,10 @@ function autoNotes(proposal: Proposal, dropped: PageSegment[]): string[] {
   ];
 }
 
-export async function convertOriginal(original: { bytes: Uint8Array; media_type: string }, options: ConversionOptions): Promise<Conversion> {
+export async function convertOriginal(original: { bytes: Uint8Array; media_type: string; name: string }, options: ConversionOptions): Promise<Conversion> {
   try {
     if (original.media_type === "application/pdf") {
-      const read = await readPdfCopy(original.bytes);
+      const read = await readPdfCopy(original.bytes, original.name);
       let segments = options.pageMap;
       let notes: string[] = [];
       if (!segments && options.autoPages) {

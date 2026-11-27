@@ -1,43 +1,42 @@
-// The process that reads one page of an original to place a highlight
-// (CONTRACT-005 M, "Highlighting on originals"). The local server starts one for
-// each page, sends it the file's bytes and what to look for, and ends it. It
-// opens no listener, gets no secret, makes no request, and writes nothing.
+// The process that reads a PDF, under a bound on its memory. It does one of two
+// jobs: the whole text of an original for a command that converts or compares it
+// (CONTRACT-002 B, "Reading a PDF"), or one page to place a highlight
+// (CONTRACT-005 M, "Highlighting on originals"). A command or the local server
+// starts one for each job, sends it the file's bytes, and ends it. It opens no
+// listener, gets no secret, makes no request, and writes no file.
+import { PdfUnreadable, readPdf } from "../../extract/src/index.ts";
 import { locateOnPage } from "../../extract/src/pdf-highlight.ts";
 import { noHighlight } from "../../core/src/highlight.ts";
 import type { HighlightWork } from "../../server/src/highlighter.ts";
+import { guard } from "./memory-guard.ts";
+import type { ReadReply, ReadWork } from "./pdf-reading.ts";
 
-// The memory guard. Reading a small PDF can take gigabytes in about a second
-// (images that unpack far larger than the file), and the library unpacks them
-// without yielding, so a timer beside it would not run. This looks from a thread
-// of its own, and ends the whole process at once.
-const GUARD = `onmessage = (event) => {
-  const look = () => { if (process.memoryUsage.rss() > event.data) process.kill(process.pid, "SIGKILL"); };
-  look();
-  setInterval(look, 5);
-  postMessage("watching");
-};`;
-
-/** Resolves once the guard is looking. A page is never read without it. */
-function guard(most: number): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!(most > 0)) return reject(new Error("no bound"));
-    const thread = new Worker(URL.createObjectURL(new Blob([GUARD], { type: "text/javascript" })));
-    let watching = false;
-    const lost = () => (watching ? process.kill(process.pid, "SIGKILL") : reject(new Error("no guard")));
-    thread.addEventListener("error", lost);
-    thread.addEventListener("close", lost);
-    thread.addEventListener("message", () => {
-      watching = true;
-      resolve();
-    });
-    thread.postMessage(most);
-  });
+async function loadQuietly(): Promise<void> {
+  const { log, warn } = console;
+  console.log = console.warn = () => {};
+  try {
+    await import("pdfjs-dist/legacy/build/pdf.mjs");
+  } finally {
+    Object.assign(console, { log, warn });
+  }
 }
 
+async function whole(work: ReadWork): Promise<ReadReply> {
+  try {
+    await guard(work.memory);
+    if (work.loadedBefore) await loadQuietly();
+    return { text: await readPdf(work.bytes, work.limits) };
+  } catch (error) {
+    if (error instanceof PdfUnreadable) return { problem: error.problem };
+    return { failed: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+const page = (work: HighlightWork) => guard(work.memory)
+  .then(() => locateOnPage(work.bytes, work.target))
+  .catch(() => noHighlight("failed"));
+
 process.on("disconnect", () => process.exit(0));
-process.once("message", (work: HighlightWork) => {
-  void guard(work.memory)
-    .then(() => locateOnPage(work.bytes, work.target))
-    .catch(() => noHighlight("failed"))
-    .then((answer) => process.send!(answer));
+process.once("message", (work: HighlightWork | ReadWork) => {
+  void ("limits" in work ? whole(work) : page(work)).then((answer) => process.send!(answer));
 });

@@ -231,7 +231,7 @@ modules, or the product owner for accepted risks.
 
 | ID | Threat | I | L | Score | Owner | Controls |
 |----|--------|---|---|-------|-------|----------|
-| TM-D-001 | Archive bombs, deep XML, huge fields, or hostile PDFs and images exhaust memory or time | 2 | 3 | 6 | `intake`, `extract` | SEC-006, SEC-007 |
+| TM-D-001 | Archive bombs, deep XML, huge fields, or hostile PDFs and images exhaust memory or time | 2 | 3 | 6 | `intake`, `extract` | SEC-006, SEC-007. A PDF of a few KB can take gigabytes: every command that parses one reads it in a separate process killed past 4 GiB of resident memory (CONTRACT-002 B). Up to that much can still be taken, the system's own figure was seen at 4.8 GiB, and compressed and swapped pages are not counted. Versions 0.0.17 and earlier have no such bound. Other formats have expanded-size caps and no memory bound |
 | TM-D-002 | The restricted store is lost, and coordinates are gone | 4 | 3 | 12 | Author | SEC-019 |
 | TM-D-003 | A bad record or merge keeps parts of a build unreadable or stops a tool | 2 | 3 | 6 | `records` | SEC-008; named errors |
 | TM-D-004 | A very large export or comment file hangs the explorer or import | 2 | 2 | 4 | `explorer`, `core` | SEC-008; chapter scope |
@@ -240,7 +240,7 @@ modules, or the product owner for accepted risks.
 | TM-D-007 | Pathological content stalls citation formatting or Typst | 2 | 2 | 4 | `publish` | None specific |
 | TM-D-008 | Injected or oversized text makes the agent loop, spend, or stop | 2 | 2 | 4 | Author | Bounded excerpts |
 | TM-D-009 | The index is corrupt or stale | 1 | 2 | 2 | `graph` | Rebuilt from records |
-| TM-D-013 | A hostile PDF, or many requests, takes the computer's memory or time while the server places a mark | 2 | 2 | 4 | `server` | SEC-043: a separate process ended after 20 seconds, one at a time, a bounded queue, operator and glyph bounds, and killed past 1.5 GiB of resident memory, which it can pass by a few hundred MB; compressed and swapped pages are not counted. The command line's conversion of an original is not so bounded |
+| TM-D-013 | A hostile PDF, or many requests, takes the computer's memory or time while the server places a mark | 2 | 2 | 4 | `server` | SEC-043: a separate process ended after 20 seconds, one at a time, a bounded queue, operator and glyph bounds, and killed past 1.5 GiB of resident memory, which it can pass by a few hundred MB; compressed and swapped pages are not counted. The command line's reading of a whole original has its own, higher bound (TM-D-001) |
 | TM-D-011 | A hostile or very large original takes the memory or time of the server or the page | 2 | 2 | 4 | `server`, `explorer` | SEC-039: size limit before reading, two originals held at once, bounded canvas, image pixels, and drawing time |
 | TM-D-010 | Oversize, slow, or many requests, from a web page or another local user, stall the local server | 2 | 2 | 4 | `server` | SEC-036 bounds, including a search's work and answer size (CONTRACT-005 M, rule 13). Another user can still use up the connection limit while it connects; the author loses browsing, not data |
 | TM-D-012 | An MCP server slows or breaks every session with the plugin, or steered calls make it build, open windows, or answer without end | 2 | 2 | 4 | `cli`, `server` | SEC-040: nothing is done until asked; calls run one at a time with a short queue and bounded lines and results; `open` is rate limited. Building a large project's data takes the memory CONTRACT-005 records |

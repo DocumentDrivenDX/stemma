@@ -85,7 +85,7 @@ absent (exit 4 if it cannot) and then runs
 | `migrate --list` / `migrate --apply <list digest>` | Move a project to a newer format (Data Design), only when the author asks. `--list` writes nothing and prints every file change and the review marks, support records, confirmations, and annotations that would end, with a digest of that list. `--apply` writes only when the digest still matches, otherwise exits 5 with `stale_input`. Neither prompts | With the first format change |
 | `ingest [--plan <file>] [--originals <dir>]... [--fetch] [--reconvert] [--refresh-lookups] --actor <kind>:<name>` | Run stages 1 and 2 (Core Pipeline). For each plan entry not yet captured, take the original from the named file or fetch its address, record an `upstream`, and convert it with the entry's settings, proposing page labels from the printed numbers. For every upstream record, find the original by hash in `.stemma/originals/` and the `--originals` directories, or fetch it with `--fetch`; convert it again and record the comparison when no current one exists; with `--reconvert`, convert every one again, and record a comparison only where the result differs from the current one. With `--fetch`, make each lookup an upstream lists that has no saved response; `--refresh-lookups` makes all of them again. Then run `check` and print its report and coverage. A refused or failed fetch is reported with what to supply; nothing is retried another way | M1 |
 | `source pages <original> [--text-layer <file>] [--page-numbers <file>] [--out <file>]` | Propose a page map from the numbers printed in the pages' own text. It writes nothing in the project; `--out` writes a `PageSegment` list to a file that does not exist yet. Page-number data (an Internet Archive page-number file, or a list of `{"page_index", "label"}`) and labels stated inside the file are compared and reported; they label nothing on their own. A warning names labels that more than one page would carry | M1 |
-| `source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>] [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]... [--text-layer <file> \| --transcription <file>] [--method born_text\|text_layer\|markup\|ocr\|manual] [--recognition <text>] [--tool <name> --tool-version <version>] [--page-map <file> \| --auto-pages] [--page-numbers <file>] [--identity <file>] [--coverage-note <text>] [--note <text>] [--name <name>]` | Convert an original into a new source file (CONTRACT-007). Without an original file, a `physical` original needs `--description`, `--held-at`, and a transcription; page images (`--image`) need a transcription too. Text with nothing but white space, an encrypted or damaged file, or a limit passed exits 5 and writes nothing. When a source file already holds the same original for another source, nothing is merged: the command exits 5 with `already_held`. `--auto-pages` applies the proposed runs, dropping a run whose labels a longer run also gives, and reports each dropped run | M1 |
+| `source convert [<original>] --source <id> --acquired-at <time> --actor <kind>:<name> [--origin <text>] [--source-version <text>] [--held-at <text>] [--description <text>] [--image <file>]... [--text-layer <file> \| --transcription <file>] [--method born_text\|text_layer\|markup\|ocr\|manual] [--recognition <text>] [--tool <name> --tool-version <version>] [--page-map <file> \| --auto-pages] [--page-numbers <file>] [--identity <file>] [--coverage-note <text>] [--note <text>] [--name <name>]` | Convert an original into a new source file (CONTRACT-007). Without an original file, a `physical` original needs `--description`, `--held-at`, and a transcription; page images (`--image`) need a transcription too. Text with nothing but white space, an encrypted or damaged file, or a limit passed (for a PDF, also its memory bound: B, "Reading a PDF") exits 5 and writes nothing. When a source file already holds the same original for another source, nothing is merged: the command exits 5 with `already_held`. `--auto-pages` applies the proposed runs, dropping a run whose labels a longer run also gives, and reports each dropped run | M1 |
 | `source label <text id> --page-map <file> --actor <kind>:<name>` | Replace a source file's page labels from a page map; text is unchanged | M1 |
 | `source seal <text id> --actor person:<name> [--note <text>]` | Record edits made to part files: update part digests and stamp `changed`. It reports the reviews, comparisons, and passages that the edit made stale. A model or software actor is refused | M1 |
 | `source verify <text id> --original <file> --actor <kind>:<name>` | Match the file's hash with the source file's original, convert it again with the recorded settings, compare each part (with person corrections undone), and save a `comparison_run` | M1 |
@@ -161,6 +161,45 @@ input. Reverse-reference closure alone is not enough: removing an attestation or
 renaming a key changes subjects that no reference reaches. With no baseline, or
 when the effect cannot be bounded, the scope widens to `all`. Builds ignore the
 baseline and run everything.
+
+**Reading a PDF** (as built). `source pages` without `--text-layer`, `source
+convert` of a PDF original (also with `--transcription` or `--text-layer`, which
+count its pages), `source verify`, and `ingest` (when it captures and when it
+compares again) parse a PDF. `source capture` and `check` do not. Each reading
+is made in a process of its own, which gets the file's bytes, opens no listener,
+makes no request, and writes no file. What the PDF library prints while it loads
+is printed for a command's first reading only.
+
+- **Memory bound.** A few KB of PDF can unpack to gigabytes, and the library
+  unpacks them without yielding. A thread of the reading process, started before
+  anything is read, looks at its resident memory every 5 ms and kills it once it
+  is over 4 GiB (4,294,967,296 bytes; `doctor` shows it). Without that thread
+  nothing is read. The command then names the file as the caller named it (for
+  `ingest` comparing again, the path where it found the original) and the limit,
+  and exits 5. No setting raises the limit.
+- **Time.** The 300-second limit is looked at between pages; the process is
+  also ended 10 seconds past it, which covers a single page that does not end.
+- **What is written.** The command that reads writes nothing from a reading
+  that fails. `ingest` stops there: the source files and records it finished
+  before stay, and it can keep a whole copy of the file it was capturing in the
+  ignored `.stemma/originals/`.
+- **How the limit was chosen** (one macOS system, Apple silicon; the system's
+  peak resident figure for the reading process). The 14 originals of the worked
+  example, 2.7 to 62 MB with 5,022 pages, needed at most 901 MiB (836 pages).
+  Invented books needed more: 5,000 pages with 450 separately placed words
+  each, 3.1 GiB; a scan of 494 MiB and 900 pages, near the input limit, 3.8
+  GiB, of which the thread saw about 3.1 GiB. A file that needs more than the
+  bound is not read, even if it is a real book; none is known.
+- **What the bound does not do.** The process passes it by what is taken between
+  two looks. The system's peak figure also counts memory the process has freed
+  and the system has not taken back, which the thread's figure leaves out: with
+  crafted files of a few KB, that figure reached 4.8 GiB before the process was
+  killed. Pages the system has compressed or swapped out are not counted. The
+  bound does not include the command that started the reading, which holds the
+  file and the text it gets back (at most 2.3 GiB in the runs above). A
+  computer with less free memory than that can still run short. On Linux and
+  Windows the bound is untested; where a system does not report that the
+  process was killed, the command still stops, with exit 70.
 
 ### B1. Unreviewed records and review marks
 

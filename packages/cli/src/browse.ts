@@ -42,7 +42,7 @@ export const highlightCommand = (): string[] => workerCommand("highlight-worker"
 
 export function workerCommand(name: "browse-worker" | "highlight-worker" = "browse-worker"): string[] {
   const worker = join(import.meta.dir, `${name}.${fromSource() ? "ts" : "js"}`);
-  if (!existsSync(worker)) throw new CommandError(70, "worker_missing", "This copy of Stemma lacks part of its local server, so nothing was served. Install Stemma again.", [worker]);
+  if (!existsSync(worker)) throw new CommandError(70, "worker_missing", "This copy of Stemma lacks one of its parts, so this was not done. Install Stemma again.", [worker]);
   return [process.execPath, ...ISOLATION_FLAGS, worker];
 }
 

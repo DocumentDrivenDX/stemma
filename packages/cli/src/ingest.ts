@@ -11,7 +11,7 @@ import {
   cacheOriginal, FetchRefused, fetchBytes, findOriginal, mediaType, type Original, randomToken, readOriginal, writeProjectFile,
 } from "@stemma/workspace";
 import { createHash } from "node:crypto";
-import { namedFile, openCorpus, type Options, requireActor, requireProject, tools, usageError, USER_AGENT } from "./context.ts";
+import { CommandError, namedFile, openCorpus, type Options, requireActor, requireProject, tools, usageError, USER_AGENT } from "./context.ts";
 import { convertAndWrite, lookUp, reconvert } from "./sources.ts";
 
 const list = (value: unknown): JsonObject[] => (Array.isArray(value) ? value.filter(isObject) : []);
@@ -37,6 +37,12 @@ const asOriginal = (bytes: Uint8Array, name: string): Original => {
   if (!type) throw new InvalidInput(`What was fetched from ${name} is not a kind of file Stemma reads.`);
   return { bytes, sha256: createHash("sha256").update(bytes).digest("hex"), size: bytes.length, media_type: type };
 };
+
+/** A file that cannot be converted stops ingest. What it finished before that file is whole, and stays. */
+const during = <T>(work: Promise<T>): Promise<T> => work.catch((error) => {
+  if (!(error instanceof InvalidInput)) throw error;
+  throw new CommandError(5, "invalid_input", `${error.message} No source file or record was written for it; what ingest wrote before it stays.`);
+});
 
 export async function ingest(options: Options, check: (options: Options) => number): Promise<number> {
   const actor = requireActor(options, "ingest records who ran it");
@@ -106,8 +112,8 @@ export async function ingest(options: Options, check: (options: Options) => numb
       && list((t.manifest.data!.original as JsonObject).files).some((f) => f.sha256 === original.sha256));
     if (!held) {
       const convert = isObject(entry.convert) ? entry.convert : {};
-      const done = await convertAndWrite({
-        root, corpus, originals: [original], actor,
+      const done = await during(convertAndWrite({
+        root, corpus, originals: [original], named: file ?? url!, actor,
         ...(isObject(convert.identity) ? { identity: convert.identity } : {}),
         options: {
           format: "json", source, "acquired-at": retrieved!, origin: url ?? text(convert.obtained_from) ?? "supplied by the author",
@@ -119,7 +125,7 @@ export async function ingest(options: Options, check: (options: Options) => numb
           ...(text(convert.page_map) ? { "page-map": resolve(base, text(convert.page_map)!) } : original.media_type === "application/pdf" ? { "auto-pages": true } : {}),
           ...(pageNumbers ? { "page-numbers": pageNumbers } : {}),
         },
-      });
+      }));
       say(`  ${label}: ${done.plan.parts} ${done.plan.paged ? "pages" : "sections"} written to ${done.plan.directory}/ (${done.converted.method}${done.plan.paged ? `, ${done.labelled} labelled` : ""})`);
     }
     writeProjectFile(root, recordPath("upstream", id), canonical(upstream));
@@ -158,13 +164,13 @@ export async function ingest(options: Options, check: (options: Options) => numb
       continue;
     }
     // The digest was matched when the file was found; it is read as that kind of original.
-    const original = { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type) };
+    const original = { ...readOriginal(path, LIMITS.input_bytes), media_type: String(data.media_type), name: path };
     for (const { id, loaded, standing } of todo) {
       if (!loaded.usable) {
         say(`  ${label}: ${loaded.directory} is damaged, so it was not compared.`);
         continue;
       }
-      const done = await reconvert(root, openCorpus(root), id, original, actor, standing);
+      const done = await during(reconvert(root, openCorpus(root), id, original, actor, standing));
       if (!done.reconvertible) say(`  ${label}: its text was supplied, so it cannot be made again from the original.`);
       else {
         compared++;

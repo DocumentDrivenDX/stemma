@@ -125,7 +125,7 @@ Full report: $DEMO/book/.stemma/reports/check.json
 $ stemma source pages $DEMO/materials/ledger-scan.pdf --project $DEMO/book
 Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- <plugin root>/dist/pdf-71vhnt0w.js".
+- <plugin root>/dist/highlight-worker.js".
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 Proposed page map, for review. Nothing in the project was changed. The file has 1 pages.
@@ -139,7 +139,7 @@ Add --out <file> to save the proposed map.
 $ stemma source convert $DEMO/materials/ledger-scan.pdf --actor person:demo-author --acquired-at 2026-01-05T09:00:00Z --origin "my own scan" --source src-demo0ledger001 --text-layer $DEMO/materials/ledger-text-layer.txt --method ocr --tool invented-ocr --tool-version 1.0 --page-map $DEMO/materials/ledger-page-map.json --project $DEMO/book
 Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- <plugin root>/dist/pdf-71vhnt0w.js".
+- <plugin root>/dist/highlight-worker.js".
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 Wrote the source file txt-random0001 to sources/ledger1911/
@@ -197,7 +197,7 @@ The PDF library's warnings are shown as it prints them: the plugin ships no nati
 $ stemma ingest --plan $DEMO/plan.json --actor person:demo-author --project $DEMO/quoting-book
 Warning: Cannot load "@napi-rs/canvas" package: "ResolveMessage: Cannot find module '@napi-rs/canvas'
 Require stack:
-- <plugin root>/dist/pdf-71vhnt0w.js".
+- <plugin root>/dist/highlight-worker.js".
 Warning: Cannot polyfill `DOMMatrix`, rendering may be broken.
 Warning: Cannot polyfill `Path2D`, rendering may be broken.
 == 1. Capture

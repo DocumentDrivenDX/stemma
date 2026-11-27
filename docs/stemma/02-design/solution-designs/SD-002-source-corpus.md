@@ -224,7 +224,7 @@ Security (BR-213) is tested with traversal names, oversized and zip-bomb contain
 - [ ] PDF structure rules are conservative: most scanned pages keep paragraphs, notes, and headings undetermined.
 - [ ] The staged multi-file write is not built; an interrupted conversion can leave a partial directory, which `source.pages` or `record.valid` reports.
 
-**Hostile input limits.** Starting caps, as design assumptions to test and report through `doctor`: original 500 MiB; 5,000 pages or sections; converted text 100 MiB; expanded container 400 MiB with each entry at most 100 MiB; 300 s per conversion. A fetch accepts HTTPS only, at most 200 MiB, 300 s, and 5 redirects, and rejects loopback, link-local, and private addresses after each redirect (SEC-013). Exceeding a cap writes nothing and says which cap.
+**Hostile input limits.** Starting caps, as design assumptions to test and report through `doctor`: original 500 MiB; 5,000 pages or sections; converted text 100 MiB; expanded container 400 MiB with each entry at most 100 MiB; 300 s per conversion; 4 GiB of resident memory for the process that reads a PDF (CONTRACT-002 B, "Reading a PDF"). The converters of other formats have no memory bound of their own. A fetch accepts HTTPS only, at most 200 MiB, 300 s, and 5 redirects, and rejects loopback, link-local, and private addresses after each redirect (SEC-013). Exceeding a cap writes nothing and says which cap.
 
 ## Concern Alignment
 

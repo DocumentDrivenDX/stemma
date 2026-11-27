@@ -7,7 +7,7 @@
 import { createHash } from "node:crypto";
 import { type Highlight, type HighlightTarget, noHighlight } from "../../core/src/highlight.ts";
 
-/** `memory` is the resident bytes at which the reading process ends itself. */
+/** `memory` is the resident bytes at which the reading process ends itself (the same process reads whole originals, under a bound of its own). */
 export const HIGHLIGHT_LIMITS = { ms: 20_000, waiting: 8, memory: 1536 * 1024 * 1024 };
 
 export type LoadedOriginal = { bytes: Buffer; release(): void } | { refused: "original_not_held" | "original_changed" };

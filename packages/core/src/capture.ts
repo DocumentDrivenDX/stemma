@@ -21,6 +21,8 @@ export interface RecordWrite extends FileWrite { id: string }
 export const LIMITS = {
   input_bytes: 500 * 1024 * 1024, parts: 5000, text_bytes: 100 * 1024 * 1024, page_map_bytes: 5 * 1024 * 1024,
   conversion_seconds: 300,
+  // The resident memory at which the process that reads an original PDF ends itself.
+  pdf_memory_bytes: 4 * 1024 * 1024 * 1024,
 };
 
 const time = (now: Date) => now.toISOString().replace(/\.\d+Z$/, "Z");

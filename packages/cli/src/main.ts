@@ -172,7 +172,7 @@ function doctor(options: Options): number {
     `Working directory: ${info.working_directory}`,
     `Project: ${project || "none named"}`,
     `Platform: ${info.platform}. ${info.platform_status}`,
-    `Limits on originals: ${LIMITS.input_bytes / 1048576} MiB a file, ${LIMITS.text_bytes / 1048576} MiB of text and ${LIMITS.parts} pages or sections.`,
+    `Limits on originals: ${LIMITS.input_bytes / 1048576} MiB a file, ${LIMITS.text_bytes / 1048576} MiB of text and ${LIMITS.parts} pages or sections. Reading a PDF is stopped past ${LIMITS.pdf_memory_bytes / 1073741824} GiB of memory.`,
     missing.length === 0
       ? "Start flags: no run-time downloads, and no .env or bunfig.toml is loaded."
       : `WARNING: started without ${missing.join(" ")}. A .env or bunfig.toml in the working directory could run code or change settings.`,
