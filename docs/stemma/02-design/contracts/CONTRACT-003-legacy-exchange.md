@@ -62,6 +62,12 @@ it `untested`.
 5. Import is atomic: on error, no record is written.
 6. A repeated import of identical bytes is reported and writes nothing without
    `--again`.
+7. A failed import names the line of each fault the codec can locate, and the
+   entry's key when it has one. After a fault the codec SHOULD resume at the
+   next entry it can find, so that several faults are named at once, and MUST
+   say how many entries it accounted for, read and unread. Text is read as
+   UTF-8, with or without a byte-order mark; other bytes are an error naming
+   the line.
 
 ### C. Same information
 
@@ -86,15 +92,57 @@ Format rules:
   compare as TeX source after removing the outer delimiters. Inner braces,
   commands, and `verbatim`-type field bytes are significant. `crossref`,
   `xdata`, and `related` stay as fields. No LaTeX is executed.
+  - A value is preserved with `encoding` `tex`: `#` parts are joined and each
+    `@string` macro defined earlier in the file is replaced by its value.
+  - A value that uses a macro with no such definition, the month macros
+    included, has no known value. It is preserved with `encoding` `raw` as an
+    expression: each unknown name as written, each other part in braces, joined
+    by ` # `. It is not mapped to a record field, except a month read as part
+    of a date. The report lists the unknown names other than months.
+  - Text between entries is a comment. Outside entries, `%` starts a comment
+    that runs to the end of its line, so a commented-out entry stays a comment.
+    A `%` comment between the fields of an entry is kept as a file-level
+    comment. (Assumption: no BibTeX or Biber reader was run to confirm either
+    `%` rule.) A line that starts with `@` and a word, with no opening
+    delimiter after it, is an error.
+  - A repeated field in one entry is kept, in order, and reported. An entry
+    with no key is an error.
 - **RIS**: tags and their order of repetition per record, and values exactly,
   after joining continuation lines by the producer's rule. The report names the
   detected variant. A line the codec cannot attribute to a tag is kept as a
   block and fails the import if it cannot be placed.
+  - A tag line is two characters (a capital, then a capital or digit), two
+    spaces, a hyphen, and a space or the end of the line. A record starts at
+    `TY` and ends at `ER`.
+  - Until a producer's rule is established from its real files, one rule
+    applies: inside a record, a line that is not a tag line continues the value
+    above it, joined by a line feed. Empty lines just before a tag line are
+    dropped; other characters are kept. Line endings are read as line feeds.
+  - Text outside records is kept as `header` blocks before the first record
+    and `other` blocks after it. Outside a record, a line that starts like a
+    tag, whatever its spacing, is an error, as are a `TY` inside an open record
+    and a file that ends inside one. Inside a record, a line that starts like a
+    tag with other spacing is a continuation, and is reported.
+- **CSL-JSON**, as preserved: each member of an item is one `LegacyField` with
+  `encoding` `json`, holding the value's own source text. The file is an array
+  of objects; anything else is an error.
 
 Equivalence MUST be tested by an equivalence comparator that is independent of
 the exporter, and, where a native reader exists, by that reader as well.
 
 ### D. Export after edits
+
+`mapped_to` is one of `title`, `issued`, `contributions/<role>`,
+`dates/<variable>`, `bib/<name>`, or `identifiers/<scheme>`. The mapped value
+that `mapped_sha256` covers is, in that order: the title; the issue date; the
+array of that role's `as_printed` names, in order; the date; the `bib` value; or
+the array of that scheme's identifier values. Several preserved fields, such as
+a repeated author tag, or a year and a month, MAY map to one path and then share
+its digest. The record's `type` has no `mapped_to`: it is mapped from the
+native entry type.
+
+An exporter that cannot yet produce a native value for an edited record MUST NOT
+emit the stale one: it writes no output and names the records and paths.
 
 For each preserved field with `mapped_to`: if the current mapped value's digest
 equals `mapped_sha256`, export the preserved native value; otherwise generate
@@ -179,17 +227,94 @@ Model-proposed parses MAY be added only as unreviewed records with a `model`
 actor, saved before any deterministic step reads them, and each parsed string MUST align to a
 span of the document text.
 
+**The Word reader** (items 1, 3, and 4; SD-015 BR-1502 and BR-1503). It takes
+the file's bytes and returns paragraphs in document order, comments, fields,
+tracked changes, reported items, and a disposition for every archive part. It
+writes nothing and fetches nothing. These rules are design assumptions until
+tests on files saved by real tools pass.
+
+- **Parts.** The main document is the one the package relationships name, and
+  its footnotes, endnotes, comments, and styles are those its own
+  relationships name. A file with no relationship part is read by Word's usual
+  names. Each part is exactly one of: **read** (the main document, notes, and
+  comments); **reported** (any other XML or text part, such as headers,
+  footers, document properties, custom data, charts, diagrams, a glossary, or
+  an imported chunk, whose text is reported and not converted); **not read**
+  (any other part, such as an image or embedded object, reported by name); or
+  **support** (package, relationship, style, numbering, setting, font, theme,
+  and comment-threading parts, which are taken to hold no document text and are
+  not examined for any).
+- **Revision view.** Insertions and move destinations are applied. Deletions,
+  move sources, and deleted table rows and cells are removed. A paragraph whose
+  paragraph mark is deleted or moved away joins the next paragraph of the same
+  container, which gives the joined paragraph its style. Current formatting is
+  used. Each tracked change is reported with its position and any stated author
+  and date. Removed text appears nowhere in the reading.
+- **Paragraphs.** A paragraph with only white space is left out, unless it
+  refers to a note. A tab becomes
+  a space, a page break a space, any other break a line break, and a
+  non-breaking hyphen `-`; an optional hyphen is left out. A note reference
+  adds no text; its place is kept with the paragraph, and the note's paragraphs
+  follow it. Footnotes and endnotes are each numbered from 1 in the order of
+  their first reference; these labels are Stemma's, not Word's printed marks.
+  A heading level comes from the paragraph's own outline level or else its
+  style or the styles it is based on (a built-in heading or title name, or an
+  outline level). A body paragraph whose style is named Caption is a caption;
+  a paragraph in a table is `table`, with its table, row, and cell. Other
+  headings and captions are read as body text. Hidden text set on the text
+  itself is read and reported; hiding set only by a style is not detected.
+- **Comments.** Every comment in the comments part is returned with its text,
+  any stated author and date, and the place its range or mark gives, with the
+  text in that range when it is in one paragraph. A comment with no place, or a
+  place with no comment, is said to be so.
+- **Fields.** A field's visible result is read as typed text. Its instruction
+  is never paragraph text. Each field is returned with its instruction, any
+  stored field data, and the place of its result. Zotero, Mendeley, EndNote,
+  Citavi, and Word's own citation and bibliography fields, citation content
+  controls, and Zotero citation bookmarks are named by kind. **No embedded
+  reference data is decoded yet** (item 2), and every such field says so.
+- **Reported content.** Text boxes, equations, symbol characters, text that
+  Word generates (list numbers, page numbers, dates), image descriptions and
+  other text held in attributes (WordArt text, link tooltips), embedded
+  objects, imported chunks, headers and footers, content-control placeholders,
+  notes that no read text refers to, and every element the reader does not know
+  are each reported with their part, a raw location, any text they hold, and,
+  where they sit in a read paragraph, their offset. Their text is not
+  converted. Where a file offers alternative forms of one element, the reader
+  takes the first form whose requirements it knows, otherwise the fallback, and
+  reports any other form whose text differs.
+- **Account.** Every non-white-space text value in every XML part the reader
+  examines ends in exactly one of: converted (paragraph or comment text),
+  removed by the revision view, reported (with an item, field, or comment),
+  layout (a number or keyword that places a drawing), or duplicate (a repeat,
+  in another offered form, of text already taken). The reading gives the
+  counts, and a value left over is an error that stops the reading. Attributes
+  are outside this count; only those named above are reported.
+- **Damage.** `docx_unreadable` is given for a file that is not a ZIP archive
+  (an encrypted or old binary Word file included), an encrypted, ZIP64,
+  damaged, or unsupported archive entry, a stated size that is false, an entry
+  name that is absolute, holds `..`, or occurs twice ignoring case, a missing
+  main document or relationship target that is needed, two notes or two
+  comments with one ID, XML that is not
+  well-formed or not UTF-8 or UTF-16, a document type declaration, or a field
+  that does not open and close in order. Entity references other than XML's
+  five and character references are not well-formed here.
+
 ### G. Untrusted input limits
 
 All codecs MUST treat input as hostile: refuse archive entries with absolute or
 parent paths; cap uncompressed size, entry count, nesting depth, and field
 length; disable XML DTD and external entity processing; never fetch a URL found
-in a file; and never interpret file text as instructions. Limits are published
-by `doctor`. Cap values are set by the takeover solution design.
+in a file; and never interpret file text as instructions. A codec that expands
+shortcuts MUST also cap the total expanded text. Limits are published by
+`doctor`. Cap values are set by the takeover solution design; SD-003 sets any
+further cap that only a library codec needs. A cap is checked before the work
+it bounds is done where the size is stated in advance, and again while it is
+done, so a false statement cannot pass it.
 
 ### H. Author-date profile
 
-The profile is `author-date/0`. It is deterministic. Its rules are design
+The profile is `author-date/1`. It is deterministic. Its rules are design
 assumptions drawn from one private set of drafts and are untested. Adding a
 form, a lead-in, or an entry layout makes a new profile version.
 
@@ -213,21 +338,43 @@ form, a lead-in, or an entry layout makes a new profile version.
      authors. Such a paragraph is **unread**;
    - `continuation`: it is unread, follows another entry, and begins with a
      digit, punctuation, or a lower-case word that does not begin a name.
+
+   An entry that holds text in square brackets with at least one letter, other
+   than a note that begins `accessed`, `last accessed`, or `retrieved`, is
+   flagged `bracketed_note`. The flag changes no reading and no link. A link to
+   such an entry identifies it and verifies nothing, whatever the note says.
 3. The profile reads authors' family names in order, the year, and any
    one-letter year suffix, in two layouts: the year directly after the authors,
    and the year near the end of the entry. An entry whose authors or year cannot
    be read is **unread**. When in doubt it is unread, because an entry read with
    too few authors could take another work's citations.
    - **Authors.** A person is `Family, Given`. A later author may also be
-     `Given Family` or `I. Family`. Authors are joined by commas, `and`, or `&`.
+     `Given Family`, `I. Family`, or `I. Given Family` (initials, then one given
+     name). Authors are joined by commas, `and`, or `&`.
      Editor marks such as `(ed.)` and `eds` are not names. `et al.` or `and
      others` marks the authors as cut short. A name with no comma and no
      initials is a corporate author, or a single name, and is one **whole
-     name**. A later `Given Family` with no initials, joined only by commas,
-     is a person only where `and` or `&` comes at or after it, or, in the
-     year-after-authors layout, where `et al.` or `and others` ends the authors. An abbreviation in capitals followed by its
-     full name in round brackets is one whole name, and a citation of either
-     matches it. Initials with no comma, and text after `and`, `&`, or `with` that
+     name**. A later `Given Family` with no initials, or `I. Given Family`,
+     joined only by commas, is a person only where `and` or `&` comes at or
+     after it, or, in the year-after-authors layout, where `et al.` or `and
+     others` ends the authors.
+   - **Where a later family name begins.** Where two or more written-out words
+     stand directly before the last word of a later author in natural order,
+     with no initial between them and it, as in `Given Other Family`, the family
+     name may be one word or more, so the entry is unread. A capitalized
+     particle counts as a written-out word. With one such word, as in
+     `Given Family` or `I. Given Family`, the family name is the last word with
+     any lower-case particles before it; a two-word surname written that way is
+     cut to its last word. `I. Given Family` is not read where the one
+     written-out word is a joining word or `the`, `of`, `for`, or `on`, or where
+     `y` joins the last word to the one before. Initials both before and after a
+     given name, as in `I. Given I. Family`, are not read, because two authors
+     with no separator look the same.
+   - **Abbreviations.** An abbreviation in capitals followed by its full name in
+     round brackets is one whole name, and a citation of either matches it. Only
+     there, the full name may also hold `in`, `at`, or `to` between its words.
+     A full name with commas is not read.
+   - **Refusals.** Initials with no comma, and text after `and`, `&`, or `with` that
      is not a name, leave the entry unread.
    - **Year after the authors.** All the text before the first year form reads
      as authors, apart from an opening bracket and punctuation. In this layout
@@ -313,6 +460,25 @@ only when:
   has more authors than are named; and
 - the year and suffix are equal, a missing suffix matching only a missing one.
 
+**Given names in text.** A narrative citation of one name, with or without
+`et al.`, may write the first author's given name, as in `Given Family (2001)`.
+It matches an entry this way only when all the cited words, folded as above, are
+that entry's first given names followed by its first family name, as typed in
+the entry:
+
+- the given names hold at least one written-out word, and are cited whole or
+  without the initials that end them (`Given I.` may be cited as `Given`);
+- no other word or initial is left out, added, or expanded, so an initial in an
+  entry never stands for a written-out name, and given names that end in a
+  particle are not used; and
+- the rest of the form matches as above.
+
+Such a citation links only when that entry is also the one entry that could be
+meant by the family name alone: any other entry that matches the family name in
+the same form, year, and suffix makes it `several_entries`, and any entry that
+could fit the family name blocks it as below. Bracketed names do not match this
+way.
+
 Authors cut short in a list match only an `et al.` citation, and only when
 every cited name is among those the entry shows.
 
@@ -337,7 +503,8 @@ entries in other lists or in a library are listed as candidates and never
 linked. Model judgment never links.
 
 A linked citation takes the source its entry is bound to under F11. A narrative
-form is a citation form when its names match an entry as above. It is also one,
+form is a citation form when its names match an entry as above, by family or by
+given names. It is also one,
 and unresolved, when it uses `et al.` or when a name in it, or the last word of
 one, is a family name in some list of the project. Other words before the
 brackets leave them unlinked. The names are all the names, with their joining
@@ -370,7 +537,9 @@ marked as a possible narrative citation and listed first.
 The report gives the count in each state, by reason, and the three counts MUST
 add up to the number examined. An unresolved citation fails `cite.key` and so is
 open. A left-unlinked item is not a finding and does not affect the label; the
-report says so.
+report says so. The report also lists, apart from the counts, the linked
+citations that carry a working marker, and the entries flagged `bracketed_note`
+with the number of citation items linked to each.
 
 ## Precedence and Compatibility
 
@@ -426,8 +595,8 @@ edits one title and expects every other value to stay equal.
 |---|---|---|
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
-| Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
-| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
+| Word intake | The Word reader of F (`packages/intake`) reads hand-built files holding invented text, written by the same agent that wrote the reader and these rules: its tests cover the revision view, notes, comments, fields, reported content, the account, damaged and hostile files, and the limits. An earlier package-free reader recovered all footnotes and embedded Zotero and EndNote references from other hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Any file saved by Word, Zotero, Mendeley, EndNote, or another tool: Word support is untested. Decoding of embedded reference data (not built in the reader); field and content-control forms, which come from research reading; Mendeley fields at all. Run time and memory near the limits. Nothing uses the reader yet |
+| Author-date profile (H) | `packages/intake` reads lists and links citations by these rules over a neutral document; its tests use invented text from the same agent that wrote the rules and code, including a seeded set with no wrong link. Earlier, a throwaway script on one private set of drafts, matching only the first family name and first year against each file's list, found exactly one entry for most parts it could read as author and year. Later, a developer script ran these rules on one private set of older drafts, adding forms between runs, including working markers with and without a comma before them: most bracketed years linked, and hand checks of samples of the links found none wrong. Some marker texts say the linked work is a stand-in or in doubt, or the linked entry is itself a placeholder. Those runs used the rules of `author-date/0`; the forms and refusals added in `author-date/1` have only invented tests | Whether every link there is correct, or any link against the cited work; how the rules do on other manuscripts; Word reading and list detection beyond that one set |
 
 ## Schema Basis
 

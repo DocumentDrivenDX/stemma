@@ -53,6 +53,17 @@ describe("US-113-AC1: reference entries", () => {
     ["Rowe, Q. Alden, Bea Stone, and Cy Teal. 2001. Fords.", "Rowe; Stone; Teal 2001 after_authors"],
     ["Rowe, Alden, Bea Stone, et al. 2001. Fords.", "Rowe; Stone [cut short] 2001 after_authors"],
     ["XYZ (Example Society). 2001. Fords.", "XYZ [whole] 2001 after_authors"],
+    // A later `I. Given Family`.
+    ["Rowe, Alden F., and R. Steven Stone. 2001. Fords.", "Rowe; Stone 2001 after_authors"],
+    ["Rowe, Alden, R. S. Bea Stone, and Cy Teal. 2001. Fords.", "Rowe; Stone; Teal 2001 after_authors"],
+    ["Rowe, Alden, and R. Steven van Stone. 2001. Fords.", "Rowe; van Stone 2001 after_authors"],
+    ["Rowe, Alden, R. Steven Stone, et al. 2001. Fords.", "Rowe; Stone [cut short] 2001 after_authors"],
+    ["Rowe, Alden F., and R. Steven Stone. Fords. Leeds, 2001.", "Rowe; Stone 2001 near_end"],
+    // Where the later family name's start is shown.
+    ["Rowe, Alden, and Najib A. Field. 2001. Fords.", "Rowe; Field 2001 after_authors"],
+    ["Rowe, Alden, and Karen van Brel. 2001. Fords.", "Rowe; van Brel 2001 after_authors"],
+    ["XYZW (Council for Example Research in the Valley). 2001. Fords.", "XYZW [whole] 2001 after_authors"],
+    ["XYZW (Society for Letters to the Fords at Example). 2001. Fords.", "XYZW [whole] 2001 after_authors"],
   ])("reads %s", (text, expected) => expect(read(text)).toBe(expected));
 
   test.each([
@@ -86,6 +97,33 @@ describe("US-113-AC1: reference entries", () => {
     ["Brel, K., Modern Rivers and others, Weirs, Leeds, 2003, a copy by hand.", "unread authors"],
     ["Brel (Lee Corso). 2003. Weirs.", "unread authors"],
     ["XYZ (with Lee Corso). 2003. Weirs.", "unread authors"],
+    // Where a later family name begins cannot be known.
+    ["Rowe, Alden, and Najib Abou Field. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and Karen Van Brel. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, Najib Abou Field, and Cy Teal. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and Ana Ortega y Gasset. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and R. Ortega y Gasset. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and Najib Abou Field. Fords. Leeds, 2001.", "unread authors"],
+    ["Rowe, A., Najib Abou Field, Fords, Leeds, 2001.", "unread authors"],
+    // What `I. Given Family` must not stretch to.
+    ["Rowe, Alden, and R. Steven T. Stone. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and K. Brel L. Corso. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and R. Najib Abou Field. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and K. Und Corso. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and K. In Corso. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, and A. The Fords. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, R. Short History. 2001. Fords.", "unread authors"],
+    ["Rowe, Alden, R. Short History, Leeds, 2001.", "unread authors"],
+    ["Rowe, Alden, and Bea Stone. R. Lee Corso. Fords. Leeds, 2001.", "unread authors"],
+    ["Brel, Karen. R. Lee Corso. Fords. Leeds, 2001.", "unread authors"],
+    // Only the full name after an abbreviation may hold \`in\`, \`at\`, or \`to\`.
+    ["Council for Example Research in the Valley. 2001. Fords.", "unread authors"],
+    ["XYZW (in the Valley). 2001. Fords.", "unread authors"],
+    ["XYZW (Council for Research in). 2001. Fords.", "unread authors"],
+    ["XYZW (Council for Research, Fords, and Weirs). 2001. Fords.", "unread authors"],
+    ["XYZW (Brel in Corso, L.). 2001. Fords.", "unread authors"],
+    ["XYZW (Council for Research with Lee Corso). 2001. Fords.", "unread authors"],
+    ["Brel (Council for Research in the Valley). 2001. Fords.", "unread authors"],
     ["Adair, J. 2014–2017. Rivers, in three parts.", "unread year_place"],
     ["Adair, J. Rivers since 1850", "unread year_place"],
     ["Adair, J. Rivers. Leeds, 2003, second printing by hand.", "unread year_place"],
@@ -107,6 +145,53 @@ describe("US-113-AC1: reference entries", () => {
       }
     }
     expect(alone).toEqual([]);
+  });
+
+  test("with the added forms, no way of joining a second author drops one", () => {
+    // `I. Given Family` has the same words as an initial and a two-word name, so a bare
+    // second surname with no initials is left out of this sweep.
+    const joins = [" ", ", ", ". ", "; ", " / ", " + ", " - ", " — ", " … ", " | ", " and ", " & ", ", and ", ", with ", ". With ",
+      " und ", " Und ", " u. ", " et ", " Et ", " y ", " Y ", " och ", " e ", " en ", " plus ", " in ", " In ", " (with "];
+    const tails = [". 2001. Fords.", ". Fords. Leeds, 2001.", ", 'Fords', 2001."];
+    const short: string[] = [];
+    let read = 0;
+    for (const first of ["Rowe, Alden", "Rowe, Alden F.", "Rowe, A."]) {
+      for (const join of joins) {
+        for (const second of ["R. Steven Stone", "R. Stone"]) {
+          for (const third of ["L. Corso", "R. Lee Corso", "Corso, L."]) {
+            const close = join === " (with " ? ")" : "";
+            const shapes: [string, number][] = [
+              [`${first}, and ${second}${join}${third}${close}`, 3],
+              [`${first}, ${second}${join}${third}${close}, and Cy Teal`, 4],
+            ];
+            for (const [authors, all] of shapes) {
+              for (const tail of tails) {
+                const r = readEntry(authors + tail);
+                if (r.status !== "read") continue;
+                read++;
+                if (!r.cutShort && r.authors.length < all) short.push(authors + tail);
+              }
+            }
+          }
+        }
+      }
+    }
+    expect(short).toEqual([]);
+    expect(read).toBeGreaterThan(200);
+  });
+
+  test("a second entry in one paragraph is found even when a later family name in it is uncertain", () => {
+    expect(read("Adair, J. 2017. Rivers. Leeds. Brel, K., and Najib Abou Field. 2017. Weirs.")).toBe("unread several_entries");
+  });
+
+  test("an entry with a bracketed note is flagged, and a year or an access note in brackets is not one", () => {
+    const entries = ["Adair, J. 2017. Rivers [PLACEHOLDER].", "Brel, K. 2003. Weirs [confirm the 2004 printing].",
+      "Corso, L. 2001. Locks [1850].", "Dunmore, P. 1999. Ponds. [Accessed 4 May 2020].", "Ewart, R. 1998. Fords [last accessed in May]."];
+    expect(readReferenceLists(chapter(entries))[0]!.entries.map((e) => [e.status, e.flags])).toEqual([
+      ["read", ["bracketed_note"]], ["read", ["bracketed_note"]], ["read", []], ["read", []], ["read", []],
+    ]);
+    // The flag changes no link.
+    expect(one(entries, "(Adair 2017)")).toEqual([`(Adair 2017) => linked ${entries[0]}`]);
   });
 
   test("keeps each entry as found, reports starts, subheadings, flags, and where a list ends", () => {
@@ -459,6 +544,73 @@ describe("US-113-AC7 and AC8: ranges, and the account", () => {
     expect(() => checkAccount(r, 1)).not.toThrow();
     expect(() => checkAccount(r, 2)).toThrow("does not add up");
     expect(() => checkAccount({ ...r, brackets: [] }, 1)).toThrow("does not add up");
+  });
+});
+
+describe("US-113: given names in running text", () => {
+  const solo = "Rowe, Alden. 2001. Fords.";
+  const linked = `(2001) => linked ${solo}`;
+  const NONE = "(2001) => unresolved no_entry";
+
+  test("a given name the entry types links, also with a possessive", () => {
+    expect(one([solo], "As Alden Rowe (2001) wrote. Alden Rowe's (2001: 4) view. Rowe (2001) too.")).toEqual([
+      linked, `(2001: 4) => linked ${solo}`, linked,
+    ]);
+    const initial = "Rowe, Alden F. 2001. Fords.";
+    expect(one([initial], "Alden Rowe (2001) and then Alden F. Rowe (2001) wrote.")).toEqual([`(2001) => linked ${initial}`, `(2001) => linked ${initial}`]);
+    const particle = "van Brel, Karen. 1999. Weirs.";
+    expect(one([particle], "As Karen van Brel (1999) wrote.")).toEqual([`(1999) => linked ${particle}`]);
+    const team = "Rowe, Alden, Bea Stone, and Cy Teal. 2001. Fords.";
+    expect(one([team], "As Alden Rowe et al. (2001) wrote.")).toEqual([`(2001) => linked ${team}`]);
+    expect(one([team], "As Alden Rowe (2001) wrote.")).toEqual([NONE]);
+    expect(one([solo, team], "As Alden Rowe (2001) wrote.")).toEqual([linked]);
+  });
+
+  test.each([
+    ["Rowe, Alden. 2001. F.", "Alan Rowe"], ["Rowe, Alden. 2001. F.", "Mary Alden Rowe"], ["Rowe, Alden. 2001. F.", "Professor Alden Rowe"],
+    ["Rowe, Alden. 2001. F.", "A. Rowe"], ["Rowe, Alden. 2001. F.", "Alden F. Rowe"], ["Rowe, Alden F. 2001. F.", "Alden G. Rowe"],
+    ["Rowe, Alden F. 2001. F.", "F. Rowe"], ["Rowe, A. 2001. F.", "Alden Rowe"], ["Rowe, A. F. 2001. F.", "A. Rowe"],
+    ["Rowe, Q. Alden. 2001. F.", "Alden Rowe"], ["Rowe, Mary Jane. 2001. F.", "Mary Rowe"], ["Rowe, Mary Jane. 2001. F.", "Jane Rowe"],
+    ["Rowe, JK. 2001. F.", "JK Rowe"], ["Rowe, Alden van. 2001. F.", "Alden Rowe"],
+    ["Rowe, Alden. 2001. F.", "Brel and Alden Rowe"], ["Stone, Bea, and Alden Rowe. 2001. F.", "Alden Rowe"],
+    ["Rowe, Alden, and Bea Stone. 2001. F.", "Alden Rowe and Bea Stone"],
+  ])("no word is left out, added, or expanded: %s is not cited by %s", (entry, cited) => {
+    expect(one([entry], `As ${cited} (2001) wrote.`)).toEqual([NONE]);
+  });
+
+  test("part of a family name is never read as the whole of it", () => {
+    expect(one(["van Rowe, Alden. 2001. F."], "As Alden Rowe (2001) wrote.")).toEqual(["(2001) => unlinked no_author_form"]);
+  });
+
+  test("bracketed names do not match by given name", () => {
+    expect(one([solo], "(Alden Rowe 2001)")).toEqual(["(Alden Rowe 2001) => unresolved no_entry"]);
+  });
+
+  test.each([
+    ["another of the family", "Rowe, Bea. 2001. Weirs.", "several_entries"],
+    ["one with the initial alone", "Rowe, A. 2001. Weirs.", "several_entries"],
+    ["a two-word family name spelled the same", "Alden Rowe, J. 2001. Weirs.", "several_entries"],
+    ["a single name", "Rowe. 2001. Weirs.", "several_entries"],
+    ["a whole name holding the family name", "Mary Rowe. 2001. Weirs.", "unread_entry"],
+    ["an unread entry with the family name", "Rowe A. 2001. Weirs.", "unread_entry"],
+    ["a repeated-author mark", "———. 2001. Weirs.", "unread_entry"],
+  ])("an entry the family name alone could mean blocks it: %s", (_, other, reason) => {
+    expect(one([solo, other], "As Alden Rowe (2001) wrote.")).toEqual([`(2001) => unresolved ${reason}`]);
+  });
+
+  test("another year or form blocks nothing, and another chapter's entry is only a candidate", () => {
+    expect(one([solo, "Rowe, Bea. 2002. W.", "Rowe, Bea, and Cy Teal. 2001. W."], "As Alden Rowe (2001) wrote.")).toEqual([linked]);
+    const r = matchAuthorDate([doc("one.docx", "As Alden Rowe (2001) wrote.", "References", "Adair, J. 2017. R."), doc("two.docx", "References", solo)]);
+    const [b] = r.brackets;
+    expect(b).toMatchObject({ state: "unresolved", items: [{ reason: "no_entry", candidates: [{ file: "two.docx", why: "other_list" }] }] });
+  });
+
+  test("a long expansion matches under either name, and its last word links no other work", () => {
+    const entry = "XYZW (Council for Example Research in the Valley). 2001. Account.";
+    expect(one([entry], "(XYZW 2001) (Council for Example Research in the Valley 2001) XYZW (2001)")).toEqual([
+      `(XYZW 2001) => linked ${entry}`, `(Council for Example Research in the Valley 2001) => linked ${entry}`, `(2001) => linked ${entry}`,
+    ]);
+    expect(one([entry, "Valley, J. 2001. W."], "The Council for Example Research in the Valley (2001) said.")).toEqual(["(2001) => unresolved unread_entry"]);
   });
 });
 
