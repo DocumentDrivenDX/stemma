@@ -22,5 +22,5 @@ export * from "./matching/quote-fold.ts";
 export * from "./page-proposal.ts";
 export * from "./retire.ts";
 export { annotate, type AnnotationRequest, planAnnotation } from "./annotations.ts";
-export { headingMatches, catalogueTitleMatches } from "./checks/metadata.ts";
+export { headingMatches, catalogueTitleMatches, imprintYears, misreadRoman } from "./checks/metadata.ts";
 export * from "./research.ts";

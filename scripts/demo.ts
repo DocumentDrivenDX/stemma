@@ -84,19 +84,15 @@ expect(refused.includes("no page is labelled"), "a scan without text has no numb
 const captured = stemma(0, book, "source", "convert", scan, ...captureArgs, "--text-layer", join(materials, "ledger-text-layer.txt"),
   "--method", "ocr", "--tool", "invented-ocr", "--tool-version", "1.0", "--page-map", join(materials, "ledger-page-map.json"));
 expect(captured.includes("pages with a printed label: 3 of 4"), "three pages should be labelled");
-const heldReport = stemma(1, book, "check");
-expect(heldReport.includes("OPEN FINDINGS: 0 problem(s), 2 could not be checked"), "the title and catalogue comparisons should be left");
+const heldReport = stemma(0, book, "check");
+expect(heldReport.startsWith("CHECKED CLEAN"), "nothing should be left open");
 expect(!heldReport.includes("NOT CHECKED"), "only checks that apply are run");
-console.log("\nThe copy's text never shows the title. A person who looks at the title page can record that, at any time.");
-const textId = /Wrote the source file (txt-\S+)/.exec(captured)![1]!;
-stemma(0, book, "review", "add", textId, "--scope", "source_details", "--pages", "0", "--fields", "title,year",
-  "--against", "the ledger's title page", "--outcome", "agrees", ...AUTHOR);
-const reviewed = stemma(1, book, "check");
-expect(reviewed.includes("OPEN FINDINGS: 0 problem(s), 1 could not be checked"), "only the missing catalogue lookup should be left");
-expect(reviewed.includes("confirmed by the author, not verified"), "the confirmation should be shown as one");
+for (const needed of ["not corroborated", "not compared with a catalogue"]) {
+  expect(heldReport.includes(needed), `the coverage summary should say ${needed}`);
+}
 console.log(`
-What is left is real: this invented work is in no catalogue, so its details cannot be compared with one.
-It stays listed. The recognized text is reported as a coverage figure, not as a finding.`);
+The copy's text never shows the title, and this invented work is in no catalogue. Nothing contradicts the record,
+so neither is a finding: the report says what was not covered. Recognized text is a coverage figure too.`);
 
 heading("6. A born-digital PDF: one command captures it, converts it page by page, compares and checks");
 // A second project, so that this part stands on its own.
@@ -106,7 +102,7 @@ add(quoting, "source", "levy", { id: "src-demo0levybook1", citation_key: "levy19
 const plan = join(base, "plan.json");
 writeFileSync(plan, JSON.stringify({ captures: [{ source: "src-demo0levybook1", file: "materials/harbour-book.pdf", retrieved_at: WHEN }] }));
 console.log("\nThe PDF library's warnings are shown as it prints them: the plugin ships no native drawing module, and reading text draws nothing.");
-const ingested = stemma(1, quoting, "ingest", "--plan", plan, ...AUTHOR);
+const ingested = stemma(0, quoting, "ingest", "--plan", plan, ...AUTHOR);
 expect(/converted again; \d+ of \d+ parts agree/.test(ingested), "the fresh conversion should be compared");
 
 heading("7. Evidence is selected by address; its words and page are copied by script");

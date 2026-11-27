@@ -204,11 +204,17 @@ text as a coverage figure, not a problem. If you can see page images, compare a
 quotation with its page before telling the author it is right, and record what
 you noticed as a flag; your comparison never counts as the author's review.
 
-When a finding is real but the work itself accounts for it, such as an original
-whose printed page numbers jump, record your evidence with `annotate --effect
-explain --actor model:<your name>`; it stays open. Dismissing it is the
-author's decision: never run a dismissal or a person's review in their name
-unless they ask you to record their own.
+A finding is evidence that something is wrong. What nothing shows or contradicts
+is coverage: the report states it, and it is not a task. Never ask the author to
+review, approve, or dismiss anything to make a report clean, and never list
+coverage as work they owe. A source is fine at any stage: metadata not yet
+captured is not a problem; add it when you learn it, saying where from. Do not
+put a value you read from a page image into a source file's `identity`: your
+reading is not evidence. To corroborate a detail, save a catalogue lookup
+(`resolve`). When an open finding is real but the work itself accounts for it,
+you may record your evidence with `annotate --effect explain --actor
+model:<your name>`; it stays open. Never run a dismissal or a person's review in
+the author's name unless they ask you to record their own.
 
 While a PDF is read, the PDF library prints warnings that it cannot load
 `@napi-rs/canvas` or provide `DOMMatrix` and `Path2D`. These concern drawing

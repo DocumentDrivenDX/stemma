@@ -32,18 +32,18 @@ export function rounds(): string {
   const from = demo.indexOf("=============== 3.");
   const to = demo.indexOf("=============== 6.");
   if (from < 0 || to < 0) throw new Error("the demo's steps changed; redraw its rounds");
-  const counts = [...demo.slice(from, to).matchAll(/OPEN FINDINGS: (\d+) problem\(s\), (\d+) could not be checked/g)]
-    .map((found) => ({ problems: Number(found[1]), unchecked: Number(found[2]) }));
+  // A run that checked clean prints no counts: both are none.
+  const counts = [...demo.slice(from, to).matchAll(/^(?:OPEN FINDINGS: (\d+) problem\(s\), (\d+) could not be checked|CHECKED CLEAN)/gm)]
+    .map((found) => ({ problems: Number(found[1] ?? 0), unchecked: Number(found[2] ?? 0) }));
   const ROUNDS: [string, string][] = [
     ["First check", "A mistyped citation key, a listed work that is never cited, a file out of its standard layout, and a cited book that is not in the project."],
     ["After three fixes", "The key is corrected, the extra listing removed and the file tidied. There is still no text of the cited book to compare with."],
-    ["Its text is added", "Text for a scan of the book is supplied. What is left could not be checked: nothing shows the title page, and the invented book is in no catalogue."],
-    ["A person looks", "The author records that the title page shows the title and year. The book is still in no catalogue, so that stays listed."],
+    ["Its text is added", "Text for a scan of the book is supplied. Nothing is open. The report says what it could not cover: nothing shows the title page, and the invented book is in no catalogue."],
   ];
   if (counts.length !== ROUNDS.length) throw new Error(`the demo now checks that project ${counts.length} times; redraw its rounds`);
   return `<figure class="rounds">
-<ol aria-label="Four checks of the demo project, in order">${ROUNDS.map(([title, what], i) => `<li><h3>${title}</h3><dl><div><dt>Problems</dt><dd>${counts[i]!.problems}</dd></div><div><dt>Could not check</dt><dd>${counts[i]!.unchecked}</dd></div></dl><p>${what}</p></li>`).join("")}</ol>
-<figcaption>This site's drawing of four runs in the <a href="examples.html#demo">demo</a>, with the counts each run printed. All names and sources in the demo are invented.</figcaption>
+<ol aria-label="Three checks of the demo project, in order">${ROUNDS.map(([title, what], i) => `<li><h3>${title}</h3><dl><div><dt>Problems</dt><dd>${counts[i]!.problems}</dd></div><div><dt>Could not check</dt><dd>${counts[i]!.unchecked}</dd></div></dl><p>${what}</p></li>`).join("")}</ol>
+<figcaption>This site's drawing of three runs in the <a href="examples.html#demo">demo</a>, with the counts each run printed. All names and sources in the demo are invented.</figcaption>
 </figure>`;
 }
 

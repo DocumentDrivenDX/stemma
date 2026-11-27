@@ -39,9 +39,9 @@ AI assistants attach real titles to wrong authors. The check compares record val
 - [ ] **US-023-AC1** — Given a record whose author, title, year, or venue disagrees with source metadata or a resolver result, when the check runs, then it fails and shows both values.
 - [ ] **US-023-AC2** — Given an identifier whose cached resolution found no work, when the check runs, then it fails with the query and date.
 - [ ] **US-023-AC3** — Given an identifier that resolves to a different work, when the check runs, then it fails and shows both works.
-- [ ] **US-023-AC4** — Given no source metadata and no resolver result for a value, when the check runs, then it reports unverifiable.
-- [ ] **US-023-AC5** — Given source details that cannot be verified automatically, when a person records a review of the title page or equivalent confirming the details, then the result is shown as confirmed by the author, not verified, and is no longer open; without that record it stays open and the report says so.
-- [ ] **US-023-AC6** — Given a confirmation, when a detail disagrees with the copy or a saved lookup, then the mismatch is still reported until fixed or dismissed.
+- [ ] **US-023-AC4** — Given no source metadata and no resolver result for a value, when the check runs, then it reports unverifiable as coverage, which is not open.
+- [ ] **US-023-AC5** — Given a detail that the title page text does not show, when an independently saved lookup agrees and nothing contradicts the record, then the check passes and names its basis; when a person instead records a review of the title page, the result is shown as confirmed by the author, not verified. Neither is required to reach checked clean.
+- [ ] **US-023-AC6** — Given a recorded confirmation, when a detail disagrees with the copy or a saved lookup, then the mismatch is still reported until fixed or dismissed.
 
 ## Edge Cases
 
@@ -59,7 +59,7 @@ Inputs are synthetic.
 | No such DOI | US-023-AC2 | Cached not-found for fixture DOI 10.5555/none, dated 2026-02-01 | Check | Fail with query and date |
 | Other work | US-023-AC3 | Cached result titled "Soil Chemistry" for a record titled "River Terraces" | Check | Fail showing both titles |
 | Nothing to compare | US-023-AC4 | Offline; no cache; source has no metadata | Check | Unverifiable |
-| Confirmed | US-023-AC5 | Scan with no extractable title metadata | Confirm the title page | Shown as confirmed by the author |
+| Corroborated or confirmed | US-023-AC5 | Scan whose text omits the year; an agreeing saved lookup, or a recorded review | Check | Pass naming the lookup, or shown as confirmed by the author; nothing open |
 | Mismatch | US-023-AC6 | Confirmed source with a seeded wrong year | Check | Mismatch reported |
 
 ## Dependencies

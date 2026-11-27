@@ -386,19 +386,24 @@ Each requirement carries its priority and, for P0, its delivery step.
 - **FR-30** (P0, M1) — Each scripted check reports pass, fail, or unverifiable
   with the evidence. No finding about a citation, claim, quotation, source,
   support record, bibliography, image, coordinate, or the working tree stops
-  writing or any build. A finding is open when it fails or cannot be checked and
-  the author has not dismissed it or, for source details, confirmed them
-  (assumption: a could-not-check result counts as open). An output is called
-  checked clean only when no finding is open. The label reflects checks only:
-  unreviewed items do not count as open, and every report counts them
-  separately. "Unverified" means only that something has not yet been checked;
-  it is not open by itself. A report lists a check only when it applies to
-  what the project holds; a check that applies and cannot be run counts as
-  open. When source details (author, title, year, venue) cannot be verified
-  automatically, a person may record a review that names the title page or
-  equivalent checked and the details confirmed (FR-89); the result is
-  then shown as confirmed by the author, not verified. A missing confirmation is
-  reported, and a mismatch stays reported until fixed or dismissed.
+  writing or any build. A finding is evidence that something is wrong, with
+  something to do about it. It is open when it fails, or when a check that
+  applies to what an output relies on could not run, and the author has not
+  dismissed it. Reaching checked clean never requires a person's review,
+  approval, or dismissal where the checks can account for what they see. What
+  nothing shows or contradicts, including metadata not yet captured, is
+  coverage: the report states it and asks nothing of anyone. A source is valid
+  at every stage of capture. An output is called checked clean only when no
+  finding is open. The label reflects checks only: unreviewed items do not count
+  as open, and every report counts them separately. "Unverified" means only that
+  something has not yet been checked; it is not open by itself. A report lists a
+  check only when it applies to what the project holds; a check that applies and
+  cannot be run counts as open. Source details (author, title, year, venue) that
+  a copy's recognized title page text does not show are corroborated from
+  independently recorded evidence, such as saved catalogue lookups; a
+  contradiction is a finding. A person may also record what the title page or
+  equivalent shows (FR-89), which is then shown as confirmed by the author, not
+  verified. A mismatch stays reported until fixed or dismissed.
 - **FR-31** (P0, M1) — Checks run inside the agent as the work changes, covering the
   changed records and the records that depend on them. Every build reruns every
   scripted check over the whole project. Neither a commit hook nor CI is
@@ -553,7 +558,7 @@ Each requirement carries its priority and, for P0, its delivery step.
 | FR-29 | Invented quotation | A quotation absent from the source text | The check fails and reports the closest match |
 | FR-29, FR-32 | Near match | A quotation differing by one word | It is reported with both texts until fixed or dismissed |
 | FR-29 | Line-end hyphen | A quoted word that the source text splits with a hyphen at a line end | The two match |
-| FR-30 | Confirm unverifiable details | A copy whose title page text cannot be compared | It is open until a person's review confirms the details; a seeded wrong year still fails |
+| FR-30 | Details the title page text cannot show | A copy whose title page text omits the year, with and without an agreeing saved lookup | Nothing is open; the report says how the year was corroborated or that it was not; a seeded wrong year still fails |
 | FR-31 | Skip nothing at build | A record edited outside the agent so that a quotation no longer matches | The build reruns the check and reports it |
 | FR-32 | Change an annotated sentence | A dismissal, then an edit to its sentence | The annotation ends and the finding is open again |
 | FR-32 | Annotate an uncited entry, then edit it | An annotation bound to the entry | It ends when the entry changes |

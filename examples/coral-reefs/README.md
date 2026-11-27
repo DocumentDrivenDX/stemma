@@ -9,7 +9,7 @@ each with a short quotation copied from its pages.
 | Folder or file | What it holds |
 |---|---|
 | `sources/` | One folder per work: `source.md`, the manifest, and one file for each page of the PDF it came from, blank pages included. About 13.6 MB of text in some 5,000 files |
-| `records/` | A record of each work; where its original came from (address, retrieval time, SHA-256); each comparison with the original; saved catalogue lookups; two flags a model recorded, on a page number and a collective title, and one retired flag; a note explaining one finding; four passages; four citations |
+| `records/` | A record of each work; where its original came from (address, retrieval time, SHA-256); each comparison with the original; saved catalogue lookups; two flags a model recorded, on a page number and a collective title, and one retired flag and one retired note; four passages; four citations |
 | `plan.json` | What was captured, from where, and how it was converted |
 | `tools/render-pages.swift` | Draws page images on macOS, for comparing text with the page. The images are not committed |
 
@@ -67,38 +67,24 @@ file yourself and use `--originals`.
 
 ## What the check finds
 
-The project is not checked clean. Four findings are open, and each needs a
-person:
+The project is checked clean. No person's review or approval is part of that.
+The report's coverage summary and its evidence say how each difference was
+settled:
 
-| Work | What is open | What would settle it |
+| Work | What the check sees | How it is settled |
 |---|---|---|
-| `darwin1842` | The year is not in the recognized text of the title page, which leaves out the last line. The page image shows 1842 | A person looks at the title page and records it |
-| `lyell1832` | The recognized text garbles the roman numeral for the year. The page image shows 1832 in roman numerals. The catalogue gives only 1830 for the volume "v. 2", the date of the set, so neither the copy nor the catalogue shows the year to the check (two findings) | One review by a person of the year settles both |
-| `geolsoc1838` | Printed page 232 is followed by 333. This is what the original prints: the page images show the two numbers, with the text running on. A note on the finding explains it | A person who agrees dismisses the finding |
-
-A model's reading of a page image is not a person's review, so it closes none of
-these. To record your own, after looking at the page:
-
-```sh
-stemma review add txt-bm6whwjm6vv9ce26mgbr --scope source_details --pages 8 --fields year \
-  --against "<what you looked at>" --outcome agrees --actor person:<you>
-stemma review add txt-g5myzs9ef0b53mhq2pe1 --scope source_details --pages 10 --fields year \
-  --against "<what you looked at>" --outcome agrees --actor person:<you>
-stemma annotate --finding c9fbbe4b77b7081004447a6d911532099c281c8f32c099381d73e0b708eaf12b \
-  --effect dismiss --reason "<why>" --actor person:<you>
-```
-
-Three kinds of difference between a record and a catalogue are the catalogue's
-way of writing things, and the check reads them by rule:
-
-| Work | The difference |
-|---|---|
-| `ladd1960` | The DOI's title gives the collective title, "Bikini and nearby atolls, Marshall Islands", before the report's own. The title page prints both, and the record holds the collective title as `collection-title` |
-| `funafuti1904` | The catalogue files the committee under its society, "Royal Society (Great Britain). Coral Reef committee". The title page, and the record, say "Coral Reef Committee of the Royal Society" |
-| `murray1880`, `geolsoc1838` | The Internet Archive gives 1834 and 1826, when the sets began. Each volume's statement ends with the year on its title page, 1880 and 1838 |
+| `darwin1842` | The recognized text of the title page leaves out the year | The saved Internet Archive record of the same item gives 1842, and nothing contradicts it |
+| `lyell1832` | The year is a roman numeral the recognition garbled, "MDCCCXXXir". The catalogue gives only 1830, the date of the set, for the volume "v. 2" | The whole token reads as 1832 once the misread I's are read as I, and as no other year |
+| `geolsoc1838` | Printed page 232 is followed by 333 | Recorded as an observation about the original: every page of the file is held, the numbers run on from 333, and page 333 opens with the heading "Northern Drift", which page 232 announces. This does not show why the numbers jump |
+| `ladd1960` | The DOI's title gives the collective title before the report's own | The title page prints both, and the record holds the collective title as `collection-title` |
+| `funafuti1904` | The catalogue files the committee under its society | "Royal Society (Great Britain). Coral Reef committee" says the same name as "Coral Reef Committee of the Royal Society" |
+| `murray1880`, `geolsoc1838` | The Internet Archive gives 1834 and 1826, when the sets began | Each volume's statement ends with the year on its title page, 1880 and 1838 |
 
 All four quotations are in the source text, on the pages cited. One needed
 "deny-" and "ing" joined across a line end, which the report points out.
+
+Checked clean means that these checks found nothing wrong. It does not mean that
+the records or the recognized text are correct.
 
 ## What was compared with the page images
 

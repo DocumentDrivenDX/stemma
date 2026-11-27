@@ -315,11 +315,11 @@ construct-credit check.
 argument, which `quote.self` reads (assumption: an unset value counts as own for
 role `thesis`, and as not own otherwise).
 
-**Confirmed source details.** When source details cannot be verified
-automatically, a person MAY record a `text_review` with scope `source_details`:
-the title page or equivalent checked and the fields confirmed. It applies only
-while the pages' digests and the source's bibliographic digest are unchanged.
-It states what the person said and is not verification or proof.
+**Confirmed source details.** A person MAY record a `text_review` with scope
+`source_details`: the title page or equivalent checked and the fields it shows.
+No check requires one. It adds to coverage and applies only while the pages'
+digests and the source's bibliographic digest are unchanged. It states what the
+person said and is not verification or proof.
 
 **Other feature records.** `plan` and `voice_profile` carry `review` as above.
 `checkpoint_input` records an author's answer at a checkpoint; an unanswered

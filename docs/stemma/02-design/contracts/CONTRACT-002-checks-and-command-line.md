@@ -215,7 +215,16 @@ file, `source.labels` for every paged one with a labelled page, and
 `source.footnotes` for every one with a note or marker. `source.labels` compares
 consecutive labelled pages of one numbering style: a label equal or lower, or
 one that advances by more than the page index does, is an anomaly; unlabelled
-pages in between are not. `source.original` emits a result for a source file
+pages in between are not. A jump is not an anomaly but a recorded observation,
+in a passing result and the coverage summary, when all of these hold
+(assumptions): the source file holds every page of the original and is sound;
+the two pages are neighbours in it; the numbers run in step on both sides of the
+jump; and the text runs on across it, shown by a word split between the two
+pages that the source writes whole elsewhere, or by a run-in heading of two or
+more words opening the second page, whose words the first page announces. A
+sentence left unfinished is not enough. These signs can be absent where nothing
+is missing, and then the jump stays a finding; they do not prove the original
+was complete when it was made into a file. `source.original` emits a result for a source file
 whose source has upstream records or that has a comparison run of its original.
 A source file whose parts fail `source.pages` is not used by other checks.
 
@@ -246,15 +255,34 @@ year. Where the record's year is later than that date: if the volume statement
 ends with years in parentheses, the record's year must be the last of them, and
 the first must not precede the catalogue date; otherwise `meta.resolver` fails.
 With no such years, the year is listed as not compared when the copy bears it
-out as `meta.source` would, or a person's current `source_details` review covers
-`year`; otherwise the result is `unverifiable` (`set_date`), which such a review
-confirms. A record year earlier than the catalogue date, and every other
+out as `meta.source` would; otherwise the result is `unverifiable` (`set_date`),
+as coverage. A record year earlier than the catalogue date, and every other
 catalogue, compare as above.
 
-`meta.source` fails when the copy's stated identity
-disagrees and the title page text does not bear out the record; a value found in
-neither is `unverifiable`. `id.resolves` covers `doi`, `ia`, and `gutenberg`
-identifiers with lookups; other identifiers are `unverifiable` (`no_lookup`).
+**Corroboration, contradiction, and coverage.** A finding is evidence that
+something is wrong. `meta.source` fails when the copy's stated identity disagrees
+and the title page text does not bear out the record, or when the record's year
+is not on the title page and an imprint line there gives another: a line that is
+a year, or ends with one after a comma, colon, or semicolon. A year inside a
+line, as in a span of years or a library stamp, is not read this way
+(assumption). The year may also be read from a roman numeral in which an I was
+recognized as `i`, `r`, `l`, `1`, `|`, or `!`, when the whole token then reads
+as the record's year. A field the copy does not show passes when a saved lookup
+agrees with the record on it, by the rules above, and no saved lookup differs on
+it; the result names the lookup. This is evidence recorded independently of the
+recognized text; what a model says it read is not evidence here. A catalogue
+that differs is `meta.resolver`'s `fail`. A field neither shown, corroborated,
+nor contradicted leaves the result `unverifiable` as **coverage**.
+
+A source is valid at every stage of capture: metadata not yet recorded is never
+a finding. These are coverage, with `coverage_only` set and `open` false:
+`meta.source` `not_found_in_copy` and `nothing_to_compare`; `meta.resolver`
+`no_lookup`, `lookup_silent`, and `set_date`; `id.resolves` `no_lookup`,
+`lookup_error`, and `lookup_silent`; and `number.present` `several_citations`.
+`id.resolves` covers `doi`, `ia`, and `gutenberg` identifiers with lookups;
+other identifiers have `no_lookup`. A text report ends its findings with a
+coverage summary: what was corroborated and how, what was not covered, and what
+was observed in an original, with the sources concerned. It asks for nothing.
 
 **`source.changed`** (assumptions). It follows the links records hold: a citation
 to its passage and claims; a claim through its non-retired attestations to notes
@@ -288,33 +316,38 @@ the finding says so. `quote.present`, `quote.page`, and `locator.extent` emit
 nothing for a citation whose key names no single source (`cite.key` reports it),
 and are `not_implemented` while manuscript files are present.
 
-**Every finding is explained.** Each `fail` or `unverifiable` result MUST say in
-plain language what is wrong or could not be checked, show its evidence, say why
-it matters, and suggest what to do. A finding without these, a repeated finding
-that adds nothing, or a finding the author cannot act on or dismiss with reason
-is a Stemma defect. Reports group findings so that one cause is shown once with
+**Every result that did not pass is explained.** Each `fail` or `unverifiable`
+result MUST say in plain language what is wrong or was not covered, show its
+evidence, say why it matters, and say what can be done, or that nothing need be.
+An open finding is evidence that something is wrong, or that a check that
+applies to what an output relies on could not run; one the author cannot act on
+is a Stemma defect. No result requires a person's review, approval, or dismissal
+for a project to be checked clean, except that a printed page jump the checks
+cannot account for stays open until the copy or its page map changes or the
+author dismisses it. Reports group findings so that one cause is shown once with
 the items it affects.
 
-**Confirmed source details.** When `meta.source` or `meta.resolver` is
-`unverifiable` and a current person's `source_details` review (CONTRACT-001 G)
-covers every field the result could not compare, the result keeps its outcome,
-gains `confirmed_by`, and is not open. It is shown as confirmed by the author, never
-as verified. A `fail` from either check is unaffected. Such a review confirms no
-other check, including `id.resolves` (assumption).
+**Recorded details.** A person MAY record, in a current `source_details` review
+(CONTRACT-001 G), what a title page shows. Where it covers every field a
+`meta.source` or `meta.resolver` coverage result names, the result gains
+`confirmed_by` and is shown as confirmed by the author, never as verified. It is
+an optional addition to coverage. A `fail` from either check is unaffected, and
+such a review confirms no other check.
 
 **Applicability.** A check emits results only for what the project holds, and a
 report lists nothing for a check that does not apply. `body.not_run[]` lists each
 check that applies to the project's contents but that this version cannot run,
 with reason `not_implemented`.
 
-**Open findings and the label.** A finding is open when its result is `fail` or
-`unverifiable`, no applicable annotation dismisses it, and no source-details
-review confirms it. A `not_implemented` entry also counts as open. A report with scope
-`all` and nothing open is labelled `checked_clean`; otherwise `open_findings`,
-with counts. Assumption: a could-not-check result counts as open, which is the
-conservative reading. `checked clean` means these checks found nothing open. It
-does not mean that the book is correct or that support verdicts were verified.
-A report with scope `changed` carries no label.
+**Open findings and the label.** A finding is open when its result is `fail`,
+or `unverifiable` and not coverage, and no applicable annotation dismisses it. A
+`not_implemented` entry also counts as open. A report with scope `all` and
+nothing open is labelled `checked_clean`; otherwise `open_findings`, with
+counts. A could-not-check result that is not coverage counts as open, such as a
+source file that is damaged or a record that cannot be read (assumption).
+`checked clean` means these checks found nothing open. It does not mean that the
+book is correct, that everything was covered, or that support verdicts were
+verified. A report with scope `changed` carries no label.
 
 **Unreviewed items.** The label reflects checks only. Records that the
 manuscript reaches (a linked claim, its evidence, relations, constructs, and
@@ -429,7 +462,7 @@ and passes when one occurrence lies wholly on cited pages.
 | `body.scope` | `changed` or `all`, with the changed record IDs |
 | `body.inputs` | Corpus digest, manuscript and research file digests (research notes are outside the corpus digest), and profiles used |
 | `body.tools` | Stemma, Bun, SQLite, and every library or program that affected a result |
-| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (ID, effect, who wrote it, and the reason), `confirmed_by?`, `open` |
+| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (ID, effect, who wrote it, and the reason), `coverage_only?`, `confirmed_by?`, `open` |
 | `body.not_run[]` | `check`, `reason`; only checks that apply |
 | `body.verification[]` | For each source file: ID, method, parts, parts reviewed whole by a person, flags, and the current comparison runs with the number of parts that disagree |
 | `body.unreviewed[]` | `record` (ID), `kind`, `reason` (`unreviewed` or `not_admitted`), and the manuscript locations that reach it; never part of the label |

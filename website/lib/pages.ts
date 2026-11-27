@@ -105,7 +105,7 @@ ${descent()}
 ${band("What gets checked", `${entries(CHECKED)}
 <p><a href="checks.html">Each check, and what passing it does not tell you</a></p>`)}
 ${band("When a quotation differs", `<p>In our made-up demo book, one typed citation quotes <q>All fields were abandoned by their holders.</q> The source's text begins with a different word. Stemma shows you both, so you can look at the page and decide.</p>
-${transcript(demoFinding("5. PROBLEM: A quotation"), "<strong>Transcript</strong> of a real run of the demo: one finding of five, exactly as the tool printed it. All names and sources are invented. When you use Stemma, Claude explains findings like this to you.")}
+${transcript(demoFinding("3. PROBLEM: A quotation"), "<strong>Transcript</strong> of a real run of the demo: one finding of three, exactly as the tool printed it. All names and sources are invented. When you use Stemma, Claude explains findings like this to you.")}
 <p><a href="examples.html#demo">The whole demo, step by step</a></p>`)}
 ${band("What stays yours", `<p>Judgment stays with you. A pass only means that your record agrees with the text made from your source, and that text can be wrong, especially when a computer read it from a scan. No check tells you that a source supports your argument.</p>
 <p>Stemma does not compare text with pictures of pages, and it cannot read a scan itself. It does not read your manuscript files; it checks the citations that have been recorded. Nothing ever stops you from writing.</p>`)}
@@ -132,7 +132,8 @@ const ROUND: { title: string; you: string; happens: string[] }[] = [
     "You can ask to see a few pages while you write. They are marked as text quoted from the source, which may contain errors."] },
   { title: "Check", you: "Check the project and explain what is open.", happens: [
     "The whole project is checked. Claude explains what is wrong, shows the evidence, says why it matters and suggests what to do.",
-    "A check that cannot be done is reported as <em>could not check</em>. It never counts as a pass."] },
+    "A check that cannot be done is reported as <em>could not check</em>. It never counts as a pass.",
+    "What nothing shows or contradicts, such as a source not compared with any catalogue, is listed as coverage. It is not a problem and asks nothing of you."] },
   { title: "Decide, and go round again", you: "I have a better scan of this book. Replace the old one.", happens: [
     "You choose what to fix. When a source is replaced, you see what relied on the old one. This version cannot note that you have looked again, so those items stay listed.",
     "Ask <q>Are any of my source files missing or changed?</q> to find files that have gone missing or been edited."] },
@@ -155,6 +156,7 @@ const WORDS: [string, string][] = [
   ["Page label", "The number printed on a page, where it could be established."],
   ["Finding", "One thing a check reports, with its evidence and a suggestion."],
   ["Could not check", "Something needed was missing, so there is no answer yet."],
+  ["Coverage", "What a report covered by other means, or did not cover, and what it saw in an original. It is not a list of things to do."],
   ["Checked clean", "The checks found nothing open. It does not mean the book is correct."],
   ["Unreviewed, not admitted", "A report counts cited items that nobody has reviewed, and sources you have not accepted into your project. The count is information, not a finding."],
 ];
@@ -240,7 +242,7 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
   { id: "source.original", question: "Does the text still match its original?", looks: "Each source's text must be tied to the original it was made from, and converting that original again must have given the same text.",
     limit: "It reads the recorded comparison, not the original. Converting again repeats any mistake already in the original's own text." },
   { id: "source.labels", question: "Do the page numbers make sense?", looks: "Printed page numbers should run on from page to page, and agree with the numbers printed on the pages.",
-    limit: "A jump may be a misprint or a missing leaf in the original. Look at the page. A note on what you saw is shown with the finding; only a person can dismiss it." },
+    limit: "Where every page of the original is held and the text plainly runs on across a jump, the report records it as something seen in the original. Otherwise a jump stays open: it may be a missing leaf or a wrong label." },
   { id: "source.footnotes", question: "Do footnotes and their markers pair up?", looks: "Where footnotes could be told apart, each marker should have its note and each note its marker.",
     limit: "It says nothing about pages whose footnotes could not be determined, which includes most scans." },
   { id: "quote.present", question: "Is the quotation in the source?", looks: "Each recorded quotation is looked for in the source's text. Differences in line breaks and spacing, and a few other quirks of printed and scanned text, are allowed. A close but different passage is shown next to your quotation.",
@@ -252,9 +254,9 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
   { id: "number.present", question: "Is your figure in the source?", looks: "A figure in a sentence that cites one source should appear in that source's text.",
     limit: "It finds the figure anywhere in the source, whatever it counts there. It does not read figures written as words." },
   { id: "meta.source", question: "Do the details match the work itself?", looks: "Authors, title and date are compared with what the original states about itself and with the text of its title page.",
-    limit: "Scanned text can garble a title page. You can look at the page and record what you saw." },
+    limit: "Scanned text can garble a title page. A saved catalogue record that agrees then bears the detail out. With neither, the report says it was not covered; that is not a problem to fix." },
   { id: "meta.resolver", question: "Do the details match a library catalogue?", looks: "Authors, title and date are compared with catalogue records saved in your project. A body filed under its parent body, and a part entered after the title of its collection, count as the same name or title.",
-    limit: "A catalogue can be wrong, or describe another edition or a whole set of volumes. Where a volume carries its set's date and nothing else shows the volume's year, the check says it could not check." },
+    limit: "A catalogue can be wrong, or describe another edition or a whole set of volumes. A source not compared with any catalogue is reported as not covered, not as a problem." },
   { id: "id.resolves", question: "Does each identifier lead to the right work?", looks: "A DOI or library identifier should have a saved catalogue record naming the same work.",
     limit: "It compares titles. Some kinds of identifier cannot be looked up." },
   { id: "cite.key", question: "Which source does this citation mean?", looks: "The short label in each citation must match exactly one source.",
@@ -297,9 +299,9 @@ ${band("What is not checked", `<p>A report runs the checks that apply to what is
 const STORY: [string, string][] = [
   ["Start a project", "A new project is created, and two invented books are recorded."],
   ["Cite, with a slip", "Two citations are added. One mistypes the short label of its source, and a book that is never cited is listed for the bibliography."],
-  ["First check", "The check finds the slip and the uncited book, notices a file out of its standard layout, and says that a cited book is not in the project. Neither invented book can be compared with a catalogue."],
+  ["First check", "The check finds the slip and the uncited book, notices a file out of its standard layout, and says that a cited book is not in the project. It also notes that neither invented book was compared with a catalogue, which is not a problem."],
   ["Fix and check again", "Three problems are fixed. There is still no text of the cited book to compare with."],
-  ["Add a scan's text", "A picture of a page holds no text, so text for the scan is supplied page by page and labelled as recognized. The author then records what the title page shows. One thing stays open: the invented book is in no catalogue."],
+  ["Add a scan's text", "A picture of a page holds no text, so text for the scan is supplied page by page and labelled as recognized. Nothing is left open. The report says what it could not cover: the title is not in the text, and the invented book is in no catalogue."],
   ["A PDF with its own text", "In a second project, one command turns a PDF into page files, converts it again to compare, and checks. The warnings shown come from the PDF-reading library and concern drawing pages, which Stemma does not do."],
   ["Cite a passage", "A passage is found and chosen by its place. A script copies its words and page into a citation."],
   ["Check typed quotations and pages", "Two more citations are typed. One differs by a word, and one cites a page the book does not have. The copied one passes, after rejoining a word split at the end of a line."],
@@ -336,7 +338,7 @@ ${more("Show six pictures", ["check-quotations.png", "demo-first-check.png", "ch
 
 /** Where each fact in the worked example comes from, in everyday words. */
 const PROVENANCE: [string, string][] = [
-  ["Title, author, publisher, place and year", "Read from the picture of the title page. The computer-read text of that page does not hold the year of publication, so the check says it could not find it."],
+  ["Title, author, publisher, place and year", "Read from the picture of the title page. The computer-read text of that page does not hold the year of publication; the saved Internet Archive record of the same item gives it, and the check names that record as its basis."],
   ["The four quotations", "An AI model chose the passages, and a script copied them. The model then compared each with the picture of its page: PDF pages 19, 105 and 106, counting from 0."],
   ["Where the original came from", "The web address it was downloaded from. The time it was obtained is the downloaded file's own date."],
   ["The text", "The text already inside the Internet Archive's PDF, made by character recognition that nobody has proofread."],
@@ -371,7 +373,7 @@ function darwin(): string {
   const without = pages.filter((p) => p.label_status !== "labelled").length;
   const checked = read("website/recorded/example-check.txt");
   const trial = read("website/recorded/example-trial.txt");
-  const counts = /OPEN FINDINGS: (\d+) problem\(s\), (\d+) could not be checked/.exec(checked)!;
+  if (!checked.includes("CHECKED CLEAN")) throw new Error("the worked example is no longer checked clean; reword the page");
   const page = `sources/${source.citation_key}/pages/p0105.md`;
   const parts: [string, string][] = [["works", "1. The works"], ["original", "2. One original"], ["text", "3. Its source files"], ["pages", "4. Its page numbers"], ["citations", "5. Four citations"], ["check", "6. The check"], ["mistakes", "7. Planted mistakes"], ["again", "8. Checking it again"], ["facts", "Where the facts come from"], ["limits", "What this does not show"]];
   return `${opening("Worked example: Darwin and coral reefs", "A real book from 1842, followed from its title page to four checked quotations.", `<p class="note">An AI model built this example and compared its facts and quotations with pictures of the pages. <strong>No person has confirmed them</strong>, and no record is marked as reviewed. The example holds the text of ${works.length} works on coral reefs. No PDF or page picture is published with it.</p>
@@ -399,7 +401,7 @@ ${band("5. Four citations", `<p>Each sentence below is this example's own wordin
 ${file(`records/passages/${citations[0]!.passage}.json`)}
 ${file(`records/citations/${citations[0]!.id}.json`)}`, { id: "citations" })}
 ${band("6. The check", `<p>All four citations pass: each quotation is in the source's text, on the page cited. One matched after rejoining the word <em>denying</em>, split at the end of a line; the report points that out so you can look.</p>
-<p>The project as a whole is <em>not</em> called checked clean. Across all the works, ${counts[1]} problems and ${counts[2]} things that could not be checked are open. The problem is a printed page number that jumps from 232 to 333. The page pictures show the same, and the report shows that explanation with the finding, which stays open unless a person dismisses it. What could not be checked is the year of two books: the computer-read text of their title pages does not show it, and in one the library catalogue gives only the date of the set the volume belongs to. A person who looks at a title page can record what it shows.</p>
+<p>The project as a whole is checked clean: nothing across the works is open. No person had to approve anything. The report also says how it got there. The computer-read text of Darwin's title page leaves out the year, and a saved library record of the same copy bears it out. In another volume the printed page numbers jump from 232 to 333; every page of the original is there and the text runs on, so the report records the jump as something seen in the original. <em>Checked clean</em> does not mean the work is correct, only that these checks found nothing wrong.</p>
 ${more("What the tool printed", transcript(checked, "<strong>Transcript</strong> of a real run on the example as published. Folder names are replaced."))}`, { id: "check" })}
 ${band("7. Planted mistakes", `<p>To see whether the checks would notice, two citations in a throwaway copy of the project were changed as if an author had typed them wrongly: <q>greater</q> became <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
 <p>Both were caught. The changed quotation is shown beside the wording in the source (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words are: page 88.</p>

@@ -38,7 +38,7 @@ Could-not-check is distinct from pass. Nothing in a report stops a build. The sa
 
 - [ ] **US-026-AC1** — Given a set of checked items, when checks finish, then each result is pass, fail, or unverifiable and carries its evidence, and each fail or unverifiable result says what is wrong, why it matters, and what to do.
 - [ ] **US-026-AC2** — Given open findings of any kind, including images, coordinates, support, or uncommitted changes, when a draft, camera-ready, or reviewer build is requested, then the build completes.
-- [ ] **US-026-AC3** — Given any open finding, including a could-not-check result, when a build reports, then the output is not labelled checked clean.
+- [ ] **US-026-AC3** — Given any open finding, including a could-not-check result that is not coverage, when a build reports, then the output is not labelled checked clean.
 - [ ] **US-026-AC4** — Given every finding is fixed, dismissed, or confirmed and some items are unreviewed, when a build reports, then the output is labelled checked clean, dismissed findings stay listed, and unreviewed items are counted separately.
 - [ ] **US-026-AC5** — Given an ordinary tool failure such as a compile error, when a build runs, then it reports a tool failure and presents no older output as current.
 - [ ] **US-026-AC6** — Given several findings with one cause, when the report is produced, then they are grouped and none is shown without an explanation.

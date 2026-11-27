@@ -47,13 +47,13 @@ const SPECS: Spec[] = [
   },
   {
     file: "demo-first-check.png", appearance: "light", width: 880, title: "check: a mistyped citation key",
-    alt: "Output of stemma check in the demo: an uncited source, a citation key no source holds, a file not in canonical form, a cited source that is not in the project, and details not yet compared with a catalogue.",
+    alt: "Output of stemma check in the demo: an uncited source, a citation key no source holds, a file not in canonical form, and a cited source that is not in the project.",
     command: "From the demo run. All names and sources are invented.",
     text: (t) => between(t("transcripts/demo.txt"), "$ stemma check --project $DEMO/book", "\n=============== 4."),
   },
   {
     file: "check-quotations.png", appearance: "light", width: 880, title: "check: a quotation that differs, and a page outside the source",
-    alt: "Output of stemma check: a cited page outside the source files, quoted words that are not on the cited page, a quotation shown beside the closest source text, details that could not be compared, and a note that one quotation matched after joining a word split at a line end.",
+    alt: "Output of stemma check: a cited page outside the source files, quoted words that are not on the cited page, a quotation shown beside the closest source text, a short coverage summary, and a note that one quotation matched after joining a word split at a line end.",
     command: "From the demo run. All names and sources are invented.",
     text: (t) => between(t("transcripts/demo.txt"), "$ stemma check --project $DEMO/quoting-book", "\n=============== 9."),
   },

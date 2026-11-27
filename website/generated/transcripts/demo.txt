@@ -44,7 +44,7 @@ By hand: list both sources for the bibliography in stemma.json (orphan1990 is ne
 =============== 3. Check: the seeded errors are reported and explained
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 4 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 4 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 14 result(s) passed.
 
 1. PROBLEM: A source is listed for the built bibliography but cited nowhere.  [bib.uncited]
@@ -62,33 +62,22 @@ Checked the whole project: 14 result(s) passed.
        key: ledgr1911
        sentence: The toll was doubled in the following century.
 
-3. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0ledger001
-       source file: records/sources/src-demo0ledger001.json
-       key: ledger1911
-
-4. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0orphan001
-       source file: records/sources/src-demo0orphan001.json
-       key: orphan1990
-
-5. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
+3. PROBLEM: A file is not written in the canonical form (key order, indentation or line endings differ).  [record.valid]
    Why it matters: Digests, review marks and diffs depend on one exact form. No value is wrong because of this alone.
    What to do: Run `fmt` on the file. It rewrites the layout and changes no value.
    - stemma.json
        file: stemma.json
 
-6. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
+4. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
    What to do: Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
    - cit-demo0toll00001
        citation file: records/citations/cit-demo0toll00001.json
        key: ledger1911
        source file: records/sources/src-demo0ledger001.json
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: ledger1911, orphan1990
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0ledger001 (not admitted)
@@ -106,17 +95,10 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 2 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 2 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 17 result(s) passed.
 
-1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0ledger001
-       source file: records/sources/src-demo0ledger001.json
-       key: ledger1911
-
-2. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held, 2 places]
+1. PROBLEM: A cited source has no source file in the project, so this citation is unchecked.  [source.held, 2 places]
    Why it matters: Without the source's text in the project, nobody can compare this citation with the source, so it is unchecked.
    What to do: Capture the source: `ingest`, or `source convert <original> --source <id>`. For a book held only on paper, supply a transcription made by a recognition tool or typed. Writing can carry on meanwhile.
    - cit-demo0toll00001
@@ -127,6 +109,9 @@ Checked the whole project: 17 result(s) passed.
        citation file: records/citations/cit-demo0toll00002.json
        key: ledger1911
        source file: records/sources/src-demo0ledger001.json
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: ledger1911
 
 For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
    - src-demo0ledger001 (not admitted)
@@ -169,29 +154,13 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+CHECKED CLEAN: the checks found nothing open.
+This does not mean that the book is correct. It covers only what is in these project files.
 Checked the whole project: 27 result(s) passed.
 
-1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0ledger001
-       source file: records/sources/src-demo0ledger001.json
-       key: ledger1911
-
-2. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-demo0ledger001
-       source file: records/sources/src-demo0ledger001.json
-       key: ledger1911
-       source text: sources/ledger1911/source.md
-       title page parts: index 0, 1
-       title in record: An invented harbour ledger
-       title result: not found in what the copy states or in its title page text
-       year in record: 1911
-       year result: not found in what the copy states or in its title page text
-       not found: title, year
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: ledger1911
+   - not corroborated: neither the title page text nor a saved catalogue record shows the title or the year: ledger1911
 
 For information, not findings: what has been compared with and reviewed for each source file.
    - sources/ledger1911 (ocr): 0 of 4 parts reviewed whole by a person
@@ -201,41 +170,10 @@ For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
 
 The whole project is checked each time.
 Full report: $DEMO/book/.stemma/reports/check.json
-[exit 1]
-
-The copy's text never shows the title. A person who looks at the title page can record that, at any time.
-
-$ stemma review add txt-random0001 --scope source_details --pages 0 --fields title,year --against "the ledger's title page" --outcome agrees --actor person:demo-author --project $DEMO/book
-Recorded rvw-random0001: a person's review. It stays current while what it covered is unchanged, and records what was said; it is not proof.
-No record problems found.
 [exit 0]
 
-$ stemma check --project $DEMO/book
-OPEN FINDINGS: 0 problem(s), 1 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
-Checked the whole project: 29 result(s) passed.
-
-1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0ledger001
-       source file: records/sources/src-demo0ledger001.json
-       key: ledger1911
-
-For information: these could not be compared and a person confirmed the details. They are confirmed by the author, not verified.
-   - src-demo0ledger001 [meta.source] review rvw-random0001
-
-For information, not findings: what has been compared with and reviewed for each source file.
-   - sources/ledger1911 (ocr): 0 of 4 parts reviewed whole by a person
-
-For information, not a finding: 1 cited item(s) are unreviewed or not admitted.
-   - src-demo0ledger001 (not admitted)
-
-The whole project is checked each time.
-Full report: $DEMO/book/.stemma/reports/check.json
-[exit 1]
-
-What is left is real: this invented work is in no catalogue, so its details cannot be compared with one.
-It stays listed. The recognized text is reported as a coverage figure, not as a finding.
+The copy's text never shows the title, and this invented work is in no catalogue. Nothing contradicts the record,
+so neither is a finding: the report says what was not covered. Recognized text is a coverage figure too.
 
 =============== 6. A born-digital PDF: one command captures it, converts it page by page, compares and checks
 
@@ -270,36 +208,20 @@ Warning: Cannot polyfill `Path2D`, rendering may be broken.
 == 3. Catalogue lookups
   0 lookup(s) made, 0 already saved.
 == 4. Check
-OPEN FINDINGS: 0 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+CHECKED CLEAN: the checks found nothing open.
+This does not mean that the book is correct. It covers only what is in these project files.
 Checked the whole project: 21 result(s) passed.
 
-1. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-
-2. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-       source text: sources/levy1911/source.md
-       title page parts: index 0, 1
-       title in record: An invented book of harbour levies
-       title result: not found in what the copy states or in its title page text
-       year in record: 1911
-       year result: not found in what the copy states or in its title page text
-       not found: title, year
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: levy1911
+   - not corroborated: neither the title page text nor a saved catalogue record shows the title or the year: levy1911
 
 For information, not findings: what has been compared with and reviewed for each source file.
    - sources/levy1911 (text_layer): 0 of 6 parts reviewed whole by a person; fresh conversion: 6 of 6 parts agree
 
 The whole project is checked each time.
 Full report: $DEMO/quoting-book/.stemma/reports/check.json
-[exit 1]
+[exit 0]
 
 =============== 7. Evidence is selected by address; its words and page are copied by script
 
@@ -343,7 +265,7 @@ No record problems found.
 [exit 0]
 
 $ stemma check --project $DEMO/quoting-book
-OPEN FINDINGS: 3 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 45 result(s) passed.
 
 1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
@@ -358,28 +280,7 @@ Checked the whole project: 45 result(s) passed.
        source text: sources/levy1911/source.md
        pages without a label: 1 page(s)
 
-2. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-
-3. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-       source text: sources/levy1911/source.md
-       title page parts: index 0, 1
-       title in record: An invented book of harbour levies
-       title result: not found in what the copy states or in its title page text
-       year in record: 1911
-       year result: not found in what the copy states or in its title page text
-       not found: title, year
-
-4. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+2. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
    Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
    What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
    - cit-demo0quote0003
@@ -390,7 +291,7 @@ Checked the whole project: 45 result(s) passed.
        found on: printed page 5 (index 5)
        address: txt-random0002/5:main:0-31
 
-5. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
+3. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
    Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
    What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
    - cit-demo0quote0002
@@ -404,6 +305,10 @@ Checked the whole project: 45 result(s) passed.
        found on: printed page 2 (index 2)
        address: txt-random0002/2:main:0-44
        text method: text_layer, quality unassessed
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: levy1911
+   - not corroborated: neither the title page text nor a saved catalogue record shows the title or the year: levy1911
 
 For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
 If the hyphen belongs to the word, the quotation should keep it: look at the page.
@@ -435,7 +340,7 @@ Stemma holds back no source: any source in this project may be sent to a hosted 
 =============== 10. A clone has everything the checks read: the originals are not needed
 
 $ stemma check --project $DEMO/clone
-OPEN FINDINGS: 3 problem(s), 2 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
+OPEN FINDINGS: 3 problem(s), 0 could not be checked, 0 kind(s) of check this version does not run. Nothing is blocked.
 Checked the whole project: 45 result(s) passed.
 
 1. PROBLEM: A cited page, chapter or paragraph is outside those in your source files.  [locator.extent]
@@ -450,28 +355,7 @@ Checked the whole project: 45 result(s) passed.
        source text: sources/levy1911/source.md
        pages without a label: 1 page(s)
 
-2. COULD NOT CHECK: The source's details have not been compared with any catalogue: no lookup is saved.  [meta.resolver]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-
-3. COULD NOT CHECK: Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.  [meta.source]
-   Why it matters: A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.
-   What to do: Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity.
-   - src-demo0levybook1
-       source file: records/sources/src-demo0levybook1.json
-       key: levy1911
-       source text: sources/levy1911/source.md
-       title page parts: index 0, 1
-       title in record: An invented book of harbour levies
-       title result: not found in what the copy states or in its title page text
-       year in record: 1911
-       year result: not found in what the copy states or in its title page text
-       not found: title, year
-
-4. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
+2. PROBLEM: The quoted words are in the source, but not where the citation says.  [quote.page]
    Why it matters: A reader who turns to the cited place and does not find the words cannot check them.
    What to do: Look at the place found, and correct the citation's locator, ideally by citing a captured passage so that the locator is copied.
    - cit-demo0quote0003
@@ -482,7 +366,7 @@ Checked the whole project: 45 result(s) passed.
        found on: printed page 5 (index 5)
        address: txt-random0002/5:main:0-31
 
-5. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
+3. PROBLEM: A quotation is not in the source's text as written. A passage close to it is; both are shown.  [quote.present]
    Why it matters: Readers take quoted words to be the source's own. Words the source does not hold misreport it.
    What to do: Compare the two texts, and look at the page itself, since converted or recognized text can be wrong. If your quotation is wrong, capture the passage by its address so the words are copied. An omission, an added word, a change of capitals or punctuation, an ellipsis or a bracketed edit all count as differences.
    - cit-demo0quote0002
@@ -496,6 +380,10 @@ Checked the whole project: 45 result(s) passed.
        found on: printed page 2 (index 2)
        address: txt-random0002/2:main:0-44
        text method: text_layer, quality unassessed
+
+Coverage, for information: what was covered by other means or not covered. Nothing here is a problem or needs doing.
+   - not compared with a catalogue: no lookup that found the work is saved: levy1911
+   - not corroborated: neither the title page text nor a saved catalogue record shows the title or the year: levy1911
 
 For information, not a finding: these quotations matched after joining a word the source text splits at a line end.
 If the hyphen belongs to the word, the quotation should keep it: look at the page.
