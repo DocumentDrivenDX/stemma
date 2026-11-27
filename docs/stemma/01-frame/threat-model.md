@@ -138,7 +138,7 @@ modules, or the product owner for accepted risks.
 | C2 | TM-S-002 | TM-T-003 | TM-R-001 | TM-I-004, 005 | TM-D-003 | TM-E-003 |
 | C3 | TM-S-003 | TM-T-003, 010 | n1 | TM-I-014 | TM-D-001 | TM-E-002 |
 | C4 | TM-S-007 | TM-T-011 | n1 | TM-I-011 | TM-D-005 | n2 |
-| C5 | TM-S-002, 006 | TM-T-001, 006 | TM-R-001 | TM-I-009, 013, 014 | TM-D-003 | n3 |
+| C5 | TM-S-002, 006 | TM-T-001, 006 | TM-R-001 | TM-I-009, 013, 014, 023 | TM-D-003 | n3 |
 | C6 | TM-S-003 | TM-T-004 | n1 | TM-I-010 | TM-D-002 | n3 |
 | C7 | n4 | TM-T-012 | n1 | TM-I-002, 010 | TM-D-002 | n3 |
 | C8 | n4 | TM-T-005 | n1 | TM-I-015 | TM-D-009 | n3 |
@@ -224,6 +224,7 @@ modules, or the product owner for accepted risks.
 | TM-I-019 | The local server is made to give a file that is not a recorded original: a request naming a path, a link placed where originals are looked for, or a file swapped for another after it was checked | 4 | 2 | 8 | `server` | SEC-038: a request names only a digest a source file records; no link is followed; the bytes sent are the bytes hashed |
 | TM-I-021 | The secret or a one-time code enters the conversation, and so the model provider and the transcript, through a tool result, the server's output, or a launch file the agent is told of | 5 | 2 | 10 | `server`, `skills/stemma` | SEC-041: results hold neither and name no launch file; `open` launches the browser itself. An agent can still read the temporary directory; the skill tells it not to |
 | TM-I-022 | MCP results send restricted positions, local paths, or much source text to the model | 4 | 3 | 12 | `server` | SEC-042: only author-export text, bounded per call, recognized coordinates and held-at places withheld. Unrecognized coordinate forms pass, and repeated calls read much text, as `excerpt` and file access already can (TM-I-001, TM-I-002) |
+| TM-I-023 | A secret or a local path is committed in an address or a name that says where an original can be had | 4 | 2 | 8 | `records`, `cli`; author | A listed location is `record_invalid` when its address is not `http` or `https`, or holds a user name or password; a private copy is recorded by a label that can hold no path separator or colon, and its path is never written (CONTRACT-001 G, LOC-03). A token in an address's query is not recognized, so such a copy has to be recorded as private. These rules do not cover an upstream's own `url`, which is recorded as given |
 | TM-I-020 | An original shown shows what the source text and the export leave out, such as a download stamp naming a person or a restricted position | 2 | 2 | 4 | Author (accepted) | Shown only through the local server on the author's computer; no export or package holds it; stated in CONTRACT-005 M |
 | TM-I-018 | Another local user learns the secret or one-time code from process arguments, output, logs, or files, and reads the project through the port | 4 | 2 | 8 | `server` | SEC-035: private launch file, nothing in arguments or output; whoever reads the file first wins the one-time code, which file permissions prevent on macOS and Linux; Windows permissions are untested. Neither is sent (SEC-037). A process running as the author that redeems the code first gets in; the author's page and the command's output then say that the link was opened first, which tells of it and does not prevent it |
 
