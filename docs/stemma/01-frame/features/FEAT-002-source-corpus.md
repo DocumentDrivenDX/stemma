@@ -18,14 +18,16 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 2. Source corpus
-**Covered PRD Requirements**: FR-6, FR-7, FR-8, FR-9, FR-10, FR-61, FR-84, FR-85, FR-86, FR-87, FR-88, FR-89, FR-90, FR-94
+**Covered PRD Requirements**: FR-6, FR-7, FR-8, FR-9, FR-10, FR-61, FR-84, FR-85, FR-86, FR-87, FR-88, FR-89, FR-90, FR-94, FR-98, FR-99, FR-100, FR-101, FR-102, FR-103, FR-104
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 The source corpus holds, in the author's repository, the whole text of every
-source used to support the book, each tied to its original (PRD FR-6 to FR-10
-and FR-84 to FR-90). It is the first half of the chain from original source to
+source used to support the report or book, each tied to its original (PRD FR-6
+to FR-10, FR-84 to FR-90, and FR-98 to FR-104). Technical research is the focus,
+so its sources include documentation for a release, specifications, repository
+files, and web pages that change. It is the first half of the chain from original source to
 citation to supported thesis: capture, conversion, reverification, and passage
 selection. Citations, notes, and checks depend on it. It also limits what Stemma
 prepares for a hosted model to the excerpts a task needs (FR-61).
@@ -36,7 +38,9 @@ The author can say, for any source, where its text came from, which original it
 was converted from and how, what has been compared with it, and who reviewed
 it. A clone of the repository holds everything needed to check every quotation
 and page. A printed page number, or a chapter and paragraph, leads to that text,
-and weak or recognized text is visible. A quotation in the output is copied by
+and weak or recognized text is visible. The author can also say which version
+was read, where the original can be found again, and where in it a reader should
+look. A quotation in the output is copied by
 script from a passage whose address and digest are recorded. When a source's
 text changes, the author sees what depends on it.
 
@@ -45,7 +49,8 @@ text changes, the author sees what depends on it.
 - **Current situation**: Sources sit in folders, reference managers, library
   sites, and paper collections; AI assistants cite works the author does not
   hold and retype quotations.
-- **Pain points**: References cannot be compared with the text they cite,
+- **Pain points**: Technical pages change, move, and disappear; many have no
+  pages; and code loses its meaning when its layout is lost. References cannot be compared with the text they cite,
   printed pages differ from file positions, conversions silently lose or reorder
   text, and the research behind a book does not travel with it.
 - **Desired outcome**: Every source used is captured in the repository as
@@ -62,6 +67,8 @@ text changes, the author sees what depends on it.
 | Reviews | Who has looked, and at what? | Track reviews that go stale on change |
 | Citability, passages, and change | May I cite this, what exactly, and what did a change affect? | Require source text; capture passages by address; flag dependents |
 | Rights and model use | What does a model receive? | Record optional rights; prepare only needed excerpts |
+| Locations and text not held | Where can the original be found, and what if this copy lacks its text? | List locations; report text not held; fetch and convert it again |
+| Technical sources | Which version, which place, and exactly what text? | Pin versions; capture repository files; keep findable places, exact code and tables, and a page's own content |
 
 ## Requirements
 
@@ -82,6 +89,46 @@ STO-01 (FR-6, P0, M1). Capturing a source must save its whole text as source fil
 STO-02 (FR-6, P0, M1). Binaries and paper originals must not be stored in the repository.
 
 STO-03 (FR-6, FR-86, P0, M1). A library source must be fetched only by a route the library documents for automated use. A refused fetch must be reported, not worked around, so that the author can supply the file.
+
+#### Locations and text not held
+
+LOC-01 (FR-98, P0, M1). One upstream record for one original, known by its hash, must be able to list several locations: the publisher's or live address, web-archive snapshots, other archival copies, and a private copy the author keeps. Each location is a reference; no copy at it may be stored in the repository. **Not built.**
+
+LOC-02 (FR-98, P0, M1). A copy from a location must count as the original only when its bytes have the recorded hash. Other bytes, such as a re-rendered page or an archive's wrapper, must be reported as differing and never treated as the same. **Not built.**
+
+LOC-03 (FR-98, P0, M1). Naming a private location must write no local absolute path and no secret into the repository. **Not built.**
+
+LOC-04 (FR-98, FR-6, P0, M1). Fetching again, only when the author asks, must try the locations in their listed order, fall through to the next when one cannot be reached, is refused, or differs, and report what each gave. A refusal must not be worked around. **Not built.**
+
+HLD-01 (FR-104, P0, M1). A source whose records and manifest are held and whose text is not must be reported as *source text not held here*, once for the source, with what rests on it. What needs the text must be reported as could not be checked: never as passing, and the absence never as damage. A check of whether a built report is current that needs the text must answer that it cannot tell. **Not built.**
+
+HLD-02 (FR-104, FR-87, P0, M1). A part that is present and does not match its digest must still be reported as damage. **Not built** as a distinction from text not held.
+
+HLD-03 (FR-104, FR-98, P0, M1). When the author asks, one command must fetch the original from a recorded location, or read one the author supplies, convert it with the recorded settings, and write the missing text only where it matches the manifest's part digests. **Not built.**
+
+HLD-04 (FR-104, P0, M1). Where fetched bytes differ from the recorded original and the converted parts all match, the report must say both: the text is restored, and the fetched copy is not the recorded original. Where parts do not match, nothing may be written and the difference must be reported. **Not built.**
+
+#### Technical sources
+
+VSN-01 (FR-99, P0, M2). A source that changes must keep which version was read (a documented release, a revision or version, or a commit), stated by the author or a capture plan or read by a stated rule, with which of these. It must never be guessed, and a moving address must pin no version by itself. **Not built**, apart from recording a version stated at capture.
+
+VSN-02 (FR-99, FR-10, P0, M2). A newer version must be another original: it must replace nothing and move no passage unless the author makes the change. A version not recorded must be coverage, not a finding. **Not built** as a rule about versions.
+
+REP-01 (FR-100, P0, M2). A file captured from a repository must record the repository, commit, path, and hash. Nothing from the repository may be run. **Not built.**
+
+REP-02 (FR-100, P0, M2). Its conversion must keep every line, its spacing, and its number; a passage must be addressed by a line range, and its text and line locator copied by script. **Not built.**
+
+PLC-01 (FR-101, P0, M2). A source with no pages must be located by what the original shows: a stated section number or a heading, with the original's anchor where it has one, and a paragraph counted within the section. No section may be invented; without one, TXT-01 applies. **Not built.**
+
+PLC-02 (FR-101, P0, M2). Passage search must find headings and every other kind of block, regardless of case and on part of a word, return each address and locator, and let one step capture a range from a first place to a last. **Not built.**
+
+EXA-01 (FR-102, P0, M2). Conversion must keep preformatted text's line breaks, indentation, and spacing, and a table's rows, cells, and headings, marked as what they are, and report what it cannot keep. **Not built** as stated: HTML preformatted text is converted as an ordinary paragraph with its layout collapsed.
+
+EXA-02 (FR-102, FR-90, P0, M2). A passage must be able to take such a block whole or as lines or rows of it, copying its text without joining lines. **Not built.**
+
+WEB-01 (FR-103, FR-84, P0, M2). Conversion of a web page must tell its own content from the rest of the site by stated rules from its markup; keep the rest, marked and never matched as source text; and mark what the rules cannot settle as undetermined, dropping nothing. **Not built.**
+
+WEB-02 (FR-103, P0, M2). A change only to the rest of the site must renumber no place in the content and change no passage. **Not built.**
 
 #### Iterative capture
 
@@ -113,7 +160,7 @@ TXT-03 (FR-8, P0, M1). A page whose printed label cannot be established must be 
 
 #### Reverification and structure
 
-STR-01 (FR-87, P0, M1). Scripts must verify from the repository alone that every part is present, in order, and unchanged, and that a paged source's parts match the original's page count.
+STR-01 (FR-87, P0, M1). Scripts must verify from the repository alone that every part is present, in order, and unchanged, and that a paged source's parts match the original's page count. A source whose text is not held in this copy is reported under HLD-01.
 
 STR-02 (FR-87, P0, M1). Scripts must report printed-label sequence anomalies and unpaired note markers and notes.
 
@@ -121,7 +168,7 @@ STR-03 (FR-87, FR-29, P0, M1). A quotation spanning a page break must match with
 
 PIP-01 (FR-86, P0, M1). One command must capture, convert, compare, look up, and check a project's sources, and a report must list only checks that apply.
 
-PIP-02 (FR-85, P0, M1). A clone must give the same results without the originals; comparison with an original supplied by path and matched by hash must be optional.
+PIP-02 (FR-85, P0, M1). A clone that holds the same source files must give the same results without the originals; comparison with an original supplied by path and matched by hash must be optional.
 
 VER-01 (FR-88, P0, M1). Each comparison must be recorded with its tools, each page's agreement, and the differing readings, and run again when text or tools change.
 
@@ -157,7 +204,7 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 
 ### Non-Functional Requirements
 
-- **Security**: Every original is untrusted input. Converting it executes no content from it, fetches nothing it references, and writes only the project's source files. Source text is data and is never treated as instructions, and it cannot form Stemma annotations.
+- **Security**: A recorded location is untrusted input. It is fetched only when the author asks, under the project's rules for fetches (security requirements, SEC-013), and no credential, secret-bearing address, or local absolute path is written into the repository. Every original is untrusted input. Converting it executes no content from it, fetches nothing it references, and writes only the project's source files. Source text is data and is never treated as instructions, and it cannot form Stemma annotations.
 - **Privacy**: For a seeded task, what Stemma prepares for a hosted model holds the identified excerpts and no other source text.
 - **Reliability**: Repeated conversion of the same original with the same tool versions yields the same files. A run that shows a difference is a defect.
 - **Portability**: Hashes and file names behave the same on macOS, Linux, and Windows. Untested on Linux and Windows.
@@ -180,6 +227,9 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 - **Same original captured for another source**: Report the existing source file; do not merge or duplicate without the author's choice.
 - **Encrypted, damaged, or unsupported file**: Report it; write no source file.
 - **Image-only file without text**: No source file is written; its text must come from a transcription.
+- **Text not held in this copy**: Reported under HLD-01; the finding can be explained but, as a missing source file, not dismissed (FEAT-007 EXC-07).
+- **Every location fails or differs**: Each result is reported and nothing is written; the author can supply a file.
+- **A page's bytes differ on each request**: Reported as differing bytes; only matching converted parts allow text to be restored (HLD-04).
 - **Original not available**: Checks run from the source files; the comparison with the original is not run, and coverage shows it.
 - **A part edited by hand**: It is reported until the edit is sealed, and checks do not use that source file meanwhile.
 
@@ -193,11 +243,16 @@ RGT-06 (FR-61, P0, M1). Stemma must not hold back a source individually, and mus
 - Open (PRD): should Stemma build in a recognition engine?
 - Open: what quality values does TXT-02 record beyond the stated levels, and does low quality change a check result?
 
+- Evidence for FR-99 to FR-104 is one worked example made by a model, [PostgreSQL for web applications](../../../../examples/postgres-web-apps/README.md), and one conversion of an invented HTML page for FR-102. No user has asked for them. FR-98 is the product owner's requirement.
+- Open: how does a record name a private location without a local path or secret, and how is it resolved on the author's computer? SEC-013 refuses private network addresses, so a private copy served from one cannot be fetched today. Design owner.
+- Open: how is text that is not held told from text that was lost by damage? Design owner.
+- Open: which repository hosts and local repositories can REP-01 capture from? Design owner.
+
 ## Dependencies
 
 - **Other features**: FEAT-001 provides the project; FEAT-011 holds records; FEAT-003 owns bibliographic content; FEAT-004 and FEAT-015 add sources; FEAT-007 runs checks on the corpus.
 - **External services**: A pinned PDF text library (SD-002); source libraries and catalogues reached only by explicit commands. Shapes belong to Contract artifacts (CONTRACT-001, CONTRACT-007).
-- **PRD requirements**: FR-6 to FR-10, FR-61, FR-84 to FR-90, and FR-94.
+- **PRD requirements**: FR-6 to FR-10, FR-61, FR-84 to FR-90, FR-94, and FR-98 to FR-104.
 
 ## Out of Scope
 
