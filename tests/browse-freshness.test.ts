@@ -2,7 +2,7 @@
 // export's own data with no size cap, arras's own answers over it, and never
 // data older than the record files.
 import { afterAll, describe, expect, test } from "bun:test";
-import { cpSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
 import { exportGraph, FILES, type ManuscriptPort, servedData } from "@stemma/graph";
@@ -12,14 +12,13 @@ import { type Built, createSearch, ProcessGone, queryOf, type SnapshotProcess, S
 import { inputsChanged, mayShowTheSame, readProject, researchFiles, scanInputs } from "@stemma/workspace";
 import { VERSION } from "../packages/cli/src/context.ts";
 import { Browsing, endRuns, post } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, ROOT, temporary } from "./helpers.ts";
 
 afterAll(endRuns);
 
 function project(): string {
   const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
+  return copyExample(dir);
 }
 
 const filesOf = (dir: string, under: string) => (readdirSync(join(dir, under), { recursive: true }) as string[]).sort().map((f) => join(dir, under, f)).filter((f) => lstatSync(f).isFile());

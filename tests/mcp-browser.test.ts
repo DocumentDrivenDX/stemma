@@ -2,13 +2,13 @@
 // (US-122-AC4): the launch file the opener is given leads to the record asked
 // for, and the code leaves the address. Without the browser these are skipped.
 import { afterAll, describe, expect, test } from "bun:test";
-import { cpSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { type Browser, chromium } from "@playwright/test";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { shipped } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, temporary } from "./helpers.ts";
 import { endMcp, McpHost, stubOpener } from "./mcp-run.ts";
 
 const browser: Browser | undefined = await chromium.launch().catch((error: unknown) => {
@@ -24,7 +24,7 @@ afterAll(async () => {
 describe.skipIf(!browser)("US-122-AC4 in a browser", () => {
   test("open with a record shows that record's page and its source, and a later open another", async () => {
     const dir = join(temporary(), "coral");
-    cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
+    copyExample(dir);
     const data = join(temporary(), "data");
     mkdirSync(data);
     const opener = stubOpener();

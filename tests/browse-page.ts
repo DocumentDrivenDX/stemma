@@ -2,12 +2,12 @@
 // a copy of the worked example, a run whose code is unused, and a watched page.
 // Each test file closes the browser itself: a hook registered here would run after
 // only the first file that imports this one.
-import { cpSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { type Browser, chromium, type Page } from "@playwright/test";
 import { expect } from "bun:test";
 import { codeIn, Run } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, temporary } from "./helpers.ts";
 
 export const launch = (args: string[] = []) => chromium.launch({ args }).catch((error: unknown) => {
   if (!String(error).includes("Executable doesn't exist")) throw error;
@@ -18,8 +18,7 @@ export const browser: Browser | undefined = await launch();
 
 export function project(): string {
   const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
+  return copyExample(dir);
 }
 
 export const HOSTILE = "</script><script>window.__ran=1</script><img src=x onerror=\"window.__ran=2\"> [a](https://example.invalid/m) ‮evil";

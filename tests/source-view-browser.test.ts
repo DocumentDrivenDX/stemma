@@ -2,7 +2,7 @@
 // headless Chromium (US-116). Fetch the browser with ./scripts/dev.sh browsers;
 // without it these tests are skipped, and say so.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { cpSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import AxeBuilder from "@axe-core/playwright";
@@ -11,7 +11,7 @@ import { exportGraph } from "@stemma/graph";
 import { normalizeSentence, sha256 } from "@stemma/records";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { bundle, writeExplorer } from "../scripts/build.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, temporary } from "./helpers.ts";
 import { anchorOf, AT, citation, corpusOf, PAGES, passage, standard, VOLUME } from "./source-view-fixture.ts";
 
 let browser: Browser | undefined;
@@ -67,7 +67,7 @@ describe.skipIf(!browser)("the worked example's source panel, as the built comma
     const work = temporary();
     const cli = await bundle(join(work, "dist"));
     const dir = join(work, "coral-reefs");
-    cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (p) => !p.endsWith("/build") });
+    copyExample(dir, ["build", "report/build"]);
     const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, "graph", "export", "--audience", "author", "--page", "--project", dir],
       { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
     expect([done.exitCode, done.stderr.toString()]).toEqual([0, ""]);

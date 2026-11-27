@@ -1,11 +1,11 @@
 // Shared by the mcp*.test.ts files: a copy of the worked example, the shipped
 // command started as a host starts it, and what it leaves behind.
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { alive, shipped } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, temporary } from "./helpers.ts";
 import { McpHost } from "./mcp-run.ts";
 
 export const filesIn = (directory: string): string[] => (!existsSync(directory) ? [] : readdirSync(directory, { withFileTypes: true }).flatMap((e) => {
@@ -16,8 +16,7 @@ export const treeOf = (directory: string) => filesIn(directory).sort().map((path
 
 export function coral(): string {
   const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
+  return copyExample(dir);
 }
 
 /** The shipped command as the host starts it: from the plugin's directory, told the session's directory and the data directory. */

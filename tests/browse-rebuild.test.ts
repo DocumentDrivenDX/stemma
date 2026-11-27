@@ -1,7 +1,7 @@
 // The built `browse` as the files under it change (US-119-AC4; CONTRACT-005 M):
 // it never answers from data older than the record files.
 import { afterAll, describe, expect, test } from "bun:test";
-import { cpSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type ManuscriptPort, servedData } from "@stemma/graph";
 import { manuscriptView } from "@stemma/publish";
@@ -9,14 +9,13 @@ import { loadCorpus } from "@stemma/records";
 import { readProject } from "@stemma/workspace";
 import { VERSION } from "../packages/cli/src/context.ts";
 import { Browsing, childrenOf, endRuns } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, temporary } from "./helpers.ts";
 
 afterAll(endRuns);
 
 function project(): string {
   const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
+  return copyExample(dir);
 }
 
 const filesOf = (dir: string, under: string) => (readdirSync(join(dir, under), { recursive: true }) as string[]).sort().map((f) => join(dir, under, f)).filter((f) => lstatSync(f).isFile());

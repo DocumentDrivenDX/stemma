@@ -1,3 +1,4 @@
+import { dlopen, FFIType } from "bun:ffi";
 import { cpSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -29,6 +30,40 @@ export function temporary(): string {
   made.push(dir);
   return dir;
 }
+
+/**
+ * clonefile(2), which copies a whole directory tree on APFS in one call, sharing
+ * the blocks until either copy is written. Undefined where it is not there.
+ */
+const clonefile = (() => {
+  if (process.platform !== "darwin") return undefined;
+  try {
+    const lib = dlopen("/usr/lib/libSystem.B.dylib", { clonefile: { args: [FFIType.cstring, FFIType.cstring, FFIType.u32], returns: FFIType.i32 } });
+    return (from: string, to: string): boolean => lib.symbols.clonefile(Buffer.from(`${from}\0`), Buffer.from(`${to}\0`), 0) === 0;
+  } catch {
+    return undefined;
+  }
+})();
+
+/**
+ * A copy of the directory `from` at `to` (which must not exist), without the
+ * paths in `leave`, relative to `from`. It is a copy-on-write clone where the
+ * file system makes one, and an ordinary copy elsewhere; either way the files
+ * are the copy's own.
+ */
+export function copyTree(from: string, to: string, leave: string[] = []): string {
+  if (clonefile?.(from, to)) {
+    for (const path of leave) rmSync(join(to, path), { recursive: true, force: true });
+    return to;
+  }
+  const left = new Set(leave.map((path) => join(from, path)));
+  cpSync(from, to, { recursive: true, filter: (path) => !left.has(path) });
+  return to;
+}
+
+/** The worked example, as a copy of its own, without what a run of Stemma makes in it. */
+export const copyExample = (to: string, leave = [".stemma", "build", "report/build", "report/report.pdf"]): string =>
+  copyTree(join(ROOT, "examples/coral-reefs"), to, leave);
 
 export function fixture(name: string, parent = temporary()): string {
   const dir = join(parent, name);

@@ -3,20 +3,19 @@
 // is written, and how the run ends. Every run is started with --no-open.
 import { afterAll, describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { platform } from "node:os";
 import { dirname, join } from "node:path";
 import { browse } from "../packages/cli/src/browse.ts";
 import { alive, Browsing, childrenOf, codeIn, commandOf, endRuns, post, redeem, Run } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, ROOT, temporary } from "./helpers.ts";
 
 afterAll(endRuns);
 
 /** The worked example, which has source files, citations and a report. */
 function project(): string {
   const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
+  return copyExample(dir);
 }
 
 /** Every file below a directory, links not followed. */

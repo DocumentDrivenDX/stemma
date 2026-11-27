@@ -1,12 +1,12 @@
 // The evidence ledger that `build report` writes (CONTRACT-006 J, US-124), run
 // as the bundled command on a copy of the worked example.
 import { beforeAll, describe, expect, test } from "bun:test";
-import { cpSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { bundle } from "../scripts/build.ts";
 import { ISOLATION_FLAGS } from "../packages/cli/src/runtime.ts";
 import { totalsOf, type Unit } from "../packages/publish/src/evidence.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { copyExample, ROOT, temporary } from "./helpers.ts";
 
 const EXAMPLE = join(ROOT, "examples/coral-reefs");
 let copy = "";
@@ -47,7 +47,7 @@ beforeAll(async () => {
   const work = temporary();
   cli = await bundle(join(work, "plugin/dist"));
   copy = join(work, "coral-reefs");
-  cpSync(EXAMPLE, copy, { recursive: true, filter: (path) => !/^(\.stemma|build|report\/build|report\/report\.pdf)(\/|$)/.test(relative(EXAMPLE, path)) });
+  copyExample(copy);
 }, 120_000);
 
 describe("the evidence ledger", () => {
