@@ -85,6 +85,9 @@ export function render(corpus: Corpus, texts: SourceTexts, spec: QuotationSpec):
     }
     const at = textAt(texts, passage);
     if (at.state === "changed") throw new ReportError(`${spec.id}: page ${at.index} of ${String(passage.text)} has changed since ${segment.passage} was captured`);
+    if (at.state === "unavailable") {
+      throw new ReportError(`${spec.id}: the text of ${String(passage.text)} cannot be read, so ${segment.passage} cannot be copied from it; a part of it is missing or damaged, as \`check\` explains`);
+    }
     if (at.state !== "ok" || !isObject(passage.quote) || at.text !== passage.quote.exact) {
       throw new ReportError(`${spec.id}: the source file no longer gives the text ${segment.passage} captured`);
     }

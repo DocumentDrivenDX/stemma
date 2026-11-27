@@ -126,6 +126,13 @@ describe("the view is made from what the report is built from", () => {
     expect(noteClusters(1, [{ cites: "volume1850", members: [{ locator: "2", text: "a" }, { locator: "2", text: "b" }] }])).toHaveLength(1);
   });
 
+  test("a text that cannot be read is said to be unreadable, not changed", () => {
+    const base = content(project({ sources: printed(), records: [one, two, note, letterPassage] }));
+    // The manifest stays and its page files do not, as when a text is left out of a repository.
+    const corpus = loadCorpus({ ...base, sources: base.sources.slice(0, 1) });
+    expect(() => buildReport(corpus, { manuscript: "report.src", quotations: LIST } as ReportSpec, TEMPLATE)).toThrow("cannot be read");
+  });
+
   test("a paragraph locator is cited as a paragraph, never as a page", () => {
     const numbered = { ...one, locator: { label: "paragraph", value: "7" } };
     const corpus = corpusWith({ records: [numbered, two, note, letterPassage] });
