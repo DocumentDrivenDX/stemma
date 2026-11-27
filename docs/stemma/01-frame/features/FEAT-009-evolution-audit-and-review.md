@@ -17,15 +17,15 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 9. Evolution, audit, and review
-**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79, FR-96 (P1)
+**Covered PRD Requirements**: FR-41 (P1), FR-42 (P1), FR-43, FR-44 (P1), FR-45, FR-46, FR-47 (P1), FR-79, FR-97 (P1)
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
 
 Evolution, audit, and review keeps the history of a book, reviews its chapters,
-and tells others how it was made. It covers PRD FR-41 to FR-47, FR-79, and FR-96.
+and tells others how it was made. It covers PRD FR-41 to FR-47, FR-79, and FR-97.
 FR-43 and FR-45 are P0 in delivery step M2; FR-46 and FR-79 are P0 in M3; the
-rest are P1. FR-96, the evidence ledger of a report, is P1 in M1.
+rest are P1. FR-97, the evidence ledger of a report, is P1 in M1.
 
 ## Ideal Future State
 
@@ -132,18 +132,18 @@ no source files unless the author includes them, and states what it cannot show.
 
 #### Evidence ledger
 
-- **LED-01** (FR-96, P1). A report build must write, beside the report, a ledger
+- **LED-01** (FR-97, P1). A report build must write, beside the report, a ledger
   of every sentence of the body and of note comments, with the labels of
   CONTRACT-006 J and totals computed from those sentences.
-- **LED-02** (FR-96, P1). Who wrote a sentence's words must come only from an
+- **LED-02** (FR-97, P1). Who wrote a sentence's words must come only from an
   authorship record made for the report's version that holds that exact
   sentence, with who recorded it. With no such record, records of that version
   that disagree, or a report that names no version, it is `unrecorded`.
-- **LED-03** (FR-96, P1). A quotation copied by script, words typed between
+- **LED-03** (FR-97, P1). A quotation copied by script, words typed between
   quotation marks, a citation with no quotation in the sentence, and a sentence
   with neither must stay distinct. Support must show as `not_judged` while no
   support record can be read.
-- **LED-04** (FR-96, P1). The ledger must name every open and unimplemented
+- **LED-04** (FR-97, P1). The ledger must name every open and unimplemented
   check and every dismissed result, count the unreviewed records and confirmed
   results beside its label, say what it does not cover, and hold no source or
   sentence text.
@@ -238,7 +238,7 @@ no source files unless the author includes them, and states what it cannot show.
     FEAT-013 FR-68 restricted-coordinate rules. Records, including imported
   comments, are held by FEAT-011. M2 work does not wait on FEAT-012.
 - **External services**: the hosted model for audits and reviews.
-- **PRD requirements**: FR-41 to FR-47, FR-79, FR-96; related FR-1, FR-10, FR-39.
+- **PRD requirements**: FR-41 to FR-47, FR-79, FR-97; related FR-1, FR-10, FR-39.
 
 ## Out of Scope
 

@@ -13,7 +13,7 @@ ddx:
 
 **Feature**: FEAT-009 — Evolution, Audit, and Review
 **Feature Requirements**: LED-01, LED-02, LED-03, LED-04
-**PRD Requirements**: FR-96
+**PRD Requirements**: FR-97
 **Priority**: P1
 
 ## Story
@@ -78,7 +78,7 @@ here can measure how much of a text is invented.
 - **Stories**: US-047 (authorship of passages) records the writer; `record add` is enough until `authorship mark` exists.
 - **Feature Spec**: FEAT-009
 - **Feature Requirements**: LED-01, LED-02, LED-03, LED-04
-- **PRD Requirements**: FR-96
+- **PRD Requirements**: FR-97
 - **External**: Innsigle signs and checks the ledger; the build does not need it.
 
 ## Out of Scope

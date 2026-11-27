@@ -33,7 +33,7 @@ ddx:
 ## Scope
 
 - Covers the Markdown reader's consumers, citation formatting, Typst conversion, and builds (FR-35 to FR-39, FR-55 to FR-58, FR-83, FR-91). FR-40 is deferred.
-- **Pilot (M1)**: `build draft` and an unwatermarked basic PDF through `build camera-ready`, both whatever the findings, at 6 x 9 in, 5.5 x 8.5 in, or A5, with the CONTRACT-006 M1 features. It is not print-ready.
+- **Pilot (M1)**: `build draft` and an unwatermarked basic PDF through `build camera-ready`, both whatever the findings, at 6 x 9 in, 5.5 x 8.5 in, or A5, with the CONTRACT-006 M1 features, endnotes among them (FR-96). It is not print-ready.
 - **M2**: full book apparatus, remaining features, images, print PDF and PDF/A, approved Chicago examples. **M3**: reviewer build. Preview is SD-012; the package is SD-009.
 - Depends on CONTRACT-006 (markup and conversion), SD-007 (report and label), and SD-003 (bibliography records).
 
@@ -54,7 +54,7 @@ ddx:
 | IMG-07, IMG-08 (FR-58) | Image records and gap findings | Image pipeline | P1 / after M2 |
 | OUT-01 to OUT-03, OUT-06 (FR-57) | Print PDF and PDF/A | Typesetter | P0 / M2 |
 | OUT-04 (FR-40) | Editable formats | None; deferred | P2 / past v1 |
-| FTN-01, FTN-02 (FR-91) | Footnotes generated from passage records; no tool commentary in output | `cite`, `publish` | P0, M2 |
+| FTN-01, FTN-02 (FR-91, FR-96) | Footnotes and endnotes generated from passage records; no tool commentary in output | `cite`, `publish` | P0, M2 |
 
 ### NFR Impact on Architecture
 
@@ -142,7 +142,7 @@ BR numbers for this feature start at 801 so that designs written in parallel can
 
 ### Component: Converter (`packages/publish/convert`) — M1; apparatus M2
 - **Purpose**: Pure mapping from model and citations to Typst source and a vendored book template.
-- **Responsibilities**: BR-809, BR-811; direction marks after right-to-left quotations; in M2 front and back matter, endnotes, figures, tables, cross-references, index, running heads, folios, contents.
+- **Responsibilities**: BR-809, BR-811; direction marks after right-to-left quotations; endnotes from M1, after each chapter and numbered through the book (assumption); in M2 front and back matter, figures, tables, cross-references, index, running heads, folios, contents.
 - **Requirements Addressed**: STR-01, STR-03, STR-04, BLD-01.
 - **Interfaces**: Browser-safe export for SD-012, including the CONTRACT-006 H linked build (M3).
 
@@ -195,7 +195,7 @@ graph TD
 |---|---|---|---|
 | Layout and citations | Typst 0.15.1 (release digests pinned in `packages/publish/src/typst.ts`), citeproc-js 2.4.63 | ADR-005 | See ADR-005 |
 | Citation style and locale | `chicago-notes-bibliography.csl` (Chicago Manual of Style 18th edition, notes and bibliography) and `locales-en-US.xml`, each pinned by its upstream revision and SHA-256 in `packages/cite/vendor/pins.json`, with their licenses | The official CSL repositories; no `ibid.` (the style gives shortened notes) | A hand-written style |
-| Indexes and endnotes (M2) | Vendored Typst packages `in-dexter` 0.7.2 and `deixis` 0.2.0, candidates | Worked in feasibility tests | Writing both now; fetching packages at build time |
+| Endnotes (M1) and indexes (M2) | Vendored Typst packages `in-dexter` 0.7.2 and `deixis` 0.2.0, candidates | Worked in feasibility tests | Writing both now; fetching packages at build time |
 | Sort order for index | Stemma-computed keys | Native sorting misplaced diacritic initials in a test | Typst native sort |
 
 TIFF and EPS converters are not chosen. Any converter must be pinned, run natively on three systems, and pass a license review.

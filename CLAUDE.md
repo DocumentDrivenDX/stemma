@@ -22,5 +22,8 @@ claude plugin marketplace add DocumentDrivenDX/plugins
 claude plugin install helix@documentdrivendx --scope user
 ```
 
+If you added that marketplace before it listed HELIX, run
+`claude plugin marketplace update documentdrivendx` before installing.
+
 For Codex and other hosts, follow HELIX's
 [install guide](https://github.com/DocumentDrivenDX/helix/blob/main/docs/install/README.md).

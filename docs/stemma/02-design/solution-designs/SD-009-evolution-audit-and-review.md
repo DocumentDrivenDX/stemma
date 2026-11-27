@@ -50,7 +50,7 @@ ddx:
 | HST-04 (FR-47) | Re-review list from recorded links since a review baseline | `core`, `graph` | P1 |
 | REV-01 to REV-03, REV-05 (FR-43) | Two-stage audit; saved findings; rival readings as unreviewed claims | `audit` mode, `core` | P0 |
 | REV-04 (FR-44) | Review in a separate context | `audit` mode | P1 |
-| LED-01 to LED-04 (FR-96) | Deterministic per-sentence ledger written with the report | `publish` evidence ledger | P1 |
+| LED-01 to LED-04 (FR-97) | Deterministic per-sentence ledger written with the report | `publish` evidence ledger | P1 |
 | REL-01 to REL-03 (FR-45) | Deterministic disclosure from records | `core` disclosure | P0 |
 | REL-04 to REL-08, REL-12 (FR-46) | Staged packaging with filtering, redaction, and scan | `publish` Packager, `graph`, `core` | P0 |
 | COM-01, COM-02 (FR-79) | Comment capture and file save | `explorer` (SD-012) | P0 |
