@@ -1,16 +1,16 @@
 // `excerpt` (CONTRACT-002 G; SD-002 BR-209): a bounded piece of source text,
 // marked as quoted data. It bounds only what it prints: a process with file
 // access can read the source files, and no source is held back.
-import { type Corpus, isObject, isRetired, sha256 } from "@stemma/records";
+import { type Corpus, sha256 } from "@stemma/records";
 import { placeOf, SourceTexts, type TextView } from "./matching/texts.ts";
 import { InvalidInput } from "./operations.ts";
 import { citedPages, locatorParts, numberOf } from "./checks/locators.ts";
-import { textAt, anchorsOf } from "./passages.ts";
+import { type SourceView, type SourceViewRequest, SourceViews } from "./source-view.ts";
 
 /** Design assumptions: what counts as an excerpt rather than a source. */
 export const EXCERPT_LIMITS = { pages: 5, characters: 30_000, context: 300 };
 
-export interface ExcerptPart { page_index?: number; printed_label?: string; heading: string; text: string }
+export interface ExcerptPart { page_index?: number; printed_label?: string; heading: string; text: string; quoted?: true }
 
 export interface Excerpt {
   source: string;
@@ -24,13 +24,20 @@ export interface Excerpt {
   boundary: string;
 }
 
+/** A token that appears nowhere in the data, so that nothing in the data can mark where it starts or ends. */
+function boundaryFor(data: string): string {
+  let boundary = sha256(data).slice(0, 16);
+  while (data.includes(boundary)) boundary = sha256(boundary).slice(0, 16);
+  return boundary;
+}
+
 function finish(view: TextView, others: string[], requested: string, parts: ExcerptPart[]): Excerpt {
   const size = parts.reduce((sum, p) => sum + p.text.length, 0);
   if (size > EXCERPT_LIMITS.characters) {
     throw new InvalidInput(`That is ${size} characters, more than the excerpt limit of ${EXCERPT_LIMITS.characters}. Ask for fewer pages.`);
   }
-  let boundary = sha256(parts.map((p) => p.text).join("\f")).slice(0, 16);
-  while (parts.some((p) => p.text.includes(boundary))) boundary = sha256(boundary).slice(0, 16);
+  // Joined with nothing between them too, since a quotation is printed run together with its context.
+  const boundary = boundaryFor(parts.map((p) => p.text).join("\f") + parts.map((p) => p.text).join(""));
   return { source: view.source, source_text: view.id, requested, method: view.method, quality: view.level, other_source_texts: others, parts, boundary };
 }
 
@@ -74,20 +81,44 @@ export function excerptPages(corpus: Corpus, source: string, range: string): Exc
   return finish(view, complete.slice(1).map((v) => v.id), `printed pages ${range}`, parts);
 }
 
+/** A passage with a little context. The rules for marking it are those of the source view (CONTRACT-005 K). */
 export function excerptPassage(corpus: Corpus, passage: string): Excerpt {
-  const data = corpus.byId.get(passage)?.data;
-  if (data?.kind !== "passage") throw new InvalidInput(`No readable passage record has the ID ${passage}.`);
-  if (isRetired(data)) throw new InvalidInput(`The passage ${passage} is retired.`);
-  const now = textAt(new SourceTexts(corpus), data);
-  if (now.state !== "ok" || !isObject(data.quote) || now.text !== data.quote.exact) {
-    throw new InvalidInput("The text at this passage's address is damaged or has changed. `check` explains why.");
-  }
-  const anchor = anchorsOf(data);
-  const [first, last] = [anchor[0]!, anchor.at(-1)!];
-  const points = (index: number) => [...now.view.part(index)!.streams[now.stream]];
-  return finish(now.view, [], `passage ${passage}`, [
-    { heading: "context before", text: points(first.index).slice(Math.max(0, first.start - EXCERPT_LIMITS.context), first.start).join("") },
-    { heading: `the passage (${now.indexes.map((i) => placeOf(now.view, i)).join("; ")})`, text: now.text },
-    { heading: "context after", text: points(last.index).slice(last.end, last.end + EXCERPT_LIMITS.context).join("") },
+  const context = { paged: EXCERPT_LIMITS.context, unpaged: EXCERPT_LIMITS.context };
+  const views = new SourceViews(corpus, { context });
+  const made = views.passage(passage);
+  if (made.state !== "highlighted") throw new InvalidInput(`The passage ${passage} cannot be shown (${made.state}). ${made.why}`);
+  const view = new SourceTexts(corpus).view(made.source_text!.id)!;
+  const [first, last] = [made.segments[0]!, made.segments.at(-1)!];
+  return finish(view, [], `passage ${passage}`, [
+    { heading: "context before", text: first.before },
+    { heading: `the passage (${made.segments.map((s) => placeOf(view, s.index)).join("; ")})`, text: made.segments.map((s) => s.quoted).join("\n"), quoted: true },
+    { heading: "context after", text: last.after },
   ]);
+}
+
+/** A citation or report quotation shown in its source, within the excerpt limits. */
+export interface ViewExcerpt {
+  view: SourceView;
+  /** The passage views, in order; none unless the view is `highlighted`. */
+  passages: SourceView[];
+  boundary: string;
+}
+
+export function excerptView(corpus: Corpus, request: SourceViewRequest, quotations: unknown[] = []): ViewExcerpt {
+  // The cited pages whole; a source with no pages only a little around the quotation.
+  const views = new SourceViews(corpus, { quotations, context: { paged: Number.POSITIVE_INFINITY, unpaged: EXCERPT_LIMITS.context } });
+  const view = views.view(request);
+  const passages = view.state === "highlighted" ? view.passages.map((p) => views.passage(p.passage)) : [];
+  const segments = passages.flatMap((p) => p.segments.map((s) => ({ text: p.source_text!.id, segment: s })));
+  const pages = new Set(segments.map((s) => `${s.text}/${s.segment.index}`)).size;
+  if (pages > EXCERPT_LIMITS.pages) {
+    throw new InvalidInput(`That quotation lies on ${pages} pages. An excerpt is at most ${EXCERPT_LIMITS.pages} pages. Ask for one passage at a time with --passage.`);
+  }
+  const size = segments.reduce((sum, { segment: s }) => sum + s.before.length + s.quoted.length + s.after.length, 0);
+  if (size > EXCERPT_LIMITS.characters) {
+    throw new InvalidInput(`That is ${size} characters of source text, more than the excerpt limit of ${EXCERPT_LIMITS.characters}. Ask for one passage at a time with --passage.`);
+  }
+  const data = [view, ...passages];
+  const run = passages.flatMap((p) => p.segments.map((s) => s.before + s.quoted + s.after)).join("\f");
+  return { view, passages, boundary: boundaryFor(`${JSON.stringify(data)}\f${run}`) };
 }

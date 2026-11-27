@@ -28,7 +28,7 @@ export interface Options {
   fetch?: boolean; reconvert?: boolean; "refresh-lookups"?: boolean; reason?: string; "replaced-by"?: string;
   finding?: string; effect?: string; "add-identifier"?: string[]; set?: string[]; author?: string[]; lookup?: string;
   replace?: boolean; from?: string; add?: string[]; remove?: string[]; tag?: string[]; stage?: string; has?: string[];
-  audience?: string; page?: boolean; chapter?: string;
+  audience?: string; page?: boolean; chapter?: string; citation?: string; quotation?: string;
   check?: boolean; pdf?: boolean;
 }
 
