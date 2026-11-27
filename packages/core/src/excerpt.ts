@@ -36,8 +36,9 @@ function finish(view: TextView, others: string[], requested: string, parts: Exce
   if (size > EXCERPT_LIMITS.characters) {
     throw new InvalidInput(`That is ${size} characters, more than the excerpt limit of ${EXCERPT_LIMITS.characters}. Ask for fewer pages.`);
   }
-  // Joined with nothing between them too, since a quotation is printed run together with its context.
-  const boundary = boundaryFor(parts.map((p) => p.text).join("\f") + parts.map((p) => p.text).join(""));
+  // A marked quotation is printed run together with its context, so that reading is searched too.
+  const together = parts.some((p) => p.quoted) ? `\f${parts.map((p) => p.text).join("")}` : "";
+  const boundary = boundaryFor(parts.map((p) => p.text).join("\f") + together);
   return { source: view.source, source_text: view.id, requested, method: view.method, quality: view.level, other_source_texts: others, parts, boundary };
 }
 

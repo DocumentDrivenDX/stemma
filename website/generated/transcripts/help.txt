@@ -38,7 +38,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   fmt [paths]
   rules check
   check [--changed | --all]
-  excerpt --source <id> --pages <printed pages> | --passage <id>
+  excerpt --source <id> --pages <printed pages> | --passage <id> | --citation <id> | --quotation <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
   annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
