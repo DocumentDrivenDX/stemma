@@ -4,16 +4,16 @@
  "subjects": [
   {
    "path": "report.md",
-   "sha256": "fa25a464b3e668d85deb9eec01ce7c70cf1c13427cd7ba74b6e11b54e7478df0"
+   "sha256": "427e7cc6b5fb797bd10ba5095dd130f170cba5aee0ab996fac92cdaf1b3be32f"
   },
   {
    "path": "report.typ",
-   "sha256": "e13ee44879a4210a1c23d39962b7be062bcbd24c185310f8631b8f6f2823a307"
+   "sha256": "5343a1d21f550c05cd855c5fed20bdca559a87999f29447a9a74f310d4e57ca8"
   }
  ],
  "inputs": {
   "spec_sha256": "7de7ac7d92f456ea4316ee9421f70ffb03076d33a395d053b2795ae7f20b0427",
-  "template_sha256": "9263758acc8b55e8c109c4e87e4505b3019bd7d61b0ba5c2826565fa3e248f6d"
+  "template_sha256": "525bb996c97fe7b2e46c75362d00579bc51a5b84a055ed000ae00b522f3fb2d8"
  },
  "profiles": {
   "sentences": "sentence-split/0"
@@ -1856,11 +1856,11 @@
    ]
   },
   {
-   "id": "u-cb8dc4d4ac789d0e-1",
+   "id": "u-72dc0013cdb2e71b-1",
    "place": "body",
    "block": 19,
    "sentence": 3,
-   "sha256": "cb8dc4d4ac789d0ea3d5a02d1fccce283b4b1592f9bc86111affa4a7a67c0851",
+   "sha256": "72dc0013cdb2e71b4ccf6e1b370ee5e31d40c545e85d752dbb573969b513525e",
    "labels": {
     "wording": "unrecorded",
     "declared_by": "none",
@@ -1871,7 +1871,27 @@
    },
    "chars": {
     "quoted": 0,
-    "wording": 83
+    "wording": 239
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-70f0b7efdd18da4a-1",
+   "place": "body",
+   "block": 19,
+   "sentence": 4,
+   "sha256": "70f0b7efdd18da4ae1652bfeda0b35f03a258c6bb566de8577d95bd5030302c8",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 138
    },
    "quotations": []
   },
@@ -1879,7 +1899,7 @@
    "id": "u-1f784ac502d24ec1-1",
    "place": "body",
    "block": 19,
-   "sentence": 4,
+   "sentence": 5,
    "sha256": "1f784ac502d24ec160c62c894d5d1bdfaaea24d919116d5914cfbe53ab7c81b3",
    "labels": {
     "wording": "unrecorded",
@@ -1901,7 +1921,7 @@
    "id": "u-fee06ed49bf8ccc1-1",
    "place": "body",
    "block": 19,
-   "sentence": 5,
+   "sentence": 6,
    "sha256": "fee06ed49bf8ccc1041949ac5a06634487ae48cde356d0200c69a2e0aeecf0df",
    "labels": {
     "wording": "unrecorded",
@@ -2523,11 +2543,11 @@
    ]
   },
   {
-   "id": "u-bdb27819bf8db740-1",
+   "id": "u-c81fd4a5dfefb401-1",
    "place": "body",
    "block": 24,
    "sentence": 5,
-   "sha256": "bdb27819bf8db740286e5f6d379f5bf96782759d092938ef0ee7c47b962617a2",
+   "sha256": "c81fd4a5dfefb401dd08c37eb11dbdb83cd1bf68d5bfcb32fa66c8d2f46928b0",
    "labels": {
     "wording": "unrecorded",
     "declared_by": "none",
@@ -2538,7 +2558,7 @@
    },
    "chars": {
     "quoted": 0,
-    "wording": 83
+    "wording": 182
    },
    "quotations": []
   },
@@ -2749,10 +2769,50 @@
    "quotations": []
   },
   {
-   "id": "u-b0722bcd4e9040dd-1",
+   "id": "u-312721e44ee8156a-1",
    "place": "body",
    "block": 26,
    "sentence": 4,
+   "sha256": "312721e44ee8156a924033cad3f773a2c4be2c9da915161e0f7d5eeaf90c3e63",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 42
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-3de869e848389a58-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 5,
+   "sha256": "3de869e848389a5871780166810a1c5e322387f68af8b34a733d6eda1de241fa",
+   "labels": {
+    "wording": "unrecorded",
+    "declared_by": "none",
+    "basis": "uncited",
+    "typed_quotation": "no",
+    "compared": "not_applicable",
+    "support": "not_applicable"
+   },
+   "chars": {
+    "quoted": 0,
+    "wording": 227
+   },
+   "quotations": []
+  },
+  {
+   "id": "u-b0722bcd4e9040dd-1",
+   "place": "body",
+   "block": 26,
+   "sentence": 6,
    "sha256": "b0722bcd4e9040dd5b07a2801fbf8ad00003a89bef20cdcf4a273dab314f9a2b",
    "labels": {
     "wording": "unrecorded",
@@ -2774,7 +2834,7 @@
    "id": "u-433900c68d7bbd1c-1",
    "place": "body",
    "block": 26,
-   "sentence": 5,
+   "sentence": 7,
    "sha256": "433900c68d7bbd1c112d6c4940af8f2057b2cb635fd38396225cfe2d5d860f0f",
    "labels": {
     "wording": "unrecorded",
@@ -2794,7 +2854,7 @@
    "id": "u-9ba4ea2a936279ff-1",
    "place": "body",
    "block": 26,
-   "sentence": 6,
+   "sentence": 8,
    "sha256": "9ba4ea2a936279ffcf8accd19c646c47a6fd054cc439456a716da407ed1d2be1",
    "labels": {
     "wording": "unrecorded",
@@ -2814,7 +2874,7 @@
    "id": "u-a7abc3c8fec3459a-1",
    "place": "body",
    "block": 26,
-   "sentence": 7,
+   "sentence": 9,
    "sha256": "a7abc3c8fec3459a7596daacd0d96ad99bc85760e51cfb014d3b42060541c731",
    "labels": {
     "wording": "unrecorded",
@@ -3752,31 +3812,31 @@
   }
  ],
  "totals": {
-  "units": 152,
+  "units": 155,
   "chars": {
    "quoted": 6573,
-   "wording": 10665
+   "wording": 11327
   },
   "labels": {
    "wording": {
-    "unrecorded": 152
+    "unrecorded": 155
    },
    "declared_by": {
-    "none": 152
+    "none": 155
    },
    "basis": {
-    "uncited": 109,
+    "uncited": 112,
     "quotation": 43
    },
    "typed_quotation": {
-    "no": 152
+    "no": 155
    },
    "compared": {
-    "not_applicable": 109,
+    "not_applicable": 112,
     "none_recorded": 43
    },
    "support": {
-    "not_applicable": 109,
+    "not_applicable": 112,
     "not_judged": 43
    }
   }
