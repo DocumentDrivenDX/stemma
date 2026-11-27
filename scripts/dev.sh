@@ -14,7 +14,8 @@
 #   ./scripts/dev.sh demo          build, then run the demo in a fresh temporary directory
 #   ./scripts/dev.sh plugin-check  build, then install into an isolated Claude profile
 #   ./scripts/dev.sh build         write dist/stemma.js and dist/release/
-#   ./scripts/dev.sh docs          regenerate website/generated/ (needs browsers)
+#   ./scripts/dev.sh docs          regenerate website/generated/, diagrams included
+#                                  (needs browsers)
 #   ./scripts/dev.sh docs-check    fail if website/generated/ is stale
 #   ./scripts/dev.sh record-example  rerun the worked example's runs that the
 #                                  site shows, into website/recorded/
