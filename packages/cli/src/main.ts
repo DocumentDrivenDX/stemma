@@ -201,7 +201,7 @@ function retire(options: Options, ids: string[]): number {
   for (const record of plan) writeProjectFile(root, record.path, record.text);
   const after = openCorpus(root);
   const retired = new Set(plan.map((r) => r.path));
-  const affected = dependants(after).filter((d) => d.walk.changes.some((c) => retired.has(c.record.path))).map((d) => d.file.path);
+  const affected = dependants(after).filter((d) => d.walk.changes.some((c) => retired.has(c.record.path))).map((d) => (d.file ? d.path : d.use!.where[0]!.value));
   const head = [
     `Retired ${plan.map((r) => r.id).join(", ")}. The files stay.`,
     affected.length === 0 ? "No passage, note, claim or citation rests on what was retired." : "These rest on what was retired, and `check` lists each under source.changed:",
@@ -314,6 +314,8 @@ function check(options: Options): number {
     process.stderr.write(`A check failed to run. This is a Stemma defect and no result may be read as a pass.\n${errors.join("\n")}\n`);
     return 70;
   }
+  // The report is written, but part of the manuscript could not be read (CONTRACT-006, Error Semantics).
+  if (body.results.some((r) => r.check === "record.valid" && r.outcome === "unverifiable" && r.open && r.reason_code?.startsWith("manuscript_"))) return 3;
   return body.label === "checked_clean" ? 0 : 1;
 }
 

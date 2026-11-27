@@ -8,7 +8,8 @@ import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
 import { SourceTexts } from "../matching/texts.ts";
 import { textAt } from "../passages.ts";
-import { active, hasManuscript, resolveCitations } from "./bibliography.ts";
+import { active } from "./bibliography.ts";
+import { cited, liveRecord, type Use } from "./cited.ts";
 import { grouped, once } from "../corpus-index.ts";
 import { itemOf, subjectOf } from "./records.ts";
 
@@ -94,7 +95,18 @@ function walker(corpus: Corpus, texts: SourceTexts) {
   };
 }
 
-export interface Dependant { file: LoadedFile; walk: Walk; source?: string }
+export interface Dependant {
+  /** The record, or for a citation in a chapter file the citation. */
+  subject: string;
+  /** The record's file, or the chapter file. */
+  path: string;
+  file?: LoadedFile;
+  use?: Use;
+  walk: Walk;
+  source?: string;
+  /** A source file of the source was retired, and nothing says when this citation was written. */
+  unfollowed?: LoadedFile[];
+}
 
 /** Every passage, note, claim and citation that rests on a source, with what has changed under it. */
 export function dependants(corpus: Corpus, texts = new SourceTexts(corpus)): Dependant[] {
@@ -109,47 +121,64 @@ export function dependants(corpus: Corpus, texts = new SourceTexts(corpus)): Dep
     for (const file of active(corpus, kind)) {
       const walk: Walk = { changes: [], reached: 0, unread: false };
       follow(idOf(file)!, walk, [], new Set());
-      if (walk.reached > 0 || walk.unread) out.push({ file, walk });
+      if (walk.reached > 0 || walk.unread) out.push({ subject: subjectOf(file), path: file.path, file, walk });
     }
   }
-  // While manuscript files cannot be read, citation records do not say what is cited now.
-  if (hasManuscript(corpus)) return out;
-  for (const { citation, key, matches } of resolveCitations(corpus)) {
+  for (const use of cited(corpus).uses) {
     const walk: Walk = { changes: [], reached: 0, unread: false };
     const seen = new Set<string>();
-    let sources = matches;
+    // A record names its source by key or ID; a chapter file names it by key.
+    const record = liveRecord(use);
+    let sources = use.matches;
     if (sources.length === 0) {
-      sources = (key !== undefined ? retiredByKey.get(key) : retiredById.get(citation.data!.source)) ?? [];
+      sources = (use.key !== undefined ? (use.key === "?" ? [] : retiredByKey.get(use.key)) : retiredById.get(use.record!.data!.source)) ?? [];
     }
-    for (const claim of list(citation.data!.claims)) follow(claim, walk, [], seen);
-    for (const passage of list(citation.data!.passage)) follow(passage, walk, [], seen);
+    for (const claim of use.claims) follow(claim, walk, [], seen);
+    // In a chapter file, a record's passage counts only while the key still names its source.
+    let passage = record?.passage === undefined ? undefined : String(record.passage);
+    if (passage !== undefined && use.written) {
+      const from = corpus.byId.get(passage)?.data?.source;
+      if (!sources.some((s) => idOf(s) === from)) passage = undefined;
+    }
+    if (passage !== undefined) follow(passage, walk, [], seen);
     const source = sources.length === 1 ? idOf(sources[0]!) : undefined;
+    let unfollowed: LoadedFile[] = [];
     if (source) {
       follow(source, walk, [], seen);
       // A citation with no passage names no source file. It is taken to rest on those its
       // source had while the citation existed: the ones retired after it was recorded.
-      if (citation.data!.passage === undefined) {
-        const since = String(isObject(citation.data!.created) ? citation.data!.created.at : "");
-        for (const record of filesBySource.get(source) ?? []) {
+      if (passage === undefined) {
+        const since = record ? String(isObject(record.created) ? record.created.at : "") : undefined;
+        for (const file of filesBySource.get(source) ?? []) {
+          const retired = file.data!.retired;
+          if (since === undefined) {
+            walk.reached++;
+            if (isObject(retired)) unfollowed.push(file);
+            continue;
+          }
           walk.reached++;
-          const retired = record.data!.retired;
           if (!isObject(retired) || !isObject(retired.stamp) || Date.parse(String(retired.stamp.at)) < Date.parse(since)) continue;
-          if (!walk.changes.some((c) => c.record === record)) {
-            walk.changes.push({ reason: "depends_on_retired", record, what: "retired source file", through: [source] });
+          if (!walk.changes.some((c) => c.record === file)) {
+            walk.changes.push({ reason: "depends_on_retired", record: file, what: "retired source file", through: [source] });
           }
         }
       }
     }
-    if (walk.reached > 0 || walk.unread) out.push({ file: citation, walk, ...(source ? { source } : {}) });
+    if (walk.reached > 0 || walk.unread) {
+      out.push({
+        subject: use.subject, path: use.path, use, walk, ...(use.written ? {} : { file: use.record! }),
+        ...(source ? { source } : {}), ...(unfollowed.length > 0 ? { unfollowed } : {}),
+      });
+    }
   }
   return out;
 }
 
 export function changedResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   const check = "source.changed";
-  return dependants(corpus, texts).map(({ file, walk, source }) => {
-    const data = file.data!;
-    const evidence: Evidence[] = [{ name: `${String(data.kind)}_file`, class: "location", value: file.path }];
+  return dependants(corpus, texts).map(({ subject, file, use, walk, source, unfollowed }) => {
+    const data = file?.data;
+    const evidence: Evidence[] = data ? [{ name: `${String(data.kind)}_file`, class: "location", value: file!.path }] : [...use!.where];
     for (const change of walk.changes) {
       const retired = change.record.data!.retired;
       evidence.push({ name: "changed_record", class: "location", value: change.record.path });
@@ -159,16 +188,23 @@ export function changedResults(corpus: Corpus, texts = new SourceTexts(corpus)):
           ? `${change.what} on ${String(retired.stamp.at)}: ${String(retired.reason)}${typeof retired.replaced_by === "string" ? ` (replaced by ${retired.replaced_by})` : ""}`
           : change.what,
       });
-      const path = change.through.filter((id) => id !== idOf(file));
+      const path = change.through.filter((id) => id !== (file ? idOf(file) : subject));
       if (path.length > 0) evidence.push({ name: "reached_through", class: "location", value: path.join(", ") });
     }
-    const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-      ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
+    const sentence = use ? use.sentence : isObject(data!.sentence) && typeof data!.sentence.text === "string" && typeof data!.sentence.sha256 === "string"
+      ? { text: data!.sentence.text, sha256: data!.sentence.sha256 } : undefined;
+    const item = use ? use.item : itemOf(file!);
     const reason = (["depends_on_retired", "text_changed", "source_details_changed"] as const).find((r) => walk.changes.some((c) => c.reason === r))
-      ?? (walk.unread ? "record_unreadable" : undefined);
+      ?? (walk.unread ? "record_unreadable" : unfollowed ? "retired_text_not_followed" : undefined);
+    // Not following a retired source file shows nothing wrong: it says what was not covered.
+    const coverage = reason === "retired_text_not_followed";
+    if (coverage) {
+      evidence.push(...unfollowed!.map((f): Evidence => ({ name: "retired_source_file", class: "location", value: f.path })),
+        { name: "coverage", class: "metadata", value: "citations with no record were not compared with source files retired before or after they were written" });
+    }
     return result({
-      check, outcome: walk.changes.length > 0 ? "fail" : walk.unread ? "unverifiable" : "pass", ...(reason ? { reason } : {}),
-      subject: subjectOf(file), locus: idOf(file) ?? file.path, evidence, item: itemOf(file),
+      check, outcome: walk.changes.length > 0 ? "fail" : walk.unread || coverage ? "unverifiable" : "pass", ...(reason ? { reason } : {}),
+      subject, locus: use ? use.locus : idOf(file!) ?? file!.path, evidence, ...(item ? { item } : {}), coverage,
       ...(source ? { source } : {}), ...(sentence ? { sentence } : {}),
     });
   });

@@ -708,7 +708,7 @@
         "fixes": [
           "repoint"
         ],
-        "message": "A record points at a record that is missing or is of the wrong kind.",
+        "message": "A record or a chapter file names a record that is missing or is of the wrong kind.",
         "open": true,
         "outcome": "fail",
         "reason_code": "reference_dangling",

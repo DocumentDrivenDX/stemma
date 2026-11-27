@@ -130,8 +130,10 @@ both texts. A match shows agreement with the source text, which can be wrong,
 above all where it was recognized from a scan: Stemma compares no text with page
 images and recognizes no characters. While it reads a PDF, the PDF library warns
 that no native drawing module is there; the plugin ships none, and reading text
-draws nothing. Manuscript files are not read yet: quotations and pages are
-checked from citation records.
+draws nothing. When the project has manuscript files in Stemma's marked-up
+Markdown, citations, quotations, pages and figures are checked as written there;
+otherwise they are checked from citation records. Word and other manuscript files
+are not read by the checks.
 
 ## Layout
 

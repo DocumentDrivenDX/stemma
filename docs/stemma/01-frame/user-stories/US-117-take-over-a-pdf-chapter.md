@@ -12,7 +12,7 @@ ddx:
 # US-117: Take over a PDF chapter
 
 **Feature**: FEAT-015 — Takeover of existing projects
-**Feature Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05, PDF-06, PDF-07, PDF-08, PDF-09, INT-03, INT-05, INT-06, INT-07, INT-08, INT-11, ADC-06, ADC-08
+**Feature Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05, PDF-06, PDF-07, PDF-08, PDF-09, PDF-10, INT-03, INT-05, INT-06, INT-07, INT-08, INT-11, INT-12, ADC-06, ADC-08
 **PRD Requirements**: FR-95
 **Priority**: P0
 
@@ -51,13 +51,18 @@ Every test file is invented and built by script.
 - [ ] **US-117-AC12** — Given text pieces on converted pages, when takeover runs, then each ends as paragraph text, a note marker, or a listed removal; and a year in brackets that a paragraph break divided appears as an `unpaired_bracket` item.
 - [ ] **US-117-AC13** — Given a chapter already taken over from Word, when a PDF of the same chapter is taken over, then nothing is written and the Word file is named; with `--separate` it proceeds and records that statement. The same holds with the formats in the other order.
 - [ ] **US-117-AC14** — Given the same PDF and tool versions, when takeover runs into two empty projects, then the text, links, reported items, and check results are the same, with no model call.
+- [ ] **US-117-AC15** — Given a chapter taken over from Word or PDF, when takeover runs on a changed file with the same name, with or without `--again`, then one `original_changed` item names the earlier import, no chapter or other record is added, and the Stemma copy is unchanged; a second such run writes nothing; with `--separate` the file is taken over; unchanged bytes still follow `--again`; and the changed text under a new name fails with `repeated_chapter`, saying that revisions are not applied.
+- [ ] **US-117-AC16** — Given quotations in a PDF chapter that hold a hyphen kept at a line end, when quotations are checked, then one whose readings give different outcomes is `unverifiable` with `uncertain_hyphen` and shows them, whether the source has the word with or without the hyphen; one whose readings all fail is failed; after the author removes a wrong hyphen from the copy it passes; and a Word chapter's results are unchanged.
+- [ ] **US-117-AC17** — Given a PDF with numbered endnotes that cite works, when takeover runs, then the notes are body text, each raised marker is listed as unpaired, no citation in them is bound or counted as a note, no link crosses a marker, and the report states the endnote limit.
+- [ ] **US-117-AC18** — Given a PDF that maps a ligature in a family name to U+FB01, in the reference entry or in the citation, when takeover runs, then the citation links as it would without the ligature, and the text keeps the character.
 
 ## Edge Cases
 
 - **Tracked changes printed in the PDF**: Stemma cannot tell. The report always says so.
 - **Citation inside a table**: A PDF does not show tables, so a citation on one line can be linked, and text across cells is not.
 - **Several chapters in one PDF**: Each list serves the text before it, as in Word. Where Stemma does not find the next chapter's heading, running prose usually makes the list not separable.
-- **Word H rules**: A Word manuscript's results do not change.
+- **Word H rules**: A Word manuscript's matching results do not change.
+- **Endnotes**: Not recognized; a manuscript that cites in endnotes gets no note-style citations from its PDF.
 
 ## Test Scenarios
 
@@ -79,12 +84,16 @@ All text is invented. Files are built by `tests/pdf.ts`, extended where a scenar
 | Account | US-117-AC12 | Seeded piece count; "(Adair" and "2017)" in separate paragraphs by a heading | Take over | Counts balance; `unpaired_bracket` listed |
 | Two forms | US-117-AC13 | Invented DOCX and PDF with the same prose | Take over both, in each order | Second refused; `--separate` proceeds |
 | Repeat run | US-117-AC14 | Same PDF | Take over twice | Same results |
+| Revision | US-117-AC15 | A chapter, then one edited sentence under the same name and under a new one | Take over each; `--again`; `--separate` | One item, nothing applied; new name refused; `--separate` adds |
+| Quotation hyphen | US-117-AC16 | "mont-" / "rose" and "reef-" / "building" in quotations; invented sources with and without each hyphen | Check; edit one hyphen out; check | Differing readings unverifiable; absent words fail; edited one passes |
+| Endnotes | US-117-AC17 | 3 raised markers and a "Notes" section with a full reference and "Ibid." | Take over | 3 unpaired markers; no note binding or count; limit stated |
+| Ligature | US-117-AC18 | A family name with U+FB01 in the entry, then in the citation | Take over | Linked both ways; character kept |
 
 ## Dependencies
 
 - **Stories**: US-099, US-113.
 - **Feature Spec**: FEAT-015
-- **Feature Requirements**: PDF-01 to PDF-09, INT-03, INT-05 to INT-08, INT-11, ADC-06, ADC-08
+- **Feature Requirements**: PDF-01 to PDF-10, INT-03, INT-05 to INT-08, INT-11, INT-12, ADC-06, ADC-08
 - **PRD Requirements**: FR-95
 - **External**: PDFs saved by named programs and versions, for support tests; they must be openly licensed or made from invented text. The reading rules are CONTRACT-003 I.
 

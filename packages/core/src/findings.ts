@@ -18,6 +18,7 @@ const ORIGINAL_WHY = "The chain from the original to your citation rests on the 
 const META_WHY = "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.";
 const ID_WHY = "An identifier that resolves nowhere, or to another work, sends a reader to the wrong thing.";
 const NUMBER_WHY = "A figure attributed to a source that does not hold it misreports the source.";
+const CHAPTER_WHY = "The citations, quotations and figures in that file are unchecked, so a mistake in any of them would go unnoticed.";
 const KEY_WHY = "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.";
 const CLAIM_WHY = "Without all three, nobody can see later what the claim rests on, how sure its writer was, or why the sources support it.";
 const CHANGED_WHY = "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.";
@@ -49,8 +50,21 @@ export const TEMPLATES = {
     "A file under records/ or sources/ does not belong there: a name or directory that does not match, or a file such as a binary that a project does not hold.",
     "References and tools find records by ID, directory and file name.",
     ["Rename or move the file as the evidence shows, or move a file that does not belong out of the project. Originals are not kept in the repository."]),
+  "record.valid:manuscript_unsupported": explain(
+    "A chapter file uses something the manuscript format does not have, so no check read anything in that file.", CHAPTER_WHY,
+    ["Change what the evidence names, at its line and column, to a supported form, then run `check` again. Writing can carry on meanwhile."]),
+  "record.valid:manuscript_syntax": explain(
+    "A chapter file has a marker that cannot be read, so no check read anything in that file.", CHAPTER_WHY,
+    ["Correct the marker at the line and column in the evidence, then run `check` again."]),
+  "record.valid:manuscript_duplicate_id": explain(
+    "A chapter file uses a citation ID that is already in use, so no check read anything in that file.", CHAPTER_WHY,
+    ["Each citation ID belongs to one place. Remove one of the two, or give the copied citation its own record."]),
+  "record.valid:manuscript_file_unread": explain(
+    "A file under manuscript/ is not a chapter file, so nothing in it was read.",
+    "A citation or quotation written only in that file is not checked.",
+    ["Nothing needs doing if it is not part of the manuscript. A chapter is a file named manuscript/<chapter ID>.md."]),
   "record.valid:reference_dangling": explain(
-    "A record points at a record that is missing or is of the wrong kind.",
+    "A record or a chapter file names a record that is missing or is of the wrong kind.",
     "The link between your evidence and its source is broken, so anything relying on it cannot be traced.",
     ["Point the reference at the right record, or remove it."], ["repoint"]),
   "record.valid:unknown_field": explain(
@@ -83,6 +97,10 @@ export const TEMPLATES = {
   "cite.key:key_missing": explain(
     "A citation record names no citation key and no source.", KEY_WHY,
     ["Add the key of the source being cited, or remove the citation."], ["repoint", "remove_citation"]),
+  "cite.key:key_unbound": explain(
+    "A citation in the manuscript is not tied to any source: its key is `?`.", KEY_WHY,
+    ["Add or choose the source it means and write that source's key in place of `?`, or remove the citation."],
+    ["repoint", "add_source", "remove_citation"]),
   "cite.key:source_unreadable": explain(
     "A citation's key could not be looked up because at least one source record cannot be read.",
     "The unreadable file may or may not be the source this citation means.",
@@ -99,10 +117,10 @@ export const TEMPLATES = {
     "Whether a listed source is cited could not be checked: there is no manuscript and there are no citation records.",
     "An unused bibliography entry would go unnoticed.",
     ["Add citation records for the citations in your manuscript, or run this again once the manuscript is in the project."]),
-  "bib.uncited:manuscript_not_read": explain(
-    "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
-    "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.",
-    ["Nothing to fix in your files. Check this entry by hand."]),
+  "bib.uncited:manuscript_unreadable": explain(
+    "Whether a listed source is cited could not be checked: no readable chapter cites it, and at least one chapter file cannot be read.",
+    "The unreadable file may be where this source is cited.",
+    ["Repair the chapter file named in the record.valid finding, then run `check` again."]),
   "bib.uncited:citation_unreadable": explain(
     "Whether a listed source is cited could not be checked: at least one citation record cannot be read.",
     "The unreadable file may be the citation of this source.",
@@ -197,6 +215,10 @@ export const TEMPLATES = {
   "source.changed:record_unreadable": explain(
     "Whether what this rests on has changed could not be checked: something it depends on cannot be read.", CHANGED_WHY,
     ["Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."]),
+  "source.changed:retired_text_not_followed": explain(
+    "A source file of this source was retired, and a citation with no record does not say whether it was written before or after.",
+    CHANGED_WHY,
+    ["Nothing needs doing: this is a limit of what was covered. Quotations, pages and locators are compared with the current text. What the sentence says in your own words is not."]),
   "source.changed:check_error": CHECK_FAILED,
   "quote.present:near_match": explain(
     "A quotation is not in the source's text as written. A passage close to it is; both are shown.", QUOTE_WHY,
@@ -219,6 +241,13 @@ export const TEMPLATES = {
   "quote.present:anchor_not_found": explain(
     "A note extract could not be compared: none of the passages it is anchored to can be found in the source text.", UNCOMPARED_WHY,
     ["See the findings on its passages, and anchor the note to a passage that is in the text."]),
+  "quote.present:unattributed_quotation": explain(
+    "Words in quotation marks, or in a block quotation, could not be tied to one citation, so they were not compared with any source.", UNCOMPARED_WHY,
+    ["Cite the source in the same sentence. Where the sentence has more than one citation, name the one quoted, as in [the words]{.quote cite=\"2\"}. If the words are not a quotation from a source, mark them [the words]{.not-quote}."],
+    ["add_citation"]),
+  "quote.present:unpaired_quote_mark": explain(
+    "A double quotation mark has no partner, so the words it was meant to enclose were not read as a quotation.", UNCOMPARED_WHY,
+    ["Add the missing mark in the same paragraph. For a sign that is not a quotation mark, such as inches, use the prime sign \u2033."]),
   "quote.present:check_error": CHECK_FAILED,
   "quote.page:wrong_page": explain(
     "The quoted words are in the source, but not where the citation says.", PAGE_WHY,

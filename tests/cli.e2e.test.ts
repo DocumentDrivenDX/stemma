@@ -61,12 +61,26 @@ describe("seeded and clean fixtures", () => {
     expect(finding.evidence).toContainEqual({ name: "key", class: "metadata", value: "orphan1990" });
   });
 
-  test("US-022-AC3 manuscript text this version cannot read is unverifiable, never a pass", () => {
-    const { code, report } = check(fixture("manuscript"));
+  test("US-022-AC3 a chapter file that cannot be read is unverifiable, never a pass, and exits 3", () => {
+    const project = fixture("manuscript");
+    writeFileSync(join(project, "manuscript/chp-fixture0chapter1.md"), "# An invented chapter\n\nA sentence.<br> [@hartwell1998]\n");
+    const { code, report } = check(project);
     const bib = report.body.results.filter((r) => r.check === "bib.uncited");
-    expect(bib.map((r) => [r.outcome, r.reason_code])).toEqual([["unverifiable", "manuscript_not_read"]]);
+    expect(bib.map((r) => [r.outcome, r.reason_code])).toEqual([["unverifiable", "manuscript_unreadable"]]);
     expect(report.body.results.filter((r) => r.check === "cite.key")).toEqual([]);
-    expect(report.body.not_run).toContainEqual({ check: "cite.key", reason: "not_implemented" });
+    const chapter = report.body.results.find((r) => r.reason_code === "manuscript_unsupported")!;
+    expect([chapter.check, chapter.outcome, chapter.open]).toEqual(["record.valid", "unverifiable", true]);
+    expect(chapter.evidence).toContainEqual({ name: "manuscript_position", class: "location", value: "manuscript/chp-fixture0chapter1.md, line 3, column 12" });
+    expect([report.body.label, code]).toEqual(["open_findings", 3]);
+  });
+
+  test("a citation in a chapter file is checked, and a listed source it cites is not uncited", () => {
+    const { code, report } = check(fixture("manuscript"));
+    const of = (name: string) => report.body.results.filter((r) => r.check === name).map((r) => [r.subject, r.outcome, r.reason_code]);
+    expect(of("cite.key")).toEqual([["manuscript/chp-fixture0chapter1.md", "pass", undefined]]);
+    expect(of("source.held")).toEqual([["manuscript/chp-fixture0chapter1.md", "fail", "no_source_file"]]);
+    expect(of("bib.uncited").map((r) => r.slice(1))).toEqual([["pass", undefined]]);
+    expect(report.body.not_run).toEqual([{ check: "draft.marked", reason: "not_implemented" }]);
     expect(code).toBe(1);
   });
 

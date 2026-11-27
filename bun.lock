@@ -47,6 +47,7 @@
     "packages/core": {
       "name": "@stemma/core",
       "dependencies": {
+        "@stemma/manuscript": "workspace:*",
         "@stemma/records": "workspace:*",
       },
     },

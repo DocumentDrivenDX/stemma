@@ -2,14 +2,13 @@
 // intact source file with text. It says nothing about whether the text is a
 // faithful reading of the original, or whether the source supports the sentence
 // that cites it.
-import { type Corpus, idOf, isObject } from "@stemma/records";
+import { type Corpus, idOf } from "@stemma/records";
 import { result } from "../findings.ts";
 import type { Evidence, Result } from "../report.ts";
 import { SourceTexts, type TextView } from "../matching/texts.ts";
 import { once } from "../corpus-index.ts";
 import { coverageOf, coverageWords } from "../verification.ts";
-import { hasManuscript, resolveCitations } from "./bibliography.ts";
-import { itemOf, subjectOf } from "./records.ts";
+import { cited } from "./cited.ts";
 
 type Reason = "no_source_file" | "no_text" | "record_unreadable" | "source_damaged";
 
@@ -50,22 +49,18 @@ export function holding(texts: SourceTexts, source: string): { outcome: "pass" |
   return held ? { outcome: "pass", evidence } : { outcome: "fail", reason: "no_text", evidence: ids.map((id) => at("source_text", corpus.texts.get(id)!.manifest.path)) };
 }
 
-/** One result for each citation record that names exactly one source (a key that names none is cite.key's finding). */
+/** One result for each citation that names exactly one source (a key that names none is cite.key's finding). */
 export function heldResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
-  // While manuscript files cannot be read, citation records do not say what is cited now.
-  if (hasManuscript(corpus)) return [];
-  return resolveCitations(corpus).flatMap(({ citation, key, matches }) => {
+  return cited(corpus).uses.flatMap((use) => {
+    const { key, matches } = use;
     if (matches.length !== 1) return [];
     const source = idOf(matches[0]!)!;
     const held = holding(texts, source);
-    const data = citation.data!;
-    const sentence = isObject(data.sentence) && typeof data.sentence.text === "string" && typeof data.sentence.sha256 === "string"
-      ? { text: data.sentence.text, sha256: data.sentence.sha256 } : undefined;
     return [result({
       check: "source.held", outcome: held.outcome, ...(held.reason ? { reason: held.reason } : {}),
-      subject: subjectOf(citation), locus: idOf(citation) ?? citation.path, source,
-      evidence: [at("citation_file", citation.path), meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)), at("source_file", matches[0]!.path), ...held.evidence],
-      item: itemOf(citation), ...(sentence ? { sentence } : {}),
+      subject: use.subject, locus: use.locus, source,
+      evidence: [...use.where, meta("key", key ?? String(matches[0]!.data!.citation_key ?? source)), at("source_file", matches[0]!.path), ...held.evidence],
+      ...(use.item ? { item: use.item } : {}), ...(use.sentence ? { sentence: use.sentence } : {}),
     })];
   });
 }

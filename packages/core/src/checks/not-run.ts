@@ -3,7 +3,7 @@
 // not apply to the project is not listed at all. When in doubt it applies.
 import { type Corpus, FULLY_CHECKED_KINDS, isObject } from "@stemma/records";
 import type { NotRun } from "../report.ts";
-import { active, hasManuscript, listedSources } from "./bibliography.ts";
+import { active, hasManuscript } from "./bibliography.ts";
 
 /** What each check would tell the author, in plain words. */
 export const CHECK_DESCRIPTIONS: Record<string, string> = {
@@ -64,10 +64,5 @@ export function notRun(corpus: Corpus): NotRun[] {
   };
   const missing = new Set(Object.entries(applies).filter(([, yes]) => yes).map(([check]) => check));
   if (corpus.records.some((f) => f.state === "ok" && !FULLY_CHECKED_KINDS.has(String(f.data?.kind)))) missing.add("record.valid");
-  // Manuscript files say what is cited and quoted now, and this version does not read them.
-  if (manuscript) {
-    for (const check of ["cite.key", "source.held", "quote.present", "quote.page", "locator.extent", "number.present", "source.changed"]) missing.add(check);
-    if (listedSources(corpus).length > 0) missing.add("bib.uncited");
-  }
   return [...missing].sort().map((check) => ({ check, reason: "not_implemented" }));
 }

@@ -136,7 +136,8 @@ rules are design assumptions.
 
 **Locus.** A finding's locus is the citation `id` when present; otherwise
 chapter ID, sentence digest, key, locator, and the occurrence's ordinal among
-equal ones in that sentence. Edits elsewhere do not change it.
+equal ones in that sentence. Edits elsewhere do not change it. CONTRACT-002 C,
+"Reading the manuscript", settles repeated sentences and quotation results.
 
 | Check | Reads |
 |---|---|
@@ -362,7 +363,8 @@ containing raw HTML, expecting `manuscript_unsupported`.
 
 | Element | Evidence | Not shown |
 |---|---|---|
-| Markup, reader, sentence and quotation rules, edits, takeover output | None. Design only | All, including whether authors tolerate the syntax |
+| Reader, sentence and quotation rules, and the checks that read them | Tests over invented text on one macOS system | Real manuscripts, Linux, Windows, whether authors tolerate the syntax |
+| Edits and takeover output | None. Design only | All |
 | citeproc-js to Typst | A feasibility test with 10 records and a 14-note sequence passed 12 of 14 Chicago rows, byte-identical across runs, one macOS system; expected strings were not checked against the manual | This markup, the output format, note-number agreement |
 | Typst features | Feasibility tests: footnote markers after Arabic or Hebrew quotations needed a direction-mark helper; indexes and per-chapter endnotes worked with the packages in-dexter 0.7.2 and deixis 0.2.0; TIFF and EPS were rejected; bleed wrote no BleedBox; fixed timestamps gave identical bytes | Conversion from this markup; right-to-left quotations at book length |
 | Sentence links | 43 test sentences linked both ways, with hanging punctuation off and nested links flattened | Converter-generated links |

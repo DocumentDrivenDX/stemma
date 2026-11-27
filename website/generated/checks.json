@@ -1,8 +1,8 @@
 [
   {
     "id": "bib.uncited",
-    "summary": "Each source listed in bibliography_include must be cited by a citation record.",
-    "limits": "It does not read manuscript files. For a project that has them, it reports that it could not check.",
+    "summary": "Each source listed in bibliography_include must be cited in the manuscript files, or in a project without them by a citation record.",
+    "limits": "When a chapter file cannot be read and no other cites the source, it reports that it could not check.",
     "findings": [
       {
         "reason": "not_cited",
@@ -21,11 +21,11 @@
         ]
       },
       {
-        "reason": "manuscript_not_read",
-        "message": "Whether a listed source is cited could not be checked: this version does not read the files in manuscript/.",
-        "why": "The manuscript, not the citation records, says what is cited now, so a guess could be wrong either way.",
+        "reason": "manuscript_unreadable",
+        "message": "Whether a listed source is cited could not be checked: no readable chapter cites it, and at least one chapter file cannot be read.",
+        "why": "The unreadable file may be where this source is cited.",
         "suggestions": [
-          "Nothing to fix in your files. Check this entry by hand."
+          "Repair the chapter file named in the record.valid finding, then run `check` again."
         ]
       },
       {
@@ -48,8 +48,8 @@
   },
   {
     "id": "cite.key",
-    "summary": "Each citation record's key must name exactly one source record.",
-    "limits": "Reads citation records only, not manuscript files. It does not show that a source supports a sentence.",
+    "summary": "The key of each citation in the manuscript files, or in a project without them of each citation record, must name exactly one source record.",
+    "limits": "It reads manuscript files only in Stemma's marked-up Markdown. It does not show that a source supports a sentence.",
     "findings": [
       {
         "reason": "key_unknown",
@@ -73,6 +73,14 @@
         "why": "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.",
         "suggestions": [
           "Add the key of the source being cited, or remove the citation."
+        ]
+      },
+      {
+        "reason": "key_unbound",
+        "message": "A citation in the manuscript is not tied to any source: its key is `?`.",
+        "why": "A reader or a build cannot tell which source this citation means, so it cannot be checked or put in the bibliography.",
+        "suggestions": [
+          "Add or choose the source it means and write that source's key in place of `?`, or remove the citation."
         ]
       },
       {
@@ -213,7 +221,7 @@
   {
     "id": "locator.extent",
     "summary": "A citation's page or other locator must fall inside the extent recorded on the source or, for pages, folios, chapters and paragraphs, inside what the source files hold.",
-    "limits": "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part. It reads citation records only.",
+    "limits": "It tests range only, not that anything is on that page. Source files made from part of a work cover only that part.",
     "findings": [
       {
         "reason": "outside_extent",
@@ -463,8 +471,8 @@
   },
   {
     "id": "quote.present",
-    "summary": "Each quotation held by a citation record must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
-    "limits": "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. It does not read manuscript files.",
+    "summary": "Each quotation in the manuscript files, or in a project without them held by a citation record, must be in the text of the cited source's files, apart from six harmless differences: white space and line breaks, soft hyphens, Latin ligatures, two Unicode spellings of the same characters, straight against curly quotation marks of the same level, and a word the text splits with a hyphen at a line end. Captured passages, note extracts and the quoted words of anchored passages are compared too. A close but different passage is shown beside the quotation.",
+    "limits": "A pass is agreement with the source text, which can be wrong, especially where it comes from character recognition. The cited page is tested by quote.page. Joining a line-end hyphen can pass a quotation that drops a hyphen belonging to the word; the report names each join. In a manuscript it knows only marked quotations, block quotations and double quotation marks; one it cannot give to a single citation is reported as not checked.",
     "findings": [
       {
         "reason": "near_match",
@@ -523,6 +531,22 @@
         ]
       },
       {
+        "reason": "unattributed_quotation",
+        "message": "Words in quotation marks, or in a block quotation, could not be tied to one citation, so they were not compared with any source.",
+        "why": "Until the quotation can be compared with the source's text, it is unchecked.",
+        "suggestions": [
+          "Cite the source in the same sentence. Where the sentence has more than one citation, name the one quoted, as in [the words]{.quote cite=\"2\"}. If the words are not a quotation from a source, mark them [the words]{.not-quote}."
+        ]
+      },
+      {
+        "reason": "unpaired_quote_mark",
+        "message": "A double quotation mark has no partner, so the words it was meant to enclose were not read as a quotation.",
+        "why": "Until the quotation can be compared with the source's text, it is unchecked.",
+        "suggestions": [
+          "Add the missing mark in the same paragraph. For a sign that is not a quotation mark, such as inches, use the prime sign ″."
+        ]
+      },
+      {
         "reason": "check_error",
         "message": "The check itself failed while running, so this was not checked.",
         "why": "This is a defect in Stemma, not a pass.",
@@ -534,7 +558,7 @@
   },
   {
     "id": "record.valid",
-    "summary": "Reads stemma.json, every record file and the rule headings in rules.md.",
+    "summary": "Reads stemma.json, every record file and the rule headings in rules.md, and reports chapter files it cannot read and citation or claim IDs in them that name no record.",
     "limits": "For some record kinds, rules beyond the record shape are not checked. A report says so when such a record is present.",
     "findings": [
       {
@@ -578,8 +602,40 @@
         ]
       },
       {
+        "reason": "manuscript_unsupported",
+        "message": "A chapter file uses something the manuscript format does not have, so no check read anything in that file.",
+        "why": "The citations, quotations and figures in that file are unchecked, so a mistake in any of them would go unnoticed.",
+        "suggestions": [
+          "Change what the evidence names, at its line and column, to a supported form, then run `check` again. Writing can carry on meanwhile."
+        ]
+      },
+      {
+        "reason": "manuscript_syntax",
+        "message": "A chapter file has a marker that cannot be read, so no check read anything in that file.",
+        "why": "The citations, quotations and figures in that file are unchecked, so a mistake in any of them would go unnoticed.",
+        "suggestions": [
+          "Correct the marker at the line and column in the evidence, then run `check` again."
+        ]
+      },
+      {
+        "reason": "manuscript_duplicate_id",
+        "message": "A chapter file uses a citation ID that is already in use, so no check read anything in that file.",
+        "why": "The citations, quotations and figures in that file are unchecked, so a mistake in any of them would go unnoticed.",
+        "suggestions": [
+          "Each citation ID belongs to one place. Remove one of the two, or give the copied citation its own record."
+        ]
+      },
+      {
+        "reason": "manuscript_file_unread",
+        "message": "A file under manuscript/ is not a chapter file, so nothing in it was read.",
+        "why": "A citation or quotation written only in that file is not checked.",
+        "suggestions": [
+          "Nothing needs doing if it is not part of the manuscript. A chapter is a file named manuscript/<chapter ID>.md."
+        ]
+      },
+      {
         "reason": "reference_dangling",
-        "message": "A record points at a record that is missing or is of the wrong kind.",
+        "message": "A record or a chapter file names a record that is missing or is of the wrong kind.",
         "why": "The link between your evidence and its source is broken, so anything relying on it cannot be traced.",
         "suggestions": [
           "Point the reference at the right record, or remove it."
@@ -622,7 +678,7 @@
   {
     "id": "source.changed",
     "summary": "Lists the passages, notes, claims and citations that rest on a source file or source since retired, on page text that has changed since a passage was captured, or on a passage captured before the source's details changed.",
-    "limits": "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
+    "limits": "A citation that names no passage is taken to rest on its source's files retired after the citation was recorded; a citation written in a manuscript with no record is not compared with retired files, and the report says so. Stemma cannot yet record that you have looked, so a finding stays listed. Damaged source files are reported by source.pages and source.held.",
     "findings": [
       {
         "reason": "depends_on_retired",
@@ -654,6 +710,14 @@
         "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
         "suggestions": [
           "Repair the unreadable file first (see the record.valid and source.pages findings), then run `check` again."
+        ]
+      },
+      {
+        "reason": "retired_text_not_followed",
+        "message": "A source file of this source was retired, and a citation with no record does not say whether it was written before or after.",
+        "why": "What you read, quoted or relied on may differ in what replaced it, so it needs looking at again.",
+        "suggestions": [
+          "Nothing needs doing: this is a limit of what was covered. Quotations, pages and locators are compared with the current text. What the sentence says in your own words is not."
         ]
       },
       {
@@ -700,7 +764,7 @@
   {
     "id": "source.held",
     "summary": "Each cited source must have source files in the project that hold text and are not damaged.",
-    "limits": "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence. It reads citation records only.",
+    "limits": "It does not show that the text is a faithful reading of the original: Stemma never compares text with page images. It does not show that a source supports a sentence.",
     "findings": [
       {
         "reason": "no_source_file",

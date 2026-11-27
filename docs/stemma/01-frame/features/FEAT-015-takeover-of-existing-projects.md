@@ -121,10 +121,13 @@ N/A — the user stories name the tasks.
 - INT-11. A chapter must be taken over from one file. A file that repeats text
   already taken over must add nothing, and must name the earlier file, unless
   the author says it is a different text.
+- INT-12. A changed file under the name of one already taken over must be
+  reported as a changed original and not applied, and must not be added as a
+  further chapter unless the author says it is a different text.
 
 #### PDF intake (FR-95)
 
-INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
+INT-03, INT-05 to INT-09, INT-11, and INT-12 apply to PDF as to Word.
 
 - PDF-01. Takeover must read a born-digital PDF manuscript with a text layer and
   must produce from it what it produces from a Word file: the same kinds of
@@ -146,12 +149,15 @@ INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
   or opening anything.
 - PDF-07. Every report must state what a PDF cannot show, including whether it
   was made with tracked changes showing, comments printed on the page, hidden or
-  struck text, tables, block quotations, and reference-manager data.
+  struck text, tables, block quotations, endnotes, and reference-manager data.
 - PDF-08. A page with no text layer or with invisibly drawn text must not be
   converted and must be named. A file with no page that can be converted must
   fail by name and write nothing. Takeover must not run recognition.
 - PDF-09. Each converted paragraph must keep the page and place of its lines in
   the original.
+- PDF-10. A check of a quotation must not pass or fail it on a reading, chosen
+  by Stemma, of a hyphen kept at a line end. Where the readings differ, it must
+  say so and show them.
 
 #### Unverified graph (FR-72)
 
@@ -294,6 +300,12 @@ INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
   overwritten (assumption).
 - **Original changed between rounds**: The system reports the difference and
   does not apply it silently.
+- **Revised draft under a new name**: Stemma does not recognize it as a changed
+  original. It adds nothing, names the earlier file whose text it repeats, and
+  says that revisions are not applied. A revision that repeats too little of
+  that text is not caught and is added as a further chapter.
+- **Two chapters in files of one name**: The second is reported as a changed
+  original until the author says it is a different text.
 - **Manuscript with no footnotes or fields**: Takeover reports what it found,
   including that it found no references; this is not a pass.
 - **Chapter with no reference list**: Its author-date citations are unresolved,
@@ -305,6 +317,11 @@ INT-03, INT-05 to INT-09, and INT-11 apply to PDF as to Word.
 - **Citation inside a table**: Until the open question is answered, it is listed
   as left unlinked with that reason. A PDF does not show which text is a table,
   so there this reason cannot be given (PDF-07).
+- **PDF manuscript with endnotes**: The notes are read as body text, their
+  markers are unpaired, and no citation in them is handled as a note.
+- **Quotation broken by a hyphen at a PDF line end**: If keeping and removing
+  the hyphen give different results, the quotation is neither passed nor
+  failed.
 - **PDF made with tracked changes showing**: Deleted text cannot be told from
   current text. Every PDF report says so; the Word file is the remedy.
 - **Reference entry split across PDF pages**: The part after the break could
