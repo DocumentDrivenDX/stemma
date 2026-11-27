@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import {
   ActorNeeded, type CheckReport, DuplicateOriginal, type Excerpt, EXCERPT_LIMITS, excerptPages, excerptPassage, formatPlan,
-  InvalidInput, LIMITS, planRetire, prepareRecord, renderReport, researchIndex, runChecks, validateFiles, dependants,
+  InvalidInput, LIMITS, planAnnotation, planRetire, prepareRecord, renderReport, researchIndex, runChecks, validateFiles, dependants,
 } from "@stemma/core";
 import { Unconvertible } from "@stemma/extract";
 import { canonical, type Corpus, KINDS, loadCorpus } from "@stemma/records";
@@ -58,6 +58,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   excerpt --source <id> --pages <printed pages> | --passage <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
+  annotate --finding <finding key> --effect explain|dismiss --reason <text> --actor <kind>:<name>
   research list
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
@@ -69,7 +70,7 @@ Exit codes: 0 done, nothing open; 1 done, findings open; 2 usage or not implemen
 /** Commands CONTRACT-002 B names that this version does not have yet. */
 const NOT_YET = new Set([
   "migrate", "key", "unreviewed", "reviewed", "rounds",
-  "support", "annotate", "import", "export", "takeover", "index", "setup", "log", "activity",
+  "support", "import", "export", "takeover", "index", "setup", "log", "activity",
   "plan", "voice", "audit", "checkpoint", "authorship", "restricted", "build", "disclosure", "scan", "graph", "map",
 ]);
 
@@ -85,6 +86,7 @@ const OPTIONS = {
   original: STRING, with: STRING, against: STRING, independent: FLAG, scope: STRING, pages: STRING, passage: STRING, fields: STRING,
   outcome: STRING, flag: LIST, "original-sha256": STRING, address: STRING, via: STRING, identifier: STRING, plan: STRING,
   originals: LIST, fetch: FLAG, reconvert: FLAG, "refresh-lookups": FLAG, reason: STRING, "replaced-by": STRING,
+  finding: STRING, effect: STRING,
 };
 
 /** The options each command takes beyond --project and --format. A command not listed takes none. */
@@ -98,7 +100,8 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   "review add": ["actor", "scope", "pages", "passage", "fields", "against", "outcome", "flag", "original-sha256", "note"],
   "review list": [], coverage: [], "passage find": ["source"], "passage capture": ["actor", "address"],
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
-  excerpt: ["source", "passage", "pages"], retire: ["actor", "reason", "replaced-by"], "record add": ["actor", "input"],
+  excerpt: ["source", "passage", "pages"], retire: ["actor", "reason", "replaced-by"],
+  annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
   check: ["changed", "all"], "research list": [], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
@@ -198,6 +201,20 @@ function retire(options: Options, ids: string[]): number {
     ...affected.map((p) => `  ${p}`),
   ].join("\n");
   return reportRecords(options, validateFiles(after, retired), `${head}\n`, { retired: plan.map((r) => r.id), affected });
+}
+
+function annotateCommand(options: Options): number {
+  const { finding, effect, reason } = options;
+  if (!finding || !reason || (effect !== "explain" && effect !== "dismiss")) throw usageError("annotate needs --finding <finding key>, --effect explain|dismiss, and --reason <text>.");
+  const actor = requireActor(options, "annotate records who wrote the note");
+  const root = requireProject(options);
+  const corpus = openCorpus(root);
+  const made = planAnnotation(corpus, runChecks(corpus, tools()).body.results, { finding, effect, reason, actor, now: new Date(), token: randomToken });
+  writeProjectFile(root, made.path, made.text);
+  const head = effect === "dismiss"
+    ? `Recorded ${made.id}: ${made.finding.check} on ${made.finding.subject} is dismissed while what it describes is unchanged. \`check\` lists it with the reason.`
+    : `Recorded ${made.id}: it explains ${made.finding.check} on ${made.finding.subject}. The finding stays open and is shown with the reason.`;
+  return reportRecords(options, validateFiles(openCorpus(root), new Set([made.path])), `${head}\n  ${made.path}\n`, { added: { id: made.id, path: made.path } });
 }
 
 function recordAdd(options: Options, kind: string | undefined): number {
@@ -313,6 +330,7 @@ function dispatch(command: string, rest: string[], options: Options): number | P
     case "ingest": only(0); return ingest(options, check);
     case "excerpt": only(0); return excerpt(options);
     case "retire": return retire(options, rest);
+    case "annotate": only(0); return annotateCommand(options);
     case "resolve": return resolveCommand(options, rest);
     case "coverage": only(1); return coverage(options, rest[0]);
     case "source pages": only(1); return sourcePages(options, rest[0]);

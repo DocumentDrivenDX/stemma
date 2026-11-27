@@ -1,5 +1,20 @@
 {
   "admission": "candidate",
+  "bib": [
+    {
+      "name": "collection-title",
+      "value": {
+        "value": "Bikini and Nearby Atolls, Marshall Islands"
+      }
+    }
+  ],
+  "changed": {
+    "at": "2026-11-27T02:26:41Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
   "citation_key": "ladd1960",
   "contributions": [
     {

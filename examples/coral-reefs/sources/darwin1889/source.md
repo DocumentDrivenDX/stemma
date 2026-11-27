@@ -26,7 +26,7 @@
   },
   "id": "txt-0j25y9a786mfy0ntdtcx",
   "identity": {
-    "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
+    "basis": "Title and names, where given, are the PDF's own document information, not read from the page. The title page parts were chosen from page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
     "contributors": [
       "Darwin, Charles, 1809-1882"
     ],

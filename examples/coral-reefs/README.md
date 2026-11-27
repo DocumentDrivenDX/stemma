@@ -9,7 +9,7 @@ each with a short quotation copied from its pages.
 | Folder or file | What it holds |
 |---|---|
 | `sources/` | One folder per work: `source.md`, the manifest, and one file for each page of the PDF it came from, blank pages included. About 13.6 MB of text in some 5,000 files |
-| `records/` | A record of each work; where its original came from (address, retrieval time, SHA-256); each comparison with the original; saved catalogue lookups; one flag on a page number; four passages; four citations |
+| `records/` | A record of each work; where its original came from (address, retrieval time, SHA-256); each comparison with the original; saved catalogue lookups; two flags a model recorded, on a page number and a collective title, and one retired flag; a note explaining one finding; four passages; four citations |
 | `plan.json` | What was captured, from where, and how it was converted |
 | `tools/render-pages.swift` | Draws page images on macOS, for comparing text with the page. The images are not committed |
 
@@ -67,16 +67,35 @@ file yourself and use `--originals`.
 
 ## What the check finds
 
-The project is not checked clean. These are open, and each is a real difference
-to look at rather than something to tune away:
+The project is not checked clean. Four findings are open, and each needs a
+person:
 
-| Work | What differs |
+| Work | What is open | What would settle it |
+|---|---|---|
+| `darwin1842` | The year is not in the recognized text of the title page, which leaves out the last line. The page image shows 1842 | A person looks at the title page and records it |
+| `lyell1832` | The recognized text garbles the roman numeral for the year. The page image shows 1832 in roman numerals. The catalogue gives only 1830 for the volume "v. 2", the date of the set, so neither the copy nor the catalogue shows the year to the check (two findings) | One review by a person of the year settles both |
+| `geolsoc1838` | Printed page 232 is followed by 333. This is what the original prints: the page images show the two numbers, with the text running on. A note on the finding explains it | A person who agrees dismisses the finding |
+
+A model's reading of a page image is not a person's review, so it closes none of
+these. To record your own, after looking at the page:
+
+```sh
+stemma review add txt-bm6whwjm6vv9ce26mgbr --scope source_details --pages 8 --fields year \
+  --against "<what you looked at>" --outcome agrees --actor person:<you>
+stemma review add txt-g5myzs9ef0b53mhq2pe1 --scope source_details --pages 10 --fields year \
+  --against "<what you looked at>" --outcome agrees --actor person:<you>
+stemma annotate --finding c9fbbe4b77b7081004447a6d911532099c281c8f32c099381d73e0b708eaf12b \
+  --effect dismiss --reason "<why>" --actor person:<you>
+```
+
+Three kinds of difference between a record and a catalogue are the catalogue's
+way of writing things, and the check reads them by rule:
+
+| Work | The difference |
 |---|---|
-| `lyell1832`, `murray1880`, `geolsoc1838` | The Internet Archive catalogue gives 1830, 1834, and 1826, the first years of the sets these volumes belong to; the records give the years on the volumes' title pages |
-| `ladd1960` | The DOI's title begins with the series title, "Bikini and nearby atolls, Marshall Islands" (two checks report it) |
-| `funafuti1904` | The catalogue, and the details in the PDF, name the committee in another word order; the recognized text of the title page is too garbled to settle it (two checks report it) |
-| `darwin1842`, `lyell1832` | The year cannot be found in the recognized text of the title page. The page images show 1842 and, in roman numerals, 1832. A person who looks can record that |
-| `geolsoc1838` | Printed page 232 is followed by 333. The page images show those two numbers, with the text running on, so it looks like a misprint in the original; a flag on the page says so |
+| `ladd1960` | The DOI's title gives the collective title, "Bikini and nearby atolls, Marshall Islands", before the report's own. The title page prints both, and the record holds the collective title as `collection-title` |
+| `funafuti1904` | The catalogue files the committee under its society, "Royal Society (Great Britain). Coral Reef committee". The title page, and the record, say "Coral Reef Committee of the Royal Society" |
+| `murray1880`, `geolsoc1838` | The Internet Archive gives 1834 and 1826, when the sets began. Each volume's statement ends with the year on its title page, 1880 and 1838 |
 
 All four quotations are in the source text, on the pages cited. One needed
 "deny-" and "ing" joined across a line end, which the report points out.
@@ -86,13 +105,14 @@ All four quotations are in the source text, on the pages cited. One needed
 A model (claude-sonnet-5-5) drew these pages with macOS PDFKit and read them.
 **No person has read any of them for this example, confirmed any value, or
 reviewed any record.** The source records are candidates that nobody has
-admitted.
+admitted. The titles and names each source file says its copy states are the
+PDF's own document information, not words read from the page.
 
 | Looked at | What was seen |
 |---|---|
 | The pages of `darwin1842` printed 2, 88, and 89 | The four quoted passages and their page numbers match the images. The image of page 89 shows "deny-" at the end of one line and "ing" at the start of the next |
-| Each work's title page, or its first page | The titles, names, and years in the source records. Ladd and Schlanger's cover names no author, so the identity points to the inner title page |
-| `geolsoc1838`, the pages numbered 232 and 333 | As in the table above |
+| Each work's title page, or its first page | The titles, names, and years in the source records. Ladd and Schlanger's cover names no author, so the identity points to the inner title page, which also prints the collective title |
+| `geolsoc1838`, PDF pages 247 and 248, counting from 0 | Printed 232 and 333. Page 232 announces a second part on the "northern drift", and the next page begins under that heading |
 | `darwin1842`, PDF pages 239 and 252, counting from 0 | A publisher's list of other books, numbered 2 and 15 on its own. Conversion left that run of fourteen pages unlabelled because it repeats numbers of the book |
 
 Printed page labels were proposed from the numbers in each work's own text. They

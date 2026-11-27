@@ -12,7 +12,7 @@ export type ProblemCode =
   | "bad_link_id" | "duplicate_name" | "sentence_digest_mismatch" | "sentence_not_normalized" | "unknown_field"
   | "wrong_location" | "stray_file" | "reference_missing" | "reference_wrong_kind" | "null_value"
   | "number_not_integer" | "bad_size" | "bad_original" | "bad_page_label" | "bad_part" | "model_verification"
-  | "response_digest_mismatch" | "bad_address" | FormatProblem | PageProblem;
+  | "response_digest_mismatch" | "bad_address" | "bad_binding" | FormatProblem | PageProblem;
 
 export interface Problem {
   reason: "record_invalid" | "record_misplaced" | "reference_dangling" | "unknown_field";
@@ -139,6 +139,10 @@ function checkRules(record: JsonObject, problems: Problem[]): void {
     const reviewed = isObject(record.reviewed) && isObject(record.reviewed.by) ? record.reviewed.by.kind : undefined;
     // A model's review is a flag, never a person's verification.
     if (reviewed === "model" && record.outcome !== "flagged") problems.push(invalid("model_verification", "/outcome"));
+  }
+  // A note binds a sentence and its source, or one record, never both.
+  if (record.kind === "annotation" && (record.item !== undefined ? record.sentence !== undefined || record.source !== undefined : record.source !== undefined && record.sentence === undefined)) {
+    problems.push(invalid("bad_binding", "/item"));
   }
   if (record.kind === "resolution" && typeof record.response === "string" && typeof record.response_sha256 === "string"
     && sha256(record.response) !== record.response_sha256) {

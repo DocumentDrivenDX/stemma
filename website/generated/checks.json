@@ -264,6 +264,14 @@
         ]
       },
       {
+        "reason": "set_date",
+        "message": "A saved lookup is for one volume of a set and gives the set's date, so the volume's year was not compared, and the copy's title page text does not show it.",
+        "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",
+        "suggestions": [
+          "Look at the title page itself. If the record's year is right, a person can confirm it: `review add <text id> --scope source_details --fields year --against <what you looked at> --outcome agrees --actor person:<name>`."
+        ]
+      },
+      {
         "reason": "lookup_silent",
         "message": "A saved lookup states no title, so nothing could be compared with it.",
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation.",

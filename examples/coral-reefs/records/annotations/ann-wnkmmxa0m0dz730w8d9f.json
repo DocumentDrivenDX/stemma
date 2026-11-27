@@ -1,0 +1,27 @@
+{
+  "check": "source.labels",
+  "created": {
+    "at": "2026-11-27T02:26:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "effect": "explain",
+  "finding_key": "c9fbbe4b77b7081004447a6d911532099c281c8f32c099381d73e0b708eaf12b",
+  "id": "ann-wnkmmxa0m0dz730w8d9f",
+  "item": {
+    "content_sha256": "55f3f1d5a772330071cadecc73717a661fd65cc47c2c425127721f81f5b58fd1",
+    "record": "txt-hcn5vw3frm4256b32xhe"
+  },
+  "kind": "annotation",
+  "reason": "The two page numbers are the ones printed. A model compared the page images of the original PDF at index 247 and 248: one is printed 232 and the next 333, an even number followed by an odd one as on the two sides of a leaf, and the text runs on, since page 232 ends by announcing a second part on the northern drift and the next page begins under the heading 'Northern Drift'. The numbering continues 334 onward. So no text appears to be missing and the numbering in the original jumps. The images do not show why. See rvw-rfg04ng7f6a30a4vjcrn. A model's reading, not a person's review.",
+  "schema": "stemma.record/0",
+  "written": {
+    "at": "2026-11-27T02:26:52Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  }
+}

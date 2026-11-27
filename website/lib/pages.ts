@@ -240,7 +240,7 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
   { id: "source.original", question: "Does the text still match its original?", looks: "Each source's text must be tied to the original it was made from, and converting that original again must have given the same text.",
     limit: "It reads the recorded comparison, not the original. Converting again repeats any mistake already in the original's own text." },
   { id: "source.labels", question: "Do the page numbers make sense?", looks: "Printed page numbers should run on from page to page, and agree with the numbers printed on the pages.",
-    limit: "A jump may be a misprint or a missing leaf in the original. Look at the page." },
+    limit: "A jump may be a misprint or a missing leaf in the original. Look at the page. A note on what you saw is shown with the finding; only a person can dismiss it." },
   { id: "source.footnotes", question: "Do footnotes and their markers pair up?", looks: "Where footnotes could be told apart, each marker should have its note and each note its marker.",
     limit: "It says nothing about pages whose footnotes could not be determined, which includes most scans." },
   { id: "quote.present", question: "Is the quotation in the source?", looks: "Each recorded quotation is looked for in the source's text. Differences in line breaks and spacing, and a few other quirks of printed and scanned text, are allowed. A close but different passage is shown next to your quotation.",
@@ -253,8 +253,8 @@ const PLAIN_CHECKS: { id: string; question: string; looks: string; limit: string
     limit: "It finds the figure anywhere in the source, whatever it counts there. It does not read figures written as words." },
   { id: "meta.source", question: "Do the details match the work itself?", looks: "Authors, title and date are compared with what the original states about itself and with the text of its title page.",
     limit: "Scanned text can garble a title page. You can look at the page and record what you saw." },
-  { id: "meta.resolver", question: "Do the details match a library catalogue?", looks: "Authors, title and date are compared with catalogue records saved in your project.",
-    limit: "A catalogue can be wrong, or describe another edition or a whole set of volumes." },
+  { id: "meta.resolver", question: "Do the details match a library catalogue?", looks: "Authors, title and date are compared with catalogue records saved in your project. A body filed under its parent body, and a part entered after the title of its collection, count as the same name or title.",
+    limit: "A catalogue can be wrong, or describe another edition or a whole set of volumes. Where a volume carries its set's date and nothing else shows the volume's year, the check says it could not check." },
   { id: "id.resolves", question: "Does each identifier lead to the right work?", looks: "A DOI or library identifier should have a saved catalogue record naming the same work.",
     limit: "It compares titles. Some kinds of identifier cannot be looked up." },
   { id: "cite.key", question: "Which source does this citation mean?", looks: "The short label in each citation must match exactly one source.",
@@ -399,7 +399,7 @@ ${band("5. Four citations", `<p>Each sentence below is this example's own wordin
 ${file(`records/passages/${citations[0]!.passage}.json`)}
 ${file(`records/citations/${citations[0]!.id}.json`)}`, { id: "citations" })}
 ${band("6. The check", `<p>All four citations pass: each quotation is in the source's text, on the page cited. One matched after rejoining the word <em>denying</em>, split at the end of a line; the report points that out so you can look.</p>
-<p>The project as a whole is <em>not</em> called checked clean. Across all the works, ${counts[1]} problems and ${counts[2]} things that could not be checked are open. Most are real differences between a title page and a library catalogue, such as a catalogue giving the first year of a set of volumes. One is a printed page number that jumps from 232 to 333, which the page pictures show too.</p>
+<p>The project as a whole is <em>not</em> called checked clean. Across all the works, ${counts[1]} problems and ${counts[2]} things that could not be checked are open. The problem is a printed page number that jumps from 232 to 333. The page pictures show the same, and the report shows that explanation with the finding, which stays open unless a person dismisses it. What could not be checked is the year of two books: the computer-read text of their title pages does not show it, and in one the library catalogue gives only the date of the set the volume belongs to. A person who looks at a title page can record what it shows.</p>
 ${more("What the tool printed", transcript(checked, "<strong>Transcript</strong> of a real run on the example as published. Folder names are replaced."))}`, { id: "check" })}
 ${band("7. Planted mistakes", `<p>To see whether the checks would notice, two citations in a throwaway copy of the project were changed as if an author had typed them wrongly: <q>greater</q> became <q>smaller</q> in the second quotation, and the first citation was moved to page 412.</p>
 <p>Both were caught. The changed quotation is shown beside the wording in the source (the mark ⏎ shows where a line ends). For the impossible page, the report also says where the quoted words are: page 88.</p>

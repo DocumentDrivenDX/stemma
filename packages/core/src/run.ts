@@ -1,5 +1,6 @@
 // One run over one parsed corpus, and the single label rule (CONTRACT-002 C).
 import { type Corpus, compareCodePoints, corpusDigest, idOf, sha256 } from "@stemma/records";
+import { annotate } from "./annotations.ts";
 import { active, citeKeyResults, resolveCitations, uncitedResults } from "./checks/bibliography.ts";
 import { coordinateResults } from "./checks/coordinates.ts";
 import { changedResults } from "./checks/changed.ts";
@@ -88,8 +89,8 @@ export const IMPLEMENTED_CHECKS: Record<string, (corpus: Corpus, context: CheckC
 export function runChecks(corpus: Corpus, tools: Record<string, string>): { body: ReportBody; errors: string[] } {
   const errors: string[] = [];
   const context: CheckContext = { texts: new SourceTexts(corpus), tools };
-  const results = sortResults(Object.entries(IMPLEMENTED_CHECKS)
-    .flatMap(([check, run]) => guarded(check, corpus, (c) => run(c, context), errors)));
+  const results = annotate(corpus, sortResults(Object.entries(IMPLEMENTED_CHECKS)
+    .flatMap(([check, run]) => guarded(check, corpus, (c) => run(c, context), errors))));
   const skipped = notRun(corpus);
   const unreviewed = unreviewedItems(corpus);
   const count = (test: (r: Result) => boolean) => results.filter(test).length;
@@ -98,7 +99,7 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>): { body
     fail: count((r) => r.outcome === "fail"),
     unverifiable: count((r) => r.outcome === "unverifiable"),
     open: count((r) => r.open),
-    dismissed: 0,
+    dismissed: count((r) => !r.open && r.annotations.some((a) => a.effect === "dismiss")),
     confirmed: count((r) => r.confirmed_by !== undefined),
     unreviewed: unreviewed.length,
     could_not_check: count((r) => r.outcome === "unverifiable"),

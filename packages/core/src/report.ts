@@ -20,7 +20,8 @@ export interface Result {
   message: string;
   why: string;
   suggestions: string[];
-  annotations: { id: string; effect: string }[];
+  /** The notes that apply, each with who wrote it and why. */
+  annotations: { id: string; effect: string; by: string; reason: string }[];
   /** A person's source-details review that covers what could not be compared. */
   confirmed_by?: string;
   open: boolean;

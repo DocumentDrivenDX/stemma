@@ -381,6 +381,9 @@ export function planReview(corpus: Corpus, request: ReviewRequest): RecordWrite 
   }
   if (request.scope === "passage" && request.passage === undefined) throw new InvalidInput("A passage review names its passage with --passage.");
   if (indexes.length === 0) throw new InvalidInput("Say which pages or sections were reviewed with --pages <indexes>.");
+  // A flag on a page the review does not cover would bind to nothing it describes.
+  const outside = request.flags.find((f) => !indexes.includes(f.index));
+  if (outside) throw new InvalidInput(`A flag names index ${outside.index}, which is not among the reviewed pages (--pages).`);
   const pages = indexes.map((index) => {
     const sha = reviewDigest(text, request.scope, index);
     if (!sha) throw new InvalidInput(`The source file has no part with index ${index}.`);

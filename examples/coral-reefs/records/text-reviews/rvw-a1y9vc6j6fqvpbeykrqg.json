@@ -1,0 +1,42 @@
+{
+  "against": "page image of PDF index 1 drawn with macOS PDFKit",
+  "created": {
+    "at": "2026-11-27T02:26:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "fields": [
+    "title"
+  ],
+  "flags": [
+    {
+      "index": 1,
+      "note": "The title page prints this collective title under the authors' names, above 'Geological Survey Professional Paper 260-Y'. The record holds it as collection-title. A model read the image; this is not a person's review.",
+      "reading": "BIKINI AND NEARBY ATOLLS, MARSHALL ISLANDS"
+    }
+  ],
+  "id": "rvw-a1y9vc6j6fqvpbeykrqg",
+  "kind": "text_review",
+  "original_sha256": "831a1e9a6ba6d9464e61e89becd4627a2fd93b324e301decfafae43c5076e928",
+  "outcome": "flagged",
+  "pages": [
+    {
+      "index": 1,
+      "sha256": "2daf4baef0fead85ce11f8d74246cfb14bc8c907b12b042e7a33e08f1fbfa394"
+    }
+  ],
+  "reviewed": {
+    "at": "2026-11-27T02:26:43Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-sonnet-5-5"
+    }
+  },
+  "schema": "stemma.record/0",
+  "scope": "source_details",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "f1307b24e0e70db84490689b7aee51249db7d4e9687510d9e1f6fbe654b885bb",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

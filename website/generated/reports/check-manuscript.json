@@ -279,7 +279,7 @@
       "bun": "1.4.5",
       "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.4",
+      "stemma": "0.0.5",
       "stemma-convert": "1"
     },
     "unreviewed": [],

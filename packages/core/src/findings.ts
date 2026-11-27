@@ -255,6 +255,9 @@ export const TEMPLATES = {
   "meta.resolver:no_lookup": explain(
     "The source's details have not been compared with any catalogue: no lookup is saved.", META_WHY,
     ["Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."], ["resolve"]),
+  "meta.resolver:set_date": explain(
+    "A saved lookup is for one volume of a set and gives the set's date, so the volume's year was not compared, and the copy's title page text does not show it.", META_WHY,
+    ["Look at the title page itself. If the record's year is right, a person can confirm it: `review add <text id> --scope source_details --fields year --against <what you looked at> --outcome agrees --actor person:<name>`."], ["confirm_details", "correct_record"]),
   "meta.resolver:lookup_silent": explain(
     "A saved lookup states no title, so nothing could be compared with it.", META_WHY,
     ["Look the work up by another identifier, or have a person confirm the details."], ["resolve", "confirm_details"]),
@@ -333,6 +336,7 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   model_verification: "a model's review can only flag; it is never a person's verification",
   response_digest_mismatch: "the saved response does not match its digest",
   bad_address: "a passage address needs, for each part, a start before its end",
+  bad_binding: "an annotation binds a sentence and its source, or one record, never both",
   front_matter_missing: "the file does not begin with a front matter block",
   front_matter_unreadable: "the front matter is not one readable JSON object",
   text_outside_block: "there is text before the first block line",

@@ -4,7 +4,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { cpSync, existsSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type CheckReport, figuresIn, foldName, planResolution, readLookup, type Result, titlesMatch } from "@stemma/core";
+import { type CheckReport, catalogueTitleMatches, figuresIn, foldName, headingMatches, planResolution, readLookup, renderReport, type Result, titlesMatch } from "@stemma/core";
 import { canonical, sha256 } from "@stemma/records";
 import { fetchBytes, FetchRefused } from "@stemma/workspace";
 import { bundle } from "../scripts/build.ts";
@@ -340,6 +340,61 @@ describe("comparisons and reviews (FR-85, FR-88, FR-89)", () => {
   });
 });
 
+describe("annotations (CONTRACT-001 G)", () => {
+  function wrongYear() {
+    const made = reef({ issued: { edtf: "1851" } });
+    const finding = () => of(made.book.check(), "meta.source")[0]!;
+    const annotate = (effect: string, actor: string, key = finding().finding_key) =>
+      made.book.run("annotate", "--finding", key, "--effect", effect, "--reason", "the page shows 1851 in a later impression", "--actor", actor);
+    return { ...made, finding, annotate };
+  }
+
+  test("an explanation is shown with its finding and leaves it open", () => {
+    const { book, finding, annotate } = wrongYear();
+    expect(annotate("explain", "model:some-model").code).toBe(0);
+    const found = finding();
+    expect([found.outcome, found.open, found.annotations.map((a) => [a.effect, a.by])]).toEqual(["unverifiable", true, [["explain", "model some-model"]]]);
+    const printed = renderReport(book.check().body);
+    expect(printed).toContain("explained by model some-model (ann-");
+    expect(printed).toContain("the page shows 1851 in a later impression");
+  });
+
+  test("only a person dismisses; the finding stays listed, and a change ends the dismissal", () => {
+    const { book, source, finding, annotate } = wrongYear();
+    for (const actor of ["model:some-model", "software:script"]) {
+      const refused = annotate("dismiss", actor);
+      expect([refused.code, refused.err.includes("Only a person")]).toEqual([5, true]);
+    }
+    expect(annotate("dismiss", "person:author", "0".repeat(64)).code).toBe(5);
+    annotate("dismiss", "person:author");
+    const found = finding();
+    expect([found.outcome, found.open]).toEqual(["unverifiable", false]);
+    expect(book.check().body.summary.dismissed).toBe(1);
+    expect(renderReport(book.check().body)).toContain("a person dismissed these findings");
+    // A dismissal typed as a model's has no effect.
+    const path = book.files().find((f) => f.startsWith("records/annotations/"))!;
+    const note = JSON.parse(book.read(path));
+    book.write(path, canonical({ ...note, written: { ...note.written, by: { kind: "model", name: "some-model" } } }));
+    expect(finding().open).toBe(true);
+    book.write(path, canonical(note));
+    expect(finding().open).toBe(false);
+    // The note was bound to the record as it was.
+    const record = `records/sources/${source}.json`;
+    book.write(record, canonical({ ...JSON.parse(book.read(record)), issued: { edtf: "1852" } }));
+    expect([finding().open, finding().annotations]).toEqual([true, []]);
+  });
+
+  test("a missing source file cannot be dismissed, and a note is not typed in by hand", () => {
+    const book = new Book();
+    book.source("a1999");
+    book.add("citation", { key: "a1999", sentence: { text: "It is so." } });
+    const held = of(book.check(), "source.held")[0]!;
+    const refused = book.run("annotate", "--finding", held.finding_key, "--effect", "dismiss", "--reason", "on paper", ...AUTHOR);
+    expect([refused.code, refused.err.includes("not dismissed")]).toEqual([5, true]);
+    expect(book.run("record", "add", "annotation", "--input", book.file("n.json", "{}"), ...AUTHOR).err).toContain("annotate");
+  });
+});
+
 describe("metadata and identifiers (FR-86)", () => {
   test("a note mark set against a name does not hide the name, and another name still differs", () => {
     expect(foldName("Smith1, Reyes\u00b2")).toBe("smith 1 reyes 2");
@@ -414,6 +469,81 @@ describe("metadata and identifiers (FR-86)", () => {
     expect(titlesMatch("The Invented Reef", "THE INVENTED REEF.")).toBe(true);
     expect(titlesMatch("The Invented Reef", "The invented reef : being a narrative")).toBe(true);
     expect(titlesMatch("The Invented Reef", "The Invented Reefs")).toBe(false);
+  });
+
+  test("a body's name matches its library heading, and no other body's", () => {
+    const name = "Reef Committee of the Learned Society";
+    expect(headingMatches(name, "Learned Society (Invented Land). Reef committee")).toBe(true);
+    expect(headingMatches("Reef Committee of Learned Society", "Learned Society. Reef Committee.")).toBe(true);
+    for (const other of ["Other Society (Invented Land). Reef committee", "Learned Society (Invented Land). Lagoon committee",
+      "Learned Society (Invented Land)", "Learned Society of Arts (Invented Land). Reef committee",
+      "Learned Society. Reef committee. Lagoon panel", "Reef committee (Invented Land). Learned Society", "Learned, Society. Reef committee"]) {
+      expect(headingMatches(name, other), other).toBe(false);
+    }
+  });
+
+  test("a heading stands only for a name the record writes whole", () => {
+    const heading = { result: { title: "The Invented Reef", creator: "Learned Society (Invented Land). Reef committee", date: "1850" } };
+    const verdict = (name: Record<string, string>) => {
+      const { book, source } = reef({ contributions: [{ lid: "a", role: "author", as_printed: name }] });
+      saveLookup(book, source, "internet_archive", "invented00reef", heading);
+      return verdicts(book.check(), "meta.resolver");
+    };
+    expect(verdict({ literal: "Reef Committee of the Learned Society" })).toEqual(["pass"]);
+    expect(verdict({ literal: "Lagoon Committee of the Learned Society" })).toEqual(["fail mismatch"]);
+    expect(verdict({ family: "Reef Committee of the Learned Society" })).toEqual(["fail mismatch"]);
+  });
+
+  test("a catalogue may give a collective title and then the part's own, and both must be the record's", () => {
+    const record = { title: "Drilling the Invented Reef", collection: "Atolls of the Invented Sea" };
+    expect(catalogueTitleMatches(record, "Atolls of the invented sea; drilling the Invented Reef")).toBe(true);
+    for (const other of ["Atolls of another sea; drilling the Invented Reef", "Atolls of the invented sea; sounding the Invented Reef",
+      "Atolls of the invented sea", "Atolls of the invented sea drilling", "Atolls of the invented sea; drilling the Invented Reef, part 2"]) {
+      expect(catalogueTitleMatches(record, other), other).toBe(false);
+    }
+    expect(catalogueTitleMatches({ title: record.title }, "Atolls of the invented sea; drilling the Invented Reef")).toBe(false);
+
+    const { book, source } = reef({ bib: [{ name: "collection-title", value: { value: "Atolls of the Invented Sea" } }], identifiers: [{ scheme: "doi", value: "10.1234/part" }] });
+    saveLookup(book, source, "crossref", "10.1234/part", { message: { title: ["Atolls of the invented sea; the Invented Reef"], author: [{ family: "Author" }], issued: { "date-parts": [[1850]] } } });
+    const report = book.check();
+    expect([verdicts(report, "meta.resolver"), verdicts(report, "id.resolves")]).toEqual([["pass"], ["pass"]]);
+  });
+
+  test("a volume of a set: the catalogue's earlier date is the set's, and a wrong year still differs", () => {
+    const against = (year: string, fields: Record<string, unknown>, resolver: "crossref" | "internet_archive" = "internet_archive") => {
+      const { book, source, text } = reef({ issued: { edtf: year } });
+      const body = resolver === "crossref"
+        ? { message: { title: ["The Invented Reef"], author: [{ family: "Author" }], issued: { "date-parts": [[1840]] }, ...fields } }
+        : { result: { title: "The Invented Reef", creator: "Author, A. N.", date: "1840", ...fields } };
+      saveLookup(book, source, resolver, resolver === "crossref" ? "10.1234/set" : "invented00reef", body);
+      return { book, text, report: book.check() };
+    };
+    const verdict = (year: string, fields: Record<string, unknown>, resolver?: "crossref") => verdicts(against(year, fields, resolver).report, "meta.resolver");
+    // The volume statement's own years: the record's year is the last of them.
+    expect(verdict("1850", { volume: "v.10 (1848-1850)" })).toEqual(["pass"]);
+    expect(verdict("1850", { volume: "v.2 (1843:Nov.-1850:June)" })).toEqual(["pass"]);
+    // The title page shows 1850, but the volume statement ends elsewhere.
+    expect(verdict("1850", { volume: "v.10 (1848-1849)" })).toEqual(["fail mismatch"]);
+    expect(verdict("1849", { volume: "v.10 (1848-1850)" })).toEqual(["fail mismatch"]);
+    expect(verdict("1850", { volume: "v.10 (1838-1850)" })).toEqual(["fail mismatch"]);
+    // No years for the volume: only the copy or a person can show the year.
+    expect(verdict("1850", { volume: "v. 2" })).toEqual(["pass"]);
+    // Without a volume statement, before the set began, or from another catalogue, years are compared as before.
+    expect(verdict("1850", {})).toEqual(["fail mismatch"]);
+    expect(verdict("1830", { volume: "v. 2" })).toEqual(["fail mismatch"]);
+    expect(verdict("1850", { volume: "10" }, "crossref")).toEqual(["fail mismatch"]);
+
+    const open = against("1862", { volume: "v. 2" });
+    expect(verdicts(open.report, "meta.resolver")).toEqual(["unverifiable set_date"]);
+    expect(of(open.report, "meta.resolver")[0]!.open).toBe(true);
+    expect(open.book.run("review", "add", open.text, "--scope", "source_details", "--pages", "0", "--fields", "year", "--against", "the printed title page", "--outcome", "agrees", ...AUTHOR).code).toBe(0);
+    expect(of(open.book.check(), "meta.resolver")[0]!.open).toBe(false);
+  });
+
+  test("a review's flag lies on a page the review covers", () => {
+    const { book, text } = reef();
+    const done = book.run("review", "add", text, "--scope", "page_number", "--pages", "3", "--flag", "2|1", "--against", "the page", "--outcome", "flagged", "--actor", "model:some-model");
+    expect([done.code, done.err.includes("not among the reviewed pages")]).toEqual([5, true]);
   });
 
   test("number.present looks for a cited sentence's figures in the source, and applies only where there are figures", () => {

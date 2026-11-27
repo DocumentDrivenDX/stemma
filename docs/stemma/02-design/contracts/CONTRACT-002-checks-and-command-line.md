@@ -234,7 +234,24 @@ also accepts the record title found as consecutive words on a title page. Each
 author's family name must appear among the stated contributors or on a title
 page. The year must be the stated issue year or appear on a title page, in figures or as a roman numeral; a venue
 is compared only when the record names one. A field the lookup does not state is
-listed as not compared. `meta.source` fails when the copy's stated identity
+listed as not compared.
+
+Three rules read a catalogue's conventions (assumptions). A catalogue title
+also matches when it is the record's `collection-title` followed by the record's
+title, both whole. A name the record writes whole (`literal`) is also stated by
+a heading of the form "Parent (qualifier). Body" when it is exactly "Body of
+Parent" or "Body of the Parent". An Internet Archive item with a `volume`
+statement is a volume of a set or serial, and its date may be the set's first
+year. Where the record's year is later than that date: if the volume statement
+ends with years in parentheses, the record's year must be the last of them, and
+the first must not precede the catalogue date; otherwise `meta.resolver` fails.
+With no such years, the year is listed as not compared when the copy bears it
+out as `meta.source` would, or a person's current `source_details` review covers
+`year`; otherwise the result is `unverifiable` (`set_date`), which such a review
+confirms. A record year earlier than the catalogue date, and every other
+catalogue, compare as above.
+
+`meta.source` fails when the copy's stated identity
 disagrees and the title page text does not bear out the record; a value found in
 neither is `unverifiable`. `id.resolves` covers `doi`, `ia`, and `gutenberg`
 identifiers with lookups; other identifiers are `unverifiable` (`no_lookup`).
@@ -249,8 +266,7 @@ from its address is `text_changed`; an edit elsewhere in the source file does
 not affect it. It emits one result for each non-retired note, claim, passage, or
 citation that reaches a source or source file. Reason codes are
 `depends_on_retired`, `text_changed`, `source_details_changed`, and
-`record_unreadable`. Until annotations are built, nothing can record that the
-author has looked, so a finding stays listed. While `manuscript/` holds files
+`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed. While `manuscript/` holds files
 this version cannot read, citations are left out and the check is also
 `not_implemented`.
 
@@ -413,7 +429,7 @@ and passes when one occurrence lies wholly on cited pages.
 | `body.scope` | `changed` or `all`, with the changed record IDs |
 | `body.inputs` | Corpus digest, manuscript and research file digests (research notes are outside the corpus digest), and profiles used |
 | `body.tools` | Stemma, Bun, SQLite, and every library or program that affected a result |
-| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (IDs and effect), `confirmed_by?`, `open` |
+| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (ID, effect, who wrote it, and the reason), `confirmed_by?`, `open` |
 | `body.not_run[]` | `check`, `reason`; only checks that apply |
 | `body.verification[]` | For each source file: ID, method, parts, parts reviewed whole by a person, flags, and the current comparison runs with the number of parts that disagree |
 | `body.unreviewed[]` | `record` (ID), `kind`, `reason` (`unreviewed` or `not_admitted`), and the manuscript locations that reach it; never part of the label |
@@ -624,7 +640,7 @@ exits 1, and labels the build `open_findings`.
 | `meta.*`, `id.resolves`, `number.present` | Tests over synthetic sources and saved responses on one macOS system; the worked example uses real catalogue responses | Other catalogues; works whose title pages convert badly |
 | `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. `annotate` and annotations are built; `annotate list` is not, and nothing is redacted. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
 
 ## Schema Basis
 

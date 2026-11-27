@@ -21,7 +21,7 @@ export interface NewRecord { kind: string; input: string; actor?: Actor; now: Da
 /** Kinds a command makes itself, so that their contents are copied or computed rather than typed. */
 const MADE_BY_COMMAND: Record<string, string> = {
   source_text: "source convert", passage: "passage capture", comparison_run: "source verify or source compare",
-  text_review: "review add", resolution: "resolve",
+  text_review: "review add", resolution: "resolve", annotation: "annotate",
 };
 
 /** Turns a record's fields into the file `record add` writes (CONTRACT-002 B). */

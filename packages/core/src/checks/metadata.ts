@@ -33,22 +33,87 @@ export function titlesMatch(a: string, b: string): boolean {
   return x === y || x === foldName(mainTitle(b)) || foldName(mainTitle(a)) === y;
 }
 
+/**
+ * A library files a body under the body it belongs to, as "Parent (Place). Body".
+ * Such a heading says the same name as "Body of Parent" or "Body of the Parent",
+ * and as no other: every word of both parts is needed, in these two orders.
+ */
+export function headingMatches(name: string, heading: string): boolean {
+  const filed = /^([^,.()]+?)\s*(?:\([^()]*\))?\.\s+([^,.()]+?)\.?$/.exec(heading.trim());
+  if (!filed) return false;
+  const [, parent, body] = filed;
+  return [`${body} of ${parent}`, `${body} of the ${parent}`].some((spoken) => foldName(spoken) === foldName(name));
+}
+
+/**
+ * Whether every name the record gives is among the names stated. A body's name,
+ * written whole in the record, may also be stated as a library heading.
+ */
+const namesWithin = (record: Described, stated: string[]): boolean => {
+  const words = foldName(stated.join(" "));
+  return record.authors.every((a) => holds(words, foldName(a)) || (record.bodies.includes(a) && stated.some((s) => headingMatches(a, s))));
+};
+
+/**
+ * A title as a catalogue states it. A part of a collected work may be entered as
+ * the collective title and then its own; both must be the record's, whole.
+ */
+export function catalogueTitleMatches(record: { title?: string; collection?: string }, theirs: string): boolean {
+  if (record.title === undefined) return false;
+  return titlesMatch(record.title, theirs)
+    || (record.collection !== undefined && foldName(`${record.collection} ${record.title}`) === foldName(theirs));
+}
+
+/**
+ * The volume statement of an Internet Archive item, such as "v.10 (1878-1880)".
+ * Such an item is one volume of a set or serial, and its catalogue date is often
+ * the set's first year, copied to every volume. Other catalogues give a volume
+ * number with the work's own date, so only this one is read.
+ */
+function setVolume(lookup: JsonObject): { stated: string; from?: number; to?: number } | undefined {
+  if (lookup.resolver !== "internet_archive" || typeof lookup.response !== "string") return undefined;
+  let value: unknown;
+  try {
+    value = JSON.parse(lookup.response);
+  } catch {
+    return undefined;
+  }
+  const stated = isObject(value) ? text(value.volume) : undefined;
+  if (!stated) return undefined;
+  // Years of coverage in closing parentheses: the first and the last four-digit year there.
+  const years = /\(([^()]*)\)\s*$/.exec(stated)?.[1]?.match(/(?<!\d)1[5-9]\d\d(?!\d)|(?<!\d)20\d\d(?!\d)/g) ?? [];
+  return years.length > 0 ? { stated, from: Number(years[0]), to: Number(years.at(-1)) } : { stated };
+}
+
 const FIELDS = ["title", "authors", "year", "venue"] as const;
 type Field = (typeof FIELDS)[number];
 
-export interface Described { title?: string; authors: string[]; year?: string; venue?: string }
+export interface Described {
+  title?: string; authors: string[]; year?: string; venue?: string;
+  /** The names among the authors that the record writes whole, as a body's is. */
+  bodies: string[];
+  /** The title of the collection or series the work belongs to. */
+  collection?: string;
+}
 
 /** What the source record says. */
 export function describe(source: JsonObject): Described {
   const title = isObject(source.title) ? text(source.title.value) : undefined;
-  const authors = list(source.contributions).filter((c) => c.role === "author" || c.role === "editor").flatMap((c) => {
-    const name = isObject(c.as_printed) ? c.as_printed : {};
-    return text(name.family) ?? text(name.literal) ?? [];
-  });
+  const names = list(source.contributions).filter((c) => c.role === "author" || c.role === "editor")
+    .map((c) => (isObject(c.as_printed) ? c.as_printed : {}));
+  const authors = names.flatMap((name) => text(name.family) ?? text(name.literal) ?? []);
+  const bodies = names.flatMap((name) => (text(name.family) === undefined ? text(name.literal) ?? [] : []));
   const year = isObject(source.issued) ? /\d{4}/.exec(String(source.issued.edtf ?? ""))?.[0] : undefined;
-  const container = list(source.bib).find((b) => b.name === "container-title");
-  const venue = container && isObject(container.value) ? text(container.value.value) : undefined;
-  return { ...(title ? { title } : {}), authors, ...(year ? { year } : {}), ...(venue ? { venue } : {}) };
+  const bib = (name: string) => {
+    const field = list(source.bib).find((b) => b.name === name);
+    return field && isObject(field.value) ? text(field.value.value) : undefined;
+  };
+  const venue = bib("container-title");
+  const collection = bib("collection-title");
+  return {
+    ...(title ? { title } : {}), authors, bodies, ...(year ? { year } : {}), ...(venue ? { venue } : {}),
+    ...(collection ? { collection } : {}),
+  };
 }
 
 const meta = (name: string, value: string): Evidence => ({ name, class: "metadata", value });
@@ -92,8 +157,7 @@ export function againstCopy(record: Described, view: TextView): { statuses: Map<
     judge("title", record.title, stated.title === undefined ? undefined : titlesMatch(record.title, stated.title), holds(pages.text, foldName(record.title)), stated.title);
   }
   if (record.authors.length > 0) {
-    const names = foldName(stated.authors.join(" "));
-    const byIdentity = stated.authors.length === 0 ? undefined : record.authors.every((a) => holds(names, foldName(a)));
+    const byIdentity = stated.authors.length === 0 ? undefined : namesWithin(record, stated.authors);
     judge("authors", record.authors.join("; "), byIdentity, record.authors.every((a) => holds(pages.text, foldName(a))), stated.authors.join("; "));
   }
   if (record.year) judge("year", record.year, stated.year === undefined ? undefined : stated.year === record.year,
@@ -173,6 +237,8 @@ const newest = (lookups: LoadedFile[]): LoadedFile[] => {
 
 export function resolverResults(corpus: Corpus, texts = new SourceTexts(corpus)): Result[] {
   const check = "meta.resolver";
+  const copyShowsYear = (source: LoadedFile, record: Described) =>
+    texts.of(idOf(source)!).views.some((view) => againstCopy(record, view).statuses.get("year") === "agrees");
   return describedSources(corpus, texts).map((source) => {
     const base = [location("source_file", source.path), keyOf(source)];
     const found = newest(lookupsOf(corpus, idOf(source)!)).filter((l) => l.data!.outcome === "found" && isObject(l.data!.found));
@@ -180,6 +246,8 @@ export function resolverResults(corpus: Corpus, texts = new SourceTexts(corpus))
     const record = describe(source.data!);
     const compared = new Set<Field>();
     const differing = new Set<Field>();
+    // A year that a lookup of one volume of a set does not give, and that nothing here shows.
+    let yearOpen = false;
     const evidence: Evidence[] = [...base];
     for (const lookup of found) {
       const says = lookup.data!.found as JsonObject;
@@ -200,14 +268,31 @@ export function resolverResults(corpus: Corpus, texts = new SourceTexts(corpus))
           evidence.push(meta(`${field}_in_record`, mine), { name: `${field}_in_lookup`, class: "source_text", value: theirs });
         }
       };
-      judge("title", record.title, catalogue.title ?? "", () => titlesMatch(record.title!, catalogue.title!));
+      judge("title", record.title, catalogue.title ?? "", () => catalogueTitleMatches(record, catalogue.title!));
       judge("authors", record.authors.length > 0 ? record.authors.join("; ") : undefined, catalogue.authors.join("; "),
-        () => record.authors.every((a) => holds(foldName(catalogue.authors.join(" ")), foldName(a))));
-      judge("year", record.year, catalogue.year ?? "", () => record.year === catalogue.year);
+        () => namesWithin(record, catalogue.authors));
+      const set = setVolume(lookup.data!);
+      // A volume cannot be dated before its set began, so only a later year can be the volume's own.
+      if (set && record.year && catalogue.year && Number(record.year) > Number(catalogue.year)) {
+        const dated = `the catalogue dates this item ${catalogue.year}, and it is the volume "${set.stated}" of a set`;
+        if (set.to !== undefined) {
+          // The volume statement gives the years the volume covers: it is dated when they end.
+          if (set.from! >= Number(catalogue.year) && Number(record.year) === set.to) {
+            compared.add("year");
+            evidence.push(meta("year_of_volume", `${dated}; the record's year is the last year the volume statement gives`));
+          } else judge("year", record.year, `${catalogue.year}; volume ${set.stated}`, () => false);
+        } else if (copyShowsYear(source, record) || confirmation(corpus, source, ["year"])) {
+          evidence.push(meta("year_not_compared", `${dated}, with no years for the volume; the record's year is borne out by the copy's title page or a person's review`));
+        } else {
+          yearOpen = true;
+          evidence.push(meta("year_in_record", record.year), meta("year_not_compared", `${dated}, with no years for the volume, and the copy's title page text does not show the record's year`));
+        }
+      } else judge("year", record.year, catalogue.year ?? "", () => record.year === catalogue.year);
       judge("venue", record.venue, catalogue.venue ?? "", () => titlesMatch(record.venue!, catalogue.venue!));
     }
     if (differing.size > 0) return result({ ...shared(check, source), outcome: "fail", reason: "mismatch", evidence });
     evidence.push(meta("compared", [...compared].join(", ") || "nothing"));
+    if (yearOpen) return result({ ...shared(check, source), outcome: "unverifiable", reason: "set_date", evidence });
     if (compared.has("title")) return result({ ...shared(check, source), outcome: "pass", evidence });
     return confirmed(result({ ...shared(check, source), outcome: "unverifiable", reason: "lookup_silent", evidence }), confirmation(corpus, source, ["title"]));
   });
@@ -230,7 +315,7 @@ export function identifierResults(corpus: Corpus, texts = new SourceTexts(corpus
     const theirs = isObject(lookup.data!.found) ? text(lookup.data!.found.title) : undefined;
     const mine = describe(source.data!).title;
     if (!theirs || !mine) return result({ ...parts, outcome: "unverifiable", reason: "lookup_silent", evidence });
-    if (titlesMatch(mine, theirs)) return result({ ...parts, outcome: "pass", evidence });
+    if (catalogueTitleMatches(describe(source.data!), theirs)) return result({ ...parts, outcome: "pass", evidence });
     return result({ ...parts, outcome: "fail", reason: "other_work", evidence: [...evidence, meta("title_in_record", mine), { name: "title_in_lookup", class: "source_text", value: theirs }] });
   }));
 }

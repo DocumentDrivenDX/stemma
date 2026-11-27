@@ -25,7 +25,7 @@
   },
   "id": "txt-r8t6cvfg4wwj6jbwqqg1",
   "identity": {
-    "basis": "First page of the PDF, read by a model (claude-sonnet-5-5); no person has confirmed it",
+    "basis": "A title or names, where given, are the PDF's own document information, not read from the page. The first page of the PDF was read by a model (claude-sonnet-5-5) to choose the title page part; no person has confirmed it",
     "title_pages": [
       0
     ]

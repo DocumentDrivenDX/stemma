@@ -21,15 +21,20 @@ const records = (kind: string): any[] => walk(join(EXAMPLE, "records", kind)).ma
 
 let report: CheckReport;
 let code = 0;
+let stemma: (...args: string[]) => { code: number; out: string };
 beforeAll(async () => {
   const work = temporary();
   const cli = await bundle(join(work, "plugin/dist"));
   const clone = join(work, "coral-reefs");
   cpSync(EXAMPLE, clone, { recursive: true, filter: (path) => !OUTSIDE.has(relative(EXAMPLE, path)) });
-  const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, "check", "--all", "--format", "json", "--project", clone],
-    { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
-  code = done.exitCode;
-  report = JSON.parse(done.stdout.toString()) as CheckReport;
+  stemma = (...args) => {
+    const done = Bun.spawnSync([process.execPath, ...ISOLATION_FLAGS, cli, ...args, "--project", clone],
+      { cwd: dirname(cli), env: { PATH: process.env.PATH ?? "", HOME: temporary() } });
+    return { code: done.exitCode, out: done.stdout.toString() };
+  };
+  const done = stemma("check", "--all", "--format", "json");
+  code = done.code;
+  report = JSON.parse(done.out) as CheckReport;
 }, 120_000);
 
 describe("the worked example", () => {
@@ -108,13 +113,7 @@ describe("the worked example", () => {
     }
     const open = report.body.results.filter((r) => r.open).map((r) => `${r.check} ${r.outcome} ${key.get(r.source ?? r.subject) ?? r.subject}`).sort();
     expect(open).toEqual([
-      "id.resolves fail ladd1960",
-      "meta.resolver fail funafuti1904",
-      "meta.resolver fail geolsoc1838",
-      "meta.resolver fail ladd1960",
-      "meta.resolver fail lyell1832",
-      "meta.resolver fail murray1880",
-      "meta.source fail funafuti1904",
+      "meta.resolver unverifiable lyell1832",
       "meta.source unverifiable darwin1842",
       "meta.source unverifiable lyell1832",
       "source.labels fail geolsoc1838",
@@ -123,4 +122,27 @@ describe("the worked example", () => {
     expect(report.body.label).toBe("open_findings");
     expect(code).toBe(1);
   });
+
+  test("the misprinted-looking page number is explained and still open", () => {
+    const found = report.body.results.find((r) => r.open && r.check === "source.labels")!;
+    expect(found.annotations.map((a) => [a.effect, a.by])).toEqual([["explain", "model claude-sonnet-5-5"]]);
+    expect(found.annotations[0]!.reason).toContain("one is printed 232 and the next 333");
+  });
+
+  // This runs in the throwaway clone with an invented reviewer. It commits nothing:
+  // no person has looked at these pages for the example.
+  test("what is left is a person's to settle: two reviews and one dismissal would check it clean", () => {
+    const years = report.body.results.filter((r) => r.open && r.check === "meta.source");
+    for (const finding of years) {
+      const text = (report.body.verification as any[]).find((v) => v.source === finding.source)!.text;
+      const page = finding.evidence.find((e) => e.name === "title_page_parts")!.value.replace("index ", "");
+      expect(stemma("review", "add", text, "--scope", "source_details", "--pages", page, "--fields", "year", "--against", "the page image", "--outcome", "agrees", "--actor", "person:test-reviewer").code).toBeLessThan(2);
+    }
+    const jump = report.body.results.find((r) => r.open && r.check === "source.labels")!;
+    expect(readFileSync(join(EXAMPLE, "README.md"), "utf8")).toContain(`--finding ${jump.finding_key}`);
+    expect(stemma("annotate", "--finding", jump.finding_key, "--effect", "dismiss", "--reason", "invented for this test", "--actor", "person:test-reviewer").code).toBeLessThan(2);
+    const after = stemma("check", "--all");
+    expect(after.out).toStartWith("CHECKED CLEAN");
+    expect(after.code).toBe(0);
+  }, 120_000);
 });
