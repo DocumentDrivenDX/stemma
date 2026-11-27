@@ -8,10 +8,10 @@ work in progress elsewhere and wait until it reaches `main`.
 |---|---|---|---|---|
 | 1 | Checks read the manuscript | FR-14, 15, 29, 35 (reader) | — | Held: takeover session's, after the unmerged manuscript reader |
 | 2 | Note and claim rules; `reviewed`/`unreviewed` | FR-20, 21, 23 | — | Open |
-| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover session; not started |
-| 4 | Citation formatter | ADR-005 | — | Held: citations work |
-| 5 | Basic PDF build | FR-83, 39, 35 | 1, 4 | Held: citations work |
-| 6 | Takeover intake | FR-71, 92 | 3 | Takeover session; matcher on main, Word reader and matcher fixes in progress |
+| 3 | Legacy exchange: BibLaTeX, CSL-JSON, RIS | FR-13 | — | Takeover session; import codecs on main (0.0.15), no commands, no export after edits or across formats |
+| 4 | Citation formatter | ADR-005 | — | On main |
+| 5 | Basic PDF build | FR-83, 39, 35 | 1, 4 | Report build on main; draft, camera-ready and reviewer builds not |
+| 6 | Takeover intake | FR-71, 92 | 3 | Takeover session; Word reader and matcher fixes on main, not yet used by the command line; no records or libraries |
 | 7 | Unverified graph and Stemma copy | FR-72, 73 | 1, 6 | Takeover session; after 1 and 6 |
 | 8 | Rounds and first report | FR-73, 93 | 7 | Takeover session; after 7 |
 | 9 | Claim support records | FR-52 to 54 | 1, 2 | Held |
