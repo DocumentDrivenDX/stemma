@@ -65,9 +65,13 @@ tests passing on invented files and `./scripts/dev.sh check` passing.
 |---|---|---|
 | P1 | **Matcher marks.** Add `seams` and `hyphens` to a neutral paragraph and `unreadPages` and `unseparatedLists` to a neutral document; apply CONTRACT-003 I, "What the matcher does with the marks", in the list reader and matcher; add the reasons `uncertain_boundary`, `uncertain_hyphen`, `uncertain_layout`, `list_incomplete` | Hand-made neutral documents show each guard, with the split entry of US-117-AC3 not linked; every existing Word and matcher test passes unchanged; a property test shows that adding any mark to a document never adds a link |
 | P2 | **PDF page facts.** Add the `core` port and implement it in `extract` over `readPdf`: for a manuscript, each page's lines and places, its state (invisible drawing, painted images or shapes), annotations, form values, link addresses, attachment names, layers, and image counts, read in a child process with a time stop. Move the CONTRACT-007 I layout rules the reader reuses into `core`. Extend `tests/pdf.ts` with annotations, invisible text, an image, and an attachment | Tests cover each page state and reported item; `pdf_unreadable` and `input_limit` cases; every source-conversion test gives byte-identical output |
-| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-117-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14, AC17, AC18 at the reader and matcher level; the library's own piece count equals the account on every invented file |
+| P3 | **Layout reader** in `intake`, a pure function of the port's page facts: removed lines, reading order, notes sections and endnotes, footnotes, paragraphs, headings, seams, hyphen marks, line places, account | US-117-AC1, AC2, AC4, AC5, AC7, AC8, AC9, AC12, AC14, AC17 to AC19 at the reader and matcher level; the library's own piece count equals the account on every invented file |
 | P4 | **List entries**: the separability rule, incomplete lists, unread pages | US-117-AC3, AC6, AC10; a seeded set with hanging, spaced, split, and run-on lists and a hand-made answer list links nothing wrong |
 | P5 | **Takeover wiring**, after step 4 or with it: `takeover` accepts PDF; `ImportBatch.format` gains `pdf` in the record schema; intake items carry page places; the command line passes the `extract` port to `intake`; the file comparison of CONTRACT-003 I for both formats; the batch field for kept-hyphen words and, here or in step 5 if that comes later, the quotation rule of BR-1535 | US-117-AC1, AC10, AC11, AC13 to AC16 through the command |
+
+Steps 4 and 5 include endnotes: the manuscript reader, which today refuses
+`[^en-…]`, reads them as it reads footnotes, the writer writes them, and every
+check over the copy reads them (FR-96). The basic PDF prints them (SD-008).
 
 After P4, run the developer report script on PDF manuscripts the author supplies,
 privately; commit only counts and invented reproductions. Every producer stays
@@ -83,7 +87,8 @@ privately; commit only counts and invented reproductions. Every producer stays
 | PDF-01 to PDF-09 (FR-95) | Rule-based layout reading over the pinned PDF library, marks the matcher honors, stated limits | PDF reader, Author-date matcher | P0 / M1 pilot |
 | INT-11 (FR-71, FR-95) | One file for each chapter | Import coordinator | P0 / M1 pilot |
 | INT-12 (FR-71, FR-95) | A changed original is reported, not applied or added | Import coordinator | P0 / M1 pilot |
-| PDF-10 (FR-95) | The batch keeps the words with a kept hyphen; quotation checks try both readings | Import coordinator, SD-007 engine | P0 / M1 pilot |
+| PDF-10 (FR-95) | The batch keeps the words with a kept hyphen; quotation checks accept either reading | Import coordinator, SD-007 engine | P0 / M1 pilot |
+| PDF-11, NTE-01 (FR-95, FR-96) | Rule-found notes sections in PDF; one note model with a kind from reader to copy | PDF reader, Reference resolver, Manuscript writer | P0 / M1 pilot |
 | INT-01, INT-03, INT-04, INT-07, INT-08 (FR-71) | Bounded read-only Word reader; staged import | Word reader, Import coordinator | P0 / M1 pilot |
 | INT-02 (FR-71) | BibLaTeX, CSL-JSON, RIS intake | SD-003 codecs, Import coordinator | P0 / M1 pilot |
 | INT-05, INT-06 (FR-71) | Support levels and nothing dropped silently | Intake report | P0 / M1 pilot |
@@ -200,6 +205,7 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1508** — Full typed reference: it binds only when its folded title, first author family name, and year match exactly one entry.
 - **BR-1509** — Short form: author family name and a short title that begins one earlier cited source's title, in document order, binds when exactly one qualifies.
 - **BR-1510** — Ibid.: `ibid.` or `Ibid.` binds only when the immediately preceding note in document order holds exactly one citation, that citation is bound, and the note has no unread reference-like text. A stated locator is taken from this note; otherwise the locator stays absent (assumption).
+- **BR-1536** — One note model (FR-96): a note is a footnote or an endnote. BR-1507 to BR-1511 apply to both; "preceding note" in BR-1510 means the one before it of the same kind, and for PDF endnotes the number before it in the same section. No step changes a note's kind.
 - **BR-1511** — Everything else, including `a.a.O.`, `ebd.`, `op. cit.`, cross-note references, and any note the reader cannot classify, becomes an ambiguous or unclassified intake item with candidates where found. Model judgment never binds.
 
 **Reference lists and author-date citations** (the profile is CONTRACT-003 H)
@@ -236,7 +242,7 @@ Shapes are CONTRACT-001. There is no round or session entity.
 - **BR-1532** — Unread pages: they are named, never recognized, and block links from any list they could affect.
 - **BR-1533** — Said every time: the limits that no rule can detect are in every PDF report, not only when something looks wrong.
 - **BR-1534** — Which file this is: the order of CONTRACT-003 I (same bytes, changed original, repeated text) applies to Word and PDF files in either order, before anything is staged. Only a changed original saves anything, its one item.
-- **BR-1535** — Quotation readings: a PDF chapter's quotations are checked with and without each uncertain hyphen, and a result stands only if the readings agree (BR-1530). It ships with whichever of step 5 or P5 comes later; no version takes over a PDF and reads its copy without it.
+- **BR-1535** — Quotation readings: a PDF chapter's quotation matches with a hyphen kept at a line end either kept or removed, and says which. This is the one exception to BR-1530, by the product owner's choice. It ships with whichever of step 5 or P5 comes later; no version takes over a PDF and reads its copy without it.
 
 BR numbers for this feature start at 1501 so that designs written in parallel cannot collide.
 
@@ -377,7 +383,9 @@ graph TD
 | INT-10 | Word reader | BR-1502 | Seeded comments all listed with text and position |
 | INT-11 | Coordinator | BR-1534 | Invented Word and PDF of one text, in both orders, and with `--separate` (US-117-AC13) |
 | INT-12 | Coordinator | BR-1519, BR-1534 | US-117-AC15 on invented Word and PDF files |
-| PDF-10 | Coordinator, check engine | BR-1530, BR-1535 | US-117-AC16; Word quotation tests unchanged |
+| PDF-10 | Coordinator, check engine | BR-1535 | US-117-AC16; Word quotation tests unchanged |
+| PDF-11 | PDF reader | BR-1528, BR-1536 | US-117-AC17, AC19 |
+| NTE-01 | Readers, resolver, writer, check engine | BR-1536 | US-099 and US-117 endnote criteria |
 | PDF-01, PDF-09 | PDF reader, Coordinator | BR-1527 | US-117-AC1 |
 | PDF-02, PDF-03 | PDF reader | BR-1528 | US-117-AC2, AC7, AC12 on invented files |
 | PDF-04, PDF-05 | PDF reader, matcher, list reader | BR-1529 to BR-1531 | US-117-AC3 to AC6; added marks never add a link; Word tests unchanged |

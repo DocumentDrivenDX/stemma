@@ -185,7 +185,7 @@ block. Text before the first block line is an error.
 | `list-item` | One list item | main |
 | `table` | A table as pipe rows; a delimiter row of `-`, `:`, and pipes is layout; a literal pipe in a cell is written `\|` | main |
 | `caption` | A caption | main |
-| `footnote` | A note body; `label` is its marker; `continued="yes"` when it carries over from an earlier page | notes |
+| `footnote` | A note body, of a footnote or an endnote; `label` is its marker; `continued="yes"` when it carries over from an earlier page | notes |
 | `running-head` | A running head or foot | furniture |
 | `folio` | The printed page number standing alone | furniture |
 | `boilerplate` | A library's or distributor's own text around the work, such as a license or header; kept, and never matched as source text | furniture |
@@ -279,7 +279,9 @@ crosses a clear gutter and each side holds at least five lines. In a PDF not
 marked as recognized text, it assigns `footnote` and `fnref` only when a small
 raised marker that occurs once in the body and a smaller line at the foot of the
 same page begin with the same marker, and `heading` only to a short line set at least 1.2 times
-the body size. Everything else stays `undetermined`.
+the body size. Everything else stays `undetermined`, a PDF original's endnotes
+included: their text stays in the main stream, where it can be quoted, and is
+not marked as notes (PRD FR-96, an open gap).
 
 **Download stamps.** A library or publisher may add to the copy it serves a
 line saying who downloaded it, from which network address, and when. That line is

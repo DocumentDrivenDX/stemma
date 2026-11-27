@@ -28,14 +28,14 @@ feature's requirements; the PRD ranks each requirement.
 | FEAT-005 | Notes, claims, constructs | Passage-anchored notes, claim ledger and claim relations, construct register | P0 | product owner | Subsystem 5: FR-20 to FR-23, FR-80 | 2026-11-26 |
 | FEAT-006 | Composition | Outline, chapter specifications, drafting from claims, rival readings | P0 | product owner | Subsystem 6: FR-24 to FR-28 | 2026-11-26 |
 | FEAT-007 | Verification and reports | Scripted checks, explained findings, claim-support records, annotations, the checked-clean label | P0 | product owner | Subsystem 7: FR-29 to FR-34, FR-52 to FR-54, FR-74 | 2026-11-26 |
-| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91 | 2026-11-26 |
+| FEAT-008 | Typesetting and publishing | Typst build, basic pilot PDF, citation formatting, drafts and camera-ready output, images, print PDF | P0 | product owner | Subsystem 8: FR-35 to FR-40, FR-55 to FR-58, FR-83, FR-91, FR-96 | 2026-11-26 |
 | FEAT-009 | Evolution, audit, review | Changelog, errata, audits, AI-use disclosure, reviewer package and reviewer comments | P0 | product owner | Subsystem 9: FR-41 to FR-47, FR-79 | 2026-11-26 |
 | FEAT-010 | Plugin, skill, and distribution | One skill with modes, command line shipped inside the plugin, self-setup of the pinned Bun, tools on three systems, desktop install on macOS and Windows, marketplace install, install tests | P0 | product owner | Subsystem 10: FR-48 to FR-51, FR-75, FR-77, FR-78 | 2026-11-26 |
 | FEAT-011 | Evidence graph and graph engine | Record files as the graph; arras-compatible TypeScript and SQLite engine, reads first | P0 | product owner | Subsystem 11: FR-62, FR-63 | 2026-11-26 |
 | FEAT-012 | Explorer and typeset preview | arras-based explorer, larger graph view contributed to arras, linked pages, in-browser Typst preview rebuilt and reloaded after edits | P0 | product owner | Subsystem 12: FR-64, FR-65, FR-76 | 2026-11-26 |
 | FEAT-013 | Argument and geographic maps | Place records, view-only maps projected from the graph, restricted locations | P0 | product owner | Subsystem 13: FR-66 to FR-68, FR-81 | 2026-11-26 |
 | FEAT-014 | Voice and style | Built-in extensible profiles, amendment from the author's writing | P0 | product owner | Subsystem 14: FR-69, FR-70 | 2026-11-26 |
-| FEAT-015 | Takeover of existing projects | Intake of Word and PDF manuscripts and libraries, unverified graph, author-date linking to reference lists, usable first report, remove, repoint, or replace rounds in a Stemma copy, construct and methodology suggestions | P0 | product owner | Subsystem 15: FR-71 to FR-73, FR-82, FR-92, FR-93, FR-95 | 2026-11-26 |
+| FEAT-015 | Takeover of existing projects | Intake of Word and PDF manuscripts and libraries, unverified graph, author-date linking to reference lists, usable first report, remove, repoint, or replace rounds in a Stemma copy, construct and methodology suggestions | P0 | product owner | Subsystem 15: FR-71 to FR-73, FR-82, FR-92, FR-93, FR-95, FR-96 | 2026-11-26 |
 
 ## Product Lifecycle
 

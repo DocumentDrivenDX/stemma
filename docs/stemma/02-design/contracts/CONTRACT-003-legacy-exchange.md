@@ -194,11 +194,12 @@ restricted values.
    records for full and partial references; and quotations and claims. Every
    record it creates takes effect at once and is marked unreviewed
    (CONTRACT-001 G).
-6. Bind a typed footnote, short form, or "ibid." to a source only when a
-   deterministic rule yields one candidate. Otherwise it goes to the author with
+6. Bind a typed footnote or endnote, short form, or "ibid." to a source only
+   when a deterministic rule yields one candidate. "Ibid." refers to the note
+   before it of the same kind. Otherwise it goes to the author with
    the candidates (FR-72). A note the reader did not classify is listed as
    unclassified, not dropped.
-7. Write `stemma.intake-report/0`: counts of notes read, citations created, bound,
+7. Write `stemma.intake-report/0`: counts of footnotes and of endnotes read, citations created, bound,
    ambiguous, and unclassified, plus items under 4 and the support levels, the
    matching profiles used, and the author-date account of H. Every item that
    needs the author or was not read is also saved as an `intake_item` record.
@@ -206,7 +207,8 @@ restricted values.
    and a next step; grouping drops no item. The groups include exact repeats:
    open reference-entry items, from any batch, whose `as_found` strings are
    identical. Groups are computed from records and not saved.
-8. Write the Stemma copy under `manuscript/` as CONTRACT-006 defines. Later
+8. Write the Stemma copy under `manuscript/` as CONTRACT-006 defines, with
+   footnotes as footnotes and endnotes as endnotes. Later
    fixes go to that copy and the records, never to the original.
 9. From M2 (FR-82), suggest constructs and methodology as unreviewed records
    with their supporting manuscript passages in `origins`. The author reviews
@@ -635,16 +637,47 @@ leaves the body text, and its place is kept as a note reference.
   with a seam at each end, and is reported `unpaired_foot_text`.
 - A raised marker that nothing pairs stays in the text as typed, with a seam on
   each side, and is reported `unpaired_marker`.
-- **Endnotes are not recognized.** Their text is read as the body text it
-  appears as, so no paragraph has location `endnote`. Their markers are not
-  tied to it: each marker the pairing rule sees is an `unpaired_marker`, and
-  its seams withhold any link that would cross it, including a narrative
-  citation whose names it follows or precedes closely. Nothing typed in an
-  endnote is read as a note: F6 does not bind its full references, short forms,
-  or "ibid.", it is not listed as unclassified, and the report's counts of
-  notes cover footnotes only. A bracketed year in that text is examined as in
-  any body text. A manuscript that cites in endnotes therefore gets no
-  note-style citations from its PDF.
+
+**Endnotes.** The runs of endnote lines are found first. Footnotes are then
+paired without those lines, and last the raised numbers left over are paired
+with the endnotes. A **notes section** is a run of lines set in one size,
+holding notes numbered from 1 without a gap, in arabic or in lower-case Roman
+numbers. A note starts at a line that begins with its number, raised or
+followed by a full stop or a space; the starting lines share one form and one
+left position, within 2 points; and each number of the run starts exactly one
+such line. The other lines continue the note before them. A section is found in
+one of two ways:
+
+- **Headed.** It follows a line that is only `Notes` or `Endnotes`. It ends at
+  the first line of another size, a heading found by size, a line that is only
+  `References`, `Bibliography`, `Notes`, or `Endnotes`, or the end of the file.
+- **At the end.** With no such line, as a word processor prints its endnotes,
+  every starting number is raised and the run reaches the end of the file.
+
+If a line after a section's end starts, in the section's form, with the next
+number, the section's end is in doubt, as when a footnote or a line of another
+size falls between two endnotes, and the section is not read. A raised number,
+set as CONTRACT-007 I's raised marker is, in the text pairs with a note of a section when it is not paired
+as a footnote, it stands after the section before (or the file's start) and
+before this one, it is the only such raised number of that value there, and the
+paired numbers rise in reading order. A section with no paired note is not a
+notes section.
+
+An endnote's paragraphs have location `endnote`, follow the paragraph that
+refers to them, and are labelled `e<section>-<number>`, counting sections from
+1. A paired marker leaves the body text and its place is kept as a note
+reference. A note that no marker pairs is still an endnote: it follows the last
+paragraph of the text its section serves and is reported `unreferenced_note`.
+The numbers give the notes' order, so "ibid." refers to the number before it in
+the same section, and the first note of a section has no note before it. The
+heading line of a headed section is a body heading. Nothing is paired across
+files.
+
+A `Notes` or `Endnotes` line whose following text does not make a section is
+reported `unrecognized_notes` with the rule it broke, and that text is read as
+body text. Notes in any other form are also read as body text; their raised
+numbers are listed as `unpaired_marker`. These rules are assumptions about what
+word processors and LaTeX print, tested on no file that either saved.
 
 **Paragraphs and headings.** Lines in reading order form one paragraph until
 one of these: the next line is indented from the left margin and the line before
@@ -668,17 +701,18 @@ seam goes:
 
 - at each join across a page or column, including a join across unread pages;
 - at each line join on an order-uncertain page;
-- at offset 0 of a body or footnote paragraph when the paragraph before it in
+- at offset 0 of a body or note paragraph, other than the first of a note, when the paragraph before it in
   the body, or in the same note, is not a heading and does not end with `.`,
   `?`, `!`, or `:`, with any closing quotation mark or bracket after it; and
-- where **Footnotes** says.
+- where **Footnotes** says. The same two rules for unpaired foot text and markers
+  hold whatever kind the marker was meant for.
 
 In a list with separable entries (below), the layout shows where entries begin,
 so seams come only from joins inside an entry and from order-uncertain pages.
 
 **List entries.** A list starts and ends as H rule 1 says. Its entries are
 **separable** only when, from its start to that end, apart from removed lines,
-paired footnotes, and subheadings:
+paired footnotes, notes sections, and subheadings:
 
 - every line is set in one size and stands at one of two left positions, the
   entry position and one deeper continuation position, within 2 points. The two
@@ -701,26 +735,17 @@ and says that exporting each chapter as its own file, or taking over its Word
 file, can help.
 
 **Quotations in the copy.** The copy keeps line-end hyphens, and the line-end
-join of `quote-fold/0` (CONTRACT-002 D) applies only to source text. A quotation
-read from a PDF could then fail only because the draft's line broke inside a
-word. So the batch keeps, for its chapter, each word in which a hyphen was kept
-at a join: the text between the white space on either side, without surrounding
+join of `quote-fold/0` (CONTRACT-002 D) applies only to source text. So the
+batch keeps, for its chapter, each word in which a hyphen was kept at a join:
+the text between the white space on either side, without surrounding
 punctuation, folded as `quote-fold/0` folds. The record schema gains that field
 with the `format` value (CONTRACT-001). In `quote.present` and `quote.page` over
-that chapter, a hyphen in a quotation is **uncertain** when the word holding it
-is one of those kept. The check compares the quotation as printed and with each
-combination of its uncertain hyphens removed. If every reading gives the same
-outcome, that outcome stands, with the evidence of the printed reading.
-Otherwise the outcome is `unverifiable`, reason `uncertain_hyphen`, and the
-evidence shows each reading, what it matched, and where. The author compares the
-words with the original page and removes a hyphen from the copy if it is not
-part of the word; the quotation is then checked as it stands. If the hyphen does
-belong, the result stays open until a person dismisses it (CONTRACT-001,
-Annotations). So no quotation passes or fails on a reading Stemma chose. The
-same word typed within a line elsewhere in the chapter is treated the same way.
-`quote-fold/0` itself is unchanged, and a chapter from Word has no such words.
-Whether such a quotation should instead pass and say which reading matched, as
-the source-side join does, is a PRD open question.
+that chapter, a quotation that holds such a word matches if it matches as
+printed or with any of those hyphens removed. A match that needs a removal is
+`normalized`, and its evidence says which hyphen was removed. This can pass a
+wrong quotation when the hyphen belongs to the word and the source writes it
+without one, the risk the source-side join already carries. A chapter from Word
+has no such words.
 
 **What the matcher does with the marks.** H applies unchanged to a document that
 has no seams, hyphen marks, unread pages, or unseparated lists, which is every
@@ -774,8 +799,8 @@ file holds:
   as current text and can produce citations; export with changes accepted, or
   take over the Word file. F4's rule for deleted text cannot be met.
 - Comments printed onto the page are read as page text.
-- Endnotes are not recognized. Their text is read as body text, their markers
-  are unpaired, and no citation in them is handled as a note.
+- Endnotes in a form **Endnotes** does not state, or in another file, are read
+  as body text, and no citation in them is handled as a note.
 - Hidden, white, struck-through, covered, and switched-off-layer text is read
   like other text. Text placed wholly off the page may not be returned at all.
 - Tables, captions, block quotations, emphasis, and each passage's language and
@@ -789,7 +814,7 @@ file holds:
   page. Right-to-left text is untested.
 
 **Account.** Every non-white-space character the library returns on a converted
-page ends in exactly one of: paragraph text, a paired note marker, or a listed
+page ends in exactly one of: paragraph text, a paired note marker, the starting number of an endnote, or a listed
 removal (stamps by count only).
 Form-field values and comment texts are reported apart. A difference stops the
 reading as an internal error. Unread pages are outside this count and are named.

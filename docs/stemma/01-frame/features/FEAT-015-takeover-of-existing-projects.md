@@ -17,7 +17,7 @@ ddx:
 **Priority**: P0
 **Owner**: product owner
 **Covered PRD Subsystem(s)**: 15. Takeover of existing projects
-**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82, FR-92, FR-93, FR-95
+**Covered PRD Requirements**: FR-71, FR-72, FR-73, FR-82, FR-92, FR-93, FR-95, FR-96
 **Cross-Subsystem Rationale**: None — single subsystem.
 
 ## Overview
@@ -75,7 +75,7 @@ These objects differ:
 | Original | The author's manuscript or library file; never changed by takeover |
 | Stemma copy | The manuscript as Stemma holds it, in marked-up Markdown with citation and claim markers; fixes are written here |
 | Embedded reference | Data held in a reference-manager field in the manuscript; still unverified |
-| Typed footnote | A footnote written as plain text, including short forms |
+| Typed footnote | A footnote or endnote written as plain text, including short forms. Where this feature says footnote or note, it means either (FR-96) |
 | Full or partial reference | A recovered reference with all, or only some, identifying data |
 | Round | One working pass through failing references |
 | Choice | The author's decision to remove, repoint, or replace one reference |
@@ -98,8 +98,8 @@ N/A — the user stories name the tasks.
 #### Intake (FR-71)
 
 - INT-01. Takeover must read a Word manuscript, including its body text,
-  headings, and tables. Word heading styles must guide the structure of the
-  Stemma copy.
+  headings, tables, footnotes, and endnotes. Word heading styles must guide
+  the structure of the Stemma copy.
 - INT-02. Takeover must read BibLaTeX libraries, CSL-JSON (Citation Style
   Language data) libraries, and RIS (a tagged reference format) libraries.
 - INT-03. Takeover must leave every original unchanged.
@@ -132,8 +132,8 @@ INT-03, INT-05 to INT-09, INT-11, and INT-12 apply to PDF as to Word.
 - PDF-01. Takeover must read a born-digital PDF manuscript with a text layer and
   must produce from it what it produces from a Word file: the same kinds of
   records, intake items, report, author-date account, and Stemma copy.
-- PDF-02. Paragraphs, headings, footnotes and their markers, running heads, page
-  numbers, and reading order must be set only by stated deterministic rules.
+- PDF-02. Paragraphs, headings, footnotes, endnotes and their markers, running
+  heads, page numbers, and reading order must be set only by stated deterministic rules.
   No model may set them. What the rules cannot establish must be reported, and
   every removed line must be listed.
 - PDF-03. Every piece of text read from a converted page must end as manuscript
@@ -149,15 +149,22 @@ INT-03, INT-05 to INT-09, INT-11, and INT-12 apply to PDF as to Word.
   or opening anything.
 - PDF-07. Every report must state what a PDF cannot show, including whether it
   was made with tracked changes showing, comments printed on the page, hidden or
-  struck text, tables, block quotations, endnotes, and reference-manager data.
+  struck text, tables, block quotations, and reference-manager data.
 - PDF-08. A page with no text layer or with invisibly drawn text must not be
   converted and must be named. A file with no page that can be converted must
   fail by name and write nothing. Takeover must not run recognition.
 - PDF-09. Each converted paragraph must keep the page and place of its lines in
   the original.
-- PDF-10. A check of a quotation must not pass or fail it on a reading, chosen
-  by Stemma, of a hyphen kept at a line end. Where the readings differ, it must
-  say so and show them.
+- PDF-10. A quotation must not fail only because the draft's line broke at a
+  hyphen. It passes if the words match with that hyphen kept or removed, and the
+  result must say which.
+- PDF-11. Takeover must recognize endnotes in the forms its rules state, handle
+  them as it handles footnotes, and report a notes section it cannot read as
+  endnotes without dropping its text.
+- NTE-01 (FR-96, P0, M1). Endnotes must be read, kept as endnotes in the Stemma
+  copy, bound, linked, checked, and counted as footnotes are, whether the
+  manuscript is Word or PDF. "Ibid." must refer to the note before it of the
+  same kind.
 
 #### Unverified graph (FR-72)
 
@@ -317,11 +324,14 @@ INT-03, INT-05 to INT-09, INT-11, and INT-12 apply to PDF as to Word.
 - **Citation inside a table**: Until the open question is answered, it is listed
   as left unlinked with that reason. A PDF does not show which text is a table,
   so there this reason cannot be given (PDF-07).
-- **PDF manuscript with endnotes**: The notes are read as body text, their
-  markers are unpaired, and no citation in them is handled as a note.
-- **Quotation broken by a hyphen at a PDF line end**: If keeping and removing
-  the hyphen give different results, the quotation is neither passed nor
-  failed.
+- **PDF manuscript with endnotes**: Endnotes under a "Notes" or "Endnotes"
+  line, or printed at the end of the file with raised numbers, are read as
+  notes. Any other form is read as body text, its markers are listed as
+  unpaired, and a notes heading Stemma could not use is reported.
+- **Endnotes in a separate PDF file**: They are not paired with markers in
+  another file.
+- **Quotation broken by a hyphen at a PDF line end**: It passes if either
+  reading matches, and says which.
 - **PDF made with tracked changes showing**: Deleted text cannot be told from
   current text. Every PDF report says so; the Word file is the remedy.
 - **Reference entry split across PDF pages**: The part after the break could

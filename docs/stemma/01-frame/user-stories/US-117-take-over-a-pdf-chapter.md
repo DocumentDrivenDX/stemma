@@ -12,8 +12,8 @@ ddx:
 # US-117: Take over a PDF chapter
 
 **Feature**: FEAT-015 — Takeover of existing projects
-**Feature Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05, PDF-06, PDF-07, PDF-08, PDF-09, PDF-10, INT-03, INT-05, INT-06, INT-07, INT-08, INT-11, INT-12, ADC-06, ADC-08
-**PRD Requirements**: FR-95
+**Feature Requirements**: PDF-01, PDF-02, PDF-03, PDF-04, PDF-05, PDF-06, PDF-07, PDF-08, PDF-09, PDF-10, PDF-11, NTE-01, INT-03, INT-05, INT-06, INT-07, INT-08, INT-11, INT-12, ADC-06, ADC-08
+**PRD Requirements**: FR-95, FR-96
 **Priority**: P0
 
 ## Story
@@ -52,9 +52,10 @@ Every test file is invented and built by script.
 - [ ] **US-117-AC13** — Given a chapter already taken over from Word, when a PDF of the same chapter is taken over, then nothing is written and the Word file is named; with `--separate` it proceeds and records that statement. The same holds with the formats in the other order.
 - [ ] **US-117-AC14** — Given the same PDF and tool versions, when takeover runs into two empty projects, then the text, links, reported items, and check results are the same, with no model call.
 - [ ] **US-117-AC15** — Given a chapter taken over from Word or PDF, when takeover runs on a changed file with the same name, with or without `--again`, then one `original_changed` item names the earlier import, no chapter or other record is added, and the Stemma copy is unchanged; a second such run writes nothing; with `--separate` the file is taken over; unchanged bytes still follow `--again`; and the changed text under a new name fails with `repeated_chapter`, saying that revisions are not applied.
-- [ ] **US-117-AC16** — Given quotations in a PDF chapter that hold a hyphen kept at a line end, when quotations are checked, then one whose readings give different outcomes is `unverifiable` with `uncertain_hyphen` and shows them, whether the source has the word with or without the hyphen; one whose readings all fail is failed; after the author removes a wrong hyphen from the copy it passes; and a Word chapter's results are unchanged.
-- [ ] **US-117-AC17** — Given a PDF with numbered endnotes that cite works, when takeover runs, then the notes are body text, each raised marker is listed as unpaired, no citation in them is bound or counted as a note, no link crosses a marker, and the report states the endnote limit.
+- [ ] **US-117-AC16** — Given quotations in a PDF chapter that hold a hyphen kept at a line end, when quotations are checked, then each passes if the source has the words with that hyphen or without it, the evidence says when a removal was needed, one that matches neither way fails, and a Word chapter's results are unchanged.
+- [ ] **US-117-AC17** — Given a PDF with numbered endnotes holding a full reference, a short form, "Ibid.", and a quotation, under a "Notes" line in one file and printed at the end with raised Roman numbers in another, when takeover runs, then each is an endnote after the paragraph that cites it, the copy keeps it as an endnote, the references bind as they would in footnotes, the quotation is checked, and the report counts endnotes apart from footnotes.
 - [ ] **US-117-AC18** — Given a PDF that maps a ligature in a family name to U+FB01, in the reference entry or in the citation, when takeover runs, then the citation links as it would without the ligature, and the text keeps the character.
+- [ ] **US-117-AC19** — Given a notes section with a missing or repeated number, an endnote whose marker is missing or raised twice, a numbered list at the end of a file with no raised numbers, a footnote that falls between two endnotes, and footnotes on earlier pages, when takeover runs, then the broken section is reported `unrecognized_notes` and kept as body text, a note without one marker is an endnote reported `unreferenced_note`, the numbered list stays body text, the interrupted section is reported and kept as body text, the earlier footnotes stay footnotes, and no text is lost.
 
 ## Edge Cases
 
@@ -62,7 +63,7 @@ Every test file is invented and built by script.
 - **Citation inside a table**: A PDF does not show tables, so a citation on one line can be linked, and text across cells is not.
 - **Several chapters in one PDF**: Each list serves the text before it, as in Word. Where Stemma does not find the next chapter's heading, running prose usually makes the list not separable.
 - **Word H rules**: A Word manuscript's matching results do not change.
-- **Endnotes**: Not recognized; a manuscript that cites in endnotes gets no note-style citations from its PDF.
+- **Endnotes**: Read in the two stated forms; other forms and a separate notes file stay body text and are reported by their unpaired markers.
 
 ## Test Scenarios
 
@@ -85,15 +86,16 @@ All text is invented. Files are built by `tests/pdf.ts`, extended where a scenar
 | Two forms | US-117-AC13 | Invented DOCX and PDF with the same prose | Take over both, in each order | Second refused; `--separate` proceeds |
 | Repeat run | US-117-AC14 | Same PDF | Take over twice | Same results |
 | Revision | US-117-AC15 | A chapter, then one edited sentence under the same name and under a new one | Take over each; `--again`; `--separate` | One item, nothing applied; new name refused; `--separate` adds |
-| Quotation hyphen | US-117-AC16 | "mont-" / "rose" and "reef-" / "building" in quotations; invented sources with and without each hyphen | Check; edit one hyphen out; check | Differing readings unverifiable; absent words fail; edited one passes |
-| Endnotes | US-117-AC17 | 3 raised markers and a "Notes" section with a full reference and "Ibid." | Take over | 3 unpaired markers; no note binding or count; limit stated |
+| Quotation hyphen | US-117-AC16 | "mont-" / "rose" and "reef-" / "building" in quotations; invented sources with and without each hyphen | Check | Either form passes; absent words fail |
+| Endnotes | US-117-AC17 | 4 endnotes under "Notes"; the same printed at the end with raised i to iv | Take over each; check | 4 endnotes, kept, bound, checked, counted |
+| Doubtful notes | US-117-AC19 | Numbers 1, 3; a raised 2 twice; a plain numbered list; a footnote between two endnotes | Take over | Reports as stated; all text accounted for |
 | Ligature | US-117-AC18 | A family name with U+FB01 in the entry, then in the citation | Take over | Linked both ways; character kept |
 
 ## Dependencies
 
 - **Stories**: US-099, US-113.
 - **Feature Spec**: FEAT-015
-- **Feature Requirements**: PDF-01 to PDF-10, INT-03, INT-05 to INT-08, INT-11, INT-12, ADC-06, ADC-08
+- **Feature Requirements**: PDF-01 to PDF-11, NTE-01, INT-03, INT-05 to INT-08, INT-11, INT-12, ADC-06, ADC-08
 - **PRD Requirements**: FR-95
 - **External**: PDFs saved by named programs and versions, for support tests; they must be openly licensed or made from invented text. The reading rules are CONTRACT-003 I.
 
