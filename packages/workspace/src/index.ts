@@ -102,7 +102,7 @@ export function readProject(root: string): ProjectContent {
     manuscript: listFiles(root, "manuscript"),
     research: listFiles(root, "research"),
     // Those under records/ and sources/ are already reported as misplaced.
-    binaries: repositoryFiles(root).filter((path) => !/^(records|sources)\//.test(path) && isBinary(join(root, path))).sort(),
+    binaries: () => repositoryFiles(root).filter((path) => !/^(records|sources)\//.test(path) && isBinary(join(root, path))).sort(),
   };
   if (existsSync(join(root, "rules.md"))) content.rules = sourceFile(root, "rules.md");
   return content;

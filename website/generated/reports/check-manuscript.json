@@ -170,6 +170,7 @@
       {
         "annotations": [],
         "check": "meta.resolver",
+        "coverage_only": true,
         "evidence": [
           {
             "class": "location",
@@ -180,6 +181,11 @@
             "class": "metadata",
             "name": "key",
             "value": "hartwell1998"
+          },
+          {
+            "class": "metadata",
+            "name": "coverage",
+            "value": "not compared with a catalogue: no lookup that found the work is saved"
           }
         ],
         "finding_key": "b0dacef924e996263f91847efe05109797a0eddcc2bf7fd16903ef9aa0d84821",
@@ -190,15 +196,15 @@
           "content_sha256": "68d57bc342eff21750daa51f3bab0a68e6ae1d17ecaad162054cf2054fe752c2",
           "record": "src-fixture0harbour01"
         },
-        "message": "The source's details have not been compared with any catalogue: no lookup is saved.",
-        "open": true,
+        "message": "The source's details have not been compared with any catalogue: no lookup that found the work is saved.",
+        "open": false,
         "outcome": "unverifiable",
         "reason_code": "no_lookup",
         "rules": [],
         "source": "src-fixture0harbour01",
         "subject": "src-fixture0harbour01",
         "suggestions": [
-          "Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."
+          "Nothing needs doing. `resolve` compares the source once an identifier is known; some works are in no catalogue it reads."
         ],
         "why": "A reference with the wrong author, title or year points readers to the wrong work, and is a common sign of an invented or confused citation."
       },
@@ -290,7 +296,7 @@
       "dismissed": 0,
       "fail": 0,
       "not_implemented": 9,
-      "open": 2,
+      "open": 1,
       "pass": 8,
       "unreviewed": 0,
       "unverifiable": 2
@@ -299,7 +305,7 @@
       "bun": "1.4.5",
       "pdfjs-dist": "6.5.438",
       "sqlite": "(removed)",
-      "stemma": "0.0.5",
+      "stemma": "0.0.7",
       "stemma-convert": "1"
     },
     "unreviewed": [],

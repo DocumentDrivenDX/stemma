@@ -55,7 +55,7 @@ Domain terms. These stay distinct:
 - A **scripted check result** is `pass`, `fail`, or `unverifiable`, computed without a model.
 - A **support finding** is a model's judgment, `supported`, `partly supported`, or `unsupported`, saved in a **support record**. It is not verification.
 - An **annotation** is the author's optional note that explains or dismisses a finding. It permits nothing and does not change a result.
-- A finding is **open** when it fails or cannot be checked and no dismissal or confirmation applies. An output is **checked clean** only when nothing is open. Unreviewed items are counted separately in every report and do not affect the label.
+- A finding is **open** when it fails, or a check an output relies on could not run, and no dismissal applies. What nothing shows or contradicts is **coverage**, which is reported and is not open. An output is **checked clean** only when nothing is open. Unreviewed items are counted separately in every report and do not affect the label.
 
 #### Scripted checks
 
@@ -93,7 +93,7 @@ CHK-16 (FR-29, P0, M1). A quotation or note extract must pass only when it match
 
 CHK-17 (FR-29, P0, M1). Any other near match must be reported with both texts until it is fixed or the author dismisses it under EXC-01.
 
-CHK-18 (FR-30, P0, M1). When source details cannot be verified automatically, a person may record a review naming the title page or equivalent checked and the details confirmed (FR-89). The result must then be shown as confirmed by the author, not verified, and must stop being open. A missing confirmation leaves it open, and a mismatch must stay reported until fixed or dismissed.
+CHK-18 (FR-30, P0, M1). A source detail that the copy's title page text does not show must be corroborated from independently recorded evidence where there is any, and otherwise reported as coverage that is not open; a contradiction must be reported as a failure until fixed or dismissed. A model's reading must not count as that evidence. A person may record a review naming the title page or equivalent checked and what it shows, which must then be shown as confirmed by the author, not verified. Reaching checked clean must not require such a review.
 
 #### Claim support
 

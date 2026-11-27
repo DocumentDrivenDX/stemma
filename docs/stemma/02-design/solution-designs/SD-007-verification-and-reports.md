@@ -116,7 +116,7 @@ Result and report shapes are CONTRACT-002; stored records are CONTRACT-001. The 
 - **BR-701** — Pure checks: a check reads ports and returns results. A thrown error becomes the CONTRACT-002 unverifiable result; it is never dropped or passed.
 - **BR-702** — Fresh build: every build's report comes from a full run in the same process. No saved result, index answer without a digest comparison, or model call enters it.
 - **BR-703** — The label is one function of results, applicable dismissals and confirmations, and not-run entries, using the CONTRACT-002 rule. Unreviewed items and unadmitted cited sources are listed and counted in `body.unreviewed` and never enter it. No setting or persona changes it, and no result of it stops a build.
-- **BR-704** — Every `fail` and `unverifiable` result is a finding with `message`, `why`, and `suggestions` from fixed templates keyed by check and reason code; a check without templates for each of its reason codes is a defect. Findings with one cause are grouped.
+- **BR-704** — Every `fail` and `unverifiable` result has `message`, `why`, and `suggestions` from fixed templates keyed by check and reason code; a check without templates for each of its reason codes is a defect. Findings with one cause are grouped.
 
 **Quotation profile `quote-fold/0`** (differences allowed are fixed by CONTRACT-002 D)
 
@@ -137,7 +137,7 @@ Result and report shapes are CONTRACT-002; stored records are CONTRACT-001. The 
 **Other matching**
 
 - **BR-715** — `locator.extent`: a recorded extent for the locator's term governs; otherwise the printed labels, chapters, or paragraph counts of the cited source's source files do. Printed labels compare within one numbering style. An unparsable locator or missing extent is unverifiable. It tests range only; `quote.page` tests that quoted words lie on the cited pages or in the cited chapter, over every occurrence.
-- **BR-716** — Metadata comparison folds case, white space, punctuation, diacritics, line-end hyphens, and canonical Unicode form only. Matching rules are those of CONTRACT-002 C. A field either side lacks is listed as not compared; a result with nothing compared is unverifiable.
+- **BR-716** — Metadata comparison folds case, white space, punctuation, diacritics, line-end hyphens, and canonical Unicode form only. Matching rules are those of CONTRACT-002 C. A field either side lacks is listed as not compared; a result with nothing compared is unverifiable, as coverage. A contradiction fails; what nothing shows or contradicts is coverage and never open.
 - **BR-717** — `id.resolves` applies only to sources with an identifier. The newest saved resolution for the same source and identifier governs, and its date is shown. No maximum age applies while that question is open.
 - **BR-718** — `quote.self` compares attributed quotations of eight or more words with claims in effect that are the book's own (CONTRACT-001 G, `claim.own`). A folded quotation equal to, or contained in, claim text fails. Shorter quotations give no result.
 - **BR-719** — `number.present` applies to digit-written figures, percentages, and decimals outside quotations and locators in a cited sentence. Four-digit years, dates, and ordinals are not figures (assumption). A figure passes when the same whole numeric token occurs in the cited source's main or notes stream. Several citation items, or ambiguous separators, give unverifiable. Spelled-out numbers are not detected. A pass shows presence only.

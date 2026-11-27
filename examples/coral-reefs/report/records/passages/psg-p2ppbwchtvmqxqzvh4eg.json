@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 2898,
+      "index": 42,
+      "page_sha256": "718c310462a6378a2be8c7d44f3ba403594de4e93b5df9860273aa396a075f96",
+      "start": 2825,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:55Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-p2ppbwchtvmqxqzvh4eg",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "900"
+  },
+  "quote": {
+    "exact": "the overall history of\nsubsidence was interrupted by periods of emergence"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-a72ssggbvnakjrgw9dw0",
+  "source_record_sha256": "f1307b24e0e70db84490689b7aee51249db7d4e9687510d9e1f6fbe654b885bb",
+  "text": "txt-z6z9mcwfnwb7he7anq7c"
+}

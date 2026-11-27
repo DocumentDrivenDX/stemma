@@ -9742,6 +9742,9 @@
       },
       {
        "string": "original_changed"
+      },
+      {
+       "string": "year_parenthesis"
       }
      ]
     },
@@ -10118,6 +10121,9 @@
       },
       {
        "string": "close"
+      },
+      {
+       "string": "restore_text"
       }
      ]
     },

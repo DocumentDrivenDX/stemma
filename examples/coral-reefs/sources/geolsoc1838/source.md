@@ -26,7 +26,7 @@
   },
   "id": "txt-hcn5vw3frm4256b32xhe",
   "identity": {
-    "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
+    "basis": "Title and names, where given, are the PDF's own document information, not read from the page. The title page parts were chosen from page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
     "contributors": [
       "Geological Society of London"
     ],

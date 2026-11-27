@@ -17,7 +17,7 @@ ddx:
 **Contract ID**: CONTRACT-003
 **Type**: schema and CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-002, FR-13, FR-71 to FR-73
+**Related**: ADR-002, FR-13, FR-71 to FR-73, FR-92, FR-93
 
 ## Purpose
 
@@ -125,14 +125,19 @@ restricted values.
 
 `takeover` MUST:
 
-1. Read body, footnotes, and endnotes in document order, and leave the file
-   unchanged.
+1. Read body text, headings, tables, footnotes, and endnotes in document
+   order, and leave the file unchanged. Word heading styles set heading levels.
+   Table text is read; until the markup carries its layout (CONTRACT-006 E) it
+   goes into an unconverted block. Each run reads one file. A further file of
+   the same manuscript adds chapters and batches to the project and changes no
+   earlier record or choice.
 2. Recover embedded reference-manager data where present: Zotero and Mendeley
    citation fields or content controls carrying CSL-JSON, and EndNote fields
    carrying EndNote XML. Each variant has its own support level (A).
 3. Treat embedded data as a claim to check, never as verified.
 4. Report tracked changes, comments, text boxes, and fields it did not
-   interpret. Text marked deleted by tracked changes MUST NOT produce citations;
+   interpret. Each comment is saved as an `unread_content` item with its text and
+   position. Text marked deleted by tracked changes MUST NOT produce citations;
    the report states which revision view was read.
 5. Create `citation` records with the sentence, quotation and locator where
    found, `as_found` text, and `document_position`; provisional `source`
@@ -144,9 +149,13 @@ restricted values.
    the candidates (FR-72). A note the reader did not classify is listed as
    unclassified, not dropped.
 7. Write `stemma.intake-report/0`: counts of notes read, citations created, bound,
-   ambiguous, and unclassified, plus items under 4 and the support levels. Every
-   item that needs the author or was not read is also saved as an `intake_item`
-   record.
+   ambiguous, and unclassified, plus items under 4 and the support levels, the
+   matching profiles used, and the author-date account of H. Every item that
+   needs the author or was not read is also saved as an `intake_item` record.
+   Items that share a cause are shown as one group with its count, its items,
+   and a next step; grouping drops no item. The groups include exact repeats:
+   open reference-entry items, from any batch, whose `as_found` strings are
+   identical. Groups are computed from records and not saved.
 8. Write the Stemma copy under `manuscript/` as CONTRACT-006 defines. Later
    fixes go to that copy and the records, never to the original.
 9. From M2 (FR-82), suggest constructs and methodology as unreviewed records
@@ -164,6 +173,7 @@ restricted values.
     intake report states how many entries were found, or that no list was
     detected. An entry that is cited nowhere then fails `bib.uncited` until the
     author removes it from the list or dismisses the finding.
+12. Read author-date citations in text by the profile in H.
 
 Model-proposed parses MAY be added only as unreviewed records with a `model`
 actor, saved before any deterministic step reads them, and each parsed string MUST align to a
@@ -176,6 +186,92 @@ parent paths; cap uncompressed size, entry count, nesting depth, and field
 length; disable XML DTD and external entity processing; never fetch a URL found
 in a file; and never interpret file text as instructions. Limits are published
 by `doctor`. Cap values are set by the takeover solution design.
+
+### H. Author-date profile
+
+The profile is `author-date/0`. It is deterministic. Its rules are design
+assumptions drawn from one private set of drafts and are untested. Adding a
+form, a lead-in, or an entry layout makes a new profile version.
+
+**Reference lists** (FR-92).
+
+1. A list starts at a paragraph whose whole text, ignoring case, is
+   `References` or `Bibliography`, with or without a heading style. It ends at
+   the next heading of the same or a higher level, or at the end of the file.
+   The report names the paragraph taken as the start.
+2. Each non-empty paragraph in a list is one entry. Its whole text is kept as
+   `as_found`. Where a paragraph may hold more or less than one entry, it is
+   reported.
+3. The profile reads authors' family names in order, the year, and any
+   one-letter year suffix, in two layouts: the year directly after the authors,
+   and the year near the end of the entry. A corporate author is one whole
+   name. An entry whose authors or year cannot be read is **unread**.
+4. Every entry, read or unread, is carried forward by F11.
+5. A list serves the chapters read from its own file. A file with no list is
+   reported.
+
+**What is examined.** Every pair of round brackets that holds a year form, in
+body text, headings, footnotes, endnotes, tables, and captions, outside the
+reference lists. A year form is a number from 1000 to 2099 with an optional
+lower-case suffix letter, or `n.d.`, `forthcoming`, or `in press`. The content
+is split into parts at semicolons.
+
+**Citation forms.**
+
+| Form | Rule |
+|---|---|
+| Names and year | `Name Year`, with an optional comma between. Names are one name, two joined by `and` or `&`, a series ending in `and` or `&`, or one or more followed by `et al.` |
+| Several years | Further year forms after a comma share the part's names, one item each |
+| Narrative | The brackets hold only year forms and locators, and names in a form above stand directly before them in the same sentence |
+| Lead-in | `cf.`, `see`, `see also`, or `based on` before the names, kept as `prefix` |
+| Page locator | After the year: any page or range after a colon or after `p.` or `pp.`, or after a comma when it is not a year form. Kept as printed, as a `page` locator |
+
+Other text in a part, such as another lead-in or a form the table does not
+define, makes the part unrecognized. No citation form takes a range of years as
+its year, so a part that has one in that place is never linked.
+
+**Matching.** A citation is compared with the entries of its own chapter's
+list. Family names compare after folding case, diacritics, and apostrophe and
+hyphen forms. It matches an entry only when:
+
+- without `et al.`, the entry has exactly the named authors, in order;
+- with `et al.`, the entry's first authors are the named ones, in order, and it
+  has more authors than are named; and
+- the year and suffix are equal, a missing suffix matching only a missing one.
+
+Exactly one matching read entry links the citation, unless an unread entry's
+text holds the first named family name and the year. In every other case the
+citation is unresolved: no entry (`no_entry`), several (`several_entries`), an
+unread entry that could fit (`unread_entry`), or no list (`no_list`). Matching
+entries in other lists or in a library are listed as candidates and never
+linked. Model judgment never links.
+
+A linked citation takes the source its entry is bound to under F11. A narrative
+form is a citation form when its names match an entry as above. It is also one,
+and unresolved, when it uses `et al.` or when a name in it is a family name in
+some list of the project. Other words before the brackets leave them
+unlinked.
+
+**Account.** Each examined pair of brackets ends in exactly one state:
+
+| State | When | Output |
+|---|---|---|
+| Linked or unresolved | Every part is a citation form | One `citation` record per item. An unresolved item has key `?` and an `ambiguous_reference` item with its reason and candidates |
+| Left unlinked | Any part is not a citation form | A `year_parenthesis` item with its position, text, and one reason code |
+
+Reason codes for left unlinked, the first that applies: `in_table` (until the
+markup carries citations in tables), `year_range` (a range of dates, with no
+part holding names, such as `(1516–1850)` or `(c. 1600–1850)`),
+`no_author_form` (every part is year forms only, with no readable narrative
+names), `mixed_parts` (some parts are
+citation forms and some are not; the item lists how each part was read), and
+`unrecognized_form`. A `no_author_form` item that follows a capitalized word is
+marked as a possible narrative citation and listed first.
+
+The report gives the count in each state, by reason, and the three counts MUST
+add up to the number examined. An unresolved citation fails `cite.key` and so is
+open. A left-unlinked item is not a finding and does not affect the label; the
+report says so.
 
 ## Precedence and Compatibility
 
@@ -232,6 +328,7 @@ edits one title and expects every other value to stay equal.
 | Preserve-native approach | A feasibility test on hand-written fixtures (18 BibLaTeX, 16 CSL-JSON, 15 RIS entries) kept the same information when regenerating with native values retained, and showed 43, 20, and 31 differences without them, on one system | Real library files. One author wrote fixtures and mapper; RIS was compared only by the spike's own parser |
 | Editing | Adding or removing a field fell back to regenerating the entry; the per-field rule in D is design only | D |
 | Word intake | A package-free reader recovered all footnotes and embedded Zotero and EndNote references from hand-built files; a short-form rule resolved 9 of 10 with none wrong and missed German "a.a.O." and author-date citations | Files saved by Word, Zotero, Mendeley, or EndNote; Mendeley fields at all |
+| Author-date profile (H) | A throwaway script, not Stemma, on one private set of drafts: matching only the first family name and first year against each file's list, it found exactly one entry for most parts it could read as author and year. It missed entries with the year near the end | Whether any match was correct; the rules in H; narrative and other forms; list detection |
 
 ## Schema Basis
 

@@ -40,7 +40,10 @@ ddx:
 [Depends]      Claims and notes that will be rechecked
 [Proposal]     Advice (not a finding): <optional suggestion and reason>
 [Choices]      Remove / repoint / replace / bind <candidate> / dismiss
-               / add source / skip / check / build / review / pause
+               / not a citation / add source / skip / check / build
+               / review / pause
+[Repeats]      (exact repeats only) <n> identical entries and their places;
+               bind or dismiss may apply to all
 ```
 
 ### Turn: after a choice
@@ -66,6 +69,8 @@ ddx:
 | Choices: replace | control | Author's chosen source | all | UF-015 Replace reference |
 | Choices: bind | control | For an unresolved footnote; no candidate is guessed | all | UF-015 Bind footnote |
 | Choices: dismiss | control | Closes an intake item only | all | UF-015 Dismiss intake item |
+| Choices: not a citation | control | Puts the text back as found and retires the record (`restore_text`) | all | UF-015 Restore text |
+| Repeats | control | One choice for the whole group, on the author's word only; each item is rechecked and recorded | all | US-114-AC4 |
 | Choices: add copy | control | Offers to record rights, which are optional and gate nothing | all | UF-015 Add the source |
 | Choices: skip | control | No record written | all | UF-015 Skip item |
 | Choices: check | control | Leaves to UF-007 | all | UF-015 Check the project |

@@ -87,6 +87,7 @@ it.
 | Status | Meaning shown | Never written as |
 |---|---|---|
 | `pass`, `fail`, `unverifiable` | The script's outcome. `unverifiable` states its reason code | "ok", "probably fine", "verified" |
+| Coverage | What was corroborated by other means, not covered, or observed in an original. Not a finding and not open | a task, a warning, or "passed" |
 | `fail (dismissed)`, `unverifiable (dismissed)`, or confirmed by the author | Outcome unchanged; the author dismissed it or confirmed the details | "resolved", "pass", "verified" |
 | Open, and "Checked clean" or "Open findings" | Whether findings remain; the label of a build, from check results only | "passed", "approved", or "checked clean" while anything is open |
 | Model judgment: `supported`, `partly_supported`, `unsupported` | A saved model verdict with model and date. The build does not rerun it | "verified", a check mark, a success color |

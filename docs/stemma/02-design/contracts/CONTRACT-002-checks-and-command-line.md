@@ -19,7 +19,7 @@ ddx:
 **Contract ID**: CONTRACT-002
 **Type**: CLI
 **Version**: 0 (provisional; see Proof Status)
-**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90
+**Related**: ADR-003, ADR-004, ADR-005, ADR-009, ADR-010, FR-10, FR-29 to FR-34, FR-39, FR-49, FR-52 to FR-54, FR-61, FR-68, FR-73, FR-74, FR-75, FR-84 to FR-90, FR-92, FR-93
 
 ## Purpose
 
@@ -101,12 +101,12 @@ absent (exit 4 if it cannot) and then runs
 | `excerpt (--passage <id> \| --source <id> --pages <printed pages>)` | Print a bounded piece of source text (G) | M1 |
 | `unreviewed list` / `reviewed <id@sha256…>` | List unreviewed records with their original passages and content digests; mark records the author has reviewed, each by the digest that was shown (a changed record is left unmarked and reported `stale_input`). Nothing waits for these commands | M1 |
 | `retire <id…> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Set `retired` on records, such as a replaced source file or a record the author rejects. The files stay. It lists the notes, claims, and citations that `source.changed` now flags. `--replaced-by` takes one record of the same kind | M1 |
-| `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close> …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding | M1 |
+| `rounds status` / `rounds choose --action <remove\|repoint\|replace\|bind\|close\|restore_text> [--repeats] …` | List remaining failing references and intake items; apply the author's choice to records and the Stemma copy, recheck, and save a `round_choice`. `remove` takes an occurrence out of the text and retires its record, or, given a listed source, takes it off `bibliography_include`. `repoint` binds the occurrence to a source already in the project, or corrects its locator. `replace` binds it to a source the author newly supplies in its place and records both sources. `bind` settles an intake item by binding its occurrence to one of its candidates. `close` settles an intake item that needs no citation, such as an unclassified note that cites nothing; it changes no finding. `bind` also takes a source the author names for an author-date item that has no suitable candidate, including a `year_parenthesis` item, for which it writes the citation. `restore_text` puts an occurrence that is not a citation back as the text found and retires its record; it causes no `takeover.removal` finding. Binding a reference-list item also moves every citation linked to that entry to the chosen source, and retires a provisional source nothing else uses, taking it off `bibliography_include`. `--repeats` applies one `bind` or `close` to every open item in an exact-repeat group (CONTRACT-003 F7) as one staged write, with one `round_choice` and recheck for each item; if any item cannot take it, nothing is written and that item is named. `rounds status` also counts `year_parenthesis` items and lists them on request | M1 |
 | `review import <comment file>` | Import reviewer comments (CONTRACT-005) | M3 |
 | `support list` / `support prepare <claim id> --passage <passage id>` / `support record --input <file>` | List needed verdicts as claim and passage pairs; emit the input bundle for one pair; validate and save a verdict (H) | M1 |
 | `annotate --finding <key> --effect explain\|dismiss --reason <text>` / `annotate list` | Save an annotation (F), or list annotations and whether each applies | M1 |
 | `import <file> --kind <csl-json\|biblatex\|ris> [--again]` / `export --kind <…> --out <file> [--batch <import id>] [--policy report\|strict]` | CONTRACT-003; `--again` imports bytes already imported; `--batch` exports one import batch | M1 |
-| `takeover <docx> [--library <file>…] [--again]` | CONTRACT-003 Word intake; `--again` reruns on bytes already taken over, keeping every author choice and edit | M1 |
+| `takeover <docx> [--library <file>…] [--again]` | CONTRACT-003 Word intake of one file; run once for each file of a manuscript; `--again` reruns on bytes already taken over, keeping every author choice and edit | M1 |
 | `index rebuild` / `index status` / `index dump` | Manage the derived index | M1 |
 | `research list` | List the Markdown files under `research/` by path (code-point order), each with the date its name starts with and its first level-one heading outside fenced code, both when present; a heading is cut at 200 characters, and one matching a coordinate form is not shown. Writes nothing and reports no finding; exit 0. JSON: `content_is` and `notes[]` (`path`, `date?`, `title?`, `problem?`: `cannot_read` or `title_withheld`) | M1 |
 | `research record --input <file>` / `research corpus <query>` / `research admit <id>` / `research reject <id>` / `research coverage` | Save a search and its candidates; search source files offline; record the author's decision, as `source admit` or `reject` does; coverage is P1 | M2 |
@@ -216,7 +216,16 @@ file, `source.labels` for every paged one with a labelled page, and
 `source.footnotes` for every one with a note or marker. `source.labels` compares
 consecutive labelled pages of one numbering style: a label equal or lower, or
 one that advances by more than the page index does, is an anomaly; unlabelled
-pages in between are not. `source.original` emits a result for a source file
+pages in between are not. A jump is not an anomaly but a recorded observation,
+in a passing result and the coverage summary, when all of these hold
+(assumptions): the source file holds every page of the original and is sound;
+the two pages are neighbours in it; the numbers run in step on both sides of the
+jump; and the text runs on across it, shown by a word split between the two
+pages that the source writes whole elsewhere, or by a run-in heading of two or
+more words opening the second page, whose words the first page announces. A
+sentence left unfinished is not enough. These signs can be absent where nothing
+is missing, and then the jump stays a finding; they do not prove the original
+was complete when it was made into a file. `source.original` emits a result for a source file
 whose source has upstream records or that has a comparison run of its original.
 A source file whose parts fail `source.pages` is not used by other checks.
 
@@ -235,10 +244,46 @@ also accepts the record title found as consecutive words on a title page. Each
 author's family name must appear among the stated contributors or on a title
 page. The year must be the stated issue year or appear on a title page, in figures or as a roman numeral; a venue
 is compared only when the record names one. A field the lookup does not state is
-listed as not compared. `meta.source` fails when the copy's stated identity
-disagrees and the title page text does not bear out the record; a value found in
-neither is `unverifiable`. `id.resolves` covers `doi`, `ia`, and `gutenberg`
-identifiers with lookups; other identifiers are `unverifiable` (`no_lookup`).
+listed as not compared.
+
+Three rules read a catalogue's conventions (assumptions). A catalogue title
+also matches when it is the record's `collection-title` followed by the record's
+title, both whole. A name the record writes whole (`literal`) is also stated by
+a heading of the form "Parent (qualifier). Body" when it is exactly "Body of
+Parent" or "Body of the Parent". An Internet Archive item with a `volume`
+statement is a volume of a set or serial, and its date may be the set's first
+year. Where the record's year is later than that date: if the volume statement
+ends with years in parentheses, the record's year must be the last of them, and
+the first must not precede the catalogue date; otherwise `meta.resolver` fails.
+With no such years, the year is listed as not compared when the copy bears it
+out as `meta.source` would; otherwise the result is `unverifiable` (`set_date`),
+as coverage. A record year earlier than the catalogue date, and every other
+catalogue, compare as above.
+
+**Corroboration, contradiction, and coverage.** A finding is evidence that
+something is wrong. `meta.source` fails when the copy's stated identity disagrees
+and the title page text does not bear out the record, or when the record's year
+is not on the title page and an imprint line there gives another: a line that is
+a year, or ends with one after a comma, colon, or semicolon. A year inside a
+line, as in a span of years or a library stamp, is not read this way
+(assumption). The year may also be read from a roman numeral in which an I was
+recognized as `i`, `r`, `l`, `1`, `|`, or `!`, when the whole token then reads
+as the record's year. A field the copy does not show passes when a saved lookup
+agrees with the record on it, by the rules above, and no saved lookup differs on
+it; the result names the lookup. This is evidence recorded independently of the
+recognized text; what a model says it read is not evidence here. A catalogue
+that differs is `meta.resolver`'s `fail`. A field neither shown, corroborated,
+nor contradicted leaves the result `unverifiable` as **coverage**.
+
+A source is valid at every stage of capture: metadata not yet recorded is never
+a finding. These are coverage, with `coverage_only` set and `open` false:
+`meta.source` `not_found_in_copy` and `nothing_to_compare`; `meta.resolver`
+`no_lookup`, `lookup_silent`, and `set_date`; `id.resolves` `no_lookup`,
+`lookup_error`, and `lookup_silent`; and `number.present` `several_citations`.
+`id.resolves` covers `doi`, `ia`, and `gutenberg` identifiers with lookups;
+other identifiers have `no_lookup`. A text report ends its findings with a
+coverage summary: what was corroborated and how, what was not covered, and what
+was observed in an original, with the sources concerned. It asks for nothing.
 
 **`source.changed`** (assumptions). It follows the links records hold: a citation
 to its passage and claims; a claim through its non-retired attestations to notes
@@ -250,8 +295,7 @@ from its address is `text_changed`; an edit elsewhere in the source file does
 not affect it. It emits one result for each non-retired note, claim, passage, or
 citation that reaches a source or source file. Reason codes are
 `depends_on_retired`, `text_changed`, `source_details_changed`, and
-`record_unreadable`. Until annotations are built, nothing can record that the
-author has looked, so a finding stays listed. While `manuscript/` holds files
+`record_unreadable`. Nothing yet records that the author has looked, other than a dismissal (F), so a finding otherwise stays listed. While `manuscript/` holds files
 this version cannot read, citations are left out and the check is also
 `not_implemented`.
 
@@ -273,33 +317,41 @@ the finding says so. `quote.present`, `quote.page`, and `locator.extent` emit
 nothing for a citation whose key names no single source (`cite.key` reports it),
 and are `not_implemented` while manuscript files are present.
 
-**Every finding is explained.** Each `fail` or `unverifiable` result MUST say in
-plain language what is wrong or could not be checked, show its evidence, say why
-it matters, and suggest what to do. A finding without these, a repeated finding
-that adds nothing, or a finding the author cannot act on or dismiss with reason
-is a Stemma defect. Reports group findings so that one cause is shown once with
-the items it affects.
+**Every result that did not pass is explained.** Each `fail` or `unverifiable`
+result MUST say in plain language what is wrong or was not covered, show its
+evidence, say why it matters, and say what can be done, or that nothing need be.
+An open finding is evidence that something is wrong, or that a check that
+applies to what an output relies on could not run; one the author cannot act on
+is a Stemma defect. No result requires a person's review, approval, or dismissal
+for a project to be checked clean, except that a printed page jump the checks
+cannot account for stays open until the copy or its page map changes or the
+author dismisses it. Reports group findings so that one cause is shown once with
+the items it affects. Each group shows its count and a next step; for example,
+every citation of one source with no source file is one group. Grouping is
+presentation: `body.results[]` keeps one result for each subject, and no
+outcome, count, or label changes (FR-93).
 
-**Confirmed source details.** When `meta.source` or `meta.resolver` is
-`unverifiable` and a current person's `source_details` review (CONTRACT-001 G)
-covers every field the result could not compare, the result keeps its outcome,
-gains `confirmed_by`, and is not open. It is shown as confirmed by the author, never
-as verified. A `fail` from either check is unaffected. Such a review confirms no
-other check, including `id.resolves` (assumption).
+**Recorded details.** A person MAY record, in a current `source_details` review
+(CONTRACT-001 G), what a title page shows. Where it covers every field a
+`meta.source` or `meta.resolver` coverage result names, the result gains
+`confirmed_by` and is shown as confirmed by the author, never as verified. It is
+an optional addition to coverage. A `fail` from either check is unaffected, and
+such a review confirms no other check.
 
 **Applicability.** A check emits results only for what the project holds, and a
 report lists nothing for a check that does not apply. `body.not_run[]` lists each
 check that applies to the project's contents but that this version cannot run,
 with reason `not_implemented`.
 
-**Open findings and the label.** A finding is open when its result is `fail` or
-`unverifiable`, no applicable annotation dismisses it, and no source-details
-review confirms it. A `not_implemented` entry also counts as open. A report with scope
-`all` and nothing open is labelled `checked_clean`; otherwise `open_findings`,
-with counts. Assumption: a could-not-check result counts as open, which is the
-conservative reading. `checked clean` means these checks found nothing open. It
-does not mean that the book is correct or that support verdicts were verified.
-A report with scope `changed` carries no label.
+**Open findings and the label.** A finding is open when its result is `fail`,
+or `unverifiable` and not coverage, and no applicable annotation dismisses it. A
+`not_implemented` entry also counts as open. A report with scope `all` and
+nothing open is labelled `checked_clean`; otherwise `open_findings`, with
+counts. A could-not-check result that is not coverage counts as open, such as a
+source file that is damaged or a record that cannot be read (assumption).
+`checked clean` means these checks found nothing open. It does not mean that the
+book is correct, that everything was covered, or that support verdicts were
+verified. A report with scope `changed` carries no label.
 
 **Unreviewed items.** The label reflects checks only. Records that the
 manuscript reaches (a linked claim, its evidence, relations, constructs, and
@@ -336,6 +388,12 @@ read manuscript files that are present, no citation record stands in for them:
 `not_implemented`. `cite.key` is `unverifiable` (`source_unreadable`) when a key
 matches no source and some source record cannot be read; `bib.uncited`
 likewise (`citation_unreadable`) for unread citation records (assumptions).
+
+**Checks over a taken-over copy.** A version that provides `takeover` MUST read
+the Stemma copy: after takeover, `cite.key`, `source.held`, `quote.present`,
+`quote.page`, `locator.extent`, `number.present`, and `bib.uncited` run from it,
+and none is left `not_implemented` or `manuscript_not_read` because manuscript
+files are present (FR-73, FR-92). A citation with key `?` fails `cite.key`.
 
 **Coordinate forms.** `coordinate.stray` recognizes, within one line: a `geo:`
 URI; degrees with a degree sign and a latitude then a longitude hemisphere
@@ -414,7 +472,7 @@ and passes when one occurrence lies wholly on cited pages.
 | `body.scope` | `changed` or `all`, with the changed record IDs |
 | `body.inputs` | Corpus digest, manuscript and research file digests (research notes are outside the corpus digest), and profiles used |
 | `body.tools` | Stemma, Bun, SQLite, and every library or program that affected a result |
-| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (IDs and effect), `confirmed_by?`, `open` |
+| `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (ID, effect, who wrote it, and the reason), `coverage_only?`, `confirmed_by?`, `open` |
 | `body.not_run[]` | `check`, `reason`; only checks that apply |
 | `body.verification[]` | For each source file: ID, method, parts, parts reviewed whole by a person, flags, and the current comparison runs with the number of parts that disagree |
 | `body.unreviewed[]` | `record` (ID), `kind`, `reason` (`unreviewed` or `not_admitted`), and the manuscript locations that reach it; never part of the label |
@@ -625,7 +683,7 @@ exits 1, and labels the build `open_findings`.
 | `meta.*`, `id.resolves`, `number.present` | Tests over synthetic sources and saved responses on one macOS system; the worked example uses real catalogue responses | Other catalogues; works whose title pages convert badly |
 | `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. `annotate` and annotations are built; `annotate list` is not, and nothing is redacted. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
 
 ## Schema Basis
 

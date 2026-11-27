@@ -322,11 +322,11 @@ construct-credit check.
 argument, which `quote.self` reads (assumption: an unset value counts as own for
 role `thesis`, and as not own otherwise).
 
-**Confirmed source details.** When source details cannot be verified
-automatically, a person MAY record a `text_review` with scope `source_details`:
-the title page or equivalent checked and the fields confirmed. It applies only
-while the pages' digests and the source's bibliographic digest are unchanged.
-It states what the person said and is not verification or proof.
+**Confirmed source details.** A person MAY record a `text_review` with scope
+`source_details`: the title page or equivalent checked and the fields it shows.
+No check requires one. It adds to coverage and applies only while the pages'
+digests and the source's bibliographic digest are unchanged. It states what the
+person said and is not verification or proof.
 
 **Other feature records.** `plan` and `voice_profile` carry `review` as above.
 `checkpoint_input` records an author's answer at a checkpoint; an unanswered
@@ -360,7 +360,10 @@ resuming needs no saved state. A `round_choice` names its action, what it
 replaced, the affected claims, and the recheck results observed when it was
 made. A stored recheck is history; current outcomes are always recomputed.
 `remove` retires the citation and keeps the record. The latest choice by
-`chosen.at` applies.
+`chosen.at` applies. A `year_parenthesis` item records brackets that
+intake left unlinked; it asks for nothing, so it is counted and listed but is
+not remaining work. A `round_choice` with action `restore_text` records that an
+occurrence read as a citation is not one.
 
 **Review comments.** A `review_comment` is untrusted text from outside the
 project. It changes no claim. `claim_sha256` shows which claim text the

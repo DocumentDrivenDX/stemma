@@ -26,6 +26,7 @@ export interface Options {
   independent?: boolean; scope?: string; pages?: string; passage?: string; fields?: string; outcome?: string; flag?: string[];
   "original-sha256"?: string; address?: string; via?: string; identifier?: string; plan?: string; originals?: string[];
   fetch?: boolean; reconvert?: boolean; "refresh-lookups"?: boolean; reason?: string; "replaced-by"?: string;
+  finding?: string; effect?: string;
 }
 
 export const sqliteVersion = (): string => {

@@ -18,7 +18,7 @@ ddx:
 **Contract ID**: CONTRACT-006
 **Type**: schema (text format) and library
 **Version**: 0 (provisional in every part; see Proof Status)
-**Related**: ADR-005, ADR-009, FR-14, FR-25, FR-29, FR-35 to FR-39, FR-65, FR-72, FR-73, FR-83
+**Related**: ADR-005, ADR-009, FR-14, FR-25, FR-29, FR-35 to FR-39, FR-65, FR-72, FR-73, FR-83, FR-92
 
 ## Purpose
 
@@ -197,6 +197,17 @@ contract. An unresolved ID or cross-reference is reported.
   are in effect at once, unreviewed. A span whose claim is retired is reported
   by `claim.inactive` and links nothing.
 - An unbound or ambiguous reference is written with key `?`.
+- An author-date parenthesis whose every part is a citation form (CONTRACT-003
+  H) is replaced by one cluster, one item per work and year. Lead-ins become
+  `prefix` and pages a `page` locator. Here the locator comes from the form the
+  intake profile names, not from a guess by the markup reader. Each item has its
+  own `citation` record, whose `as_found` keeps the bracketed text as typed,
+  with any narrative names, and whose `document_position` keeps where it was.
+- In a narrative form the author's names stay in the prose and each item has
+  `mode="suppress-author"`. How a note style typesets it is not settled (PRD
+  open question on the pilot's citation style).
+- A parenthesis left unlinked stays as text, escaped as B requires. So do the
+  author's own bracketed working markers.
 - A tool edit (round choice, retired claim, repoint) MUST change only the
   affected byte span and leave the rest of the file identical. It MUST refuse if
   the file changed since it was read.

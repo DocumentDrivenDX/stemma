@@ -1,6 +1,6 @@
 // The worked example, checked from the committed files alone, as in a clone with
 // no originals: what is held, that its citations are what their passages copied,
-// and exactly which findings are open.
+// and that it checks clean.
 import { beforeAll, describe, expect, test } from "bun:test";
 import { cpSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
@@ -100,27 +100,26 @@ describe("the worked example", () => {
     expect(report.body.results.filter((r) => r.check === "quote.present" && r.subject.startsWith("cit-")).length).toBe(4);
   });
 
-  test("leaves open exactly the differences its README describes, and runs every applicable check", () => {
-    const key = new Map(records("sources").map((s) => [s.id, s.citation_key]));
-    for (const name of readdirSync(join(EXAMPLE, "sources"))) {
-      const text = readFileSync(join(EXAMPLE, "sources", name, "source.md"), "utf8");
-      key.set(JSON.parse(text.slice(4, text.indexOf("\n---\n", 4))).id, name);
-    }
-    const open = report.body.results.filter((r) => r.open).map((r) => `${r.check} ${r.outcome} ${key.get(r.source ?? r.subject) ?? r.subject}`).sort();
-    expect(open).toEqual([
-      "id.resolves fail ladd1960",
-      "meta.resolver fail funafuti1904",
-      "meta.resolver fail geolsoc1838",
-      "meta.resolver fail ladd1960",
-      "meta.resolver fail lyell1832",
-      "meta.resolver fail murray1880",
-      "meta.source fail funafuti1904",
-      "meta.source unverifiable darwin1842",
-      "meta.source unverifiable lyell1832",
-      "source.labels fail geolsoc1838",
-    ]);
+  test("is checked clean: every applicable check runs and nothing is open", () => {
+    expect(report.body.results.filter((r) => r.open)).toEqual([]);
     expect(report.body.not_run).toEqual([]);
-    expect(report.body.label).toBe("open_findings");
-    expect(code).toBe(1);
+    expect(report.body.label).toBe("checked_clean");
+    expect(code).toBe(0);
   });
+
+  test("says what was borne out by other means and what was seen in an original, without any person's act", () => {
+    const key = new Map(records("sources").map((s) => [s.id, s.citation_key]));
+    expect(report.body.summary.confirmed).toBe(0);
+    expect(report.body.summary.dismissed).toBe(0);
+    expect(report.body.results.filter((r) => r.coverage_only)).toEqual([]);
+    const darwin = report.body.results.find((r) => r.check === "meta.source" && key.get(r.source!) === "darwin1842")!;
+    expect(darwin.evidence.find((e) => e.name === "year_corroborated_by")!.value).toContain("internet_archive record of ia:b29331213");
+    const lyell = report.body.results.find((r) => r.check === "meta.source" && key.get(r.source!) === "lyell1832")!;
+    expect(lyell.evidence.find((e) => e.name === "year_result")!.value).toContain('"MDCCCXXXir"');
+    const jumps = report.body.results.flatMap((r) => r.evidence.filter((e) => e.name === "observation").map((e) => e.value));
+    expect(jumps.length).toBe(1);
+    expect(jumps[0]).toContain('printed page 232 is followed by 333');
+    expect(jumps[0]).toContain('"Northern Drift"');
+  });
+
 });

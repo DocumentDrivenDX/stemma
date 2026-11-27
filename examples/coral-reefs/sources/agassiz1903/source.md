@@ -1,5 +1,12 @@
 ---
 {
+  "changed": {
+    "at": "2026-11-27T02:51:10Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
   "conversion": {
     "level": "unassessed",
     "method": "ocr",
@@ -26,7 +33,7 @@
   },
   "id": "txt-r774cmd8fg4a77tvvk4g",
   "identity": {
-    "basis": "Title page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
+    "basis": "Title and names, where given, are the PDF's own document information, not read from the page. The title page parts were chosen from page images drawn with macOS PDFKit and read by a model (claude-sonnet-5-5); no person has confirmed them",
     "contributors": [
       "Agassiz, Alexander, 1835-1910"
     ],
@@ -166,102 +173,102 @@
     {
       "file": "pages/p0022.md",
       "index": 22,
-      "sha256": "ba7aa8475ce294d505f7fac44e2d176b289e1cda2505bac5fb7aced167880ab6"
+      "sha256": "7bac2456c2134b1ba4c9a3bfc631163a13d3d2c2e346e0397d1c8f278892ffe7"
     },
     {
       "file": "pages/p0023.md",
       "index": 23,
-      "sha256": "32679969f126b50470162d410aea056907f1768c127eb99617e3cd7d8b2d3971"
+      "sha256": "d17e2a941cc7b3eb9390a2c114dedb9c04e0c6a1fd414847823d15e2f3aebcea"
     },
     {
       "file": "pages/p0024.md",
       "index": 24,
-      "sha256": "ed9b9dbc01cd2b53acc4d3893cbf964e13c20758dc76a9b5bb51ece80d241e99"
+      "sha256": "232a6e0bcca54c014f4cea3f0c1314c5aefc83f03a58891cbc61eb0ff9b8b97d"
     },
     {
       "file": "pages/p0025.md",
       "index": 25,
-      "sha256": "2b8672c36490aef427375f87007a14962a829783633f3ac09a743e1bda7d978b"
+      "sha256": "6f627fed4ece92bca013324b896651c90be06d08e2c5b7f3d4949adf2ced88b7"
     },
     {
       "file": "pages/p0026.md",
       "index": 26,
-      "sha256": "d34fa793aa30b6067355a0a95e821e10a75dd2b67761a2a0179be25cf6966c33"
+      "sha256": "cf56c92d62072e826579f20dcb719cdeee398ae6573601818e6dbda90fa4805f"
     },
     {
       "file": "pages/p0027.md",
       "index": 27,
-      "sha256": "8409f26650a12bcf5baf49a84987fc43f8e8fef39cb7f681cabd740905bbe0bb"
+      "sha256": "80a0a25089f00334e4143f13e5558e05231cb508a6f85ec069a43d50a446137a"
     },
     {
       "file": "pages/p0028.md",
       "index": 28,
-      "sha256": "a7e0782d4d1bac51da6fa72cfe6ceadd8c6c1d5fafb907db4ff6decc4554b990"
+      "sha256": "9bbe02d826f398ba9afa08cac72c202ea100bcd74cf2aac16a14f0f7260e11fa"
     },
     {
       "file": "pages/p0029.md",
       "index": 29,
-      "sha256": "f755e1b3d0577e41d99b0935b64ddf86e7e7fa7176193d98f4ac9b1aedada342"
+      "sha256": "db2d4f2c7d000cb8970467c55d406f0819778a11055cbf598aeb5ca2f9ee6c1f"
     },
     {
       "file": "pages/p0030.md",
       "index": 30,
-      "sha256": "6d5cd8f15a9f49704ce8885e48173c6bd12e15fe52c77cc8282d9a648fe7f8fe"
+      "sha256": "d32f3970218a972e1f0457e2e1c9f857bf77fe56e8d9341e021cc84e67289c61"
     },
     {
       "file": "pages/p0031.md",
       "index": 31,
-      "sha256": "fa4c5cbea9fd9ce861fbb6ccdf33c129a525af96270014388657a3ee0ef4cb7d"
+      "sha256": "45c685ce524b7468b1d09a349d1dbdf78d0ef2a42d2ef779fc5a339ce54d1eaf"
     },
     {
       "file": "pages/p0032.md",
       "index": 32,
-      "sha256": "5882390fd038f41d428d46384365e8a931efb79a7796b6767a95510332051e17"
+      "sha256": "6ca1b2ec927550eb9e2ab050483d22fa61828c70906bcd37a43fa46c549edd98"
     },
     {
       "file": "pages/p0033.md",
       "index": 33,
-      "sha256": "f831adffdecc6bad40fd5d56da1086c7f101986fd967f925ae06c9616619dac4"
+      "sha256": "d7553ed65648c46a6d6e98404c84e50621cc03c68751c114e3c0f6ef55c6aa22"
     },
     {
       "file": "pages/p0034.md",
       "index": 34,
-      "sha256": "dafcf07f0ba6e1479a119d87a98e2719910b99585ae95609364f524bbac2ade1"
+      "sha256": "fe3289c591c3bc43849c7d976244c12fbc56ff2f111321d88609de93e47b4712"
     },
     {
       "file": "pages/p0035.md",
       "index": 35,
-      "sha256": "dd7c38425630d8696982a531f92b521ff409b2cc5086dbfd318857e66f8342ee"
+      "sha256": "a1aeafcb46ecfa4fc94670bd7ae615d6633cb2893124c47a5f30f92530ed63c3"
     },
     {
       "file": "pages/p0036.md",
       "index": 36,
-      "sha256": "e9ef86de3015f0c82b57eccb652bb123d78d16726487b991135168cd54d13c50"
+      "sha256": "5b933f6b0c9c241b0b2980f2a99594172fbe34e0ef0f073839ef8e67d3301f79"
     },
     {
       "file": "pages/p0037.md",
       "index": 37,
-      "sha256": "fb1c93364045189dcd97ea8b52b172d643363792e2fc590e6ed947d33a900082"
+      "sha256": "2508797f20f2d8cc79ac13c3839fcdeae2120e008dd5bb1113e0d139658d1c20"
     },
     {
       "file": "pages/p0038.md",
       "index": 38,
-      "sha256": "12dfc363db8835f81d26af6ebde21bd071c1185f400db98c5517c921a56a3bab"
+      "sha256": "09099472bc3b6a18dfa065909d15e4acc0ea2335ca1fc80a8ad3a8f3ec125cd9"
     },
     {
       "file": "pages/p0039.md",
       "index": 39,
-      "sha256": "39f6a8a0be1eb2ecd9f84f9e0680cb0fa80bd1766591cfad05257a2837871212"
+      "sha256": "564aa45bc5ef7f148cdc219100a1babd3ad291fd10c7bd3f64d855e5edb3da3c"
     },
     {
       "file": "pages/p0040.md",
       "index": 40,
-      "sha256": "aa59c65e6fe930119a225b64fe541bf22d09362c6c48c65ca05c464fad68deff"
+      "sha256": "57591e37eb2cf3f1756fa19eade46119f4b19a50dddf8226538503033fff3061"
     },
     {
       "file": "pages/p0041.md",
       "index": 41,
-      "sha256": "5833e980e98d7591dc3fe635c699fc18a4b82fce77d7f20ef1bf229b4ef5bd1a"
+      "sha256": "747e8ca9c258f1ca7f4541d6daa72fa855341bf4c9e42578368acc3b0476dae5"
     },
     {
       "file": "pages/p0042.md",

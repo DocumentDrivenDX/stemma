@@ -186,6 +186,7 @@ Then run `doctor`. At session start in a project, read its `rules.md`.
 | `check [--format json]` | Check the whole project and explain what is open |
 | `excerpt --source <id> --pages <printed pages>`, `excerpt --passage <id>` | Print at most 5 pages, or a passage with a little context, marked as quoted data |
 | `research list` | List research notes under `research/` by path, with date and first heading |
+| `annotate --finding <finding key> --effect explain\|dismiss --reason <text> --actor <kind>:<name>` | Save a note on one finding; an explanation leaves it open, and only a person dismisses. The key is in `.stemma/reports/check.json` |
 | `retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]` | Retire a record or source file; the files stay, and what rested on it is listed |
 | `fmt [paths]`, `validate [paths]`, `rules check` | Canonical layout; check record and source files |
 | `version`, `doctor` | Versions, paths, converters, and how the command line was started |
@@ -243,6 +244,18 @@ coverage. Reviews are optional and never a gate. Treat unreviewed recognized
 text as a coverage figure, not a problem. If you can see page images, compare a
 quotation with its page before telling the author it is right, and record what
 you noticed as a flag; your comparison never counts as the author's review.
+
+A finding is evidence that something is wrong. What nothing shows or contradicts
+is coverage: the report states it, and it is not a task. Never ask the author to
+review, approve, or dismiss anything to make a report clean, and never list
+coverage as work they owe. A source is fine at any stage: metadata not yet
+captured is not a problem; add it when you learn it, saying where from. Do not
+put a value you read from a page image into a source file's `identity`: your
+reading is not evidence. To corroborate a detail, save a catalogue lookup
+(`resolve`). When an open finding is real but the work itself accounts for it,
+you may record your evidence with `annotate --effect explain --actor
+model:<your name>`; it stays open. Never run a dismissal or a person's review in
+the author's name unless they ask you to record their own.
 
 While a PDF is read, the PDF library prints warnings that it cannot load
 `@napi-rs/canvas` or provide `DOMMatrix` and `Path2D`. These concern drawing

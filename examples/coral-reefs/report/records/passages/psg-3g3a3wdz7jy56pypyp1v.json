@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 956,
+      "index": 147,
+      "page_sha256": "a9b09ddb77162ed9c5f2d59fbaee83f86576a22deaae381486a8566612614e90",
+      "start": 889,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:49:35Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-3g3a3wdz7jy56pypyp1v",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "120"
+  },
+  "quote": {
+    "exact": "it is incredible that the greater number could have\nthus originated"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-48g9pqaf1748q15bbpqs",
+  "source_record_sha256": "6c6060a2f645fd9adf883904005dbe063f749ad5f3bd3f690fe6ba5177688878",
+  "text": "txt-0j25y9a786mfy0ntdtcx"
+}

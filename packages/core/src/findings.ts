@@ -155,7 +155,7 @@ export const TEMPLATES = {
     ["Look at the page images. A second numbering bound into one file can do this: label only the pages of the work you cite."], ["relabel"]),
   "source.labels:label_jump": explain(
     "Printed page numbers advance by more than the pages do, as when pages are missing from the original or a label is wrong.", LABEL_WHY,
-    ["Look at the page images. If leaves are missing from your copy, the finding records that; otherwise correct the page map (`source label`)."], ["relabel"]),
+    ["Nothing in the text shows that the pages run on. If leaves are missing from your copy, capture a complete one; if a label is wrong, correct the page map (`source label`)."], ["relabel", "capture_source"]),
   "source.labels:folio_differs": explain(
     "A page number printed on a page differs from the label recorded for that page.", LABEL_WHY,
     ["Look at the page image and correct whichever is wrong."], ["relabel"]),
@@ -248,25 +248,28 @@ export const TEMPLATES = {
     "The source's details could not be compared with a copy: its source file is damaged.", META_WHY,
     ["See the source.pages finding and repair the source file."], ["restore_source"]),
   "meta.source:not_found_in_copy": explain(
-    "Some of the source's details were not found in what the copy states or in the text of its title page. The text there may be recognized text with errors.", META_WHY,
-    ["Look at the title page itself. If the record is right, a person can confirm it: `review add <text id> --scope source_details --fields <fields> --against <what you looked at> --outcome agrees --actor person:<name>`. If the title page is elsewhere, name it in the source file's identity."], ["confirm_details", "correct_record"]),
+    "Some of the source's details are shown neither by the copy's title page text nor by a saved catalogue record, and nothing contradicts them.", META_WHY,
+    ["Nothing needs doing: this is a limit of what was covered. A saved lookup or a copy with a clearer text would corroborate more. The author may also record what the title page shows (`review add --scope source_details`)."]),
   "meta.source:nothing_to_compare": explain(
-    "The source record has no title, so its details could not be compared with the copy.", META_WHY,
-    ["Record the title from the work itself."], ["correct_record"]),
+    "The source record has no title yet, so its details could not be compared with the copy.", META_WHY,
+    ["Nothing needs doing. Once a title is recorded, it is compared."]),
   "meta.source:check_error": CHECK_FAILED,
   "meta.resolver:mismatch": explain(
     "The source record disagrees with a saved catalogue lookup.", META_WHY,
     ["Compare both with the work itself. Correct the record if it is wrong. A catalogue can be wrong or describe another edition: if so, keep the record and the finding shows the difference."], ["correct_record"]),
   "meta.resolver:no_lookup": explain(
-    "The source's details have not been compared with any catalogue: no lookup is saved.", META_WHY,
-    ["Give the source's upstream record an identifier to look up, or run `resolve <source id> --via crossref|internet_archive --identifier <value>`. Some works are in neither catalogue."], ["resolve"]),
+    "The source's details have not been compared with any catalogue: no lookup that found the work is saved.", META_WHY,
+    ["Nothing needs doing. `resolve` compares the source once an identifier is known; some works are in no catalogue it reads."], ["resolve"]),
   "meta.resolver:lookup_silent": explain(
-    "A saved lookup states no title, so nothing could be compared with it.", META_WHY,
-    ["Look the work up by another identifier, or have a person confirm the details."], ["resolve", "confirm_details"]),
+    "A saved lookup states no title, so no title could be compared with it.", META_WHY,
+    ["Nothing needs doing. A lookup by another identifier may state one."], ["resolve"]),
+  "meta.resolver:set_date": explain(
+    "A saved lookup is for one volume of a set and gives the set's date, and nothing else here shows the volume's year or contradicts it.", META_WHY,
+    ["Nothing needs doing. A catalogue record that dates the volume, or a copy with a clearer title page text, would corroborate the year."]),
   "meta.resolver:check_error": CHECK_FAILED,
   "id.resolves:no_lookup": explain(
     "An identifier on the source record has not been looked up.", ID_WHY,
-    ["Run `resolve` for it. This version looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be checked."], ["resolve"]),
+    ["Nothing needs doing. `resolve` looks up DOIs at Crossref and Internet Archive items; other identifiers cannot yet be looked up."], ["resolve"]),
   "id.resolves:not_found": explain(
     "A catalogue did not find the work this identifier should name.", ID_WHY,
     ["Check the identifier against the work and correct or remove it."], ["correct_record"]),
@@ -275,17 +278,17 @@ export const TEMPLATES = {
     ["Check which is wrong: the identifier or the record's title."], ["correct_record"]),
   "id.resolves:lookup_silent": explain(
     "The saved lookup states no title, or the record has none, so the identifier could not be compared.", ID_WHY,
-    ["Check the identifier by hand."]),
+    ["Nothing needs doing. It is compared once both state a title."]),
   "id.resolves:lookup_error": explain(
     "The saved lookup is a response that could not be read.", ID_WHY,
-    ["Run `resolve` again."], ["resolve"]),
+    ["Nothing needs doing. Running `resolve` again replaces it."], ["resolve"]),
   "id.resolves:check_error": CHECK_FAILED,
   "number.present:figure_absent": explain(
     "A figure in a sentence that cites this source was not found in the source's text.", NUMBER_WHY,
     ["Find the figure in the source and correct the sentence, or move the figure to a sentence that does not attribute it to this source. A converted or recognized text can also be wrong: look at the page."]),
   "number.present:several_citations": explain(
     "A sentence with a figure cites more than one source, so which one holds the figure could not be judged.", NUMBER_WHY,
-    ["Check the figure by hand, or split the citation."]),
+    ["Nothing needs doing. A sentence that cites one source has its figures looked for there."]),
   "number.present:text_unavailable": explain(
     "A figure could not be compared: the source has no usable text.", NUMBER_WHY,
     ["Capture or repair the source's text."], ["capture_source"]),
@@ -338,6 +341,7 @@ export const PROBLEMS: Record<ProblemCode, string> = {
   model_verification: "a model's review can only flag; it is never a person's verification",
   response_digest_mismatch: "the saved response does not match its digest",
   bad_address: "a passage address needs, for each part, a start before its end",
+  bad_binding: "an annotation binds a sentence and its source, or one record, never both",
   front_matter_missing: "the file does not begin with a front matter block",
   front_matter_unreadable: "the front matter is not one readable JSON object",
   text_outside_block: "there is text before the first block line",
@@ -359,6 +363,8 @@ interface FindingParts {
   sentence?: Result["sentence"];
   item?: Result["item"];
   evidence?: Evidence[];
+  /** Nothing shows anything wrong: the result says only what was not covered. */
+  coverage?: boolean;
 }
 
 export function result(parts: FindingParts): Result {
@@ -381,7 +387,8 @@ export function result(parts: FindingParts): Result {
     why: explanation?.why ?? "",
     suggestions: [...(explanation?.suggestions ?? [])],
     annotations: [],
-    open: outcome !== "pass",
+    ...(parts.coverage && outcome === "unverifiable" ? { coverage_only: true } : {}),
+    open: outcome === "fail" || (outcome === "unverifiable" && !parts.coverage),
   };
 }
 

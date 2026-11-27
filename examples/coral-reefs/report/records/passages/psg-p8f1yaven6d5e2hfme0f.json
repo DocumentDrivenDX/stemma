@@ -1,0 +1,31 @@
+{
+  "anchor": [
+    {
+      "end": 240,
+      "index": 92,
+      "page_sha256": "9c6ee3e1c48dc0159cd47acaf59e7752f9ea4bf6d4d7dca824fde086980d0a80",
+      "start": 69,
+      "stream": "main"
+    }
+  ],
+  "created": {
+    "at": "2026-11-27T02:50:03Z",
+    "by": {
+      "kind": "model",
+      "name": "claude-opus-5-5"
+    }
+  },
+  "id": "psg-p8f1yaven6d5e2hfme0f",
+  "kind": "passage",
+  "locator": {
+    "label": "page",
+    "value": "245"
+  },
+  "quote": {
+    "exact": "The series of topographic forms, from fringing reefs through barrier\nreefs to atoll reefs, look as simple as a natural sequence can well be,\nbut it may be wholly deceptive"
+  },
+  "schema": "stemma.record/0",
+  "source": "src-aap7r89s50h94pgvvzz8",
+  "source_record_sha256": "78f1f40f660a283f41f3c97adb2a0205cbbb4b26771b5b300bcc6a78fe924d61",
+  "text": "txt-8q5sdvm520cwygpgjvn8"
+}
