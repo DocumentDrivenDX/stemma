@@ -4,80 +4,20 @@
 // Fetch the browser with ./scripts/dev.sh browsers; without it these tests are
 // skipped, and say so.
 import { afterAll, describe, expect, test } from "bun:test";
-import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import AxeBuilder from "@axe-core/playwright";
-import { type Browser, chromium, type Page } from "@playwright/test";
 import { createSession, listen } from "@stemma/server";
 import { buildServed } from "../packages/explorer/build.ts";
 import { responseProof } from "./browse-http.ts";
-import { Browsing, codeIn, endRuns, redeem, Run } from "./browse-run.ts";
-import { ROOT, temporary } from "./helpers.ts";
+import { Browsing, endRuns, redeem } from "./browse-run.ts";
+import { browser, HOSTILE, launch, notice, project, retitle, searchBox, stored, takenDown, unused, watched } from "./browse-page.ts";
 
-const launch = (args: string[] = []) => chromium.launch({ args }).catch((error: unknown) => {
-  if (!String(error).includes("Executable doesn't exist")) throw error;
-  console.warn("SKIPPED the served explorer's browser tests: headless Chromium is not fetched (./scripts/dev.sh browsers).");
-  return undefined;
-});
-const browser: Browser | undefined = await launch();
 afterAll(async () => {
   await browser?.close();
   await endRuns();
 });
-
-function project(): string {
-  const dir = join(temporary(), "coral");
-  cpSync(join(ROOT, "examples/coral-reefs"), dir, { recursive: true, filter: (from) => !/[\\/](build|\.stemma)$/.test(from) });
-  return dir;
-}
-
-const HOSTILE = "</script><script>window.__ran=1</script><img src=x onerror=\"window.__ran=2\"> [a](https://example.invalid/m) ‮evil";
-
-function retitle(dir: string, title: string): string {
-  const name = (readdirSync(join(dir, "records"), { recursive: true }) as string[]).sort().find((f) => f.split("/").at(-1)!.startsWith("src-"))!;
-  const path = join(dir, "records", name);
-  const record = JSON.parse(readFileSync(path, "utf8")) as { id: string; title: { value: string } };
-  record.title.value = title;
-  writeFileSync(path, `${JSON.stringify(record, null, 2)}\n`);
-  return record.id;
-}
-
-/** A run that has printed its launch file and whose code nobody has used. */
-async function unused(dir: string) {
-  const run = await Run.command(["browse", "--no-open", "--format", "json", "--project", dir]);
-  await run.until(() => run.stdout.includes("\n"));
-  const info = JSON.parse(run.stdout.split("\n")[0]!) as { address: string; launch_file: string; data_identity: string };
-  return { run, info, code: codeIn(info.launch_file) };
-}
-
-async function watched(context = browser!) {
-  const own = await context.newContext({ viewport: { width: 1400, height: 900 } });
-  const page = await own.newPage();
-  const seen = { requests: [] as string[], sent: [] as string[], errors: [] as string[], dialogs: [] as string[], notFound: [] as string[] };
-  own.on("response", (response) => {
-    if (response.status() === 404) seen.notFound.push(response.url());
-  });
-  own.on("request", (request) => {
-    seen.requests.push(`${request.method()} ${request.url()}`);
-    seen.sent.push(JSON.stringify([request.headers(), request.postData()]));
-  });
-  page.on("console", (message) => {
-    if (message.type() === "error" || message.type() === "warning") seen.errors.push(message.text());
-  });
-  page.on("pageerror", (error) => seen.errors.push(String(error)));
-  page.on("dialog", (dialog) => {
-    seen.dialogs.push(dialog.message());
-    void dialog.dismiss();
-  });
-  return { context: own, page, seen };
-}
-
-const searchBox = (page: Page) => page.getByRole("textbox", { name: /Search/ });
-const notice = (page: Page, title: string) => page.getByRole("heading", { level: 1, name: title });
-const stored = (page: Page) => page.evaluate(() => ({ session: { ...window.sessionStorage }, local: window.localStorage.length, cookie: document.cookie }));
-/** No record, source text or banner is on the screen. */
-const takenDown = async (page: Page) => expect(await page.locator("[data-testid=data-identity], .stemma-browser, .stemma-manuscript, mark").count()).toBe(0);
 
 describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
   test("AC1, AC3, AC4, AC6: from the launch file to the source of a citation, through a change, a reload and the server's end", async () => {
@@ -328,166 +268,6 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       await notice(page, "This tab has no access").waitFor();
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       await one.stop();
-    } finally {
-      await context.close();
-    }
-  }, 60_000);
-});
-
-const FAKE = "FAKE RECORD FROM ANOTHER PROGRAM";
-
-/** What the page asked of another program, which answers every call with 200 and data of the right shape. */
-interface Impostor {
-  asked: { path: string; headers: Record<string, string>; body: string }[];
-  stop(): void;
-}
-
-type Answer = (path: string) => { body: string; proof?: string | undefined };
-
-/** Data as the real server would give it, naming the data the page loaded. */
-const plausible = (identity: string): Answer => (path) => ({
-  body: JSON.stringify(path === "/api/session" ? { secret: "A".repeat(43) }
-    : path === "/api/status" ? { state: "current", data_identity: identity }
-    : { data_identity: identity, result: path === "/api/boot" ? { banner: { warnings: [FAKE] }, manuscript_state: "none" } : { data: { marker: FAKE }, errors: [] } }),
-});
-
-/** Takes the port a server has just left. */
-function impostor(address: string, answer: Answer): Impostor {
-  const asked: Impostor["asked"] = [];
-  const server = Bun.serve({
-    hostname: "127.0.0.1", port: Number(new URL(address).port),
-    async fetch(request) {
-      const path = new URL(request.url).pathname;
-      asked.push({ path, headers: Object.fromEntries(request.headers), body: await request.text() });
-      const { body, proof } = answer(path);
-      return new Response(body, { headers: { "content-type": "application/json", ...(proof === undefined ? {} : { "x-stemma-proof": proof }) } });
-    },
-  });
-  return { asked, stop: () => void server.stop(true) };
-}
-
-/** The page has said it stopped, shows and keeps nothing, and asks no more. */
-async function givenUp(page: Page, other: Impostor, kept: string[]) {
-  await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });
-  await takenDown(page);
-  expect(await page.content()).not.toContain(FAKE);
-  expect(await page.title()).toBe("Stemma explorer");
-  expect(Object.keys((await stored(page)).session)).toEqual([]);
-  const so = other.asked.length;
-  await Bun.sleep(4500);
-  expect(other.asked.length).toBe(so);
-  // It was sent signatures, never a key.
-  expect(other.asked.length).toBeGreaterThan(0);
-  for (const key of kept) expect(JSON.stringify(other.asked).includes(key)).toBe(false);
-}
-
-describe.skipIf(!browser)("US-119-AC10 another program that takes the port", () => {
-  test.each([
-    ["with no proof", (): string | undefined => undefined],
-    ["with a made-up proof", (): string | undefined => "A".repeat(43)],
-  ] as const)("after the page has loaded, answering 200 with plausible data %s, is not believed", async (_, proof) => {
-    const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
-    let other: Impostor | undefined;
-    try {
-      await page.goto(pathToFileURL(info.launch_file).href);
-      await searchBox(page).waitFor();
-      const secret = (await stored(page)).session["stemma.secret"]!;
-      await run.stop();
-      const answer = plausible(info.data_identity);
-      other = impostor(info.address, (path) => ({ ...answer(path), proof: proof() }));
-      await givenUp(page, other, [secret, code]);
-    } finally {
-      other?.stop();
-      await context.close();
-    }
-  }, 60_000);
-
-  test("sending again a real answer with its real proof is not believed", async () => {
-    const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
-    let other: Impostor | undefined;
-    try {
-      const genuine: Promise<{ body: string; proof: string }>[] = [];
-      page.on("response", (response) => {
-        if (response.url().endsWith("/api/status")) genuine.push(response.text().then((body) => ({ body, proof: response.headers()["x-stemma-proof"]! })));
-      });
-      await page.goto(pathToFileURL(info.launch_file).href);
-      await searchBox(page).waitFor();
-      await Bun.sleep(2500);
-      const secret = (await stored(page)).session["stemma.secret"]!;
-      const kept = await genuine[0]!;
-      expect(kept.proof).toMatch(/^[A-Za-z0-9_-]{43}$/);
-      await run.stop();
-      other = impostor(info.address, () => kept);
-      await givenUp(page, other, [secret, code]);
-    } finally {
-      other?.stop();
-      await context.close();
-    }
-  }, 60_000);
-
-  test.each(["/api/session", "/api/boot"])("before the page has any data, taking the port ahead of %s, it gets nothing it can use and shows nothing", async (first) => {
-    const { run, info, code } = await unused(project());
-    const { context, page } = await watched();
-    let other: Impostor | undefined;
-    try {
-      let release!: () => void;
-      const held = new Promise<void>((resolve) => (release = resolve));
-      let holding = false;
-      // The shell and script come from Stemma; the named call is held until the port has changed hands.
-      await page.route(`**${first}`, async (route) => {
-        holding = true;
-        await held;
-        await route.continue().catch(() => {});
-      });
-      await page.goto(pathToFileURL(info.launch_file).href);
-      while (!holding) await Bun.sleep(25);
-      const secret = (await stored(page)).session["stemma.secret"];
-      expect(secret === undefined).toBe(first === "/api/session");
-      await run.stop();
-      other = impostor(info.address, plausible(info.data_identity));
-      release();
-      await givenUp(page, other, [code, ...(secret ? [secret] : [])]);
-      expect(other.asked[0]!.path).toBe(first);
-      if (first === "/api/session") expect(other.asked.map((a) => [a.path, a.body])).toEqual([["/api/session", "{}"]]);
-    } finally {
-      other?.stop();
-      await context.close();
-    }
-  }, 60_000);
-
-  test.each([
-    ["/api/boot", async () => {}],
-    ["/api/arras", async () => {}],
-    ["/api/query", async (page: Page) => searchBox(page).fill("subsidence")],
-    ["/api/manuscript", async (page: Page) => page.getByRole("link", { name: "Manuscript", exact: true }).click()],
-    ["/api/source-view", async (page: Page) => {
-      await page.getByRole("link", { name: "Manuscript", exact: true }).click();
-      await page.locator("a.stemma-quotation").first().click();
-    }],
-  ] as const)("a real answer of %s with its body changed is not used", async (path, reach) => {
-    const { run, info } = await unused(project());
-    const { context, page } = await watched();
-    try {
-      let changed = 0;
-      await page.route(`**${path}`, async (route) => {
-        const response = await route.fetch();
-        // The real status and proof, and a body that differs by one added space.
-        const body = `${await response.text()} `;
-        changed++;
-        await route.fulfill({ response, body, headers: { ...response.headers(), "content-length": String(Buffer.byteLength(body)) } });
-      });
-      await page.goto(pathToFileURL(info.launch_file).href);
-      if (path !== "/api/boot" && path !== "/api/arras") {
-        await searchBox(page).waitFor();
-        await reach(page);
-      }
-      await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });
-      expect(changed).toBeGreaterThan(0);
-      await takenDown(page);
-      expect(Object.keys((await stored(page)).session)).toEqual([]);
-      await run.stop();
     } finally {
       await context.close();
     }
