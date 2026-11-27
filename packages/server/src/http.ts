@@ -7,8 +7,10 @@
 // node:http, not Bun.serve: on the pinned Bun only node:http ends a request
 // whose headers or body arrive too slowly.
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { DRAWN_TYPES, MOST_ORIGINAL_BYTES } from "../../core/src/original-pages.ts";
 import { MAC_HEADER, MAC_SHAPE, NONCE_HEADER, NONCE_SHAPE, PROOF_HEADER } from "../../core/src/browse-proof.ts";
 import { refusal } from "./answers.ts";
+import type { Originals } from "./originals.ts";
 import { ProcessGone } from "./process.ts";
 import type { Prove, Session, Signed } from "./session.ts";
 import type { Answer, Verdict } from "./snapshots.ts";
@@ -16,6 +18,8 @@ import type { Answer, Verdict } from "./snapshots.ts";
 export const HOST = "127.0.0.1";
 export const LIMITS = { headerBytes: 16 * 1024, bodyBytes: 64 * 1024, requestMs: 10_000, connections: 64 };
 export const REQUEST_HEADER = "x-stemma-request";
+/** Rule 13 for originals: the largest given, how many are held in memory at once, and how long one may take to be taken. */
+export const ORIGINAL_LIMITS = { bytes: MOST_ORIGINAL_BYTES, held: 2, sendMs: 120_000 };
 
 export const SECURITY_HEADERS: Record<string, string> = {
   "content-security-policy": "default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'none'",
@@ -27,23 +31,38 @@ export const SECURITY_HEADERS: Record<string, string> = {
   "x-frame-options": "DENY",
 };
 
+/** The pinned pdf.js beyond what is in the page's script: its worker and decoders by path, and the data it asks for by name. */
+export interface PdfAssets {
+  scripts: Record<string, string>;
+  data: Map<string, Uint8Array>;
+}
+
 export interface Assets {
   html: string;
   js: string;
   css: string;
+  pdf?: PdfAssets;
 }
 
-const ASSETS: Record<string, [keyof Assets, string]> = {
+const SCRIPT = "text/javascript; charset=utf-8";
+/** What the answer with an original carries in place of the page's policy: it is never a document or a script. */
+export const ORIGINAL_HEADERS: Record<string, string> = {
+  "content-security-policy": "default-src 'none'; sandbox; frame-ancestors 'none'",
+  "content-disposition": 'attachment; filename="original"',
+};
+
+const ASSETS: Record<string, ["html" | "js" | "css", string]> = {
   "/": ["html", "text/html; charset=utf-8"],
-  "/app.js": ["js", "text/javascript; charset=utf-8"],
+  "/app.js": ["js", SCRIPT],
   "/app.css": ["css", "text/css; charset=utf-8"],
 };
 
 /** The calls a snapshot answers, by path. */
 const SNAPSHOT_CALLS: Record<string, string> = {
   "/api/boot": "boot", "/api/arras": "arras", "/api/query": "query", "/api/source-view": "source-view", "/api/manuscript": "manuscript", "/api/search": "search",
+  "/api/original-page": "original-page",
 };
-const CALLS = new Set(["/api/session", "/api/status", ...Object.keys(SNAPSHOT_CALLS)]);
+const CALLS = new Set(["/api/session", "/api/status", "/original", "/pdfjs-data", ...Object.keys(SNAPSHOT_CALLS)]);
 
 /** Headers a rule reads. Node keeps only the first of some repeats, so a repeat is refused. */
 const ONCE = ["host", "origin", "content-type", "content-length", "transfer-encoding", REQUEST_HEADER, NONCE_HEADER, MAC_HEADER];
@@ -55,6 +74,17 @@ export interface ListenOptions {
   /** Told of each call that passed every rule. */
   used?(): void;
   limits?: Partial<typeof LIMITS>;
+  /** Where originals are read from. Without it, none is held. */
+  originals?: Originals;
+  originalLimits?: Partial<typeof ORIGINAL_LIMITS>;
+}
+
+/** An answer whose body is bytes: only ever a successful one. */
+interface Bytes {
+  bytes: Uint8Array;
+  headers?: Record<string, string>;
+  /** Called when the bytes are taken or given up, and with it whatever holds them. */
+  sent?(): void;
 }
 
 export interface Listening {
@@ -91,7 +121,24 @@ export async function listen(options: ListenOptions): Promise<Listening> {
   let host = "";
   let origin = "";
 
-  const send = (response: ServerResponse, status: number, type: string, body: string, more: Record<string, string> = {}) => {
+  const originalLimits = { ...ORIGINAL_LIMITS, ...options.originalLimits };
+  /** The places for an original held in memory (rule 13). */
+  let free = originalLimits.held;
+  const waiting: (() => void)[] = [];
+  async function hold(): Promise<() => void> {
+    if (free > 0) free--;
+    else await new Promise<void>((resolve) => waiting.push(resolve));
+    let held = true;
+    return () => {
+      if (!held) return;
+      held = false;
+      const next = waiting.shift();
+      if (next) next();
+      else free++;
+    };
+  }
+
+  const send = (response: ServerResponse, status: number, type: string, body: string | Uint8Array, more: Record<string, string> = {}) => {
     if (response.headersSent || response.destroyed) return;
     response.writeHead(status, { ...SECURITY_HEADERS, ...more, "content-type": type, "content-length": Buffer.byteLength(body), connection: "close" });
     // One request a connection: whatever else is arriving on it is not read.
@@ -126,9 +173,11 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     if (method === "GET") {
       // `url` is the request line's target as sent: nothing is decoded or resolved.
       const asset = Object.hasOwn(ASSETS, url) ? ASSETS[url]! : undefined;
-      if (!asset) return refuse(response, 404, "not_found", "There is nothing at that path.");
+      const scripts = options.assets.pdf?.scripts ?? {};
+      const script = Object.hasOwn(scripts, url) ? scripts[url]! : undefined;
+      if (!asset && script === undefined) return refuse(response, 404, "not_found", "There is nothing at that path.");
       if (chunked || (length !== undefined && length !== "0")) return refuse(response, 400, "bad_request", "A GET carries no body.");
-      return send(response, 200, asset[1], options.assets[asset[0]]);
+      return asset ? send(response, 200, asset[1], options.assets[asset[0]]) : send(response, 200, SCRIPT, script!);
     }
 
     if (!CALLS.has(url)) return refuse(response, 404, "not_found", "There is nothing at that path.");
@@ -166,15 +215,57 @@ export async function listen(options: ListenOptions): Promise<Listening> {
     if (admitted.verdict === "replayed") return refuse(response, 401, "replayed", "That request has been sent before, or its time is not now.");
     const { prove } = admitted;
     if (admitted.verdict === "too_many") return proved(response, prove, refusal(503, "too_many_calls", "Too many calls in too short a time. Wait a minute."));
+    let made: Answer | Bytes | undefined;
     try {
-      return proved(response, prove, await respond(url, bytes.toString("utf8")));
+      made = await respond(url, bytes.toString("utf8"), response);
+      if (!("bytes" in made)) return proved(response, prove, made);
+      const { bytes: body, headers, sent } = made;
+      if (sent) {
+        // What holds the bytes is let go when the answer has been taken, or given up as not taken.
+        if (response.destroyed) return sent();
+        const late = setTimeout(() => response.destroy(), originalLimits.sendMs);
+        response.once("close", () => {
+          clearTimeout(late);
+          sent();
+        });
+      }
+      send(response, 200, "application/octet-stream", body, { ...headers, [PROOF_HEADER]: prove(200, body) });
     } catch {
+      if (made && "bytes" in made) made.sent?.();
       return proved(response, prove, INTERNAL);
     }
   }
 
+  /** The bytes of an original, or why they are not given (CONTRACT-005 M, "Originals"). */
+  async function original(process: Extract<Verdict, { state: "current" }>["process"], body: Record<string, unknown>, response: ServerResponse): Promise<Answer | Bytes> {
+    const { sha256 } = body;
+    if (Object.keys(body).length !== 1 || typeof sha256 !== "string" || !/^[0-9a-f]{64}$/.test(sha256)) return refusal(400, "bad_request", "The request body is not what this call takes.");
+    const asked = await process.ask("original-record", { sha256 });
+    const recorded = (JSON.parse(asked.body) as { result?: { size: number; media_type: string } | null }).result;
+    if (!recorded) return refusal(404, "unknown_original", "No source file in effect records an original with that digest.");
+    if (!DRAWN_TYPES.includes(recorded.media_type)) return refusal(415, "original_unsupported", "Only PDF originals and PNG or JPEG page images are given.");
+    if (recorded.size > originalLimits.bytes) return refusal(422, "original_too_large", `The original is recorded as ${recorded.size} bytes, more than the ${originalLimits.bytes} this server gives.`);
+    const release = await hold();
+    // Nobody is left to take it, so it is not read.
+    if (response.destroyed) {
+      release();
+      return INTERNAL;
+    }
+    try {
+      const found = options.originals ? await options.originals.read(sha256, recorded.size) : { refused: "original_not_held" as const };
+      if ("bytes" in found) return { bytes: found.bytes, headers: ORIGINAL_HEADERS, sent: release };
+      release();
+      return found.refused === "original_changed"
+        ? refusal(409, "original_changed", "A file of the recorded size, or the cache's file for this digest, is there, but its SHA-256 differs from the recorded one, so it is not given.")
+        : refusal(404, "original_not_held", "No file with the recorded size and SHA-256 is in .stemma/originals/ or in a place named with --originals.");
+    } catch (error) {
+      release();
+      throw error;
+    }
+  }
+
   /** The answer to a call that was accepted. */
-  async function respond(url: string, text: string): Promise<Answer> {
+  async function respond(url: string, text: string, response: ServerResponse): Promise<Answer | Bytes> {
     let body: Record<string, unknown>;
     try {
       const parsed: unknown = JSON.parse(text);
@@ -184,6 +275,11 @@ export async function listen(options: ListenOptions): Promise<Listening> {
       return refusal(400, "bad_request", "The body is not a JSON object.");
     }
     options.used?.();
+    // The pinned pdf.js's own data, which no project file is part of, so no scan is waited for. The name is only looked up.
+    if (url === "/pdfjs-data") {
+      const found = Object.keys(body).length === 1 && typeof body.name === "string" ? options.assets.pdf?.data.get(body.name) : undefined;
+      return found ? { bytes: found } : refusal(404, "not_found", "There is no such data of the PDF library.");
+    }
     // The scan this waits for begins after the request arrived.
     const verdict = await options.check();
     if (url === "/api/status") {
@@ -195,6 +291,7 @@ export async function listen(options: ListenOptions): Promise<Listening> {
       return STALE(verdict.state === "failed" ? "The project could not be read again, so nothing is shown. Ask for the status to see why." : "The project's files changed. Stemma is reading them again.");
     }
     try {
+      if (url === "/original") return await original(verdict.process, body, response);
       return await verdict.process.ask(SNAPSHOT_CALLS[url]!, body);
     } catch (error) {
       // Only a process that has ended is a reason to wait; anything else would have the page wait for ever.

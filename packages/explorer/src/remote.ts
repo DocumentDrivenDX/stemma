@@ -5,7 +5,7 @@
 // each read to the server unchanged, but for the limit of arras's search.
 import { TAGS, type TagPair } from "../../core/src/browse-proof.ts";
 import type { ArrasClient, SchemaApi } from "./arras-types.ts";
-import { type Proved, provedPost } from "./proof.ts";
+import { provedBytes, type ProvedBytes } from "./proof.ts";
 
 const KEY = "stemma.secret";
 
@@ -18,7 +18,8 @@ export type Redemption = "opened" | "code_used" | "code_expired";
 const MOST_BODY_BYTES = 64 * 1024;
 
 export class CallFailed extends Error {
-  constructor(readonly trouble: Trouble, message: string) {
+  /** For `failed`, the server's code, when it gave one. */
+  constructor(readonly trouble: Trouble, message: string, readonly code?: string) {
     super(message);
   }
 }
@@ -27,6 +28,16 @@ export interface Status {
   state: "current" | "rebuilding" | "failed";
   data_identity?: string;
   message?: string;
+}
+
+const parsed = (bytes: Uint8Array): Record<string, unknown> => JSON.parse(new TextDecoder().decode(bytes)) as Record<string, unknown>;
+
+/** What a proved refusal is, as an error. */
+function refused(status: number, json: Record<string, unknown>): Error {
+  const error = (json.error ?? {}) as { code?: string; message?: string; arras?: { status: number; code?: string } };
+  if (error.code === "index_stale") return new CallFailed("stale", error.message ?? "");
+  if (error.arras) return Object.assign(new Error(error.message), error.arras);
+  return new CallFailed("failed", `${error.code ?? status}: ${error.message ?? ""}`, error.code);
 }
 
 function stored(): string | undefined {
@@ -82,9 +93,15 @@ export class Server {
   }
 
   private async post(key: string, tags: TagPair, path: string, body: string): Promise<{ status: number; json: Record<string, unknown> }> {
-    let proved: Proved | undefined;
+    const got = await this.send(key, tags, path, body);
+    return { status: got.status, json: parsed(got.bytes) };
+  }
+
+  /** One signed request. What comes back has proved itself, or nothing comes back. */
+  private async send(key: string, tags: TagPair, path: string, body: string): Promise<ProvedBytes> {
+    let proved: ProvedBytes | undefined;
     try {
-      proved = await provedPost((to, init) => fetch(to, {
+      proved = await provedBytes((to, init) => fetch(to, {
         method: "POST", cache: "no-store", credentials: "omit", redirect: "error", referrerPolicy: "no-referrer",
         headers: { "content-type": "application/json", "x-stemma-request": "1", ...init.headers },
         body: init.body,
@@ -97,7 +114,7 @@ export class Server {
     if (!proved) return this.stop("What answered could not prove that it is this run of Stemma.");
     // An answer proved before another failed is not used after it.
     if (this.gone) throw new CallFailed("stopped", "Stemma's server has stopped.");
-    return { status: proved.status, json: JSON.parse(proved.text) as Record<string, unknown> };
+    return proved;
   }
 
   /** Trades the one-time code, which signs the request and is not sent, for the run's secret. A refused code leaves any secret the tab already has. */
@@ -112,17 +129,26 @@ export class Server {
   }
 
   async call(path: string, body: unknown): Promise<Record<string, unknown>> {
+    const { status, bytes } = await this.signedCall(path, body);
+    const json = parsed(bytes);
+    if (status === 200) return json;
+    throw refused(status, json);
+  }
+
+  /** A call whose successful answer is bytes: an original, or data of the PDF library. */
+  async bytes(path: "/original" | "/pdfjs-data", body: unknown): Promise<Uint8Array<ArrayBuffer>> {
+    const { status, bytes } = await this.signedCall(path, body);
+    if (status === 200) return bytes;
+    throw refused(status, parsed(bytes));
+  }
+
+  private async signedCall(path: string, body: unknown): Promise<ProvedBytes> {
     if (this.gone) throw new CallFailed("stopped", "Stemma's server has stopped.");
     if (this.secret === undefined) throw new CallFailed("locked", "This tab has no access.");
     const text = JSON.stringify(body);
     // The server's refusal of this comes before it can prove anything, which would look like another program's answer.
     if (new TextEncoder().encode(text).length > MOST_BODY_BYTES) throw new CallFailed("failed", "too_large: The request is too large.");
-    const { status, json } = await this.post(this.secret, TAGS.call, path, text);
-    if (status === 200) return json;
-    const error = (json.error ?? {}) as { code?: string; message?: string; arras?: { status: number; code?: string } };
-    if (error.code === "index_stale") throw new CallFailed("stale", error.message ?? "");
-    if (error.arras) throw Object.assign(new Error(error.message), error.arras);
-    throw new CallFailed("failed", `${error.code ?? status}: ${error.message ?? ""}`);
+    return this.send(this.secret, TAGS.call, path, text);
   }
 
   async status(): Promise<Status> {

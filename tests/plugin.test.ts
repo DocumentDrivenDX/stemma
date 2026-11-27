@@ -130,11 +130,20 @@ describe("what is released", () => {
   });
 
   test("beside it go the explorer page template and the licenses of the code in the page", () => {
+    const files = (path: string) => readFileSync(join(plugin, path), "utf8");
     const template = readFileSync(join(plugin, "dist/explorer.template.html"), "utf8");
     for (const mark of ["__STEMMA_BANNER_JSON__", "__STEMMA_MODULE_JSON__", "__STEMMA_GRAPH_JSON__", "__STEMMA_SOURCEVIEWS_JSON__", "__STEMMA_MANUSCRIPT_JSON__"]) expect(template.split(mark)).toHaveLength(2);
     expect(readdirSync(join(plugin, "dist/explorer-licenses")).sort()).toEqual([
-      "arras-ui.md", "graphql.txt", "react-dom.txt", "react.txt", "scheduler.txt", "tailwindcss.txt", "tanstack-query-core.txt", "tanstack-react-query.txt",
+      "arras-ui.md", "core-js.txt", "graphql.txt", "jbig2.txt", "openjpeg.txt", "pdfjs-dist.txt", "pdfjs-jbig2.txt", "pdfjs-openjpeg.txt",
+      "react-dom.txt", "react.txt", "scheduler.txt", "tailwindcss.txt", "tanstack-query-core.txt", "tanstack-react-query.txt",
     ]);
+    // The offline page holds no PDF library, so none of what draws originals.
+    expect(template.includes("pdfjsVersion") || template.includes("GlobalWorkerOptions")).toBe(false);
+    const served = readdirSync(join(plugin, "dist/explorer-served")).sort();
+    expect(served).toEqual(["app.css", "app.js", "index.html", "jbig2_nowasm_fallback.js", "openjpeg_nowasm_fallback.js", "pdf-worker.js", "pdf.worker.min.js"]);
+    expect(files("dist/explorer-served/pdf-worker.js")).toBe('import "/pdfjs/jbig2_nowasm_fallback.js";\nimport "/pdfjs/openjpeg_nowasm_fallback.js";\nimport "/pdfjs/pdf.worker.min.js";\n');
+    // No WebAssembly and no scripting engine is shipped.
+    expect((readdirSync(join(plugin, "dist"), { recursive: true }) as string[]).filter((f) => /\.wasm$|sandbox|quickjs/i.test(f))).toEqual([]);
     // A page an author passes on carries the licenses with it.
     expect(template).toContain("=== graphql.txt ===");
   });

@@ -54,7 +54,10 @@ async function unused(dir: string) {
 async function watched(context = browser!) {
   const own = await context.newContext({ viewport: { width: 1400, height: 900 } });
   const page = await own.newPage();
-  const seen = { requests: [] as string[], sent: [] as string[], errors: [] as string[], dialogs: [] as string[] };
+  const seen = { requests: [] as string[], sent: [] as string[], errors: [] as string[], dialogs: [] as string[], notFound: [] as string[] };
+  own.on("response", (response) => {
+    if (response.status() === 404) seen.notFound.push(response.url());
+  });
   own.on("request", (request) => {
     seen.requests.push(`${request.method()} ${request.url()}`);
     seen.sent.push(JSON.stringify([request.headers(), request.postData()]));
@@ -146,8 +149,11 @@ describe.skipIf(!browser)("US-119 the served explorer in a browser", () => {
       expect(seen.sent.length).toBeGreaterThan(20);
       expect(seen.sent.filter((r) => r.includes(secret) || r.includes(code))).toEqual([]);
       // A call made while the records are being read again is answered 503 `index_stale`,
-      // which the browser logs whether or not it happens to be caught in that moment.
-      expect([seen.errors.filter((e) => !/Failed to load resource.*\b503\b/.test(e)), seen.dialogs]).toEqual([[], []]);
+      // which the browser logs whether or not it happens to be caught in that moment. This copy of
+      // the example holds no original, which `/original` answers 404; the browser logs that too.
+      expect([seen.errors.filter((e) => !/Failed to load resource.*\b(503|404)\b/.test(e)), seen.dialogs]).toEqual([[], []]);
+      // Nothing else was 404.
+      expect(seen.notFound.filter((u) => u !== `${origin}/original`)).toEqual([]);
 
       expect(await run.stop()).toBe(0);
       await notice(page, "Stemma’s server has stopped").waitFor({ timeout: 15_000 });

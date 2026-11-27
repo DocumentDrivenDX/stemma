@@ -95,7 +95,7 @@ describe.skipIf(!browser)("the worked example's source panel, as the built comma
       // The whole page text stands around the mark, in order.
       expect(await panel.locator(".stemma-source-text").first().textContent()).toBe(passageView.segments[0].before + passageView.segments[0].quoted + passageView.segments[0].after);
       const words = await panel.innerText();
-      for (const part of [view.citation.sentence, `Printed page ${passageView.segments[0].printed_label}`, "Converted or recognized text, not a reading of the page", "recorded quality unassessed", "The original, as recorded", "This page does not open originals"]) {
+      for (const part of [view.citation.sentence, `Printed page ${passageView.segments[0].printed_label}`, "Converted or recognized text, not a reading of the page", "recorded quality unassessed", "The original, as recorded", "Original not shown: the offline file cannot show originals."]) {
         expect(words, view.id).toContain(part);
       }
       expect(await markVisible(page)).toBe(true);

@@ -102,7 +102,7 @@ describe.skipIf(!browser)("the worked example's report in the page", () => {
     const main = page.getByRole("main");
     await main.getByRole("heading", { level: 1, name: "Foundations Out of Sight" }).waitFor();
     const words = await main.innerText();
-    for (const part of ["This is the manuscript as the export read it, not the printed PDF.", "Originals are not opened yet.", "report/report.src"]) expect(words).toContain(part);
+    for (const part of ["This is the manuscript as the export read it, not the printed PDF.", "This offline file cannot show originals.", "report/report.src"]) expect(words).toContain(part);
     expect(await page.locator(".stemma-notes > li").count()).toBe(view.notes.length);
     expect(await page.locator("a.stemma-entry").count()).toBe(view.bibliography.length);
     expect(await page.locator(".stemma-broken, mark").count()).toBe(0);
@@ -130,7 +130,7 @@ describe.skipIf(!browser)("the worked example's report in the page", () => {
     await citation.click();
     await page.locator('section.stemma-source[data-route="#/manuscript/citation/1/0"] mark').first().waitFor();
     expect(await markVisible(page)).toBe(true);
-    for (const words of ["Cited source:", "Converted or recognized text, not a reading of the page", "This page does not open originals"]) expect(await pane(page).innerText()).toContain(words);
+    for (const words of ["Cited source:", "Converted or recognized text, not a reading of the page", "Original not shown: the offline file cannot show originals."]) expect(await pane(page).innerText()).toContain(words);
     await page.getByRole("link", { name: "Close the source" }).click();
     await pane(page).waitFor({ state: "detached" });
     expect(seen).toEqual(quiet);
@@ -164,10 +164,18 @@ describe.skipIf(!browser)("the worked example's report in the page", () => {
       await page.locator(`a.stemma-entry[data-entry="${entry.source}"]`).click();
       const found = page.locator(`section.stemma-source[data-route="#/manuscript/source/${entry.source}"]`);
       await found.waitFor();
-      expect(await found.locator("mark").count()).toBe(0);
+      // The first quotation of the work, by the order of its places and then of those with no citation, is shown in its source.
+      const first = entry.places.flatMap((p) => view.notes.find((n) => n.number === p.note)!.citations[p.citation]!.quotations)[0] ?? entry.quoted[0]?.quotation;
+      if (first === undefined) {
+        expect(await found.locator("mark").count()).toBe(0);
+        expect(await found.innerText()).toContain("The report quotes nothing from this work, so nothing is highlighted");
+      } else {
+        await found.locator(".stemma-quoted mark").first().waitFor();
+        expect(await marksOf(page)).toEqual([{ id: first, state: "highlighted", marks: expected(first) }]);
+        expect(await found.innerText()).toContain("Shown first is the first quotation of this work in the report");
+      }
       const links = await found.locator(".stemma-places a[href^='#/manuscript/citation/']").evaluateAll((all) => all.map((a) => a.getAttribute("href")));
       expect(links).toEqual(entry.places.map((p) => `#/manuscript/citation/${p.note}/${p.citation}`));
-      expect(await found.innerText()).toContain("Nothing is highlighted here.");
     }
     const last = view.bibliography.at(-1)!;
     await pane(page).locator(".stemma-places a").first().click();

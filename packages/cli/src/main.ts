@@ -76,8 +76,9 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   research list
   graph export --audience author [--page] [--out <dir>]
   graph status [--out <dir>]
-  browse [--no-open] [--idle-minutes <n>]
-             serves the explorer to a browser on this computer until stopped
+  browse [--no-open] [--idle-minutes <n>] [--originals <path>]...
+             serves the explorer to a browser on this computer until stopped;
+             originals are shown from .stemma/originals/ and the named places
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network, and build report --pdf once, to fetch the pinned Typst.
@@ -126,7 +127,7 @@ const COMMAND_OPTIONS: Record<string, (keyof Options)[]> = {
   ingest: ["actor", "plan", "originals", "fetch", "reconvert", "refresh-lookups"], resolve: ["actor", "via", "identifier"],
   excerpt: ["source", "passage", "pages", "citation", "quotation"], retire: ["actor", "reason", "replaced-by"],
   annotate: ["actor", "finding", "effect", "reason"], "record add": ["actor", "input"],
-  check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
+  check: ["changed", "all"], "research list": [], "graph export": ["audience", "page", "out", "chapter"], "graph status": ["audience", "out"], browse: ["no-open", "idle-minutes", "originals"], init: [], doctor: [], version: [], validate: [], fmt: [], "rules check": [],
 };
 
 function version(options: Options): number {

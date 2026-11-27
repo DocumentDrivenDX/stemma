@@ -5,23 +5,30 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { inputsChanged, mayShowTheSame, scanInputs } from "@stemma/workspace";
 import {
-  type Assets, BuildFailure, type Built, createSession, type LaunchFile, listen, openInBrowser, type SnapshotEvent, Snapshots, spawnSnapshotProcess,
-  writeLaunchFile,
+  type Assets, BuildFailure, type Built, createOriginals, createSession, type LaunchFile, listen, openInBrowser, originalPlaces, PDF_SCRIPTS, type PdfAssets,
+  pdfData, type SnapshotEvent, Snapshots, spawnSnapshotProcess, writeLaunchFile,
 } from "@stemma/server";
 import { CommandError, type Options, requireProject, usageError, VERSION } from "./context.ts";
 import { ISOLATION_FLAGS } from "./runtime.ts";
 
-const ASSET_FILES: Record<keyof Assets, string> = { html: "index.html", js: "app.js", css: "app.css" };
+const ASSET_FILES = { html: "index.html", js: "app.js", css: "app.css" };
 const IDLE_MINUTES = 60;
 
 /** A run from this repository's source, which has no built files beside it. */
 const fromSource = () => /[\\/]packages[\\/]cli[\\/]src[\\/]browse\.ts$/.test(import.meta.path);
 
+/** The pdf.js worker and decoders beside the served page, and the character maps and fonts the PDF reader ships with. */
+function shippedPdf(directory: string): PdfAssets {
+  const scripts = Object.fromEntries(Object.entries(PDF_SCRIPTS).map(([path, file]) => [path, readFileSync(join(directory, "explorer-served", file), "utf8")]));
+  return { scripts, data: pdfData(join(directory, "pdfjs")) };
+}
+
 /** The served page ships beside the built command line, and is read once, whole. */
 async function pageAssets(): Promise<Assets> {
   const shipped = join(import.meta.dir, "explorer-served");
   if (existsSync(shipped)) {
-    return Object.fromEntries(Object.entries(ASSET_FILES).map(([name, file]) => [name, readFileSync(join(shipped, file), "utf8")])) as unknown as Assets;
+    const files = Object.fromEntries(Object.entries(ASSET_FILES).map(([name, file]) => [name, readFileSync(join(shipped, file), "utf8")])) as unknown as Assets;
+    return { ...files, pdf: shippedPdf(import.meta.dir) };
   }
   if (fromSource()) {
     // Not a literal, so that the built command line holds no bundler and nothing of the explorer's sources.
@@ -72,6 +79,8 @@ export interface BrowseDependencies {
 export async function browse(options: Options, dependencies: BrowseDependencies = {}): Promise<number> {
   const root = requireProject(options);
   const idle = idleMinutes(options) * 60_000;
+  // Relative names are relative to the project, as for `ingest`.
+  const originals = await originalPlaces(root, options.originals ?? []);
   const json = options.format === "json";
   const say = (line: string) => process.stdout.write(`${line}\n`);
   // With --format json, standard output is the one object; everything else is said on standard error.
@@ -110,7 +119,7 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
       launch?.remove();
       if (how === "used") tell(openedLine(at));
     });
-    const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()) }).catch((error: unknown) => {
+    const listening = await listen({ assets, session, check: () => snapshots.check(), used: () => (used = Date.now()), originals: createOriginals(root, originals.places) }).catch((error: unknown) => {
       throw new CommandError(5, "cannot_listen", `No port on 127.0.0.1 could be opened, so nothing is served. ${error instanceof Error ? error.message : ""}`);
     });
     server = listening;
@@ -118,12 +127,16 @@ export async function browse(options: Options, dependencies: BrowseDependencies 
     const opened = options["no-open"] ? false : await (dependencies.open ?? openInBrowser)(launch.path);
 
     if (json) {
-      process.stdout.write(`${JSON.stringify({ address: listening.address, data_identity: built.data_identity, launch_file: launch.path, opened, build_ms: buildMs, entries: built.entries, warnings: built.warnings, stemma: VERSION })}\n`);
+      for (const warning of originals.warnings) tell(`WARNING originals_place: ${warning}`);
+      process.stdout.write(`${JSON.stringify({ address: listening.address, data_identity: built.data_identity, launch_file: launch.path, opened, build_ms: buildMs, entries: built.entries, warnings: built.warnings, originals: originals.places, stemma: VERSION })}\n`);
     } else {
       say([
         `Serving the explorer at ${listening.address} to this computer only.`,
         `Data identity ${built.data_identity.slice(0, 12)}. Entries: ${built.entries}. Read in ${seconds(buildMs)}.`,
         ...warningLines(built),
+        ...originals.warnings.map((w) => `WARNING originals_place: ${w}`),
+        originals.places.length === 0 ? "Originals are looked for only in .stemma/originals/. Name where yours are with --originals <folder>."
+          : `Originals are looked for in .stemma/originals/ and in: ${originals.places.join(", ")}`,
         "The served pages hold passage text, source page text, other record contents, and the report's text when there is one.",
         opened ? "Your browser was asked to open it. If no page appears, open this file in your browser:" : "To open it, open this file in your browser:",
         `  ${launch.path}`,

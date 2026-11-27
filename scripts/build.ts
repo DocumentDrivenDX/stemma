@@ -4,7 +4,7 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { isBuiltin } from "node:module";
 import { basename, join } from "node:path";
-import { buildServed, buildTemplate, explorerLicenses } from "../packages/explorer/build.ts";
+import { buildServed, buildTemplate, explorerLicenses, pdfScripts, servedLicenses } from "../packages/explorer/build.ts";
 
 const root = join(import.meta.dir, "..");
 
@@ -31,12 +31,12 @@ export async function writeExplorer(outdir: string): Promise<void> {
   writeFileSync(join(outdir, "explorer.template.html"), await buildTemplate());
   const served = await buildServed();
   mkdirSync(join(outdir, "explorer-served"), { recursive: true });
-  for (const [name, text] of [["index.html", served.html], ["app.js", served.js], ["app.css", served.css]] as const) {
+  for (const [name, text] of [["index.html", served.html], ["app.js", served.js], ["app.css", served.css], ...Object.entries(pdfScripts())] as [string, string][]) {
     writeFileSync(join(outdir, "explorer-served", name), text);
   }
   const licenses = join(outdir, "explorer-licenses");
   mkdirSync(licenses, { recursive: true });
-  for (const [name, text] of Object.entries(explorerLicenses())) writeFileSync(join(licenses, name), text);
+  for (const [name, text] of Object.entries({ ...explorerLicenses(), ...servedLicenses() })) writeFileSync(join(licenses, name), text);
 }
 
 /** The licences of the citation processor, style and locale bundled into the command line (BR-1004). */

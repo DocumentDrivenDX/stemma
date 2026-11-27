@@ -32,17 +32,27 @@ export interface Proved {
   text: string;
 }
 
+export interface ProvedBytes {
+  status: number;
+  bytes: Uint8Array<ArrayBuffer>;
+}
+
+export type Send = (path: string, init: { headers: Record<string, string>; body: string }) => Promise<Response>;
+
 /**
  * Sends a signed POST. Nothing is given when the answer's proof is missing or
  * wrong, whatever its status: not a byte of such an answer is read further.
  */
-export async function provedPost(
-  send: (path: string, init: { headers: Record<string, string>; body: string }) => Promise<Response>,
-  keyText: string, tags: TagPair, path: string, body: string,
-): Promise<Proved | undefined> {
+export async function provedBytes(send: Send, keyText: string, tags: TagPair, path: string, body: string): Promise<ProvedBytes | undefined> {
   const headers = await signed(keyText, tags, path, body);
   const response = await send(path, { headers, body });
   const bytes = new Uint8Array(await response.arrayBuffer());
   const right = await proves(keyText, tags, headers[NONCE_HEADER]!, path, response.status, bytes, response.headers.get(PROOF_HEADER));
-  return right ? { status: response.status, text: new TextDecoder().decode(bytes) } : undefined;
+  return right ? { status: response.status, bytes } : undefined;
+}
+
+/** The same, for an answer that is text. */
+export async function provedPost(send: Send, keyText: string, tags: TagPair, path: string, body: string): Promise<Proved | undefined> {
+  const got = await provedBytes(send, keyText, tags, path, body);
+  return got && { status: got.status, text: new TextDecoder().decode(got.bytes) };
 }

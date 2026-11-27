@@ -5,6 +5,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { PLACEHOLDERS } from "../graph/src/page.ts";
+import type { PdfAssets } from "../server/src/http.ts";
+import { PDF_SCRIPTS, pdfData } from "../server/src/pdf-assets.ts";
 
 const root = join(import.meta.dir, "../..");
 
@@ -27,6 +29,50 @@ export function explorerLicenses(): Record<string, string> {
     ["graphql.txt", join(import.meta.dir, "licenses/graphql-LICENSE.txt")],
   ];
   return Object.fromEntries(files.map(([name, path]) => [name, readFileSync(path, "utf8").replace(/\r\n?/g, "\n")]));
+}
+
+const unixText = (path: string) => readFileSync(path, "utf8").replace(/\r\n?/g, "\n");
+
+/**
+ * The licenses of what only the served page runs: the pinned pdf.js, with the
+ * core-js polyfills its legacy build holds, and the two image decoders. The
+ * character maps and fonts ship with their own beside them.
+ */
+export function servedLicenses(): Record<string, string> {
+  const pdfjs = packageDir("pdfjs-dist", root);
+  const files: [string, string][] = [
+    ["pdfjs-dist.txt", join(pdfjs, "LICENSE")],
+    ["pdfjs-openjpeg.txt", join(pdfjs, "wasm/LICENSE_PDFJS_OPENJPEG")],
+    ["openjpeg.txt", join(pdfjs, "wasm/LICENSE_OPENJPEG")],
+    ["pdfjs-jbig2.txt", join(pdfjs, "wasm/LICENSE_PDFJS_JBIG2")],
+    ["jbig2.txt", join(pdfjs, "wasm/LICENSE_JBIG2")],
+    ["core-js.txt", join(import.meta.dir, "licenses/core-js-LICENSE.txt")],
+  ];
+  return Object.fromEntries(files.map(([name, path]) => [name, unixText(path)]));
+}
+
+/**
+ * The scripts of the pdf.js worker, by the names `PDF_SCRIPTS` serves them from.
+ * The entry imports the two JavaScript image decoders before the worker, from
+ * the very addresses pdf.js will later import them by, so that all of the code
+ * is loaded when the worker starts and none is asked for afterwards.
+ */
+export function pdfScripts(): Record<string, string> {
+  const pdfjs = packageDir("pdfjs-dist", root);
+  const library = (path: string) => unixText(join(pdfjs, path)).replace(/\n\/\/# sourceMappingURL=.*\n?$/, "\n");
+  const entry = Object.keys(PDF_SCRIPTS).filter((path) => path !== "/pdf-worker.js").reverse();
+  return {
+    "pdf-worker.js": entry.map((path) => `import ${JSON.stringify(path)};\n`).join(""),
+    "pdf.worker.min.js": library("legacy/build/pdf.worker.min.mjs"),
+    "openjpeg_nowasm_fallback.js": library("wasm/openjpeg_nowasm_fallback.js"),
+    "jbig2_nowasm_fallback.js": library("wasm/jbig2_nowasm_fallback.js"),
+  };
+}
+
+/** pdf.js as the server holds it, made from the installed library, for a run from source and for tests. */
+export function servedPdf(): PdfAssets {
+  const files = pdfScripts();
+  return { scripts: Object.fromEntries(Object.entries(PDF_SCRIPTS).map(([path, file]) => [path, files[file]!])), data: pdfData(packageDir("pdfjs-dist", root)) };
 }
 
 /** What goes inside a script element: nothing in it may end the element or start another. */
@@ -84,6 +130,13 @@ function pageStyles(): string {
     ".stemma-pane{flex:0 0 clamp(20rem,40vw,40rem);box-sizing:border-box;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:#fff;border-left:1px solid #94a3b8}",
     ".stemma-pane-bar{padding:.4rem .75rem;border-bottom:1px solid #cbd5e1;font-size:.875rem;text-align:right}",
     ".stemma-pane .stemma-source{flex:1 1 auto;min-height:0;position:static;max-height:none;border:0}",
+    // A page's text with its original beside it, side by side where there is room, and then the panel takes more of it.
+    ".stemma-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:.75rem;align-items:start}.stemma-pair>*{min-width:0}",
+    "@media (min-width:60rem){.stemma-source:has(.stemma-pair){flex-basis:clamp(20rem,50vw,64rem)}.stemma-pane:has(.stemma-pair){flex-basis:clamp(20rem,62vw,72rem)}.stemma-pane .stemma-source:has(.stemma-pair){flex-basis:auto}}",
+    // The original stays in sight while the text beside it is read down to its highlight.
+    ".stemma-original{position:sticky;top:.5rem;margin-top:.75rem}.stemma-sheet{overflow:auto;max-height:78vh;border:1px solid #64748b;background:#e2e8f0}.stemma-sheet canvas{display:block;height:auto;background:#fff}",
+    ".stemma-unmarked{border-left:4px solid #b45309;background:#fffbeb;padding:.25rem .5rem;margin:.25rem 0}.stemma-zoom{font:inherit;color:#0f172a;background:#fff;border:1px solid #64748b;border-radius:4px;padding:0 .5rem;margin-left:.5rem;cursor:pointer}.stemma-zoom[aria-pressed=true]{background:#0f172a;color:#fff}",
+    ".stemma-no-original{border:1px solid #64748b;background:#f8fafc;padding:.5rem;margin:.5rem 0}",
     ".stemma-source-text{white-space:pre-wrap;border:1px solid #cbd5e1;background:#f8fafc;padding:.5rem;margin:.25rem 0}",
     // The printed page stays in sight while its text is scrolled to the highlight.
     ".stemma-page-heading{position:sticky;top:-.75rem;background:#fff;padding:.25rem 0}",
@@ -111,7 +164,7 @@ function pageStyles(): string {
  * script and styles as files of their own, none inline, and no data. The server
  * sends its content security policy as a header.
  */
-export async function buildServed(): Promise<{ html: string; js: string; css: string }> {
+export async function buildServed(): Promise<{ html: string; js: string; css: string; pdf: PdfAssets }> {
   const js = (await bundleHost("served.tsx")).script;
   const html = [
     "<!doctype html>",
@@ -133,7 +186,7 @@ export async function buildServed(): Promise<{ html: string; js: string; css: st
     "</html>",
     "",
   ].join("\n");
-  return { html, js, css: pageStyles() };
+  return { html, js, css: pageStyles(), pdf: servedPdf() };
 }
 
 export async function buildTemplate(): Promise<string> {

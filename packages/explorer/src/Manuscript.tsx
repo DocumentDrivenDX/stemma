@@ -77,7 +77,7 @@ function Statement({ view }: { view: ManuscriptView }) {
     <p role="note" className="stemma-statement">
       <strong>This is the manuscript as {served ? "Stemma read it from your files" : "the export read it"}, not the printed PDF.</strong>{" "}
       {view.inputs ? <>It is <code><Text value={view.inputs.template} /></code> and <code>{view.inputs.directory}/report.json</code>, assembled again with the project’s records and citation style; <code>report.md</code>, <code>report.pdf</code> and other report directories are not read. </> : null}
-      Originals are not opened yet. Choose a quotation, a note’s citation, or a bibliography entry to see its source.
+      {served ? "Where the original can be shown, its page is beside the converted text; the original is not highlighted." : "This offline file cannot show originals."} Choose a quotation, a note’s citation, or a bibliography entry to see its source.
     </p>
   );
 }
@@ -176,18 +176,28 @@ function CitedWork({ view, id }: { view: ManuscriptView; id: string }) {
   );
 }
 
-/** Every place the report cites the work of one bibliography entry. Nothing is highlighted here. */
-function EntryPane({ view, entry }: { view: ManuscriptView; entry: ManuscriptEntry & { source: string } }) {
+/** One bibliography entry's work: its first quotation in its source, and every place the report cites it. */
+function EntryPane({ view, entry, getView }: { view: ManuscriptView; entry: ManuscriptEntry & { source: string }; getView: GetSourceView }) {
+  const citationOf = (place: { note: number; citation: number }) => view.notes.find((n) => n.number === place.note)!.citations[place.citation]!;
+  // In the order the places are listed, then of those quoted with no citation. No text is matched to choose it.
+  const first = entry.places.flatMap((place) => citationOf(place).quotations)[0] ?? entry.quoted[0]?.quotation;
   return (
     <>
       <p><strong>Source:</strong> <CitedWork view={view} id={entry.source} /></p>
       <p className="st:my-1">{entry.text === undefined ? <Text value={entry.withheld ?? ""} /> : <Runs runs={inlineRuns(entry.text)} links />}</p>
-      <p role="note">Nothing is highlighted here. Choose a place to see the words it cites. This page does not open originals.</p>
-      <h3 className="st:mt-3 st:font-semibold">Where the report cites it: {entry.places.length} citation(s)</h3>
+      {first === undefined
+        ? <p role="note">The report quotes nothing from this work, so nothing is highlighted and no page of an original is shown.</p>
+        : (
+          <>
+            <p role="note">Shown first is the first quotation of this work in the report, in its source. <button type="button" className="stemma-back" onClick={() => goTo("stemma-places")}>Every place the report cites it</button> is listed after it.</p>
+            <QuotationSource view={view} id={first} getView={getView} />
+          </>
+        )}
+      <h3 id="stemma-places" tabIndex={-1} className="st:mt-3 st:font-semibold">Where the report cites it: {entry.places.length} citation(s)</h3>
       {entry.places.length === 0 ? <p>No note cites it. The bibliography lists it all the same.</p> : null}
       <ul className="stemma-places st:list-disc st:pl-5">
         {entry.places.map((place) => {
-          const citation = view.notes.find((n) => n.number === place.note)!.citations[place.citation]!;
+          const citation = citationOf(place);
           return (
             <li key={`${place.note}/${place.citation}`} className="st:my-1">
               <PaneLink to={{ kind: "citation", note: place.note, index: place.citation }}>Note {place.note}: {citationWords(citation, false)}</PaneLink>
@@ -221,7 +231,7 @@ function PaneBody({ view, route, getView }: { view: ManuscriptView; route: Exclu
   const listed = (source: string | undefined) => source !== undefined && view.bibliography.some((e) => e.source === source);
   if (route.kind === "source") {
     const entry = view.bibliography.find((e) => e.source === route.id);
-    return entry ? <EntryPane view={view} entry={{ ...entry, source: route.id }} /> : <Absent />;
+    return entry ? <EntryPane view={view} entry={{ ...entry, source: route.id }} getView={getView} /> : <Absent />;
   }
   if (route.kind === "citation") {
     const citation = view.notes.find((n) => n.number === route.note)?.citations[route.index];

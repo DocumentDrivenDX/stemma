@@ -26,6 +26,12 @@ export const STATES: Record<SourceViewState, string> = {
   not_exported: "Text left out of this export",
 };
 
+/**
+ * The original page beside one segment's text, which only the served page can
+ * show. It is given in, so that the offline page holds none of what draws it.
+ */
+export const ShowOriginal = createContext<((text: string, segment: PageSegment) => ReactNode) | undefined>(undefined);
+
 /** True in the served page, whose data comes from the project's files as they are, not from an export. */
 export const Served = createContext(false);
 
@@ -127,22 +133,32 @@ function Original({ original }: { original: ViewOriginal }) {
         ))}
       </ul>
       {original.other_page_files ? <p>{original.other_page_files} page image(s) of other pages are not listed.</p> : null}
-      <p className="st:text-slate-600">
-        This page does not open originals, and cannot say whether one is held: opening an original will come with the local server. <code>excerpt</code> says whether a copy is held.
-      </p>
     </section>
   );
 }
 
 function Passage({ passage, link }: { passage: SourceView; link: boolean }) {
   const text = passage.source_text!;
+  const showOriginal = useContext(ShowOriginal);
   return (
     <>
       {link ? <p className="st:mt-3"><a className="st:underline" href={`#/explore/stemma/Passage/${encodeURIComponent(passage.id)}`}>Passage record {passage.id}</a></p> : null}
       <p className="st:mt-2">
         <strong>Converted or recognized text, not a reading of the page.</strong> Method <Text value={text.method} />, recorded quality <Text value={text.level} />.
       </p>
-      {passage.segments.map((s) => <Page key={`${s.index} ${s.stream}`} segment={s} />)}
+      {showOriginal ? passage.segments.map((s) => (
+        <div key={`${s.index} ${s.stream}`} className="stemma-pair">
+          <div><Page segment={s} /></div>
+          {showOriginal(text.id, s)}
+        </div>
+      )) : (
+        <>
+          {passage.segments.map((s) => <Page key={`${s.index} ${s.stream}`} segment={s} />)}
+          <p role="note" className="stemma-no-original">
+            <strong>Original not shown: the offline file cannot show originals.</strong> <code>stemma browse</code> shows the original page beside this text where it holds the original and the page is established; <code>excerpt</code> says whether a copy is held.
+          </p>
+        </>
+      )}
       <details className="st:mt-2">
         <summary className="st:cursor-pointer st:underline">How the text was made</summary>
         {text.recognition === undefined ? null : <p><Text value={text.recognition} /></p>}

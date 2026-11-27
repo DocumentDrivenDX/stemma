@@ -4,6 +4,7 @@
 // which also answers arras's search query. Nothing here writes, opens a file, or
 // connects anywhere: a record ID is only looked up.
 import { createStaticClient, loadStore } from "@documentdrivendx/arras-ui/static";
+import { originalPage, recordedOriginals, type TextOriginal } from "../../core/src/original-pages.ts";
 import { ARRAS_SEARCH_QUERY, arrasAccepts, createSearch, queryOf, SEARCH_LIMITS, type SearchData } from "./search.ts";
 import type { Answer } from "./snapshots.ts";
 
@@ -15,6 +16,8 @@ export interface ServedData {
   views: Record<string, unknown>;
   manuscript: { state: string };
   search: SearchData;
+  /** What each source file records of its original, for the page it is and the digests that may be given. */
+  originals?: Record<string, TextOriginal>;
 }
 
 export const ARRAS_CALLS = ["version", "viewer", "meta", "status", "schemaCatalog", "export"] as const;
@@ -37,6 +40,8 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
   const client = createStaticClient(await loadStore(data.moduleText, data.graphText), data.moduleText);
   const { banner, views, manuscript, data_identity } = data;
   const search = createSearch(data.search);
+  const texts = data.originals ?? {};
+  const recorded = recordedOriginals(texts);
   const moduleName = (JSON.parse(data.moduleText) as { id: string }).id;
   // What arras says of its answers' freshness and revision, taken from one answer of its own.
   const probe = await client.moduleQuery(moduleName, 'query { _search(text: "zz", limit: 1) { freshness { backend asOf at consistency } } }');
@@ -71,6 +76,13 @@ export async function answersOf(data: ServedData, mostBytes: number = MOST_ANSWE
     if (!isObject(body)) return BAD;
     if (route === "boot") return ok({ banner, manuscript_state: manuscript.state });
     if (route === "manuscript") return ok(manuscript);
+    if (route === "original-page") {
+      const { text, index } = body;
+      if (Object.keys(body).some((key) => key !== "text" && key !== "index") || typeof text !== "string" || !wholeFrom(index, 0, Number.MAX_SAFE_INTEGER)) return BAD;
+      return ok(Object.hasOwn(texts, text) ? originalPage(texts[text]!, index) : null);
+    }
+    // Asked by the command alone, for `/original`: the page cannot name this call.
+    if (route === "original-record") return ok(typeof body.sha256 === "string" ? recorded.get(body.sha256) : null);
     if (route === "source-view") {
       if (typeof body.id !== "string") return BAD;
       return ok(Object.hasOwn(views, body.id) ? views[body.id] : null);

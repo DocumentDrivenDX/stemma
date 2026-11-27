@@ -599,11 +599,12 @@ emphasis and a bare `http` or `https` address a link as in K; in a quotation onl
 the italics its list entry names are applied. A quotation, a citation, and a
 bibliography entry each open a pane at their own route. The pane shows quotation
 views under the K rules with the components of the record's source panel, taking
-passage views from `stemma.sourceviews.json`. A bibliography entry's pane lists
-its places and then shows one quotation of the work in its source, as a quotation
-pane does, saying which it is: the first the places list in order, else the first
-quoted without a citation of its own. The others open from the list. When the
-report quotes nothing from the work, the pane says so and highlights nothing. On a narrow screen the pane lies over
+passage views from `stemma.sourceviews.json`. A bibliography entry's pane shows
+one quotation of the work in its source, as a quotation pane does, saying which
+it is: the first in the order of its places, else the first quoted without a
+citation of its own. It then lists every place, and the others open from the
+list. When the report quotes nothing from the work, the pane says so and
+highlights nothing. On a narrow screen the pane lies over
 the lower part of the window and can be closed. The content security policy (D)
 is unchanged and the page sends no request.
 
@@ -644,7 +645,7 @@ for by a digest the snapshot records, in places the command was given
 | Method and path | Body | Answer |
 |---|---|---|
 | `GET /`, `GET /app.js`, `GET /app.css` | none | The page shell, script, and styles. They hold no project data |
-| `GET /pdf-worker.js`, `GET /pdfjs/pdf.worker.min.mjs`, `GET /pdfjs/openjpeg_nowasm_fallback.js`, `GET /pdfjs/jbig2_nowasm_fallback.js` | none | The pinned pdf.js worker and its two image decoders. They hold no project data |
+| `GET /pdf-worker.js`, `GET /pdfjs/pdf.worker.min.js`, `GET /pdfjs/openjpeg_nowasm_fallback.js`, `GET /pdfjs/jbig2_nowasm_fallback.js` | none | The pinned pdf.js worker and its two image decoders. They hold no project data |
 | `POST /api/session` | `{}`, signed with the one-time code | `{"secret"}`, once; after that the refusal `code_used` or `code_expired` |
 | `POST /api/status` | `{}` | `{"state": "current" \| "rebuilding" \| "failed", "data_identity"?, "message"?}` |
 | `POST /api/boot` | `{}` | Banner data and the manuscript view's state |

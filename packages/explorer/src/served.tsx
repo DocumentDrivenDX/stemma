@@ -5,16 +5,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { ManuscriptView } from "../../core/src/manuscript-view.ts";
-import type { SourceView } from "../../core/src/source-view.ts";
+import type { PageSegment, SourceView } from "../../core/src/source-view.ts";
 import type { BannerData } from "../../graph/src/export.ts";
 import { Explorer } from "./app.tsx";
 import { Banner } from "./Banner.tsx";
 import { foldingClient } from "./client.ts";
 import { Manuscript } from "./Manuscript.tsx";
+import { Original, originalSource } from "./Original.tsx";
+import { type PdfEngine, startPdfEngine } from "./pdf-engine.ts";
 import { SearchView } from "./Search.tsx";
 import { CallFailed, isSearch, noSchemaApi, type Read, readsOf, type Redemption, remoteClient, Server, takeCode } from "./remote.ts";
 import type { ManuscriptRoute, SearchRoute } from "./route.ts";
-import { type GetSourceView, Served, Text, useLoaded } from "./SourcePanel.tsx";
+import { type GetSourceView, Served, ShowOriginal, Text, useLoaded } from "./SourcePanel.tsx";
 
 /** How often the page asks whether its data is still current, shown or hidden. */
 const POLL_MS = 2000;
@@ -94,7 +96,7 @@ function ServedManuscript({ read, route, getView }: { read: Read; route: Manuscr
 }
 
 /** One snapshot's pages. Give it a key of its number, so that nothing of another stays. */
-function Ready({ server, loaded, lost }: { server: Server; loaded: Loaded; lost(error: CallFailed): void }) {
+function Ready({ server, loaded, lost, pdf }: { server: Server; loaded: Loaded; lost(error: CallFailed): void; pdf: PdfEngine }) {
   const lostNow = useRef(lost);
   lostNow.current = lost;
   const made = useMemo(() => {
@@ -111,18 +113,26 @@ function Ready({ server, loaded, lost }: { server: Server; loaded: Loaded; lost(
         return folding.moduleQuery(module, query, variables);
       },
     };
-    return { read, getView, client, search: { view: (route: SearchRoute) => <SearchView read={read} route={route} />, last: () => typed } };
+    const originals = originalSource(server, read, pdf, (error) => lostNow.current(error));
+    return {
+      read, getView, client, originals, search: { view: (route: SearchRoute) => <SearchView read={read} route={route} />, last: () => typed },
+      showOriginal: (text: string, segment: PageSegment) => <Original source={originals} text={text} segment={segment} />,
+    };
   }, []);
+  // What was held of this data's originals is let go with it.
+  useEffect(() => () => made.originals.close(), []);
   return (
-    <div className="stemma-page">
-      <Banner data={loaded.banner} served />
-      <Explorer client={made.client} schemaApi={noSchemaApi} getView={made.getView} search={made.search}
-        manuscript={loaded.manuscript ? (route) => <ServedManuscript read={made.read} route={route} getView={made.getView} /> : undefined} />
-    </div>
+    <ShowOriginal value={made.showOriginal}>
+      <div className="stemma-page">
+        <Banner data={loaded.banner} served />
+        <Explorer client={made.client} schemaApi={noSchemaApi} getView={made.getView} search={made.search}
+          manuscript={loaded.manuscript ? (route) => <ServedManuscript read={made.read} route={route} getView={made.getView} /> : undefined} />
+      </div>
+    </ShowOriginal>
   );
 }
 
-function App({ server, code }: { server: Server; code: Promise<Redemption | undefined> }) {
+function App({ server, code, pdf }: { server: Server; code: Promise<Redemption | undefined>; pdf: PdfEngine }) {
   const [phase, setPhase] = useState<Phase>({ kind: "opening" });
   const [covered, setCovered] = useState(false);
   const lost = useRef<(error: CallFailed) => void>(() => {});
@@ -246,7 +256,7 @@ function App({ server, code }: { server: Server; code: Promise<Redemption | unde
     <>
       {covered ? <Notice title="Checking that this is current"><p>The page has not heard from Stemma for a while, so what it showed is covered until it has.</p></Notice> : null}
       <div hidden={covered}>
-        <Ready key={phase.loaded.number} server={server} loaded={phase.loaded} lost={(error) => lost.current(error)} />
+        <Ready key={phase.loaded.number} server={server} loaded={phase.loaded} lost={(error) => lost.current(error)} pdf={pdf} />
       </div>
     </>
   );
@@ -256,5 +266,7 @@ function App({ server, code }: { server: Server; code: Promise<Redemption | unde
 const given = takeCode();
 const server = new Server();
 const exchanged = given === undefined ? Promise.resolve(undefined) : server.exchange(given);
+// Started now, so that all of its code is loaded with the page's own (CONTRACT-005 M, "Originals").
+const pdf = startPdfEngine();
 
-createRoot(document.getElementById("root")!).render(<Served value={true}><App server={server} code={exchanged} /></Served>);
+createRoot(document.getElementById("root")!).render(<Served value={true}><App server={server} code={exchanged} pdf={pdf} /></Served>);

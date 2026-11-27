@@ -26,7 +26,7 @@ export interface Signed {
 }
 
 /** The proof of an answer to one signed request. */
-export type Prove = (status: number, body: string) => string;
+export type Prove = (status: number, body: string | Uint8Array) => string;
 
 function signedWith(key: string, tags: TagPair, request: Signed): boolean {
   if (!NONCE_SHAPE.test(request.nonce) || !MAC_SHAPE.test(request.mac)) return false;
@@ -36,7 +36,7 @@ function signedWith(key: string, tags: TagPair, request: Signed): boolean {
 }
 
 const proverOf = (key: string, tags: TagPair, { nonce, path }: Signed): Prove =>
-  (status, body) => hmac(key, responseMessage(tags, nonce, path, status, sha256(Buffer.from(body, "utf8")))).toString("base64url");
+  (status, body) => hmac(key, responseMessage(tags, nonce, path, status, sha256(typeof body === "string" ? Buffer.from(body, "utf8") : body))).toString("base64url");
 
 export type Redeemed = { prove: Prove } & ({ secret: string } | { refused: "code_used" | "code_expired" });
 export interface Admitted {
