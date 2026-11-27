@@ -2,7 +2,7 @@
 // outside it is refused with its position, never dropped or passed through.
 import { isRecordId } from "@stemma/records";
 import { type Attributes, readAttributes } from "./attributes.ts";
-import { malformed, type Position, unsupported } from "./model.ts";
+import { a, checkLabel, malformed, noteKindOf, type Position, unsupported } from "./model.ts";
 
 /** One line of a block's content, with where its first character lies in the file. */
 export interface Line extends Position { text: string }
@@ -104,10 +104,11 @@ function parse(lines: Line[], context: Context, chapter: RawChapter, out: RawBlo
 
     const note = NOTE.exec(line.text);
     if (note) {
-      if (context.note || context.quote || context.list) throw unsupported("footnote definition inside another block", where(line));
       const label = note[1]!;
-      if (label.startsWith("en-")) throw unsupported("endnote", where(line));
-      if (chapter.notes.has(label)) throw malformed("a footnote is defined twice", where(line));
+      const kind = noteKindOf(label);
+      if (context.note || context.quote || context.list) throw unsupported(`${kind} definition inside another block`, where(line));
+      checkLabel(label, where(line));
+      if (chapter.notes.has(label)) throw malformed(`${a(kind)} is defined twice`, where(line));
       const content = [cut(line, note[0].length)];
       for (i++; i < lines.length; i++) {
         const next = lines[i]!;
@@ -117,7 +118,7 @@ function parse(lines: Line[], context: Context, chapter: RawChapter, out: RawBlo
           content.push({ ...next, text: "" });
         } else if (indentOf(next.text) >= 2) content.push(next);
         else if (interrupts(next.text)) break;
-        else throw unsupported("footnote continuation line that is not indented", where(next));
+        else throw unsupported(`${kind} continuation line that is not indented`, where(next));
       }
       // Continuation lines share one indentation; the first line has already lost its label.
       const indent = Math.min(...content.slice(1).filter((l) => !blank(l)).map((l) => indentOf(l.text)));

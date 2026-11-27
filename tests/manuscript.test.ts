@@ -96,6 +96,29 @@ describe("sentences (SD-007 BR-711 to BR-713)", () => {
     expect(read.sentences.map((s) => [s.text, keys(s.citations)])).toEqual([["The toll rose.", ["a1", "b2"]], ["It fell.", []]]);
   });
 
+  test("an endnote is read as a footnote is, and each note keeps its kind", () => {
+    // Labels of equal length, so that every position is the same in both.
+    const text = (first: string, second: string) =>
+      `[The toll rose.[^${first}]]{.claim ids="clm-fixture0claim001"} It fell.[^${second}]\n\n`
+      + `[^${first}]: [@a1 page="3"].\n[^${second}]: The roll says "less" there.[@b2 page="4"]\n\n  It says no more.\n`;
+    const foot = chapter(text("abc1", "abc2"));
+    const end = chapter(text("en-1", "en-2"));
+    const unlabelled = (read: typeof foot) => JSON.parse(JSON.stringify(read, (key, value) => (key === "note" || key === "noteKind" ? undefined : value)));
+    expect(unlabelled(end)).toEqual(unlabelled(foot));
+    expect(keys(end.claims[0]!.citations)).toEqual(["a1"]);
+    expect(end.quotations.map((q) => [q.text, q.citation?.key])).toEqual([["less", "b2"]]);
+    for (const [read, kind] of [[foot, "footnote"], [end, "endnote"]] as const) {
+      expect(read.blocks.map((b) => b.noteKind)).toEqual([undefined, kind, kind, kind]);
+      expect(read.sentences.map((s) => s.noteKind)).toEqual([undefined, undefined, kind, kind]);
+    }
+  });
+
+  test("footnotes and endnotes in one chapter each keep their own kind", () => {
+    const read = chapter("One.[^1] Two.[^en-1]\n\n[^en-1]: At the end.\n\n[^1]: At the foot.\n");
+    expect(read.sentences.filter((s) => s.note).map((s) => [s.text, s.note, s.noteKind]))
+      .toEqual([["At the end.", "en-1", "endnote"], ["At the foot.", "1", "footnote"]]);
+  });
+
   test("equal citations in one sentence are told apart by their ordinal", () => {
     const read = chapter('Twice [@a1 page="3"] and again [@a1 page="3"] and [@a1 page="4"].\n');
     expect(read.citations.map((c) => c.ordinal)).toEqual([0, 1, 0]);
@@ -188,7 +211,7 @@ describe("anything else is refused with its position", () => {
     ["a link", "See [this](http://example.org).\n"], ["an image", "![alt](a.png)\n"], ["a code span", "Run `this`.\n"],
     ["a code fence", "```\ncode\n```\n"], ["indented code", "    code\n"], ["a thematic break", "One.\n\n---\n"],
     ["an underlined heading", "Title\n=====\n"], ["a table", "| a | b |\n|---|---|\n"], ["a deep heading", "##### Deep\n"],
-    ["an endnote", "A.[^en-1]\n"], ["a figure", "::: figure {#fig-a}\nCaption\n:::\n"], ["a cross-reference", "[](#sec-a){.ref}\n"],
+    ["a figure", "::: figure {#fig-a}\nCaption\n:::\n"], ["a cross-reference", "[](#sec-a){.ref}\n"],
     ["an index entry", '[]{.index term="x"}\n'], ["an unknown class", "[x]{.loud}\n"], ["a character reference", "A &amp; B.\n"],
     ["an unknown citation attribute", '[@a1 pg="2"]\n'], ["a lazy quotation line", "> One\ntwo\n"],
   ];
@@ -205,10 +228,23 @@ describe("anything else is refused with its position", () => {
     ["two locators", '[@a1 page="1" folio="2"]\n'], ["overlapping claims", '[[a]{.claim ids="clm-fixture0claim001"}]{.claim ids="clm-fixture0claim002"}\n'],
     ["a claim without a claim ID", '[a]{.claim ids="src-fixture0claim001"}\n'], ["a cite out of range", '["a"]{.quote cite="3"} [@a1].\n'],
     ["a marker without a note", "A.[^1]\n"], ["a note without a marker", "A.\n\n[^1]: Lost.\n"],
+    ["an endnote marker without a note", "A.[^en-1]\n"], ["an endnote without a marker", "A.\n\n[^en-1]: Lost.\n"],
+    ["an endnote defined twice", "A.[^en-1]\n\n[^en-1]: One.\n\n[^en-1]: Two.\n"],
+    ["an endnote label with nothing after en-", "A.[^en-]\n\n[^en-]: One.\n"],
     ["a misplaced attribute line", '{lang="fr"}\nText.\n'], ["an unclosed unconverted block", '::: unconverted {id="itm-fixture0item0001"}\n'],
   ];
   for (const [what, text] of malformed) {
     test(what, () => expect(read(text).problems.map((p) => p.code)).toEqual(["manuscript_syntax"]));
+  }
+
+  const nested: [string, string, string][] = [
+    ["an endnote in a footnote", "A.[^1]\n\n[^1]: B.[^en-1]\n\n[^en-1]: C.\n", "endnote inside a footnote"],
+    ["a footnote in an endnote", "A.[^en-1]\n\n[^en-1]: B.[^1]\n\n[^1]: C.\n", "footnote inside an endnote"],
+    ["an endnote referred to twice", "A.[^en-1] B.[^en-1]\n\n[^en-1]: C.\n", "an endnote referred to twice"],
+    ["an endnote defined in a list", "- A.[^en-1]\n\n  [^en-1]: C.\n", "endnote definition inside another block"],
+  ];
+  for (const [what, text, detail] of nested) {
+    test(what, () => expect(read(text).problems.map((p) => [p.code, p.detail])).toEqual([["manuscript_unsupported", detail]]));
   }
 
   test("the position is the file's line and column, and a problem holds no manuscript text", () => {

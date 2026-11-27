@@ -1,8 +1,8 @@
 // A block's inline content: its plain text, and where the citations, footnote
-// markers and marked spans lie in it (CONTRACT-006 B and C).
+// and endnote markers, and marked spans lie in it (CONTRACT-006 B and C).
 import { type CitationItem, readAttributes, readCluster, type SpanAttributes, spanAttributes } from "./attributes.ts";
 import { type Line } from "./blocks.ts";
-import { malformed, type Position, unsupported } from "./model.ts";
+import { checkLabel, malformed, type Position, unsupported } from "./model.ts";
 
 export interface Cluster extends Position { offset: number; items: CitationItem[] }
 export interface Marker extends Position { offset: number; label: string }
@@ -106,11 +106,11 @@ export function readInline(lines: Line[]): Inline {
       pieces.push({ text: c.repeat(n), at: at(i), run });
       i += n;
     } else if (c === "[") {
-      const footnote = /^\[\^([^\]\s]+)\]/.exec(rest);
-      if (footnote) {
-        if (footnote[1]!.startsWith("en-")) throw unsupported("endnote", at(i));
-        markers.push({ ...at(i), piece: pieces.length, label: footnote[1]! });
-        i += footnote[0].length;
+      const note = /^\[\^([^\]\s]+)\]/.exec(rest);
+      if (note) {
+        checkLabel(note[1]!, at(i));
+        markers.push({ ...at(i), piece: pieces.length, label: note[1]! });
+        i += note[0].length;
       } else if (source[i + 1] === "@") {
         const { items, end } = readCluster(source, i, at(i));
         clusters.push({ ...at(i), piece: pieces.length, items });

@@ -13,7 +13,7 @@ import { spanAttributes } from "./attributes.ts";
 import { type Line, type QuoteGroup, type RawBlock, readBlocks } from "./blocks.ts";
 import { type Inline, readInline, type Span } from "./inline.ts";
 import {
-  type Chapter, type Citation, malformed, type Manuscript, type ManuscriptProblem, type Position, Refusal, type Sentence, unsupported,
+  a, type Chapter, type Citation, malformed, type Manuscript, type ManuscriptProblem, noteKindOf, type Position, Refusal, type Sentence, unsupported,
 } from "./model.ts";
 import { doubleQuotes, type Range, splitSentences } from "./sentences.ts";
 
@@ -28,7 +28,7 @@ const bare = (text: string): string => {
   return /^(?:".*"|“.*”)$/s.test(trimmed) ? trimmed.slice(1, -1) : trimmed;
 };
 
-/** One block with its sentences, before footnotes are attached. */
+/** One block with its sentences, before notes are attached. */
 interface Parsed {
   raw: RawBlock;
   index: number;
@@ -57,7 +57,8 @@ function readChapter(path: string, id: string, source: string): Chapter {
       : readInline(block.lines);
     chapter.blocks.push({
       kind: block.kind, line: block.line, column: block.column, quoted: block.quote !== undefined, list: block.list, text: inline.text,
-      ...(block.level ? { level: block.level } : {}), ...(block.id ? { id: block.id } : {}), ...(block.note ? { note: block.note } : {}),
+      ...(block.level ? { level: block.level } : {}), ...(block.id ? { id: block.id } : {}),
+      ...(block.note ? { note: block.note, noteKind: noteKindOf(block.note) } : {}),
     });
     const marked = inline.spans.filter((s) => s.attributes.mark === "quote");
     // Unconverted text is carried, not read, so it has no sentences.
@@ -79,7 +80,7 @@ function readChapter(path: string, id: string, source: string): Chapter {
       const text = normalizeSentence(parsed.inline.text.slice(range.start, range.end));
       return {
         text, sha256: sha256(text), block: parsed.index, citations: [], ...parsed.inline.positionAt(range.start),
-        ...(parsed.raw.note ? { note: parsed.raw.note } : {}),
+        ...(parsed.raw.note ? { note: parsed.raw.note, noteKind: noteKindOf(parsed.raw.note) } : {}),
       };
     });
   }
@@ -98,7 +99,7 @@ function readChapter(path: string, id: string, source: string): Chapter {
     return citation;
   };
 
-  /** Clusters and footnote markers of one block, in reading order. */
+  /** Clusters and note markers of one block, in reading order. */
   const walk = (parsed: Parsed, carrier?: { sentence: Sentence; block: number; offset: number }) => {
     const events = [
       ...parsed.inline.clusters.map((c) => ({ offset: c.offset, line: c.line, column: c.column, cluster: c })),
@@ -114,11 +115,12 @@ function readChapter(path: string, id: string, source: string): Chapter {
         }
         continue;
       }
-      if (parsed.raw.note) throw unsupported("footnote inside a footnote", event);
       const { label } = event.marker;
+      const kind = noteKindOf(label);
+      if (parsed.raw.note) throw unsupported(`${kind} inside ${a(noteKindOf(parsed.raw.note))}`, event);
       const note = notes.get(label);
-      if (!note) throw malformed("a footnote marker has no definition", event);
-      if (referenced.has(label)) throw unsupported("a footnote referred to twice", event);
+      if (!note) throw malformed(`${a(kind)} marker has no definition`, event);
+      if (referenced.has(label)) throw unsupported(`${a(kind)} referred to twice`, event);
       referenced.add(label);
       const only = citationOnly(label);
       for (const block of note.blocks) {
@@ -135,7 +137,7 @@ function readChapter(path: string, id: string, source: string): Chapter {
   };
   for (const parsed of body) walk(parsed);
   for (const [label, note] of notes) {
-    if (!referenced.has(label)) throw malformed("a footnote is defined but never referred to", note.at);
+    if (!referenced.has(label)) throw malformed(`${a(noteKindOf(label))} is defined but never referred to`, note.at);
   }
 
   const within = (parsed: Parsed, span: Range): Citation[] => placed

@@ -24,15 +24,24 @@ export interface Citation extends Position {
   ordinal: number;
 }
 
+/** Which kind of note a label names (CONTRACT-006 E). Both are read alike; a build prints them in different places. */
+export type NoteKind = "footnote" | "endnote";
+
+export const noteKindOf = (label: string): NoteKind => (label.startsWith("en-") ? "endnote" : "footnote");
+
+/** The kind with its article, for what a problem says. */
+export const a = (kind: NoteKind): string => (kind === "endnote" ? "an endnote" : "a footnote");
+
 export interface Sentence extends Position {
   /** Plain text without citations or marker syntax, normalized (CONTRACT-001 E). */
   text: string;
   sha256: string;
   block: number;
-  /** The footnote label, for a sentence inside a footnote. */
+  /** The note's label, for a sentence inside a footnote or an endnote. */
   note?: string;
+  noteKind?: NoteKind;
   /**
-   * Citations in reading order. A footnote that holds only citations adds them
+   * Citations in reading order. A note that holds only citations adds them
    * here, at its marker.
    */
   citations: Citation[];
@@ -48,7 +57,9 @@ export interface Block extends Position {
   id?: string;
   quoted: boolean;
   list: boolean;
+  /** The label of the note that holds it. */
   note?: string;
+  noteKind?: NoteKind;
   /** Plain text. For an unconverted block, its lines as written. */
   text: string;
 }
@@ -103,3 +114,8 @@ export class Refusal extends Error {
 
 export const unsupported = (detail: string, at: Position) => new Refusal("manuscript_unsupported", detail, at);
 export const malformed = (detail: string, at: Position) => new Refusal("manuscript_syntax", detail, at);
+
+/** `en-` with nothing after it is neither an endnote label nor a footnote label. */
+export function checkLabel(label: string, at: Position): void {
+  if (label === "en-") throw malformed("an endnote label has text after `en-`", at);
+}
