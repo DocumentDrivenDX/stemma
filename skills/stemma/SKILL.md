@@ -267,12 +267,12 @@ reported as unchecked.
 ## Editing a manuscript in a shared doc
 
 When the author wants to edit or discuss a manuscript file in a Claude Doc, or
-bring a reviewer's doc edits back, use the `docsync` skill. It is a separate
-DocumentDrivenDX plugin. Do not sync by exporting a doc over the file or by
-copying text across by hand. If the skill is not available, say that shared
-editing needs the docsync plugin (https://github.com/DocumentDrivenDX/docsync),
-install it only if the author asks, and carry on in the file. Nothing else in
-Stemma needs it.
+bring a reviewer's doc edits back, use the `docsync` skill. It comes from a
+separate plugin that Claude Code installs with Stemma. Do not sync by exporting a
+doc over the file or by copying text across by hand. If the skill is not
+available, say that shared editing needs the docsync plugin
+(https://github.com/DocumentDrivenDX/docsync), install it only if the author
+asks, and carry on in the file. Nothing else in Stemma uses it.
 
 - Before the first doc, tell the author it is a hosted copy of the whole
   manuscript, quotations included.

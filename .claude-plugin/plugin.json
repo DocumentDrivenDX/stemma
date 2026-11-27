@@ -9,5 +9,6 @@
   "homepage": "https://github.com/DocumentDrivenDX/stemma",
   "repository": "https://github.com/DocumentDrivenDX/stemma",
   "license": "MIT",
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "dependencies": ["docsync"]
 }

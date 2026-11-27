@@ -32,10 +32,10 @@ manuscript cases handled and nothing specific to Stemma or HELIX. Stemma adds no
 sync code. Its skill says when to use docsync and what Stemma does around it:
 run `check` after edits land, and say what that check does not read.
 
-Shared editing is optional. Writing, checks, and builds never need it. docsync is
-listed in the DocumentDrivenDX marketplace as `docsync@documentdrivendx`. Stemma
-declares no plugin dependency on it; an author who wants shared editing installs
-it too.
+Stemma's manifest declares docsync, listed in the same DocumentDrivenDX
+marketplace, as a dependency, so installing Stemma with Claude Code installs it
+too. It declares no version range. Using shared editing stays optional: writing,
+checks, and builds call nothing in docsync.
 
 ## Why We Chose This
 
@@ -52,10 +52,15 @@ serve Stemma, HELIX, and other repositories, and a copy in each would drift.
 **Good**: One sync engine, on the runtime Stemma already pins. The manuscript
 stays plain Markdown in the repository (ADR-009).
 
-**Trade-offs**: A second plugin to install, against ADR-004's single
-installation, unless Stemma declares it as a dependency; Codex documents no plugin
-dependencies, so its users would install both. docsync fetches its own copy of
-Bun. The shared document is a hosted copy of the whole manuscript, quotations
+**Trade-offs**: Claude Code does not load Stemma while docsync is missing, even
+for an author who never shares a document, and every Stemma install takes docsync's
+latest published version. An update does not always add a new dependency: in
+Claude Code 2.1.236, updating an installed Stemma left docsync missing and Stemma
+not loaded until `claude plugin install stemma@documentdrivendx` was run again.
+The [plugin dependency documentation](https://code.claude.com/docs/en/plugins/dependencies)
+says `claude plugin update` installs a missing dependency from 2.1.319.
+Codex documents no plugin dependencies, so its users would install both. docsync
+fetches its own copy of Bun. The shared document is a hosted copy of the whole manuscript, quotations
 included, so the author is told before it is made (FR-61 concerns what Stemma
 prepares for a hosted model, not this copy). Footnotes appear in the document as
 plain text. docsync does not know CONTRACT-006: an editor can change or remove a
@@ -77,8 +82,11 @@ manuscript exported over its file; Stemma saying that landed edits were checked.
 **Result**: partly tested
 **Evidence**: On one invented chapter in CONTRACT-006 markup, a docsync round
 trip landed doc edits in the file and wrote repository edits back, through the
-docs tools. The plugin installed from the marketplace on GitHub and its command
-line ran. Typing in the Docs interface, a real manuscript, Windows, Codex, and a
+docs tools. docsync installed from the marketplace on GitHub and its command
+line ran. With Claude Code 2.1.236 and a local copy of that marketplace,
+installing a build of Stemma installed docsync too, and the update behaved as
+above. The desktop app's handling of the dependency, and of an update, is
+untested. Typing in the Docs interface, a real manuscript, Windows, Codex, and a
 live session using the installed skill are untested.
 
 ## Concern Impact
