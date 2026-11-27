@@ -41,8 +41,9 @@ claude plugin install stemma@documentdrivendx
 ```
 
 That also installs [docsync](https://github.com/DocumentDrivenDX/docsync), which
-Stemma uses when you want to edit a manuscript with others in a Claude Doc. If an
-update leaves Claude saying that docsync is not installed, install it by name:
+Stemma uses when you want to edit a manuscript with others, in a Claude Doc or in
+a Word file in a shared OneDrive, Dropbox or iCloud Drive folder. If an update
+leaves Claude saying that docsync is not installed, install it by name:
 
 ```sh
 claude plugin install docsync@documentdrivendx

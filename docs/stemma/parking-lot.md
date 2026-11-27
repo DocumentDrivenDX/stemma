@@ -64,7 +64,7 @@ distorting current commitments.
 - **Artifact Type**: Feature Spec
 - **Source**: PRD P2
 - **Rationale**: v1 serves one author with reviewers; shared editing adds conflict and permission rules.
-- **Impact if Omitted**: Co-authors work through git branches and the PDF.
+- **Impact if Omitted**: Co-authors work through git branches, the PDF, or a manuscript file shared through docsync (ADR-011), which is one author's repository with others editing its text, not a shared corpus.
 - **Dependencies**: FEAT-001, FEAT-002
 - **Revisit Trigger**: Two pilot authors need concurrent edits on one project.
 - **Target Activity/Milestone**: After v1
@@ -148,7 +148,7 @@ distorting current commitments.
 - **Artifact Type**: Feature Spec
 - **Source**: PRD P2, FR-40
 - **Rationale**: The owner deferred manuscript export past v1. No native Word export from Typst was found.
-- **Impact if Omitted**: Co-authors and publishers who need an editable format get none from Stemma. Legacy bibliography export (FR-13) is unaffected.
+- **Impact if Omitted**: Co-authors and publishers who need an editable format get no publication export from Stemma. A manuscript file can be shared as a Word file through docsync (ADR-011), which shows its markers as text. Legacy bibliography export (FR-13) is unaffected.
 - **Dependencies**: FEAT-008
 - **Revisit Trigger**: A pilot author's co-author or press requires an editable format; decide then what each format must keep.
 - **Target Activity/Milestone**: After v1

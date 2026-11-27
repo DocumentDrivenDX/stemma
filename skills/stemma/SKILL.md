@@ -341,21 +341,27 @@ author has a recognition tool, use its output with `--method ocr` and name it;
 otherwise the author types the passages (`--method manual`) or the citation stays
 reported as unchecked.
 
-## Editing a manuscript in a shared doc
+## Editing a manuscript in a shared doc or Word file
 
 When the author wants to edit or discuss a manuscript file in a Claude Doc, or
-bring a reviewer's doc edits back, use the `docsync` skill. It comes from a
-separate plugin that Claude Code installs with Stemma. Do not sync by exporting a
-doc over the file or by copying text across by hand. If the skill is not
-available, say that shared editing needs the docsync plugin
+keep it in step with a Word file that co-authors edit, such as one in a OneDrive,
+Dropbox or iCloud Drive folder, or bring a reviewer's edits back, use the
+`docsync` skill. It comes from a separate plugin that Claude Code installs with
+Stemma. Word files need docsync 0.2.0 or later; if the installed one has no Word
+commands, tell the author it needs updating. Do not sync by exporting a doc or
+converting a Word file over the manuscript, or by copying text across by hand. If
+the skill is not available, say that shared editing needs the docsync plugin
 (https://github.com/DocumentDrivenDX/docsync), install it only if the author
 asks, and carry on in the file. Nothing else in Stemma uses it.
 
 - Before the first doc, tell the author it is a hosted copy of the whole
-  manuscript, quotations included.
-- Editors can change quotations and citations in the doc. Never repair or retype
-  one yourself; show the author each such change in the diff, and capture new
-  evidence by passage address as usual.
+  manuscript, quotations included. Before the first Word file in a shared folder,
+  tell them everyone with access to the folder can read it.
+- Never bind a Word file that `takeover` read as an original: a push would change
+  it, and Stemma does not change originals. Make a separate copy to share.
+- Editors can change quotations and citations in the doc or Word file. Never
+  repair or retype one yourself; show the author each such change in the diff,
+  and capture new evidence by passage address as usual.
 - After edits land, update the affected records and run `check`. Say that
   `check` reads the records and source files, not the manuscript text, so a
   quotation or citation changed only in the manuscript is not detected.
