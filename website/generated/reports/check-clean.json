@@ -4,7 +4,8 @@
     "inputs": {
       "corpus_sha256": "346d6b1d95802875d0246421c25d629ef35799eae0e8a0cd74b72ccf2dbb49cd",
       "manuscript": [],
-      "profiles": []
+      "profiles": [],
+      "research": []
     },
     "label": "checked_clean",
     "mode": "work",

@@ -31,6 +31,7 @@ The plugin runs this through its launcher: sh scripts/stemma.sh <data directory>
   check [--changed | --all]
   excerpt --source <id> --pages <printed pages> | --passage <id>
   retire <record id...> --reason <text> --actor <kind>:<name> [--replaced-by <id>]
+  research list
 
 Options: --project <dir> (default: nearest ancestor holding stemma.json), --format text|json
 Only ingest --fetch, ingest --refresh-lookups and resolve use the network.

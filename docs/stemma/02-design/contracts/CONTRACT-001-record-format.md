@@ -70,7 +70,8 @@ DocumentDrivenDX schema format) core `0.10.0` document using the `umf.ddd`
 | `records/<kind directory>/<id>.json` | One record per file | yes |
 | `manuscript/` | Stemma's own copy of the manuscript, one marked-up Markdown file per chapter (CONTRACT-006) | yes |
 | `sources/<name>/` | Source files: a manifest record and its page or section files (CONTRACT-007) | yes |
-| `.gitattributes` | `eol=lf` for the five paths above | yes |
+| `research/` | Research notes: Markdown that is not a record (L) | yes |
+| `.gitattributes` | `eol=lf` for the five paths above, and for `research/**/*.md` | yes |
 | `.stemma/` | Derived index, reports, and the originals cache `originals/<sha256>` | no |
 | `build/` | Build outputs and graph exports (CONTRACT-005) | no, except as CONTRACT-005 allows |
 
@@ -438,6 +439,31 @@ records cite rules by that ID.
 Any record MAY hold `x`, an object whose keys are namespaced `<owner>.<name>`.
 It is outside the UMF schema. Another unknown field is reported as a warning.
 A writer MUST preserve unknown fields.
+
+### L. Research notes
+
+A research note is working prose: a search write-up, a source inventory, a
+thesis test, open questions. It is not a record. It is not source text or
+evidence, nothing cites it, and it admits no source and records no search or
+decision. The corpus digest (E) leaves it out; a check report lists note
+digests beside it, because `coordinate.stray` reads notes (CONTRACT-002 C). The
+rule on restricted values (H) covers notes as it covers every tracked file.
+
+A writer that creates a note names it `research/YYYY-MM-DD-<slug>.md`: the date
+the note was started, then a slug matching `[a-z0-9]+(-[a-z0-9]+)*` of at most
+60 characters. The slug says what the note is about; this is the one place where
+a tool forms a file name from words, since a note has no ID. A writer MUST NOT
+overwrite a different note: it appends `-2`, then `-3`. The first line is
+`# <title>`. There is no front matter.
+
+This grammar binds writers only. A reader MUST accept any name and form, in any
+folder below `research/`, and MUST NOT report or rewrite a note for either.
+`record.valid`, `validate`, and `fmt` ignore notes.
+
+No index file exists. The index is worked out when asked for (`research list`,
+CONTRACT-002 B). A committed index would conflict between branches and go stale
+after a hand edit; numbers or random IDs would add a counter to allocate or make
+names unreadable.
 
 ## Precedence and Compatibility
 

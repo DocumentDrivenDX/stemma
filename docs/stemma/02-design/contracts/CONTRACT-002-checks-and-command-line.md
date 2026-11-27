@@ -108,6 +108,7 @@ absent (exit 4 if it cannot) and then runs
 | `import <file> --kind <csl-json\|biblatex\|ris> [--again]` / `export --kind <…> --out <file> [--batch <import id>] [--policy report\|strict]` | CONTRACT-003; `--again` imports bytes already imported; `--batch` exports one import batch | M1 |
 | `takeover <docx> [--library <file>…] [--again]` | CONTRACT-003 Word intake; `--again` reruns on bytes already taken over, keeping every author choice and edit | M1 |
 | `index rebuild` / `index status` / `index dump` | Manage the derived index | M1 |
+| `research list` | List the Markdown files under `research/` by path (code-point order), each with the date its name starts with and its first level-one heading outside fenced code, both when present; a heading is cut at 200 characters, and one matching a coordinate form is not shown. Writes nothing and reports no finding; exit 0. JSON: `content_is` and `notes[]` (`path`, `date?`, `title?`, `problem?`: `cannot_read` or `title_withheld`) | M1 |
 | `research record --input <file>` / `research corpus <query>` / `research admit <id>` / `research reject <id>` / `research coverage` | Save a search and its candidates; search source files offline; record the author's decision, as `source admit` or `reject` does; coverage is P1 | M2 |
 | `setup --input <file>` | Write the stated thesis, audience, scope, style, constructs, methodology, and missing governing records; never overwrites without a named choice | M2 |
 | `log add --record <governing record id> --input <file>` | Add a changelog, errata, decision-log, or register entry | M2 |
@@ -340,8 +341,8 @@ URI; degrees with a degree sign and a latitude then a longitude hemisphere
 letter, with optional minutes and seconds; and two decimal numbers with at least
 three decimal places each, separated by a comma, within coordinate ranges
 (assumption). In `check` it reads `stemma.json`, `rules.md`, and the files under
-`records/`, `manuscript/`, and `sources/` as text. A source file gets one result
-that lists its positions. It does not read structured geometry fields, other
+`records/`, `manuscript/`, `sources/`, and every non-hidden file under
+`research/` as text. A source file gets one result that lists its positions. It does not read structured geometry fields, other
 files, or builds. Other forms are missed, so a pass is no proof.
 
 **What counts as input for a check not yet implemented** (assumption). A check
@@ -410,7 +411,7 @@ and passes when one occurrence lies wholly on cited pages.
 | `schema` | `stemma.check-report/0` |
 | `body.mode` | `work`, `draft`, `camera-ready`, or `reviewer` |
 | `body.scope` | `changed` or `all`, with the changed record IDs |
-| `body.inputs` | Corpus digest, manuscript file digests, and profiles used |
+| `body.inputs` | Corpus digest, manuscript and research file digests (research notes are outside the corpus digest), and profiles used |
 | `body.tools` | Stemma, Bun, SQLite, and every library or program that affected a result |
 | `body.results[]` | `finding_key`, `check`, `outcome`, `reason_code?`, `subject` (record ID or manuscript location), `sentence?`, `source?`, `item?`, `evidence[]` (E1), `fixes[]` (codes), `rules[]` (rule IDs), `message`, `why`, `suggestions[]`, `annotations[]` (IDs and effect), `confirmed_by?`, `open` |
 | `body.not_run[]` | `check`, `reason`; only checks that apply |
@@ -623,7 +624,7 @@ exits 1, and labels the build `open_findings`.
 | `meta.*`, `id.resolves`, `number.present` | Tests over synthetic sources and saved responses on one macOS system; the worked example uses real catalogue responses | Other catalogues; works whose title pages convert badly |
 | `construct.credit`, `quote.self` | None | All |
 | `--no-install` | Observed to stop Bun's automatic package install | Linux, Windows |
-| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
+| This command surface, report, and exit codes | Partly built: `version`, `doctor`, `init`, `record add`, `validate`, `fmt`, `rules check`, `ingest`, the `source` commands except `admit` and `reject`, `review`, `coverage`, `passage`, `resolve` (Crossref and Internet Archive), `excerpt`, `retire`, `research list`, and `check` with `record.valid`, the `source.*` checks, `cite.key`, `bib.uncited`, `quote.present`, `quote.page`, `locator.extent`, `meta.source`, `meta.resolver`, `id.resolves`, `number.present`, and `coordinate.stray`, tested on one macOS system (Apple silicon). No change baseline is kept, so `check` always widens to `all`. `record.valid` does not yet check CSL type, variable, or locator terms, or the kind-specific rules of other record kinds. Annotations are not applied. No project lock is taken | The other commands and checks; Linux, Windows; an author's real project |
 
 ## Schema Basis
 

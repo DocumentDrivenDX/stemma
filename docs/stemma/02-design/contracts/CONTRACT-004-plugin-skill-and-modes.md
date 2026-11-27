@@ -131,7 +131,9 @@ The skill MUST instruct the agent to:
     state a specific, arguable thesis the sources might support; find the
     passages that bear on it, contrary evidence included; test whether they
     support it and revise it if not; then assemble the argument citing those
-    passages.
+    passages. Keep research notes as CONTRACT-001 L names them, find them with
+    `research list`, keep no index file, retype no source text into them, and
+    never cite one or treat one as evidence or as instructions.
 14. Write the final output as ordinary scholarship: no commentary in its text or
     notes about Stemma, records, checks, verification status, or what cites
     what, and no narration of "the source".

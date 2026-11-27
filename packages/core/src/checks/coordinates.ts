@@ -34,7 +34,7 @@ export function findCoordinates(line: string): number[] {
 
 /** Files scanned as one unit each. A source file's parts are reported together. */
 export function scannedGroups(corpus: Corpus): { subject: string; files: SourceFile[] }[] {
-  const single: SourceFile[] = [corpus.settings, ...corpus.records.filter((f) => !f.path.startsWith("sources/")), ...(corpus.rules ? [corpus.rules] : []), ...corpus.manuscript];
+  const single: SourceFile[] = [corpus.settings, ...corpus.records.filter((f) => !f.path.startsWith("sources/")), ...(corpus.rules ? [corpus.rules] : []), ...corpus.manuscript, ...corpus.research];
   const grouped = new Map<string, SourceFile[]>(single.map((f) => [f.path, [f]]));
   for (const file of corpus.sources) {
     const [, name, ...rest] = file.path.split("/");

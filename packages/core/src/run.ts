@@ -113,6 +113,9 @@ export function runChecks(corpus: Corpus, tools: Record<string, string>): { body
       manuscript: corpus.manuscript
         .map((f) => ({ path: f.path, sha256: f.bytes ? sha256(f.bytes) : "unreadable" }))
         .sort((a, b) => compareCodePoints(a.path, b.path)),
+      research: corpus.research
+        .map((f) => ({ path: f.path, sha256: f.bytes ? sha256(f.bytes) : "unreadable" }))
+        .sort((a, b) => compareCodePoints(a.path, b.path)),
       profiles: results.some((r) => r.check === "quote.present") ? [QUOTE_PROFILE] : [],
     },
     tools,

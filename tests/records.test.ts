@@ -12,7 +12,7 @@ const file = (record: { id: string; [key: string]: unknown }, text = canonical(r
 const settings = (more: object = {}): SourceFile => ({
   path: "stemma.json", bytes: bytes(canonical({ schema: "stemma.project/0", project_id: "p", format: 0, ...more })),
 });
-const load = (records: SourceFile[], project = settings()) => loadCorpus({ settings: project, records, sources: [], manuscript: [] });
+const load = (records: SourceFile[], project = settings()) => loadCorpus({ settings: project, records, sources: [], manuscript: [], research: [] });
 const codes = (corpus: ReturnType<typeof load>) => corpus.records.flatMap((f) => f.problems.map((p) => p.code));
 
 describe("canonical form", () => {

@@ -9,7 +9,8 @@
           "sha256": "ab5b9ae682ae957b5e743b0eb38de9d628fdb949338dcbad6a1ca048dc4c6865"
         }
       ],
-      "profiles": []
+      "profiles": [],
+      "research": []
     },
     "label": "open_findings",
     "mode": "work",

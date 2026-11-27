@@ -53,6 +53,7 @@ export function readProject(root: string): ProjectContent {
     records: listFiles(root, "records"),
     sources: listFiles(root, "sources"),
     manuscript: listFiles(root, "manuscript"),
+    research: listFiles(root, "research"),
   };
   if (existsSync(join(root, "rules.md"))) content.rules = sourceFile(root, "rules.md");
   return content;
@@ -113,7 +114,7 @@ Write each rule under a level-two heading with a number that is never reused,
 for example "RULE-001 Spell the town as the charter does".
 `;
 
-const ATTRIBUTES = ["stemma.json", "rules.md", "records/**", "manuscript/**", "sources/**"].map((p) => `${p} text eol=lf`);
+const ATTRIBUTES = ["stemma.json", "rules.md", "records/**", "manuscript/**", "sources/**", "research/**/*.md"].map((p) => `${p} text eol=lf`);
 const IGNORED = [".stemma/", "build/"];
 
 function addLines(root: string, path: string, lines: string[]): boolean {

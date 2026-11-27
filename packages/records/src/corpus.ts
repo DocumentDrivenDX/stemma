@@ -77,6 +77,8 @@ export interface ProjectContent {
   sources: SourceFile[];
   rules?: SourceFile;
   manuscript: SourceFile[];
+  /** Every file under research/: the author's and the assistant's research notes. */
+  research: SourceFile[];
 }
 
 /** One part of a source file: a page, or a section of a source with no pages. */
@@ -117,6 +119,8 @@ export interface Corpus {
   byId: Map<string, LoadedFile>;
   rules?: SourceFile;
   manuscript: SourceFile[];
+  /** Notes, not records or evidence: outside the corpus digest. */
+  research: SourceFile[];
 }
 
 export const idOf = (file: LoadedFile): string | undefined =>
@@ -327,7 +331,7 @@ export function loadCorpus(content: ProjectContent): Corpus {
   checkKeys(records.filter((f) => f.state === "ok" && f.data?.kind === "source"));
   for (const file of [settings, ...records]) checkReferences(file, byId, unreadableIds);
   const texts = new Map(found.texts.flatMap((t) => (idOf(t.manifest) ? [[idOf(t.manifest)!, t] as const] : [])));
-  const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript };
+  const corpus: Corpus = { settings, records, partFiles: found.partFiles, texts, sources: content.sources, byId, manuscript: content.manuscript, research: content.research };
   if (content.rules) corpus.rules = content.rules;
   return corpus;
 }

@@ -29,6 +29,9 @@ ddx:
 
 - Delivery step M2. Covers candidate search, corpus-first search, admission, and
   the coverage log (coverage is P1).
+- Research notes (CONTRACT-001 L) are the author's and the assistant's working
+  prose, indexed by `research list`. They are not `search` or `decision`
+  records: corpus search, the scope report, and coverage do not read them.
 - Governed by the Architecture, ADR-002, CONTRACT-001 (records), CONTRACT-002
   (`research`, `source add`, `resolve`), CONTRACT-004 (`research` mode), and the
   project concerns.

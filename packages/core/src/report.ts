@@ -40,7 +40,7 @@ export interface ReportBody {
   mode: "work";
   scope: "all";
   changed: string[];
-  inputs: { corpus_sha256: string; manuscript: { path: string; sha256: string }[]; profiles: string[] };
+  inputs: { corpus_sha256: string; manuscript: { path: string; sha256: string }[]; research: { path: string; sha256: string }[]; profiles: string[] };
   tools: Record<string, string>;
   results: Result[];
   not_run: NotRun[];

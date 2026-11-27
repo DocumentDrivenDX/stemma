@@ -63,6 +63,7 @@ does not, and what was not examined.
 | Bibliography record | The official description of a work (FEAT-003) | Checkable only with a source file |
 | Search record | A query, its limits, scope, date, and results | No |
 | Admission decision | The author's dated admission or rejection of a candidate | No |
+| Research note | Working prose in the project, named by date and subject and listed on request (CONTRACT-001 L). Not a search record, source, or evidence | No |
 
 ## Requirements
 

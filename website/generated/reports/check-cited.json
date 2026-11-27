@@ -4,7 +4,8 @@
     "inputs": {
       "corpus_sha256": "42974ec440081b6f7ed8d7634f76094ab3778a4a67defbd6c45affe1e3be3897",
       "manuscript": [],
-      "profiles": []
+      "profiles": [],
+      "research": []
     },
     "label": "open_findings",
     "mode": "work",
